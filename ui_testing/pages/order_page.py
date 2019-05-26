@@ -81,3 +81,11 @@ class Order(Orders):
         elif test_unit:
             self.set_test_unit(test_unit=test_unit)
         self.save(save_btn='order:save')
+
+    def get_no(self):
+            return self.base_selenium.get_value(element="order:no")
+
+    def set_no(self, no):
+            self.base_selenium.set_text(element="order:no", value=no)
+
+
