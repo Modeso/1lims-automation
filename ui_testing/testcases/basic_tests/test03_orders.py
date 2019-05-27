@@ -22,9 +22,10 @@ class OrdersTestCases(BaseTest):
     @parameterized.expand(['cancel'])
     def test001_cancel_button_edit_no(self, save):
         """
-        New: Orders: In case I update the order number then press on cancel button, message will display that the data will be lost
+        New: Orders: Save/Cancel button: After I edit no field then press on cancel button,
+        a pop up will appear that the data will be
 
-        LIMS-4330
+        LIMS-5241
         :return:
         """
         self.order_page.get_random_orders()
@@ -32,15 +33,40 @@ class OrdersTestCases(BaseTest):
         current_no = self.order_page.get_no()
         new_no = self.generate_random_string()
         self.order_page.set_no(new_no)
-        if 'save_btn' == save:
+        if 'save' == save:
             self.order_page.save(save_btn='order:save')
         else:
-            self.order_page.cancel(force=True)
+            self.article_page.cancel(force=True)
 
-        self.base_selenium.get(url=order_url, sleep=self.base_selenium.TIME_X_LARGE)
+        self.base_selenium.get(url=order_url, sleep=self.base_selenium.TIME_MEDIUM)
 
-        if 'save_btn' == save:
+        if 'save' == save:
             self.assertEqual(new_no, self.order_page.get_no())
         else:
             self.assertEqual(current_no, self.order_page.get_no())
 
+    @parameterized.expand(['save'])
+    def test002_cancel_button_edit_no(self, save):
+        """
+        New: Orders: I can update the order number successfully ( from the order view ) & In case I have order number
+        with year then updated it , the new number that updated should be add with year
+
+        LIMS-4335
+        :return:
+        """
+        self.order_page.get_random_orders()
+        order_url = self.base_selenium.get_url()
+        current_no = self.order_page.get_no()
+        new_no = self.generate_random_string()
+        self.order_page.set_no(new_no)
+        if 'save' == save:
+            self.order_page.save(save_btn='order:save')
+        else:
+            self.article_page.cancel(force=True)
+
+        self.base_selenium.get(url=order_url, sleep=self.base_selenium.TIME_MEDIUM)
+
+        if 'save' == save:
+            self.assertEqual(new_no, self.order_page.get_no())
+        else:
+            self.assertEqual(current_no, self.order_page.get_no())

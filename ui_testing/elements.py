@@ -3,9 +3,11 @@ elements = {
                            'value': 'generalSearch'},
                 'table': {'method': 'id',
                           'value': 'table'},
+
                 'save': {'method': 'class_name',
-                         'value': 'btn-primary',
-                         'order': 0},
+                           'value': 'btn-primary',
+                           'order': 0},
+
                 'cancel': {'method': 'class_name',
                            'value': 'btn-secondary',
                            'order': 1},
@@ -48,7 +50,9 @@ elements = {
                           'order': 0},
                 'table_cells': {'method': 'tag_name',
                                 'value': 'td',
-                                'order': -1}
+                                'order': -1},
+
+
                 },
     'login': {
         'username': {'method': 'name',
@@ -200,14 +204,17 @@ elements = {
         'test_unit_btn': {'method': 'tag_name',
                           'value': 'span',
                           'order': 1},
-        'save': {'method': 'class_name',
-                 'value': 'btn-primary',
+        'save': {'method': 'id',
+                 'value': 'button_save_order',
                  'order': 1},
+
         'cancel': {'method': 'class_name',
                    'value': 'btn-secondary',
                    'order': 1},
-         'no': {'method': 'id',
+        'no': {'method': 'id',
                 'value': 'orderNoWithYearfield'},
+
+
     }
 
 }
