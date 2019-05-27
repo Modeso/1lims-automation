@@ -19,31 +19,6 @@ class OrdersTestCases(BaseTest):
         self.order_page.get_orders_page()
 
 
-    @parameterized.expand(['cancel'])
-    def test001_cancel_button_edit_no(self, save):
-        """
-        New: Orders: Save/Cancel button: After I edit no field then press on cancel button,
-        a pop up will appear that the data will be
-
-        LIMS-5241
-        :return:
-        """
-        self.order_page.get_random_orders()
-        order_url = self.base_selenium.get_url()
-        current_no = self.order_page.get_no()
-        new_no = self.generate_random_string()
-        self.order_page.set_no(new_no)
-        if 'save' == save:
-            self.order_page.save(save_btn='order:save')
-        else:
-            self.article_page.cancel(force=True)
-
-        self.base_selenium.get(url=order_url, sleep=self.base_selenium.TIME_MEDIUM)
-
-        if 'save' == save:
-            self.assertEqual(new_no, self.order_page.get_no())
-        else:
-            self.assertEqual(current_no, self.order_page.get_no())
 
     @parameterized.expand(['save'])
     def test002_cancel_button_edit_no(self, save):
