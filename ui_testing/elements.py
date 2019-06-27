@@ -194,6 +194,13 @@ elements = {
                     'value': '#articlefield > div'},
         'contact': {'method': 'id',
                     'value': 'contactfield'},
+        'departments': {'method': 'id',
+                    'value': 'departments'},
+        'test_date': {'method': 'id',
+                    'value': 'date_testDate'},
+        'shipment_date': {'method': 'id',
+                    'value': 'date_shipmentDate'},
+
         'tests': {'method': 'id',
                   'value': 'tests'},
         'test_plan': {'method': 'id',
@@ -204,16 +211,24 @@ elements = {
         'test_unit_btn': {'method': 'tag_name',
                           'value': 'span',
                           'order': 1},
+
         'save': {'method': 'id',
                  'value': 'button_save_order',
                  'order': 1},
 
-        'cancel': {'method': 'class_name',
-                   'value': 'btn-secondary',
-                   'order': 1},
+        #'cancel': {'method': 'class_name',
+                   #'value': 'btn-secondary',
+                   #'order': 1},
         'no': {'method': 'id',
                 'value': 'orderNoWithYearfield'},
-
+        'cancel': {'method': 'id',
+                'value': 'button_cancel_order'},
+        'cancel_button': {'method': 'class_name',
+                   'value': 'swal2-cancel',
+                   'order': 0},
+        'ok': {'method': 'class_name',
+                   'value': 'swal2-confirm',
+                   'order': 0},
 
     }
 

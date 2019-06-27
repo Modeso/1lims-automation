@@ -45,6 +45,44 @@ class Order(Orders):
     def get_contact(self):
         return self.base_selenium.get_text(element='order:contact').split('\n')[0]
 
+    def set_departments(self, departments=''):
+        if departments:
+            self.base_selenium.select_item_from_drop_down(element='order:departments', item_text=departments)
+        else:
+            self.base_selenium.select_item_from_drop_down(element='order:departments')
+            return self.get_departments()
+
+    def get_departments(self):
+        return self.base_selenium.get_text(element='order:departments').split('\n')[0]
+
+    def set_test_date(self, test_date=''):
+        if test_date:
+            self.base_selenium.text(element='order:test_date', item_text=test_date)
+        else:
+            self.base_selenium.set_text(element='order:test_date', value=test_date)
+            return self.get_test_date()
+
+    #def set_test_date(self, test_date=''):
+        #if test_date:
+            #self.base_selenium.datepicker(element='order:test_date', item_text=test_date)
+        #else:
+            #self.base_selenium.datepicker(element='order:test_date', value=test_date)
+            #return self.get_test_date()
+
+
+    def get_test_date(self):
+        return self.base_selenium.get_value(element='order:test_date').split('\n')[0]
+
+    def set_shipment_date(self, shipment_date=''):
+        if shipment_date:
+            self.base_selenium.text(element='order:shipment_date', item_text=shipment_date)
+        else:
+            self.base_selenium.set_text(element='order:shipment_date', value=shipment_date)
+            return self.get_shipment_date()
+
+    def get_shipment_date(self):
+        return self.base_selenium.get_value(element='order:shipment_date').split('\n')[0]
+
     def set_test_plan(self, test_plan=''):
         test_plan_btn = self.base_selenium.find_element_in_element(destination_element='order:test_plan_btn',
                                                                    source_element='order:tests')
@@ -69,7 +107,7 @@ class Order(Orders):
             return self.get_test_unit()
 
     def get_test_unit(self):
-        return self.base_selenium.get_text(element='order:test_unit').split('\n')[0]
+        return self.base_selenium.get_text(element='order:test_unit_btn').split('\n')[0]
 
     def create_new_order(self, material_type='', article='', contact='', test_plan='', test_unit=''):
         self.set_new_order()
@@ -87,5 +125,20 @@ class Order(Orders):
 
     def set_no(self, no):
             self.base_selenium.set_text(element="order:no", value=no)
+
+    def edit_random_order(self, edit_method, edit_value, save=True):
+        if 'contact' in edit_method:
+            self.set_contact(edit_value)
+        elif 'departments' in edit_method:
+            self.set_departments(edit_value)
+        #elif 'contact' in edit_method:
+            #self.set_contact(edit_value)
+        #elif '' in edit_method:
+            #self.set_contact(edit_value)
+
+        if save:
+            self.save()
+        else:
+            self.cancel()
 
 

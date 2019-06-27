@@ -156,6 +156,8 @@ class ArticlesTestCases(BaseTest):
         else:
             self.assertEqual(current_material_type, self.article_page.get_material_type())
 
+
+
     def test007_archived_articles_shoudnt_dispaly_in_test_plan(self):
         """
         New: Article: In case I archived any article this article shouldn't display in the test plan module when

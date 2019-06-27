@@ -475,3 +475,13 @@ class BaseSelenium:
 
     def fail(self, message):
         print(message)
+
+    def datepicker(date):
+        driverInstance = webdriver.Chrome()
+        driverInstance.get("http://www.seleniumframework.com/Practiceform/")
+        driverInstance.maximize_window()
+        driverInstance.find_element_by_id("vfb-8").click()
+        elements = driverInstance.find_elements_by_xpath(".//*[@id='ui-datepicker-div']/table/tbody/tr/td/a")
+        for dates in elements:
+            if (dates.is_enabled() and dates.is_displayed() and str(dates.get_attribute("innerText")) == date):
+                dates.click()
