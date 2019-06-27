@@ -7,3 +7,7 @@ password=admin
 browser=chrome
 headless_mode=False
 remote_driver=False
+
+//files
+
+1lims-automation/*
