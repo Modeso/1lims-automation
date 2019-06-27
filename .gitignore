@@ -10,4 +10,4 @@ remote_driver=False
 
 //files
 
-1lims-automation/*
+ui_testing/1lims-automation/*
