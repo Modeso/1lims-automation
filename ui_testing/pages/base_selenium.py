@@ -503,7 +503,7 @@ class BaseSelenium:
         else:
             self.driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
 
-<<<<<<< HEAD
+
     def log(self, message):
         print(message)
 
@@ -519,5 +519,3 @@ class BaseSelenium:
         for dates in elements:
             if (dates.is_enabled() and dates.is_displayed() and str(dates.get_attribute("innerText")) == date):
                 dates.click()
-=======
->>>>>>> a7945beb9145eb38bcb6703e719524ff53388ff6

@@ -17,14 +17,15 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.wait_until_page_url_has(text='dashboard')
         self.order_page.get_orders_page()
 
-    @parameterized.expand(['save', 'cancel'])  # done with date 19/6
+    @parameterized.expand(['save', 'cancel'])
     def test003_cancel_button_edit_departments(self, save):
         """
-        Orders: In case I update the article then press on cancel button, a pop up should display with ( ok & cancel )
-        buttons and when I press on cancel button, this update shouldn't submit
+        Orders: department Approach: In case I update the department then press on save button ( the department updated successfully )
+        & when I press on cancel button ( this department not updated )
 
-        LIMS-4613
-        LIMS-4613
+
+        LIMS-4765
+        LIMS-4765
         :return:
         """
         self.order_page.get_random_orders()
