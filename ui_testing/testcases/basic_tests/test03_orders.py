@@ -18,7 +18,6 @@ class OrdersTestCases(BaseTest):
         self.order_page.get_orders_page()
 
     @parameterized.expand(['save', 'cancel'])
-<<<<<<< HEAD
     def test002_cancel_button_edit_contact(self, save):
         """
         Orders: In case I update the contact then press on cancel button, a pop up should display with ( ok & cancel )
@@ -26,16 +25,6 @@ class OrdersTestCases(BaseTest):
 
         LIMS-4764
         LIMS-4764
-=======
-    def test003_cancel_button_edit_departments(self, save):
-        """
-        Orders: department Approach: In case I update the department then press on save button ( the department updated successfully )
-        & when I press on cancel button ( this department not updated )
-
-
-        LIMS-4765
-        LIMS-4765
->>>>>>> 8ee852179d8e75112b071399a22fa74fa6cc7626
         :return:
         """
         self.order_page.get_random_orders()
