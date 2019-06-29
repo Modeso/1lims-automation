@@ -503,6 +503,7 @@ class BaseSelenium:
         else:
             self.driver.execute_script('window.scrollTo(0, document.body.scrollHeight);')
 
+
     def log(self, message):
         print(message)
 
