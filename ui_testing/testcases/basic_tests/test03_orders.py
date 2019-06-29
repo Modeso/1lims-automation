@@ -17,22 +17,22 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.wait_until_page_url_has(text='dashboard')
         self.order_page.get_orders_page()
 
-    @parameterized.expand(['save', 'cancel'])  # done with date 19/6
-    def test003_cancel_button_edit_departments(self, save):
+    @parameterized.expand(['save', 'cancel'])
+    def test002_cancel_button_edit_contact(self, save):
         """
-        Orders: In case I update the article then press on cancel button, a pop up should display with ( ok & cancel )
+        Orders: In case I update the contact then press on cancel button, a pop up should display with ( ok & cancel )
         buttons and when I press on cancel button, this update shouldn't submit
 
-        LIMS-4613
-        LIMS-4613
+        LIMS-4764
+        LIMS-4764
         :return:
         """
         self.order_page.get_random_orders()
         order_url = self.base_selenium.get_url()
         self.order_page.sleep_tiny()
-        current_departments = self.order_page.get_departments()
-        self.order_page.set_departments()
-        new_departments = self.order_page.get_departments()
+        current_contact = self.order_page.get_contact()
+        self.order_page.set_contact()
+        new_contact = self.order_page.get_contact()
         if 'save' == save:
             self.order_page.save(save_btn='order:save')
         else:
@@ -41,7 +41,6 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.get(url=order_url, sleep=5)
 
         if 'save' == save:
-            self.assertEqual(new_departments, self.order_page.get_departments())
+            self.assertEqual(new_contact, self.order_page.get_contact())
         else:
-            self.assertEqual(current_departments, self.order_page.get_departments())
-
+            self.assertEqual(current_contact, self.order_page.get_contact())

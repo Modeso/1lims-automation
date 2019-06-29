@@ -1,0 +1,2 @@
+2019-06-29 13:00:11.284 | INFO     | ui_testing.testcases.base_test:setUp:14 - * Test case : test002_cancel_button_edit_contact_0_save
+2019-06-29 13:01:02.725 | INFO     | ui_testing.testcases.base_test:tearDown:19 -  * TearDown time. 	
