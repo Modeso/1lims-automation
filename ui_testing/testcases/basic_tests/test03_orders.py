@@ -22,8 +22,6 @@ class OrdersTestCases(BaseTest):
         """
         Orders: department Approach: In case I update the department then press on save button ( the department updated successfully )
         & when I press on cancel button ( this department not updated )
-
-
         LIMS-4765
         LIMS-4765
         :return:

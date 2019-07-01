@@ -1,0 +1,3 @@
+2019-07-01 18:22:29.557 | INFO     | ui_testing.testcases.base_test:setUp:14 - * Test case : test003_cancel_button_edit_departments_0_save
+2019-07-01 18:22:59.295 | INFO     | ui_testing.pages.base_selenium:select_item_from_drop_down:340 -  There is no drop-down options
+2019-07-01 18:23:16.898 | INFO     | ui_testing.testcases.base_test:tearDown:19 -  * TearDown time. 	

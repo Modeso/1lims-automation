@@ -1,7 +1,6 @@
 from ui_testing.pages.orders_page import Orders
 
 
-
 class Order(Orders):
     def get_order(self):
         return self.base_selenium.get_text(element='order:order').split('\n')[0]

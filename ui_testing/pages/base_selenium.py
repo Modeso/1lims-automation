@@ -177,6 +177,7 @@ class BaseSelenium:
                     break
             raise TimeoutException()
 
+
     def wait_until_element_located_and_has_text(self, element, text):
         method, value, order = self.get_method_value_order(element=element)
         if order == 0:
