@@ -1,2 +1,0 @@
-2019-07-01 12:33:22.728 | INFO     | ui_testing.testcases.base_test:setUp:14 - * Test case : test004_cancel_button_edit_shipment_date_0_save
-2019-07-01 12:34:16.024 | INFO     | ui_testing.testcases.base_test:tearDown:19 -  * TearDown time. 	

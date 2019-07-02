@@ -28,6 +28,7 @@ class OrdersTestCases(BaseTest):
         """
         self.order_page.get_random_orders()
         order_url = self.base_selenium.get_url()
+        self.base_selenium.LOGGER.info(' + order_url : {}'.format(order_url))
         self.order_page.sleep_tiny()
         current_departments = self.order_page.get_departments()
         self.order_page.set_departments()
@@ -39,8 +40,15 @@ class OrdersTestCases(BaseTest):
 
         self.base_selenium.get(url=order_url, sleep=5)
 
+        order_departments = self.order_page.get_departments()
+
         if 'save' == save:
-            self.assertEqual(new_departments, self.order_page.get_departments())
+            self.base_selenium.LOGGER.info(
+                ' + Assert {} (new_departments) == {} (order_departments)'.format(new_departments, order_departments))
+            self.assertEqual(new_departments, order_departments)
+
         else:
-            self.assertEqual(current_departments, self.order_page.get_departments())
+            self.base_selenium.LOGGER.info(
+                ' + Assert {} (current_departments) == {} (order_departments)'.format(current_departments, order_departments))
+            self.assertEqual(current_departments, order_departments)
 
