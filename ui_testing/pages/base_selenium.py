@@ -278,6 +278,11 @@ class BaseSelenium:
         self.find_element(element).clear()
         self.find_element(element).send_keys(value)
 
+    def set_value(self, element, value):
+        self.wait_until_element_located(element)
+        self.find_element(element).clear()
+        self.find_element(element).send_keys(value)
+
     def clear_text(self, element):
         self.wait_until_element_located(element)
         self.find_element(element).clear()

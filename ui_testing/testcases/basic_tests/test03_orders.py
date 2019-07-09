@@ -111,6 +111,78 @@ class OrdersTestCases(BaseTest):
                                                                                       order_departments))
             self.assertEqual(current_departments, order_departments)
 
+    @parameterized.expand(['save_btn', 'cancel'])
+    def test004_cancel_button_edit_shipment_date(self, save):
+        """
+        New: Article: Save/Cancel button: After I edit comment then press on cancel button,
+        a pop up will appear that the data will be
+
+        LIMS-3586
+        LIMS-3576
+        :return:
+        """
+        self.order_page.get_random_order()
+        order_url = self.base_selenium.get_url()
+        self.base_selenium.LOGGER.info(' + order_url : {}'.format(order_url))
+        current_shipment_date = self.order_page.get_shipment_date()
+        new_shipment_date= self.generate_random_string()
+        self.order_page.set_shipment_date(new_shipment_date)
+        self.order_page.get_suborder_table()
+        if 'save_btn' == save:
+            self.order_page.save(save_btn='order:save_btn')
+        else:
+            self.order_page.cancel(force=True)
+
+        self.base_selenium.get(url=order_url, sleep=self.base_selenium.TIME_MEDIUM)
+
+        order_shipment_date = self.order_page.get_shipment_date()
+        if 'save_btn' == save:
+            self.base_selenium.LOGGER.info(
+                ' + Assert {} (new_shipment_date) == {} (order_shipment_date)'.format(new_shipment_date,
+                                                                                      order_shipment_date))
+            self.assertEqual(new_shipment_date, order_shipment_date)
+        else:
+            self.base_selenium.LOGGER.info(
+                ' + Assert {} (current_shipment_date) == {} (order_shipment_date)'.format(current_shipment_date,
+                                                                                          order_shipment_date))
+            self.assertEqual(current_shipment_date, order_shipment_date)
+
+    @parameterized.expand(['save_btn', 'cancel'])
+    def test005_cancel_button_edit_test_date(self, save):
+        """
+        New: Article: Save/Cancel button: After I edit comment then press on cancel button,
+        a pop up will appear that the data will be
+
+        LIMS-3586
+        LIMS-3576
+        :return:
+        """
+        self.order_page.get_random_order()
+        order_url = self.base_selenium.get_url()
+        self.base_selenium.LOGGER.info(' + order_url : {}'.format(order_url))
+        current_test_date = self.order_page.get_test_date()
+        new_test_date = self.generate_random_string()
+        self.order_page.set_test_date(new_test_date)
+        self.order_page.get_suborder_table()
+        if 'save_btn' == save:
+            self.order_page.save(save_btn='order:save_btn')
+        else:
+            self.order_page.cancel(force=True)
+
+        self.base_selenium.get(url=order_url, sleep=self.base_selenium.TIME_MEDIUM)
+
+        order_test_date = self.order_page.get_test_date()
+        if 'save_btn' == save:
+            self.base_selenium.LOGGER.info(
+                ' + Assert {} (new_test_date) == {} (order_test_date)'.format(new_test_date,
+                                                                              order_test_date))
+            self.assertEqual(new_test_date, order_test_date)
+        else:
+            self.base_selenium.LOGGER.info(
+                ' + Assert {} (current_test_date) == {} (order_test_date)'.format(current_test_date,
+                                                                                      order_test_date))
+            self.assertEqual(current_test_date, order_test_date)
+
     def test01_archive_order(self):
         """
             New: Orders: Archive

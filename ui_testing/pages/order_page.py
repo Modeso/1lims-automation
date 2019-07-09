@@ -176,3 +176,22 @@ class Order(Orders):
                 self.base_selenium.LOGGER.info(' + {} is not a header element!'.format(key))
                 self.base_selenium.LOGGER.info(' + Header keys : {}'.format(suborder_elements_dict.keys()))
 
+    def set_shipment_date(self, shipment_date=''):
+        if shipment_date:
+            self.base_selenium.set_value(element='order:shipment_date', value=shipment_date)
+        else:
+            self.base_selenium.set_value(element='order:shipment_date', value=shipment_date)
+            return self.get_shipment_date()
+
+    def set_test_date(self, test_date=''):
+        if test_date:
+            self.base_selenium.set_text(element='order:test_date', value=test_date)
+        else:
+            self.base_selenium.set_text(element='order:test_date', value=test_date)
+            return self.get_shipment_date()
+
+    #def get_calendar_dates(self):
+        #self.base_selenium.LOGGER.info(' + Get calendar dates.')
+        #self.base_selenium.click(element='order:calendar_button')
+
+
