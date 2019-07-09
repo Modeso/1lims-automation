@@ -114,8 +114,7 @@ class OrdersTestCases(BaseTest):
     @parameterized.expand(['save_btn', 'cancel'])
     def test004_cancel_button_edit_shipment_date(self, save):
         """
-        New: Article: Save/Cancel button: After I edit comment then press on cancel button,
-        a pop up will appear that the data will be
+        I can update the shipment date successfully with save/cancel buttons
 
         LIMS-3586
         LIMS-3576
@@ -150,9 +149,7 @@ class OrdersTestCases(BaseTest):
     @parameterized.expand(['save_btn', 'cancel'])
     def test005_cancel_button_edit_test_date(self, save):
         """
-        New: Article: Save/Cancel button: After I edit comment then press on cancel button,
-        a pop up will appear that the data will be
-
+        I can update test date with successfully with save/cancel buttons
         LIMS-3586
         LIMS-3576
         :return:
