@@ -185,9 +185,9 @@ class Order(Orders):
 
     def set_test_date(self, test_date=''):
         if test_date:
-            self.base_selenium.set_text(element='order:test_date', value=test_date)
+            self.base_selenium.set_value(element='order:test_date', value=test_date)
         else:
-            self.base_selenium.set_text(element='order:test_date', value=test_date)
+            self.base_selenium.set_value(element='order:test_date', value=test_date)
             return self.get_shipment_date()
 
     #def get_calendar_dates(self):
