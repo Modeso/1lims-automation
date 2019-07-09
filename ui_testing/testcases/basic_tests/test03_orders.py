@@ -146,7 +146,7 @@ class OrdersTestCases(BaseTest):
                                                                                           order_shipment_date))
             self.assertEqual(current_shipment_date, order_shipment_date)
 
-    @parameterized.expand(['save_btn', 'cancel'])
+    @parameterized.expand(['save_btn','cancel'])
     def test005_cancel_button_edit_test_date(self, save):
         """
         I can update test date with successfully with save/cancel buttons
