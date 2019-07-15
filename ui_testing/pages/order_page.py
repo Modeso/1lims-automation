@@ -101,7 +101,7 @@ class Order(Orders):
             self.get_suborder_table()
             self.duplicate_from_table_view(number_of_duplicates=multiple_suborders)
 
-        self.save(save_btn='order:save_btn')
+        self.save(sleep=False, save_btn='order:save_btn')
         return order_no
         
     def get_no(self):

@@ -223,7 +223,9 @@ elements = {
         'filter_order_no': {'method': 'id',
                             'value': 'orderNofield'},
         'analysis_filter': {'method': 'id',
-                            'value': 'analysisfield'}
+                            'value': 'analysisfield'},
+                'alert_confirmation': {'method': 'id',
+                                       'value': 'noty_layout__topCenter'}
     },
 
     'order': {
