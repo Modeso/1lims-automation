@@ -487,3 +487,6 @@ class OrdersTestCases(BaseTest):
         # by filtering with the new random generated order number, if the count of the orders remained the same,
         # that's mean that all orders with the same number have been successfully updated.
         self.assertEqual(new_orders_count, records_in_analysis_after_update_count)
+
+
+

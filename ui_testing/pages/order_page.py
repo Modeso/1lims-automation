@@ -39,6 +39,7 @@ class Order(Orders):
                 element='order:article')
             return self.get_article()
 
+
     def is_article_existing(self, article):
         self.set_article(article=article)
         return self.base_selenium.check_item_in_items(element='order:article', item_text=article)
@@ -86,7 +87,7 @@ class Order(Orders):
     def get_test_unit(self):
         return self.base_selenium.get_text(element='order:test_unit').split('\n')[0]
 
-    def create_new_order(self, material_type='', article='', contact='', test_plan='', test_unit='', multiple_suborders=0):
+    def create_new_order(self,  material_type='', article='', contact='',  test_plan='', test_unit='', multiple_suborders=0):
         self.click_create_order_button()
         self.set_new_order()
         self.set_material_type(material_type=material_type)
