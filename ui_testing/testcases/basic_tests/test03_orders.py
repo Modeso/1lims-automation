@@ -653,7 +653,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.set_test_unit(test_unit='r')
         self.order_page.save(save_btn='order:save_btn')
 
-     def test016_validate_order_test_unit_test_plan_edit_mode(self):
+    def test016_validate_order_test_unit_test_plan_edit_mode(self):
             """
             New: orders Test plan /test unit validation in edit mode
 
