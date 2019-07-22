@@ -751,4 +751,49 @@ class OrdersTestCases(BaseTest):
                                                                                           order_shipment_date))
             self.assertEqual(current_shipment_date, order_shipment_date)
 
+    @parameterized.expand(['save_btn', 'cancel'])
+    def test020_update_material_type_with_test_unit(self, save):
+        """
+        New: Orders: Material type Approach: I can update the material type
+        filed with test units records successfully
+        LIMS-3844
+        LIMS-3844
+        :return:
+        """
 
+        self.order_page.get_orders_page()
+        self.order_page.create_new_order(material_type='r', article='a', test_unit='f', multiple_suborders=0)
+        orders_result = self.orders_page.result_table()
+        self.order_page.get_random_x(row=orders_result[0])
+        order_url = self.base_selenium.get_url()
+        self.base_selenium.LOGGER.info(' + order_url : {}'.format(order_url))
+        order_material_type = self.order_page.get_material_type()
+        self.order_page.set_material_type(
+            material_type='s')
+        new_material_type = self.order_page.get_material_type()
+        self.order_page.confirm_popup(force=True)
+        self.order_page.set_article(
+            article='a')
+        self.order_page.set_test_unit(
+            test_unit='t')
+        if 'save_btn' == save:
+            self.order_page.save(save_btn='order:save_btn')
+        else:
+            self.order_page.cancel(force=True)
+
+        self.base_selenium.get(url=order_url, sleep=5)
+        current_material_type = self.order_page.get_material_type()
+
+        if 'save_btn' == save:
+            self.base_selenium.LOGGER.info(
+                ' + Assert {} (current_material_type) == {} (new_material_type)'.format(current_material_type,
+                                                                                        new_material_type))
+
+            self.assertEqual(new_material_type, current_material_type)
+
+        else:
+            self.base_selenium.LOGGER.info(
+                ' + Assert {} (current_material_type) == {} (order_material_type)'.format(current_material_type,
+
+                                                                                          order_material_type))
+            self.assertEqual(current_material_type, order_material_type)
