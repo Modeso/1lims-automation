@@ -500,43 +500,44 @@ class OrdersTestCases(BaseTest):
             LIMS-4297
             :return:
             """
-
-
             self.order_page.get_orders_page()
             self.order_page.click_create_order_button()
             order_url = self.base_selenium.get_url()
             self.base_selenium.LOGGER.info(' + order_url : {}'.format(order_url))
             self.order_page.set_new_order()
             self.order_page.set_contact()
-            self.order_page.set_material_type(material_type='Raw Material')
-            self.order_page.set_article(article='ar11')
+            self.order_page.set_material_type(
+                material_type='Raw Material')
+            self.order_page.set_article(
+                article='ar11')
             self.order_page.get_article()
-            self.order_page.set_test_plan(test_plan='tp6')
+            self.order_page.set_test_plan(
+                test_plan='tp6')
             self.order_page.save(save_btn='order:save_btn')
-            self.base_selenium.get(url=order_url, sleep=self.base_selenium.TIME_MEDIUM)
             self.order_page.get_orders_page()
             orders_result = self.orders_page.result_table()
             self.order_page.get_random_x(row=orders_result[0])
             order_url = self.base_selenium.get_url()
             self.base_selenium.LOGGER.info(' + order_url : {}'.format(order_url))
             order_article = self.order_page.get_article()
-            self.order_page.set_article(article='Related article test')
+            self.order_page.set_article(
+                article='Related article test')
             new_article = self.order_page.get_article()
             self.order_page.confirm_popup(force=True)
-            self.order_page.set_test_plan(test_plan='tp6')
+            self.order_page.set_test_plan(
+                test_plan='onequal')
             self.order_page.get_suborder_table()
             if 'save_btn' == save:
                 self.order_page.save(save_btn='order:save_btn')
             else:
                 self.order_page.cancel(force=True)
-
             self.base_selenium.get(url=order_url, sleep=5)
             current_article = self.order_page.get_article()
 
             if 'save_btn' == save:
                 self.base_selenium.LOGGER.info(
                     ' + Assert {} (current_article) == {} (new_article)'.format(current_article,
-                                                                               new_article))
+                                                                                new_article))
 
                 self.assertEqual(new_article, current_article)
 
@@ -546,4 +547,3 @@ class OrdersTestCases(BaseTest):
                                                                                   order_article))
 
                 self.assertEqual(current_article, order_article)
-
