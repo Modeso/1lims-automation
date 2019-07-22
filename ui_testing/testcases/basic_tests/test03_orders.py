@@ -773,7 +773,6 @@ class OrdersTestCases(BaseTest):
                 material_type='Raw Material')
             self.order_page.set_article(
                 article='ar11')
-            self.order_page.get_article()
             self.order_page.set_test_plan(
                 test_plan='tp6')
             self.order_page.save(save_btn='order:save_btn')
