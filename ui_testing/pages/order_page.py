@@ -32,17 +32,15 @@ class Order(Orders):
 
     def set_article(self, article=''):
         if article:
-            self.base_selenium.select_item_from_drop_down(
-                element='order:article', item_text=article)
+            self.base_selenium.select_item_from_drop_down(element='order:article', item_text=article)
         else:
-            self.base_selenium.select_item_from_drop_down(
-                element='order:article')
+            self.base_selenium.select_item_from_drop_down(element='order:article')
             return self.get_article()
 
 
     def is_article_existing(self, article):
-        self.set_article(article=article)
-        return self.base_selenium.check_item_in_items(element='order:article', item_text=article)
+         self.set_article(article=article)
+         return self.base_selenium.check_item_in_items(element='order:article', item_text=article)
 
     def set_contact(self, contact=''):
         if contact:
@@ -58,23 +56,24 @@ class Order(Orders):
 
     def set_test_plan(self, test_plan=''):
         if test_plan:
-            self.base_selenium.select_item_from_drop_down(
-                element='order:test_plan', item_text=test_plan)
+            self.base_selenium.select_item_from_drop_down(element='order:test_plan', item_text=test_plan)
         else:
-            self.base_selenium.select_item_from_drop_down(
-                element='order:test_plan')
+            self.base_selenium.select_item_from_drop_down(element='order:test_plan')
             return self.get_test_plan()
 
-    def get_test_plan(self, first_only=True):
-        if first_only:
-            return self.base_selenium.get_text(element='order:test_plan').split('\n')[0]
+    def get_test_plan(self):
+        test_plans = self.base_selenium.get_text(element='order:test_plan')
+        if "×" in test_plans:
+            return test_plans.replace("× ", "").split('\n')
         else:
-            test_plans = []
-            test_plans_list = self.base_selenium.get_text(element='order:test_plan').split('\n')
-            for test_plan in test_plans_list:
-                test_plans.append(test_plan.split('× ')[1])
-            return ','.join(test_plans)
+            return []
 
+    def clear_test_plan(self):
+        return self.base_selenium.clear_items_in_drop_down(element='order:test_plan')
+    
+    def clear_test_unit(self):
+        return self.base_selenium.clear_items_in_drop_down(element='order:test_unit')
+    
     def set_test_unit(self, test_unit):
         if test_unit:
             self.base_selenium.select_item_from_drop_down(
@@ -85,7 +84,11 @@ class Order(Orders):
             return self.get_test_unit()
 
     def get_test_unit(self):
-        return self.base_selenium.get_text(element='order:test_unit').split('\n')[0]
+        test_units = self.base_selenium.get_text(element='order:test_unit')
+        if "×" in test_units:
+            return test_units.replace("× ", "").split('\n')
+        else:
+            return []
 
     def create_new_order(self,  material_type='', article='', contact='',  test_plan='', test_unit='', multiple_suborders=0):
         self.click_create_order_button()
@@ -97,7 +100,7 @@ class Order(Orders):
         if test_plan:
             self.set_test_plan(test_plan=test_plan)
         elif test_unit:
-            self.set_test_unit(test_unit=test_unit)
+            self.set_test_unit(test_unit=test_unit)    
         if multiple_suborders > 0:
             self.get_suborder_table()
             self.duplicate_from_table_view(number_of_duplicates=multiple_suborders)
@@ -116,8 +119,8 @@ class Order(Orders):
             self.set_contact(edit_value)
         elif 'departments' in edit_method:
             self.set_departments(edit_value)
-        # elif 'contact' in edit_method:
-        # self.set_contact(edit_value)
+         #elif 'material_type' in edit_method:
+            #self.set_material_type(edit_value)
         # elif '' in edit_method:
         # self.set_contact(edit_value)
 
@@ -140,6 +143,12 @@ class Order(Orders):
         if not date:
             date = self.get_random_date()
         self.base_selenium.set_text(element='order:test_date', value=date)
+        return date
+
+    def set_shipment_date(self, date=''):
+        if not date:
+            date = self.get_random_date()
+        self.base_selenium.set_text(element='order:shipment_date', value=date)
         return date
         
     def get_departments(self):
