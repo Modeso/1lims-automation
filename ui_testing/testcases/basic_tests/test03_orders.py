@@ -573,7 +573,7 @@ class OrdersTestCases(BaseTest):
             material_type=test_plan_dict['Material Type'])
         self.order_page.confirm_popup(force=True)
         self.order_page.set_article(
-            article_name=test_plan_dict['Article Name'])
+            article=test_plan_dict['Article Name'])
         self.order_page.set_test_plan(
             test_plan=test_plan_dict['Test Plan Name'])
         if 'save_btn' == save:
