@@ -1096,62 +1096,6 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(len(rows_count)-1,1)
         
         
-    # def test025_existing_order_with_deleted_number(self):
-    #     """
-    #     New: Order: Try to create a new order with existing order but use a deleted order number
-
-    #     LIMS-2430
-    #     """
-    #     self.base_selenium.LOGGER.info(
-    #         ' Running test case to check that you cannot create from existing wih=th archived or deleted order number')
-        
-    #     order_row = self.order_page.get_random_order_row()
-    #     self.order_page.click_check_box(source=order_row)
-    #     order_data = self.base_selenium.get_row_cells_dict_related_to_header(
-    #         row=order_row)
-    #     analysis_numbers_list = order_data['Analysis No.'].split(',')
-    #     self.base_selenium.LOGGER.info(
-    #         ' + Try to archive order with number : {}'.format(order_data['Order No.']))
-    #     order_deleted = self.order_page.archive_selected_orders(
-    #         check_pop_up=True)
-    #     self.base_selenium.LOGGER.info(' + {} '.format(order_deleted))
-
-    #     if order_deleted:
-    #         self.base_selenium.LOGGER.info(
-    #             ' + Order number : {} archive successfully'.format(order_data['Order No.']))
-    #         self.analyses_page.get_analyses_page()
-    #         has_active_analysis = self.analyses_page.search_if_analysis_exist(
-    #             analysis_numbers_list)
-    #         self.base_selenium.LOGGER.info(
-    #             ' + Has activated analysis? : {}.'.format(has_active_analysis))
-    #     else:
-    #         self.analyses_page.get_analyses_page()
-    #         self.base_selenium.LOGGER.info(
-    #             ' + Archive Analysis with numbers : {}'.format(analysis_numbers_list))
-    #         self.analyses_page.search_by_number_and_archive(
-    #             analysis_numbers_list)
-    #         self.order_page.get_orders_page()
-    #         rows = self.order_page.search(analysis_numbers_list[0])
-    #         self.order_page.click_check_box(source=rows[0])
-    #         self.base_selenium.LOGGER.info(
-    #             ' + archive order has analysis number =  {}'.format(analysis_numbers_list[0]))
-    #         self.order_page.archive_selected_orders()
-
-    #     self.base_selenium.LOGGER.info(
-    #         ' Creating new order with from existing ' + order_data['Order No.'])
-    #     self.order_page.click_create_order_button()
-    #     self.order_page.set_existing_order()
-    #     self.order_page.sleep_tiny()
-    #     ret = self.order_page.set_existing_number(no=order_data['Order No.'])
-    #     self.base_selenium.LOGGER.info(ret)
-    #     # self.order_page.sleep_tiny()
-    #     # order_no_class_name = self.base_selenium.get_attribute(
-    #     #         element="order:no", attribute='class')
-    #     # self.assertIn('has-error', order_no_class_name)
-    #     # order_error_message = self.base_selenium.get_text(
-    #     #         element="order:order_no_error_message")
-    #     # self.assertIn('No. already exists in archived, you can go to Archive table and restore it', order_error_message)
-
     def test026_create_existing_order_with_test_plans_and_change_material_type(self):
         """
         New: Orders with test plans: Create a new order from an existing order with test plans but change the material type 
