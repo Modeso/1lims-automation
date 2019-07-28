@@ -933,7 +933,7 @@ class OrdersTestCases(BaseTest):
         article = self.order_page.get_article()
         self.assertEqual('Search', article)
         test_unit = self.order_page.get_test_unit()
-        self.assertEqual('Search', article)
+        self.assertEqual('Search', test_unit)
         self.order_page.set_article(article='a')
         self.order_page.set_test_unit(test_unit=test_unit_dict['Test Unit Name'])
         
@@ -1094,4 +1094,143 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.LOGGER.info('+ Assert count archived orders with a specific analysis number: {}'.format(len(rows_count)))
 
         self.assertEqual(len(rows_count)-1,1)
+        
+        
+    # def test025_existing_order_with_deleted_number(self):
+    #     """
+    #     New: Order: Try to create a new order with existing order but use a deleted order number
 
+    #     LIMS-2430
+    #     """
+    #     self.base_selenium.LOGGER.info(
+    #         ' Running test case to check that you cannot create from existing wih=th archived or deleted order number')
+        
+    #     order_row = self.order_page.get_random_order_row()
+    #     self.order_page.click_check_box(source=order_row)
+    #     order_data = self.base_selenium.get_row_cells_dict_related_to_header(
+    #         row=order_row)
+    #     analysis_numbers_list = order_data['Analysis No.'].split(',')
+    #     self.base_selenium.LOGGER.info(
+    #         ' + Try to archive order with number : {}'.format(order_data['Order No.']))
+    #     order_deleted = self.order_page.archive_selected_orders(
+    #         check_pop_up=True)
+    #     self.base_selenium.LOGGER.info(' + {} '.format(order_deleted))
+
+    #     if order_deleted:
+    #         self.base_selenium.LOGGER.info(
+    #             ' + Order number : {} archive successfully'.format(order_data['Order No.']))
+    #         self.analyses_page.get_analyses_page()
+    #         has_active_analysis = self.analyses_page.search_if_analysis_exist(
+    #             analysis_numbers_list)
+    #         self.base_selenium.LOGGER.info(
+    #             ' + Has activated analysis? : {}.'.format(has_active_analysis))
+    #     else:
+    #         self.analyses_page.get_analyses_page()
+    #         self.base_selenium.LOGGER.info(
+    #             ' + Archive Analysis with numbers : {}'.format(analysis_numbers_list))
+    #         self.analyses_page.search_by_number_and_archive(
+    #             analysis_numbers_list)
+    #         self.order_page.get_orders_page()
+    #         rows = self.order_page.search(analysis_numbers_list[0])
+    #         self.order_page.click_check_box(source=rows[0])
+    #         self.base_selenium.LOGGER.info(
+    #             ' + archive order has analysis number =  {}'.format(analysis_numbers_list[0]))
+    #         self.order_page.archive_selected_orders()
+
+    #     self.base_selenium.LOGGER.info(
+    #         ' Creating new order with from existing ' + order_data['Order No.'])
+    #     self.order_page.click_create_order_button()
+    #     self.order_page.set_existing_order()
+    #     self.order_page.sleep_tiny()
+    #     ret = self.order_page.set_existing_number(no=order_data['Order No.'])
+    #     self.base_selenium.LOGGER.info(ret)
+    #     # self.order_page.sleep_tiny()
+    #     # order_no_class_name = self.base_selenium.get_attribute(
+    #     #         element="order:no", attribute='class')
+    #     # self.assertIn('has-error', order_no_class_name)
+    #     # order_error_message = self.base_selenium.get_text(
+    #     #         element="order:order_no_error_message")
+    #     # self.assertIn('No. already exists in archived, you can go to Archive table and restore it', order_error_message)
+
+    def test026_create_existing_order_with_test_plans_and_change_material_type(self):
+        """
+        New: Orders with test plans: Create a new order from an existing order with test plans but change the material type 
+
+        LIMS-3410
+        """
+        self.base_selenium.LOGGER.info('Running test case to create an existing order with test plans and change material type')
+        test_plan_dict = self.get_active_article_with_tst_plan(
+            test_plan_status='complete')
+      
+        self.base_selenium.LOGGER.info(test_plan_dict['Test Plan Name'])  
+        self.order_page.get_orders_page()    
+        created_order = self.order_page.create_new_order(material_type=test_plan_dict['Material Type'], article=test_plan_dict['Article Name'], contact='a',
+                                         test_units=[], test_plans=test_plan_dict['Test Plan Name'])
+           
+        created_existing_order = self.order_page.create_existing_order_with_auto_fill(no=created_order.replace("'", ""))
+        self.order_page.sleep_tiny()
+        self.order_page.set_material_type(material_type='Subassembely')
+        self.order_page.sleep_medium()
+        self.base_selenium.LOGGER.info('Check If article and test plans are empty')
+        article = self.order_page.get_article()
+        self.assertEqual('Search', article)
+        test_plan = self.order_page.get_test_plan()
+        self.assertEqual('Search', test_plan)
+        self.order_page.set_article(article='a')
+        self.order_page.set_test_plan(test_plan='')
+        
+        article = self.order_page.get_article()
+        test_plan = self.order_page.get_test_plan()
+        self.order_page.save(save_btn='order:save_btn')
+        self.base_selenium.LOGGER.info(' + Order created with no : {} '.format(created_existing_order))
+        self.analyses_page.get_analyses_page()
+        self.base_selenium.LOGGER.info(
+            'Assert There is an analysis for this new order.')
+        orders_analyess = self.analyses_page.search(created_order)
+        latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
+            row=orders_analyess[0])
+        self.assertEqual(
+           created_order.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
+        self.assertEqual(
+           article.split(' No:')[0], latest_order_data['Article Name'])
+        self.assertEqual(
+           'Subassembely', latest_order_data['Material Type'])
+        self.assertEqual(
+           test_plan, latest_order_data['Test Plan Name'])
+
+    def test027_create_existing_order_with_test_plans_and_change_article(self):
+        """
+        New: Orders with test plans: Create a new order from an existing order with test plans but change the article
+
+        LIMS-3410
+        """
+        self.base_selenium.LOGGER.info('Running test case to create an existing order with test plans and change article')
+        test_plan_dict = self.get_active_article_with_tst_plan(
+            test_plan_status='complete')
+        
+        self.order_page.get_orders_page()    
+        created_order = self.order_page.create_new_order(material_type=test_plan_dict['Material Type'], article=test_plan_dict['Article Name'], contact='a',
+                                         test_units=[], test_plans=test_plan_dict['Test Plan Name'])
+          
+        created_existing_order = self.order_page.create_existing_order_with_auto_fill(no=created_order.replace("'", ""))
+        self.order_page.sleep_tiny()
+        self.order_page.set_article(article='r')
+        self.order_page.sleep_medium()
+        self.base_selenium.LOGGER.info('Check If test plans are empty')
+        test_plan = self.order_page.get_test_plan()
+        self.assertEqual('Search', test_plan)
+        self.order_page.set_test_plan(test_plan='')
+        
+        test_plan = self.order_page.get_test_plan()
+        self.order_page.save(save_btn='order:save_btn')
+        self.base_selenium.LOGGER.info(' + Order created with no : {} '.format(created_existing_order))
+        self.analyses_page.get_analyses_page()
+        self.base_selenium.LOGGER.info(
+            'Assert There is an analysis for this new order.')
+        orders_analyess = self.analyses_page.search(created_order)
+        latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
+            row=orders_analyess[0])
+        self.assertEqual(
+           created_order.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
+        self.assertEqual(
+           test_plan, latest_order_data['Test Plan Name']) 
