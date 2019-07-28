@@ -1212,7 +1212,7 @@ class OrdersTestCases(BaseTest):
         """
         New: Orders: Test plan/Merge Approach: Allow user to select multiple test plans and triggered one analysis record only with multiple test plans.
 
-        LIMS-4132
+        LIMS-4132 LIMS-4464
         """
         self.base_selenium.LOGGER.info('Running test case to create an order with multiple test plans')
         created_order = self.order_page.create_new_order(material_type='r', test_plans=['r', 's'], save=0)
@@ -1234,6 +1234,8 @@ class OrdersTestCases(BaseTest):
         s= ','
         self.assertEqual(
            s.join(test_plans), latest_order_data['Test Plans'])
+        self.assertEqual(
+           'Open', latest_order_data['Status'])
         
         self.order_page.get_orders_page()
         order_filter_field = self.order_page.order_filters_element(
@@ -1259,6 +1261,8 @@ class OrdersTestCases(BaseTest):
         s= ','
         self.assertEqual(
            s.join(test_plans), latest_order_data['Test Plans'])
+        self.assertEqual(
+           'Open', latest_order_data['Status'])
         
         self.order_page.get_orders_page()
         order_filter_field = self.order_page.order_filters_element(
@@ -1284,5 +1288,7 @@ class OrdersTestCases(BaseTest):
         s= ','
         self.assertEqual(
            s.join(test_plans), latest_order_data['Test Plans'])
+        self.assertEqual(
+           'Open', latest_order_data['Status'])
        
   
