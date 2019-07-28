@@ -1178,3 +1178,31 @@ class OrdersTestCases(BaseTest):
            created_order.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
         self.assertEqual(
            test_plan, latest_order_data['Test Plan Name']) 
+
+
+    def test028_create_existing_order_and_change_contact(self):
+        """
+        New: Orders with test units/ test plans: Create a new order from an existing order and change the contac
+
+        LIMS-3415
+        """
+        self.base_selenium.LOGGER.info('Running test case to create an existing order and change contact')
+        created_existing_order = self.order_page.create_existing_order(test_units=['r'], save=0)
+        self.order_page.sleep_tiny()
+        self.order_page.set_contact(contact='')
+        self.order_page.sleep_medium()
+        contact = self.order_page.get_contact()
+        self.order_page.save(save_btn='order:save_btn')
+        self.order_page.sleep_medium()
+        order_filter_field = self.order_page.order_filters_element(
+            'Order No.')
+        self.order_page.open_filter_menu()
+        self.order_page.filter('Order No.', order_filter_field['element'], created_existing_order,
+                               order_filter_field['type'])
+        orders_data = self.order_page.search(created_existing_order)
+        for row in orders_data[:-1]:          
+            row_with_headers=self.base_selenium.get_row_cells_dict_related_to_header(row=row)
+            contact_name = row_with_headers['Contact Name']
+            self.base_selenium.LOGGER.info(" + Contact Name : {}".format(contact_name))
+            self.assertEqual(contact, contact_name)
+  

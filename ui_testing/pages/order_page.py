@@ -114,14 +114,14 @@ class Order(Orders):
         return order_no
     
     
-    def create_existing_order(self, no='', material_type='', article='', contact='', test_units=[], multiple_suborders=0):
+    def create_existing_order(self, no='', material_type='', article='', contact='', test_units=[], test_plans = [], multiple_suborders=0, save=1):
         self.base_selenium.LOGGER.info(' + Create new order.')
         self.click_create_order_button()
         self.set_existing_order()
         order_no = self.set_existing_number(no)
         self.set_material_type(material_type=material_type)
         self.set_article(article=article)
-        self.set_contact(contact=contact)
+        # self.set_contact(contact=contact)
         
         for test_unit in test_units:
             self.set_test_unit(test_unit)    
@@ -129,7 +129,8 @@ class Order(Orders):
             self.get_suborder_table()
             self.duplicate_from_table_view(number_of_duplicates=multiple_suborders)
 
-        self.save(save_btn='order:save_btn')
+        if(save == 1):
+            self.save(save_btn='order:save_btn')
         self.base_selenium.LOGGER.info(' + Order created with no : {} '.format(order_no))
         return order_no
     
