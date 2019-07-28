@@ -92,7 +92,7 @@ class Order(Orders):
         else:
             return []
 
-    def create_new_order(self, material_type='', article='', contact='', test_plans=[], test_units=[], multiple_suborders=0):
+    def create_new_order(self, material_type='', article='', contact='', test_plans=[], test_units=[], multiple_suborders=0, save=1):
         self.base_selenium.LOGGER.info(' + Create new order.')
         self.click_create_order_button()
         self.set_new_order()
@@ -109,7 +109,8 @@ class Order(Orders):
             self.get_suborder_table()
             self.duplicate_from_table_view(number_of_duplicates=multiple_suborders)
 
-        self.save(save_btn='order:save_btn')
+        if save == 1:
+            self.save(save_btn='order:save_btn')
         self.base_selenium.LOGGER.info(' + Order created with no : {} '.format(order_no))
         return order_no
     

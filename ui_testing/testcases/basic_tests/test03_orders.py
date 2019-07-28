@@ -1205,4 +1205,84 @@ class OrdersTestCases(BaseTest):
             contact_name = row_with_headers['Contact Name']
             self.base_selenium.LOGGER.info(" + Contact Name : {}".format(contact_name))
             self.assertEqual(contact, contact_name)
+            
+    
+    
+    def test029_create_new_order_with_multiple_test_plans(self):
+        """
+        New: Orders: Test plan/Merge Approach: Allow user to select multiple test plans and triggered one analysis record only with multiple test plans.
+
+        LIMS-4132
+        """
+        self.base_selenium.LOGGER.info('Running test case to create an order with multiple test plans')
+        created_order = self.order_page.create_new_order(material_type='r', test_plans=['r', 's'], save=0)
+        self.order_page.sleep_tiny()
+        self.order_page.sleep_medium()
+        test_plans = self.order_page.get_test_plan()
+        self.base_selenium.LOGGER.info(test_plans)
+        self.order_page.save(save_btn='order:save_btn')
+        self.order_page.sleep_medium()
+        self.analyses_page.get_analyses_page()
+        self.base_selenium.LOGGER.info(
+            'Assert There is an analysis for this new order.')
+        orders_analyess = self.analyses_page.search(created_order)
+        self.assertEqual(2, len(orders_analyess))
+        latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
+            row=orders_analyess[0])
+        self.assertEqual(
+           created_order.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
+        s= ','
+        self.assertEqual(
+           s.join(test_plans), latest_order_data['Test Plans'])
+        
+        self.order_page.get_orders_page()
+        order_filter_field = self.order_page.order_filters_element(
+            'Order No.')
+        self.order_page.open_filter_menu()
+        self.order_page.filter('Order No.', order_filter_field['element'], created_order,
+                               order_filter_field['type'])
+        orders_data = self.order_page.search(created_order)
+     
+        self.order_page.get_random_x(orders_data[0])
+        order_url = self.base_selenium.get_url()
+        self.base_selenium.LOGGER.info(' + Order url : {}'.format(order_url))
+        self.order_page.set_test_plan('q')
+        test_plans = self.order_page.get_test_plan()
+        
+        self.analyses_page.get_analyses_page()
+        self.base_selenium.LOGGER.info(
+            'Assert There is an analysis for this new order.')
+        orders_analyess = self.analyses_page.search(created_order)
+        self.assertEqual(2, len(orders_analyess))
+        latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
+            row=orders_analyess[0])
+        s= ','
+        self.assertEqual(
+           s.join(test_plans), latest_order_data['Test Plans'])
+        
+        self.order_page.get_orders_page()
+        order_filter_field = self.order_page.order_filters_element(
+            'Order No.')
+        self.order_page.open_filter_menu()
+        self.order_page.filter('Order No.', order_filter_field['element'], created_order,
+                               order_filter_field['type'])
+        orders_data = self.order_page.search(created_order)
+     
+        self.order_page.get_random_x(orders_data[0])
+        order_url = self.base_selenium.get_url()
+        self.base_selenium.LOGGER.info(' + Order url : {}'.format(order_url))
+        self.order_page.set_test_plan(test_plans[0][1:])
+        test_plans = self.order_page.get_test_plan()
+        
+        self.analyses_page.get_analyses_page()
+        self.base_selenium.LOGGER.info(
+            'Assert There is an analysis for this new order.')
+        orders_analyess = self.analyses_page.search(created_order)
+        self.assertEqual(2, len(orders_analyess))
+        latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
+            row=orders_analyess[0])
+        s= ','
+        self.assertEqual(
+           s.join(test_plans), latest_order_data['Test Plans'])
+       
   
