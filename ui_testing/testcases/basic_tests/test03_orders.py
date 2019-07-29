@@ -1122,7 +1122,7 @@ class OrdersTestCases(BaseTest):
         analysis_no = selected_order_data['Analysis No.']
 
         self.order_page.get_random_x(row=rows[1])
-        self.order_page.update_suborder(sub_order_index=1, test_plans=True, tp_value='tp2')
+        self.order_page.update_suborder(sub_order_index=1, test_plans=['tp2'])
         self.base_selenium.LOGGER.info('Update order with test plans: {}'.format('tp2'))
         sub_order_data = self.order_page.get_suborder_data(sub_order_index=1, test_plan=True)
         suborder_testplans = sub_order_data['test_plan']
@@ -1132,12 +1132,9 @@ class OrdersTestCases(BaseTest):
         # getting the length of the table, should be 2
         self.base_selenium.LOGGER.info('Get analysis page to filter with order no to make sure that new test plan did not trigger new analysis')
         self.analyses_page.get_analyses_page()
-        self.analyses_page.open_filter_menu()
-        self.analyses_page.filter_by(filter_element='orders:filter_order_no', filter_text=order_no.replace("'",''), field_type='drop_down')
-        self.analyses_page.filter_apply()
-        self.base_selenium.LOGGER.info('Filter analysis page with order no: #{}'.format(order_no))
 
-        analysis_records=self.analyses_page.result_table()
+        self.base_selenium.LOGGER.info('Filter analysis page with order no: #{}'.format(order_no))
+        analysis_records=self.analyses_page.search(value=order_no)
         analysis_count = len(analysis_records) -1
         self.base_selenium.LOGGER.info('comparing count of analysis triggered with this order after adding new test plan')
         self.base_selenium.LOGGER.info('analysis triggered count: {}, and it should be 2'.format(analysis_count))
@@ -1223,12 +1220,9 @@ class OrdersTestCases(BaseTest):
         # getting the length of the table, should be 2
         self.base_selenium.LOGGER.info('Get analysis page to make sure that removing test plan did not delete the triggered analysis')
         self.analyses_page.get_analyses_page()
-        self.analyses_page.open_filter_menu()
-        self.analyses_page.filter_by(filter_element='orders:filter_order_no', filter_text=order_no.replace("'",''), field_type='drop_down')
-        self.analyses_page.filter_apply()
         self.base_selenium.LOGGER.info('Filter by order no to make sure that the analysis was not deleted')
         
-        analysis_records=self.analyses_page.result_table()
+        analysis_records=self.analyses_page.search(value=order_no)
         analysis_count = len(analysis_records) -1
 
         self.base_selenium.LOGGER.info('+ Assert count of analysis is: {}, and it should be {}'.format(analysis_count, 2))
