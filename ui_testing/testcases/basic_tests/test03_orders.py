@@ -1103,26 +1103,19 @@ class OrdersTestCases(BaseTest):
 
         material_type='Raw Material'
 
+        basic_order_data = self.get_random_order_data(material_type=material_type)
+
         new_article_data = self.article_page.create_new_article(material_type=material_type)
 
-        new_article='8501b440c'
+        new_article = new_article_data['name']
+        new_testplan = basic_order_data['testplan']
+        testplan_testunits = basic_order_data['testunits_in_testplan']
 
-        initial_testplan='1f1ddf7f0a'
-        new_testplan='ce25005b3d'
-
-        self.test_plan.get_test_plans_page()
-        new_testplan_record = self.test_plan.search(value=new_testplan)
-        new_testplan_testunits=self.analyses_page.get_child_table_data(index=0)
-
-        testplan_testunits = []
-        for testunit in new_testplan_testunits:
-            testplan_testunits.append(testunit['Test Unit Name'])
         
-        self.order_page.get_orders_page()
 
         self.base_selenium.LOGGER.info('Create new order with 4 suborders to test updating article on')
         self.base_selenium.LOGGER.info('Creating new order with 4 suborders')
-        order_no=self.order_page.create_new_order(multiple_suborders=3, article=initial_article, test_plans=[initial_testplan], test_units=[''], material_type=material_type)
+        order_no=self.order_page.create_new_order(multiple_suborders=3, test_plans=['tp1'], test_units=[''], material_type=material_type)
 
         self.base_selenium.LOGGER.info('Open the 4th order from the order table, to confirm order\'s data that it was created with')
         rows = self.order_page.result_table()
