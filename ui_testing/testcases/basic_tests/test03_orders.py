@@ -1129,7 +1129,7 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.LOGGER.info('Material type: {}, Article name: {}, Test plans: {}, Test Units: {}'.format(suborder_data['material_types'], suborder_data['article'], suborder_data['test_plan'], suborder_data['test_unit']))
 
         self.base_selenium.LOGGER.info('Change article from {}, to {}, and press cancel'.format(suborder_data['article'], new_article))
-        self.order_page.update_suborder(sub_order_index=3, articles=new_article, test_plans=[''], form_view=False)
+        self.order_page.update_suborder(sub_order_index=3, articles=new_article, form_view=False)
         self.base_selenium.click(element='order:confirm_cancel')
 
         self.base_selenium.LOGGER.info('Getting data after pressing cancel to make sure that it did not change')
