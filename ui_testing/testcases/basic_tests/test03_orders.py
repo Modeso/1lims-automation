@@ -1262,18 +1262,9 @@ class OrdersTestCases(BaseTest):
         when you press on cancel button nothing updated
         """
 
-        # self.base_selenium.LOGGER.info('Getting the data needed to create the orders')
-        # testplans_with_articles = self.get_multiple_active_article_with_tst_plan()
-
-        # initial_article = testplans_with_articles[0]['Article Name']
-        # new_article = (article for article in testplans_with_articles if article['Article Name'] != initial_article)['Article Name']
-
-        # initial_testplan = testplans_with_articles[0]['Test Plan Name']
-        # new_testplan = (article for article in testplans_with_articles if article['Article Name'] == new_article)['Test Plan Name']
-        # material_type=testplans_with_articles[0]['Material Type']
 
         material_type='Raw Material'
-        initial_article='86a3a8e347'
+        initial_article='d'
         new_article='8501b440c'
 
         initial_testplan='1f1ddf7f0a'
@@ -1418,4 +1409,3 @@ class OrdersTestCases(BaseTest):
 
         self.base_selenium.LOGGER.info('analysis test units are: {}, and it should be: {}'.format(analysis_test_units, testplan_testunits))
         self.assertEqual(set(analysis_test_units) == set(testplan_testunits), True)
-        
