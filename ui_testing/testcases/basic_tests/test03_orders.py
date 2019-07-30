@@ -1103,17 +1103,12 @@ class OrdersTestCases(BaseTest):
 
         material_type='Raw Material'
 
-        basic_order_data = self.get_random_order_data(material_type=material_type)
+        new_order_data = self.get_random_order_data(material_type=material_type)
 
-        new_article_data = self.article_page.create_new_article(material_type=material_type)
+        new_article = new_order_data['article_name']
+        new_testplan = new_order_data['testplan']
+        testplan_testunits = new_order_data['testunits_in_testplan']
 
-        new_article = new_article_data['name']
-        new_testplan = basic_order_data['testplan']
-        testplan_testunits = basic_order_data['testunits_in_testplan']
-
-        
-
-        self.base_selenium.LOGGER.info('Create new order with 4 suborders to test updating article on')
         self.base_selenium.LOGGER.info('Creating new order with 4 suborders')
         order_no=self.order_page.create_new_order(multiple_suborders=3, test_plans=['tp1'], test_units=[''], material_type=material_type)
 
@@ -1134,13 +1129,12 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.LOGGER.info('Material type: {}, Article name: {}, Test plans: {}, Test Units: {}'.format(suborder_data['material_types'], suborder_data['article'], suborder_data['test_plan'], suborder_data['test_unit']))
 
         self.base_selenium.LOGGER.info('Change article from {}, to {}, and press cancel'.format(suborder_data['article'], new_article))
-        self.order_page.update_suborder(sub_order_index=3, articles=new_article, test_plans=[''])
+        self.order_page.update_suborder(sub_order_index=3, articles=new_article, test_plans=[''], form_view=False)
         self.base_selenium.click(element='order:confirm_cancel')
 
         self.base_selenium.LOGGER.info('Getting data after pressing cancel to make sure that it did not change')
         
         suborder_data_after_pressing_cancel = self.order_page.get_suborder_data(sub_order_index=3)
-
         
         self.base_selenium.LOGGER.info('Comparing order data after pressing cancel')
 
@@ -1157,7 +1151,7 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(suborder_data['test_unit'], suborder_data_after_pressing_cancel['test_unit'])
 
         self.base_selenium.LOGGER.info('Change article from {}, to {}, and press confirm'.format(suborder_data['article'], new_article))
-        self.order_page.update_suborder(sub_order_index=3, articles=new_article)
+        self.order_page.update_suborder(sub_order_index=3, articles=new_article, form_view=False)
         self.base_selenium.click(element='order:confirm_pop')
 
         self.base_selenium.LOGGER.info('Get suborder data to make sure that only test plans are removed after updating the article')
@@ -1180,7 +1174,7 @@ class OrdersTestCases(BaseTest):
 
         self.base_selenium.LOGGER.info('Update Test plans and press save to make sure that it is updated')
 
-        self.order_page.update_suborder(sub_order_index=3, test_plans=[new_testplan])
+        self.order_page.update_suborder(sub_order_index=3, test_plans=[new_testplan], form_view=False)
         suborder_data_after_changing_testplans = self.order_page.get_suborder_data(sub_order_index=3)
 
         self.base_selenium.LOGGER.info('Update test plans from {}, to {}'.format(suborder_data['test_plans'], suborder_data_after_changing_testplans['test_plans']))
@@ -1188,7 +1182,7 @@ class OrdersTestCases(BaseTest):
 
         self.base_selenium.LOGGER.info('Refreshing the page to make sure that data are saved correctly')
         self.base_selenium.refresh()
-        self.order_page.sleep_medium()
+        self.order_page.sleep_large()
 
         self.base_selenium.LOGGER.info('Get order table with add view to check the data after being saved')
         self.order_page.get_suborder_table()
