@@ -1179,7 +1179,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.update_suborder(sub_order_index=3, test_plans=[new_testplan], form_view=False)
         suborder_data_after_changing_testplans = self.order_page.get_suborder_data(sub_order_index=3)
 
-        self.base_selenium.LOGGER.info('Update test plans from {}, to {}'.format(suborder_data['test_plans'], suborder_data_after_changing_testplans['test_plans']))
+        self.base_selenium.LOGGER.info('Update test plans from {}, to {}'.format(suborder_data['test_plan'], suborder_data_after_changing_testplans['test_plan']))
         self.order_page.save(save_btn="order:save_btn")
 
         self.base_selenium.LOGGER.info('Refreshing the page to make sure that data are saved correctly')
@@ -1238,3 +1238,5 @@ class OrdersTestCases(BaseTest):
 
         self.base_selenium.LOGGER.info('analysis test units are: {}, and it should be: {}'.format(analysis_test_units, testplan_testunits))
         self.assertEqual(set(analysis_test_units) == set(testplan_testunits), True)
+
+    
