@@ -1164,6 +1164,8 @@ class OrdersTestCases(BaseTest):
             suborder_testunits = sub_order_data['test_unit']
             suborder_testunits = suborder_testunits.split('|')
             self.order_page.remove_testunit_by_name(index=1, testunit_name=suborder_testunits[0])
+            self.order_page.confirm_popup(force=True)
+            
             self.base_selenium.LOGGER.info('Remove test unit with name: {}'.format(suborder_testunits[0]))
             suborder_testunits_before_refresh = sub_order_data['test_unit'].split('|')
             self.order_page.save(save_btn='order:save_btn')
