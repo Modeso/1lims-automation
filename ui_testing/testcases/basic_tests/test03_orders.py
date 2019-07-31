@@ -1095,7 +1095,7 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(len(rows_count)-1,1)
 
     # this bug will only affect the delete case, but the adding case is working fine
-    @skip('https://modeso.atlassian.net/browse/LIMS-4915')
+    # @skip('https://modeso.atlassian.net/browse/LIMS-4915')
     @parameterized.expand(['add', 'delete'])
     def test021_update_suborder_testunits(self, save):
         """
@@ -1114,7 +1114,7 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.LOGGER.info('Creating new order with 2 suborders')
         order_no_created = self.order_page.create_new_order(multiple_suborders=1, material_type='Raw Material', test_units=['', ''])
 
-        rows = self.order_page.result_table()
+        rows = self.order_page.search(value=order_no_created)
         selected_order_data = self.base_selenium.get_row_cells_dict_related_to_header(row=rows[0])
         analysis_no = selected_order_data['Analysis No.']
         order_no = selected_order_data['Order No.']
@@ -1124,15 +1124,17 @@ class OrdersTestCases(BaseTest):
             self.base_selenium.LOGGER.info('Update the 2nd suborder by adding new test unit')
             self.order_page.get_random_x(row=rows[1])
             self.order_page.update_suborder(sub_order_index=1, test_units=[''])
-            suborder_testunits_before_refresh = sub_order_data['test_unit'].split('|')
+            suborder_testunits_before_refresh = self.order_page.get_suborder_data(sub_order_index=1)
+            suborder_testunits_before_refresh = suborder_testunits_before_refresh['test_unit'].split('|')
             self.order_page.save(save_btn='order:save_btn')
 
             self.base_selenium.LOGGER.info('Refresh to make sure that data are saved correctly')
-            self.base_selenium.refresh()
+            self.base_selenium.refresh(sleep=10)
 
             self.base_selenium.LOGGER.info('Get suborder data to check it')
-            sub_order_data = self.order_page.get_suborder_data(sub_order_index=1)
-            suborder_testunits_after_refresh = sub_order_data['test_unit'].split('|')
+            self.order_page.get_suborder_table()
+            suborder_testunits_after_refresh = self.order_page.get_suborder_data(sub_order_index=1)
+            suborder_testunits_after_refresh = suborder_testunits_after_refresh['test_unit'].split('|')
 
             self.base_selenium.LOGGER.info('+ Assert Test units: test units are: {}, and should be: {}'.format(suborder_testunits_after_refresh, suborder_testunits_before_refresh))
 
@@ -1169,6 +1171,7 @@ class OrdersTestCases(BaseTest):
             self.order_page.confirm_popup(force=True)
             
             self.base_selenium.LOGGER.info('Remove test unit with name: {}'.format(suborder_testunits[0]))
+            sub_order_data = self.order_page.get_suborder_data(sub_order_index=1)
             suborder_testunits_before_refresh = sub_order_data['test_unit'].split('|')
             self.order_page.save(save_btn='order:save_btn')
 

@@ -42,8 +42,8 @@ class BaseTest(TestCase):
         self.base_selenium.quit_driver()
         self.base_selenium.LOGGER.info(' * TearDown. \t')
 
-    def generate_random_string(self):
-        return str(uuid4()).replace("-", "")[:10]
+    def generate_random_string(self, length=10):
+        return str(uuid4()).replace("-", "")[:length]
 
     def fix_data_format(self, data_list):
         tmp = []
