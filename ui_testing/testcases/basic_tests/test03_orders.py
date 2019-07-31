@@ -1095,6 +1095,7 @@ class OrdersTestCases(BaseTest):
 
         self.assertEqual(len(rows_count)-1,1)
 
+    @skip('https://modeso.atlassian.net/browse/LIMS-4913')    
     def test025_update_suborder_testplan(self):
         """
         New: Orders: Test plans/Merge Approach: 
