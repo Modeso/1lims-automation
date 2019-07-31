@@ -1100,7 +1100,9 @@ class OrdersTestCases(BaseTest):
         Orders: department Approach: In case I update the department then press on save button
         ( the department updated successfully )
         &
-        when I press on cancel button ( this department not updated ) 
+        when I press on cancel button ( this department not updated )
+
+        LIMS-4765
         """
         self.base_selenium.LOGGER.info('Getting contact with departments to make sure that the new selected contact has departments')
         new_contact=self.contacts_page.get_contact_with_departments()
