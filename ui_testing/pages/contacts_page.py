@@ -18,7 +18,7 @@ class Contacts(BasePages):
         self.base_selenium.LOGGER.info('Get all the contacts records to get value with departmens')
         rows=self.result_table() 
         for row in rows:
-            row_data = self.base_selenium.get_row_cells_dict_related_to_header(rows.index[row])
+            row_data = self.base_selenium.get_row_cells_dict_related_to_header(row)
             if row_data['Departments']:
                 return row_data['Contact Name']
 
