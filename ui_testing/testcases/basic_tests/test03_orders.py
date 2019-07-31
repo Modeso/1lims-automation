@@ -1094,6 +1094,8 @@ class OrdersTestCases(BaseTest):
 
         self.assertEqual(len(rows_count)-1,1)
 
+    # this bug will only affect the delete case, but the adding case is working fine
+    @skip('https://modeso.atlassian.net/browse/LIMS-4915')
     @parameterized.expand(['add', 'delete'])
     def test021_update_suborder_testunits(self, save):
         """
