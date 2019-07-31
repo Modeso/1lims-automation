@@ -1099,6 +1099,8 @@ class OrdersTestCases(BaseTest):
         In case you update the article then press on ok button ( In pop-up) test plans should be removed
         &
         when you press on cancel button nothing updated
+        LIMS-4297
+        LIMS-3423
         """
 
         material_type='Raw Material'
