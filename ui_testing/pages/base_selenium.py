@@ -297,22 +297,11 @@ class BaseSelenium:
             cancel = self.find_element_in_element(destination_element='general:cancel_span', source=ng_value)
             cancel.click()
 
-    def clear_items_with_text_in_drop_down(self, element, items_text=[]):
-        # element is ng-select element
-        # make sure that there are elements to b deleted
-        self.wait_until_element_located(element)
-        ng_values = self.find_element_in_element(destination_element='general:ng_values', source_element=element)
-        for ng_value in ng_values:
-            if ng_value.text in items_text:
-                cancel = self.find_element_in_element(destination_element='general:cancel_span', source=ng_value)
-                cancel.click()
-
     def check_element_is_exist(self, element):
         if self.wait_element(element):
             return True
         else:
             return False
-
     def select_random_item(self, element):
         items = self.find_elements(element=element)
         if len(items) <= 1:

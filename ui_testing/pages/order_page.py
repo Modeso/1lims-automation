@@ -77,8 +77,8 @@ class Order(Orders):
     def clear_test_unit(self):
         if self.get_test_unit():
             self.base_selenium.clear_items_in_drop_down(element='order:test_unit')
-    
-    def set_test_unit(self, test_unit):
+
+    def set_test_unit(self, test_unit=''):
         if test_unit:
             self.base_selenium.select_item_from_drop_down(element='order:test_unit', item_text=test_unit)
         else:
@@ -282,4 +282,8 @@ class Order(Orders):
     def click_auto_fill(self):
         button = self.base_selenium.find_element_in_element(source_element='order:auto_fill_container',
                                                             destination_element='order:auto_fill')
-        button.click()    
+        button.click()
+
+
+
+
