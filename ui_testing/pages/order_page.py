@@ -78,7 +78,7 @@ class Order(Orders):
         if self.get_test_unit():
             self.base_selenium.clear_items_in_drop_down(element='order:test_unit')
     
-    def set_test_unit(self, test_unit):
+    def set_test_unit(self, test_unit=''):
         if test_unit:
             self.base_selenium.select_item_from_drop_down(element='order:test_unit', item_text=test_unit)
         else:
