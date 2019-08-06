@@ -13,3 +13,25 @@ class AnalysesTestCases(BaseTest):
             username=self.base_selenium.username, password=self.base_selenium.password)
         self.base_selenium.wait_until_page_url_has(text='dashboard')
         self.analyses_page.get_analyses_page()
+
+
+    def test001_export_analyses_sheet(self):
+        """
+        New: Orders: XSLX Approach: user can download all data in table view with the same order with table view
+        LIMS-3274
+        :return:
+        """
+        self.base_selenium.LOGGER.info(' * Download XSLX sheet')
+        self.analyses_page.select_all_records()
+        self.analyses_page.download_xslx_sheet()
+        rows_data = self.analyses_page.get_table_rows_data()
+        for index in range(len(rows_data) - 1):
+            self.base_selenium.LOGGER.info(
+                ' * Comparing the analysis no. {} '.format(index + 1))
+            fixed_row_data = self.fix_data_format(rows_data[index].split('\n'))
+            values = self.analyses_page.sheet.iloc[index].values
+            fixed_sheet_row_data = self.fix_data_format(values)
+            self.base_selenium.LOGGER.info('{}'.format(fixed_row_data))
+            self.base_selenium.LOGGER.info('{}'.format(fixed_sheet_row_data))
+            for item in fixed_row_data:
+                self.assertIn(item, fixed_sheet_row_data)
