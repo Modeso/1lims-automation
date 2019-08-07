@@ -15,7 +15,7 @@ class AnalysesTestCases(BaseTest):
         self.analyses_page.get_analyses_page()
 
 
-    def test001_export_analyses_sheet(self):
+    def test001_export_analyses_sheet_approve_result(self):
         """
         Approved results should display in XSLX file.
         LIMS-3765
