@@ -32,7 +32,5 @@ class AnalysesTestCases(BaseTest):
             fixed_row_data = self.fix_data_format(rows_data[index].split('\n'))
             values = self.analyses_page.sheet.iloc[index].values
             fixed_sheet_row_data = self.fix_data_format(values)
-            self.base_selenium.LOGGER.info('{}'.format(fixed_row_data))
-            self.base_selenium.LOGGER.info('{}'.format(fixed_sheet_row_data))
             for item in fixed_row_data:
                 self.assertIn(item, fixed_sheet_row_data)
