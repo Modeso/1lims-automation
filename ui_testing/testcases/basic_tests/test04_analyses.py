@@ -37,16 +37,7 @@ class AnalysesTestCases(BaseTest):
                 self.assertIn(item, fixed_sheet_row_data)
 
     def test002_archive_analysis(self):
-        """
-            New: Orders: Archive
-            The user cannot archive an order unless all corresponding analysis are archived
-            LIMS-3425
-
-            New: Archive order has active analysis
-            The user cannot archive an order unless all corresponding analysis are archived
-            LIMS-4329
-        :return:
-        """
+        
         analysis_row = self.analyses_page.result_table()[0]
         self.analyses_page.click_check_box(source=analysis_row)
         analysis_data = self.base_selenium.get_row_cells_dict_related_to_header(
@@ -70,11 +61,7 @@ class AnalysesTestCases(BaseTest):
             self.assertFalse(has_active_analysis)
 
     def test003_restore_archived_analyses(self):
-        """
-        Restore Order
-        I can restore any order successfully
-        LIMS-4374
-        """
+        
         self.base_selenium.LOGGER.info(' + Get Archived analyses ')
         self.analyses_page.get_archived_items()
         self.base_selenium.LOGGER.info(' + Select Row ')
@@ -93,11 +80,7 @@ class AnalysesTestCases(BaseTest):
         self.assertEqual(record_data['Analysis No.'].replace("'",''), analysis_data['Analysis No.'].replace("'",''))
 
     def test004_deleted_archived_analysis(self):
-        """
-        New: Order without/with article: Deleting of orders
-        The user can hard delete any archived order
-        LIMS-3257
-        """
+        
         self.analyses_page.get_archived_items()
         analysis_row = self.analyses_page.result_table()[0]
         self.analyses_page.click_check_box(source=analysis_row)
