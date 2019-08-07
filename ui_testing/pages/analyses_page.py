@@ -25,3 +25,23 @@ class Analyses(BasePages):
             if len(rows) > 1:
                 return True
         return False
+
+    def get_random_analysis(self):
+        self.base_selenium.LOGGER.info(' + Get random analysis.')
+        row = self.get_random_analysis_row()
+        analysis_dict = self.base_selenium.get_row_cells_dict_related_to_header(row=row)
+        self.get_random_x(row=row)
+        return analysis_dict
+
+    def get_random_analysis_row(self):
+        return self.get_random_table_row(table_element='analyses:analyses_table')
+
+    def archive_selected_analysis(self, check_pop_up=False):
+        self.base_selenium.scroll()
+        self.base_selenium.click(element='orders:right_menu')
+        self.base_selenium.click(element='orders:archive')
+        self.confirm_popup()
+        if check_pop_up:
+            if self.base_selenium.wait_element(element='general:confirmation_pop_up'):
+                return False
+        return True

@@ -201,4 +201,14 @@ class BasePages:
        childtable_arrow = self.base_selenium.find_element_in_element(destination_element='general:child_table_arrow', source=source)
        childtable_arrow.click()
 
+    def is_record_exist(self, value):
+        results = self.search(value=value)
+        if len(results) == 0:
+            return False
+        else:
+            if value in results[0].text:
+                return True
+            else:
+                return False
+
     

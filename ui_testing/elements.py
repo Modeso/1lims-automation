@@ -340,8 +340,15 @@ elements = {
         'analysis': {
             'filter_order_no': {
                 'method': 'id',
-                'value': 'orderNofield'}
-
+                'value': 'orderNofield'},
+        },
+        'analyses': {
+            'analyses_table':{'method': 'id',
+                         'value': 'table'},
+            'right_menu': {'method': 'xpath',
+                       'value': '//*[@id="custom-accordion-panel"]/div/a/i'},
+            'archive': {'method': 'link_text',
+                    'value': 'Archive'},    
         }
     }
 }
