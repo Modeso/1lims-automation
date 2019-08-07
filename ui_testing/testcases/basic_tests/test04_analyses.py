@@ -17,10 +17,11 @@ class AnalysesTestCases(BaseTest):
 
     def test001_export_analyses_sheet(self):
         """
-        New: Orders: XSLX Approach: user can download all data in table view with the same order with table view
-        LIMS-3274
-        :return:
+        Approved results should display in XSLX file.
+        LIMS-3765
         """
+        self.base_selenium.LOGGER.info('Filter by approved to make sure that the records has approved result')
+        self.analyses_page.search(value='Approved')
         self.base_selenium.LOGGER.info(' * Download XSLX sheet')
         self.analyses_page.select_all_records()
         self.analyses_page.download_xslx_sheet()
