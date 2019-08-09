@@ -15,88 +15,58 @@ class AnalysesTestCases(BaseTest):
         self.analyses_page.get_analyses_page()
 
 
-    def test001_export_analyses_sheet(self):
+    @parameterized.expand(['archive', 'restore'])
+    def test002_archive_analysis(self, action):
         """
-        New: Orders: XSLX Approach: user can download all data in table view with the same order with table view
-        LIMS-3274
-        :return:
-        """
-        self.base_selenium.LOGGER.info(' * Download XSLX sheet')
-        self.analyses_page.select_all_records()
-        self.analyses_page.download_xslx_sheet()
-        rows_data = self.analyses_page.get_table_rows_data()
-        for index in range(len(rows_data) - 1):
-            self.base_selenium.LOGGER.info(
-                ' * Comparing the analysis no. {} '.format(index + 1))
-            fixed_row_data = self.fix_data_format(rows_data[index].split('\n'))
-            values = self.analyses_page.sheet.iloc[index].values
-            fixed_sheet_row_data = self.fix_data_format(values)
-            self.base_selenium.LOGGER.info('{}'.format(fixed_row_data))
-            self.base_selenium.LOGGER.info('{}'.format(fixed_sheet_row_data))
-            for item in fixed_row_data:
-                self.assertIn(item, fixed_sheet_row_data)
+        In the analysis section, I can archive/restore any record successfully 
+        I can archive or restore multiple records when I select them then press on restore/archive from the header 
+        I can restore/archive one record from the options section
 
-    def test002_archive_analysis(self):
+        LIMS-5035
+        """
         
-        analysis_row = self.analyses_page.result_table()[0]
+        if action == 'restore':
+            self.base_selenium.LOGGER.info(' + Get Archived analyses ')
+            self.analyses_page.get_archived_items()
+
+        random_analysis_record = randint(1, 20)
+        
+        analysis_row = self.analyses_page.result_table()[random_analysis_record]
+
         self.analyses_page.click_check_box(source=analysis_row)
         analysis_data = self.base_selenium.get_row_cells_dict_related_to_header(
             row=analysis_row)
         analysis_numbers_list = analysis_data['Analysis No.'].split(',')
-        self.base_selenium.LOGGER.info(
-            ' + Archiveing analysis with number : {}'.format(analysis_data['Analysis No.']))
-        analysis_archived = self.analyses_page.archive_selected_analysis(
-            check_pop_up=True)
-        self.base_selenium.LOGGER.info(' + {} '.format(analysis_archived))
 
-        if analysis_archived:
+        if action == 'archive':
             self.base_selenium.LOGGER.info(
-                ' + Analysis number : {} archived successfully'.format(analysis_data['Analysis No.']))
-            self.base_selenium.LOGGER.info(
-                ' + Assert analysis numbers : {} is not active'.format(analysis_numbers_list))
-            has_active_analysis = self.analyses_page.search_if_analysis_exist(
-                analysis_numbers_list)
-            self.base_selenium.LOGGER.info(
-                ' + Has activated analysis? : {}.'.format(has_active_analysis))
-            self.assertFalse(has_active_analysis)
+                ' + Archiveing analysis with number : {}'.format(analysis_data['Analysis No.']))
+            analysis_record = self.analyses_page.archive_selected_analysis(
+                check_pop_up=True)
+                
+            if analysis_record:
+                self.base_selenium.LOGGER.info(
+                    ' + Analysis number : {} archived successfully'.format(analysis_data['Analysis No.']))
+                analysis_record = self.analyses_page.search(value=analysis_numbers_list[0])
 
-    def test003_restore_archived_analyses(self):
-        
-        self.base_selenium.LOGGER.info(' + Get Archived analyses ')
-        self.analyses_page.get_archived_items()
-        self.base_selenium.LOGGER.info(' + Select Row ')
-        selected_analysis_data = self.analyses_page.result_table()[0]
-        analysis_data = self.base_selenium.get_row_cells_dict_related_to_header(row=selected_analysis_data)
-        self.analyses_page.click_check_box(source=selected_analysis_data)
+                self.base_selenium.LOGGER.info('Analysis records with this number must be 0')
+                self.assertEqual(len(analysis_record), 1)
+                self.base_selenium.LOGGER.info(
+                    ' + Assert analysis numbers : {} is not active'.format(analysis_numbers_list))
+            else:
+                self.base_selenium.LOGGER.info('Analysis couldn\'t be archived')
 
-        self.base_selenium.LOGGER.info(' + Restore Selected Row ')
-        self.analyses_page.restore_selected_items()
-        self.base_selenium.LOGGER.info(' + Get Active analyses')
-        self.analyses_page.get_active_items()
-        record = self.analyses_page.search(value=analysis_data['Analysis No.'])[0]
-        record_data = self.base_selenium.get_row_cells_dict_related_to_header(row=record)
-        self.base_selenium.LOGGER.info(' + Analysis with number =  {} restored successfully?'.format(
-        analysis_data['Analysis No.']))
-        self.assertEqual(record_data['Analysis No.'].replace("'",''), analysis_data['Analysis No.'].replace("'",''))
+        elif action == 'restore':
+            self.base_selenium.LOGGER.info(' + Restore Selected Row ')
+            self.analyses_page.restore_selected_items()
+            self.base_selenium.LOGGER.info(' + Get Active analyses')
+            self.analyses_page.get_active_items()
+            
+            self.base_selenium.LOGGER.info('Making sure that analysis is now active successfully')
+            record = self.analyses_page.search(value=analysis_data['Analysis No.'])[0]
+            record_data = self.base_selenium.get_row_cells_dict_related_to_header(row=record)
 
-    def test004_deleted_archived_analysis(self):
-        
-        self.analyses_page.get_archived_items()
-        analysis_row = self.analyses_page.result_table()[0]
-        self.analyses_page.click_check_box(source=analysis_row)
-
-        analysis_data = self.base_selenium.get_row_cells_dict_related_to_header(
-            row=analysis_row)
-        analysis_numbers_list = analysis_data['Analysis No.'].split(',')
-
-        self.base_selenium.LOGGER.info(
-            ' + Delete analysis has number = {}'.format(analysis_data['Analysis No.']))
-        self.analyses_page.delete_selected_item()
-        self.assertFalse(self.analyses_page.confirm_popup())
-
-        self.base_selenium.LOGGER.info(
-            ' + Is analysis number {} deleted successfully?'.format(analysis_numbers_list))
-        has_active_analysis = self.analyses_page.search_if_analysis_exist(
-            analysis_numbers_list)
-        self.base_selenium.LOGGER.info(' + {} '.format(has_active_analysis))
-        self.assertFalse(has_active_analysis)
+            self.base_selenium.LOGGER.info(' + Analysis with number =  {} restored successfully?'.format(
+            analysis_data['Analysis No.']))
+            
+            self.assertEqual(record_data['Analysis No.'].replace("'",''), analysis_data['Analysis No.'].replace("'",''))
