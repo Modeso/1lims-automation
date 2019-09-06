@@ -79,8 +79,7 @@ class TestUnitsTestCases(BaseTest):
         testUnitsResults = self.test_unit_page.search(value ='Quantitative MiBi')
 
         self.base_selenium.LOGGER.info('Selecting the first testunit')
-        testunitsRecords = self.order_page.result_table()
-        self.test_unit_page.get_random_x(row=testunitsRecords[0])
+        self.test_unit_page.get_random_x(row=testUnitsResults[0])
 
         self.base_selenium.LOGGER.info('set the upper limit with \'-\' in case of quantitative mibi')
         self.test_unit_page.set_upper_limit(value='-')
