@@ -73,4 +73,40 @@ class TestUnitsTestCases(BaseTest):
         LIMS-3677
         """
 
-        
+        self.base_selenium.LOGGER.info('Generate new random name to make sure that this testunit will be archived')
+        newRandomName = self.generate_random_string()
+
+        self.base_selenium.LOGGER.info('filter by all to make sure that testunits will have material type all, to be added in any testplan')
+        testunitsRecords = self.order_page.search(value='all')
+        self.test_unit_page.get_random_x(row=testunitsRecords[0])
+
+        self.base_selenium.LOGGER.info('Edit the name to be: {}'.format(newRandomName))
+        self.test_unit_page.set_testunit_name(name=newRandomName)
+
+        self.base_selenium.LOGGER.info('Save the new data')
+        self.test_unit_page.saveAndCreateNewVersion()
+
+        self.base_selenium.LOGGER.info('Get testunits page')
+        self.test_unit_page.get_test_units_page()
+
+        self.base_selenium.LOGGER.info('Search by the testunit name {} to archive'.format(newRandomName))
+        results = self.test_unit_page.search(value=newRandomName)
+
+        self.base_selenium.LOGGER.info('Archive the testunit')
+        self.test_unit_page.select_random_multiple_table_rows()
+        self.test_unit_page.archive_selected_test_units()
+
+        self.base_selenium.LOGGER.info('Get testplans page')
+        self.test_plan.get_test_plans_page()
+
+        self.base_selenium.LOGGER.info('Get first record in testplans page')
+        testplansRecords = self.test_plan.result_table()
+        self.test_plan.get_random_x(row=testplansRecords[0])
+
+        self.base_selenium.LOGGER.info('Set the new testunit')
+        testUnitAdded = self.test_plan.set_test_unit(test_unit=newRandomName)
+
+        self.base_selenium.LOGGER.info('+ Assert doesn testunit available in the testunits dropdown? : {}'.format(testUnitAdded))
+        self.assertEqual(testUnitAdded, False)
+
+

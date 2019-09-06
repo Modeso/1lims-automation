@@ -375,6 +375,7 @@ class BaseSelenium:
                     break
             else:
                 self.LOGGER.info(' There is no {} option in the drop-down'.format(item_text))
+                return False
 
     def _unique_index_list(self, data):
         result = []

@@ -92,7 +92,11 @@ elements = {
                 'filter_btn': {'method': 'id',
                             'value': 'filter_btn'},
                 'filter_reset_btn': {'method': 'id',
-                            'value': 'reset_btn'}
+                            'value': 'reset_btn'},
+                            
+                'saveAndComplete': { 'method': 'id',
+                            'value': 'submitWithVersion'
+                }
                 },
     'login': {
         'username': {'method': 'name',
@@ -227,6 +231,10 @@ elements = {
     'test_unit': {
         'no': {'method': 'id',
                'value': 'numberfield'},
+        'testunitName': {
+            'method': 'id',
+            'value': 'namefield'
+        },
         'material_type': {'method': 'xpath',
                           'value': '//*[@id="materialTypefield"]'},
         'material_type_options': {'method': 'class_name',
