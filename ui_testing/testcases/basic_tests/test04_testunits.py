@@ -66,3 +66,34 @@ class TestUnitsTestCases(BaseTest):
         for test_unit_name in test_unit_names:
             self.assertTrue(self.test_unit_page.is_test_unit_in_table(value=test_unit_name))
 
+
+    def test005_quantative_mibi_not_entering_dash_in_upper_limit(self):
+
+        """
+        Upper limit Approach, user can't enter  in the upper limit
+
+        LIMS-3768
+        """
+
+        self.base_selenium.LOGGER.info('Search by Quantitative MiBi')
+        testUnitsResults = self.test_unit_page.search(value ='Quantitative MiBi')
+
+        self.base_selenium.LOGGER.info('Selecting the first testunit')
+        testunitsRecords = self.order_page.result_table()
+        self.test_unit_page.get_random_x(row=testunitsRecords[0])
+
+        self.base_selenium.LOGGER.info('set the upper limit with \'-\' in case of quantitative mibi')
+        self.test_unit_page.set_upper_limit(value='-')
+        self.test_unit_page.sleep_tiny()
+
+        self.base_selenium.LOGGER.info('pressing save')
+        self.test_unit_page.press_save()
+
+        self.base_selenium.LOGGER.info('Waiting for error message to make sure that validation forbids adding - in the upper limit')
+        validation_result =  self.base_selenium.wait_element(element='general:oh_snap_msg')
+
+        
+        self.base_selenium.LOGGER.info('+ Assert error msg which indicates that it does not allow to add - in upper limit has appeared? {}'.format(validation_result))
+        self.assertEqual(validation_result, True)
+
+
