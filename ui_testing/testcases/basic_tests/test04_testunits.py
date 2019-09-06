@@ -66,3 +66,11 @@ class TestUnitsTestCases(BaseTest):
         for test_unit_name in test_unit_names:
             self.assertTrue(self.test_unit_page.is_test_unit_in_table(value=test_unit_name))
 
+    def test006_search_by_archived_testunit (self):
+        """
+        Archived test units shouldn't display in the test plan step two & also in the analysis step two.
+
+        LIMS-3677
+        """
+
+        
