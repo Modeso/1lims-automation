@@ -94,7 +94,7 @@ elements = {
                 'filter_reset_btn': {'method': 'id',
                             'value': 'reset_btn'},
                             
-                'saveAndComplete': { 'method': 'id',
+                'save_and_complete': { 'method': 'id',
                             'value': 'submitWithVersion'
                 }
                 },
@@ -231,7 +231,7 @@ elements = {
     'test_unit': {
         'no': {'method': 'id',
                'value': 'numberfield'},
-        'testunitName': {
+        'testunit_name': {
             'method': 'id',
             'value': 'namefield'
         },
