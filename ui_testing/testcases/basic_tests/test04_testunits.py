@@ -113,7 +113,7 @@ class TestUnitsTestCases(BaseTest):
         self.test_unit_page.search(value=new_random_name)
 
         self.base_selenium.LOGGER.info('Getting records count')
-        testunits_count = self.order_page.get_table_records()
+        testunits_count = self.test_unit_page.get_table_records()
 
         self.base_selenium.LOGGER.info('+ Assert testunit records count is: {}, and it should be {}'.format(testunits_count, 1))
         self.assertEqual(testunits_count, 1)
