@@ -87,7 +87,7 @@ class TstUnit(TstUnits):
         self.base_selenium.LOGGER.info('Get testunit iterations')
         return self.base_selenium.get_value(element='test_unit:iteration').split('\n')[0]
     
-    def saveAndCreateNewVersion (self, confirm=True):
+    def save_and_create_new_version (self, confirm=True):
         self.save(save_btn='general:save_and_complete', logger_msg='Save And Create New Version')
         self.sleep_small()
         self.confirm_popup(force=confirm)

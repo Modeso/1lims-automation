@@ -66,60 +66,94 @@ class TestUnitsTestCases(BaseTest):
         for test_unit_name in test_unit_names:
             self.assertTrue(self.test_unit_page.is_test_unit_in_table(value=test_unit_name))
 
-    @parameterized.expand(['spec', 'quan'])
-    def test008_force_use_to_choose_specification_or_limit_of_quantification (self, specification_type):
+    def test004_check_version_after_update(self):
         """
-        The specification & Limit of quantification one of them should be mandatory.
+        After I update any field then press on save , new version created in the active table.
+        LIMS-3676
 
-        LIMS-4158
+        After the user edit any of the followings fields
+        test unit name 
+        test unit number 
+        category
+        method
+        iteration
+        materiel type 
+        specification 
+        the should updated successfully when I enter one more time 
+        LIMS-5288
         """
-        self.base_selenium.LOGGER.info('Prepare random data for the new testunit')
+
+        self.base_selenium.LOGGER.info('Generate random data for update')
+        new_random_number = self.generate_random_number(limit=100000)
         new_random_name = self.generate_random_string()
         new_random_method = self.generate_random_string()
+        new_random_category = self.generate_random_string()
         new_random_iteration = self.generate_random_number(limit=4)
-        new_random_upper_limit = self.generate_random_number(limit=1000)
 
-        self.base_selenium.LOGGER.info('Create new testunit with the randomly generated data')
-        self.test_unit_page.create_new_testunit(name=new_random_name, testunit_type='Quantitative', iteration=new_random_iteration, method=new_random_method)
+        self.base_selenium.LOGGER.info('Getting data of the first testunit')
+        testunits_records = self.test_unit_page.result_table()
+        first_testunit_data = self.base_selenium.get_row_cells_dict_related_to_header(row=testunits_records[0])
 
-        self.base_selenium.LOGGER.info('Sleep to make sure that page is loaded')
-        self.test_unit_page.sleep_tiny()
+        old_version = first_testunit_data['Version']
+        self.base_selenium.LOGGER.info('old version: {}'.format(old_version))
+        self.base_selenium.LOGGER.info('Open the first record to update it')
+        self.test_unit_page.get_random_x(row=testunits_records[0])
 
-        self.base_selenium.LOGGER.info('Create new testunit with the random data')
-        self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
-        
-        self.base_selenium.LOGGER.info('Sleep to make sure that data is written to be ready for validation')
-        self.test_unit_page.sleep_tiny()
+        self.base_selenium.LOGGER.info('Set the new testunit number to be: {}'.format(new_random_number))
+        self.test_unit_page.set_testunit_number(number=new_random_number)
 
-        self.base_selenium.LOGGER.info('Waiting for error message to make sure that validation forbids adding - in the upper limit')
-        validation_result =  self.base_selenium.wait_element(element='general:oh_snap_msg')
+        self.base_selenium.LOGGER.info('Set the new testunit name to be: {}'.format(new_random_name))
+        self.test_unit_page.set_testunit_name(name=new_random_name)
 
-        self.base_selenium.LOGGER.info('Checking that a validation message actually appeared which means that user can not create testunit without choosing specification of limit of quantification')
-        self.assertEqual(validation_result, True)
-        
-        self.base_selenium.LOGGER.info('Set the testunit to be: {}'.format(specification_type))
-        self.test_unit_page.use_specification_or_quantification(type_to_use=specification_type)
+        self.base_selenium.LOGGER.info('Set new material type')        
+        self.test_unit_page.set_material_type()
+        new_materialtypes = self.test_unit_page.get_material_type()
 
-        if specification_type == 'spec':
-            self.test_unit_page.set_spec_upper_limit(value=new_random_upper_limit)
-        elif specification_type == 'quan':
-            self.test_unit_page.set_quan_upper_limit(value=new_random_upper_limit)
+        self.base_selenium.LOGGER.info('Set the new category to be: {}'.format(new_random_category))
+        self.test_unit_page.set_category(category=new_random_category)
 
-        self.test_unit_page.sleep_tiny()
-        
-        self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
+        self.base_selenium.LOGGER.info('Set the new testunit iteartions to be: {}'.format(new_random_iteration))
+        self.test_unit_page.set_testunit_iteration(iteration=new_random_iteration)
 
-        self.base_selenium.LOGGER.info('Search by testunit name: {}, to make sure that testunit created successfully'.format(new_random_name))
-        self.test_unit_page.search(value=new_random_name)
+        self.base_selenium.LOGGER.info('Set the method to be: {}'.format(new_random_method))
+        self.test_unit_page.set_method(method=new_random_method)
 
-        self.base_selenium.LOGGER.info('Getting records count')
-        testunits_count = self.order_page.get_table_records()
+        self.base_selenium.LOGGER.info('pressing save and create new version')
+        self.test_unit_page.save_and_create_new_version(confirm=True)
 
-        self.base_selenium.LOGGER.info('+ Assert testunit records count is: {}, and it should be {}'.format(testunits_count, 1))
-        self.assertEqual(testunits_count, 1)
+        self.base_selenium.LOGGER.info('Refresh to make sure that the new data are saved')
+        self.base_selenium.refresh()
+        self.test_unit_page.sleep_small()
 
+        self.base_selenium.LOGGER.info('Getting testunit data after referesh')
+        updated_testunit_name = self.test_unit_page.get_testunit_name()
+        update_testunit_number = self.test_unit_page.get_testunit_number()
+        updated_material_types = self.test_unit_page.get_material_type()
+        updated_category = self.test_unit_page.get_category()
+        updated_iterations = self.test_unit_page.get_testunit_iteration()
+        updated_method = self.test_unit_page.get_method()
 
+        self.base_selenium.LOGGER.info('+ Assert testunit name is: {}, and should be {}'.format(new_random_name, updated_testunit_name))
+        self.assertEqual(new_random_name, updated_testunit_name)
 
+        self.base_selenium.LOGGER.info('+ Assert testunit number is: {}, and should be {}'.format(str(new_random_number), update_testunit_number))
+        self.assertEqual(str(new_random_number), update_testunit_number)
 
+        self.base_selenium.LOGGER.info('+ Assert testunit materialTypes are: {}, and should be {}'.format(new_materialtypes, updated_material_types))
+        self.assertEqual(new_materialtypes, updated_material_types)
 
-        
+        self.base_selenium.LOGGER.info('+ Assert testunit category is: {}, and should be {}'.format(new_random_category, updated_category))
+        self.assertEqual(new_random_category, updated_category)
+
+        self.base_selenium.LOGGER.info('+ Assert testunit iterations is: {}, and should be {}'.format(str(new_random_iteration), updated_iterations))
+        self.assertEqual(str(new_random_iteration), updated_iterations)
+
+        self.base_selenium.LOGGER.info('+ Assert testunit Method is: {}, and should be {}'.format(new_random_method, updated_method))
+        self.assertEqual(new_random_method, updated_method)
+
+        self.test_unit_page.get_test_units_page()
+        testunit_records = self.test_unit_page.result_table()
+        first_testunit_data = self.base_selenium.get_row_cells_dict_related_to_header(row=testunit_records[0])
+        new_version = first_testunit_data['Version']
+        self.base_selenium.LOGGER.info('+ Assert testunit version is: {}, new version: {}'.format(old_version, new_version))
+        self.assertNotEqual(old_version, new_version)
