@@ -233,7 +233,7 @@ elements = {
     'test_unit': {
         'no': {'method': 'id',
                'value': 'numberfield'},
-        'upperLimitField': {'method': 'id',
+        'upper_limit_field': {'method': 'id',
                             'value': 'upperLimitfield'},
         'material_type': {'method': 'xpath',
                           'value': '//*[@id="materialTypefield"]'},

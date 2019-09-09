@@ -7,7 +7,7 @@ class TstUnit(TstUnits):
 
 
     def set_upper_limit(self, value=''):
-        self.base_selenium.set_text(element='test_unit:upperLimitField', value=value)
+        self.base_selenium.set_text(element='test_unit:upper_limit_field', value=value)
 
     def press_save(self):
         self.save(save_btn='general:saveWithId')
