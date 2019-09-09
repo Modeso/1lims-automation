@@ -87,7 +87,7 @@ class TstUnit(TstUnits):
         self.base_selenium.LOGGER.info('Get testunit iterations')
         return self.base_selenium.get_value(element='test_unit:iteration').split('\n')[0]
     
-    def saveAndCreateNewVersion (self, confirm=True):
+    def save_and_create_new_version (self, confirm=True):
         self.save(save_btn='general:save_and_complete', logger_msg='Save And Create New Version')
         self.sleep_small()
         self.confirm_popup(force=confirm)
@@ -102,7 +102,7 @@ class TstUnit(TstUnits):
             self.base_selenium.select_item_from_drop_down(
                 element='test_unit:type')
 
-    def use_specification_or_quantification(self, type_to_use='spec'):
+    def use_specification_or_quantification(self, type_to_use=''):
         self.base_selenium.LOGGER.info('Check to use {}'.format(type_to_use))
         if type_to_use == 'spec':
             self.base_selenium.click(element='test_unit:use_specification')
@@ -116,7 +116,7 @@ class TstUnit(TstUnits):
     
     def set_spec_lower_limit(self, value=''):
         self.base_selenium.LOGGER.info('Set specification lower limit to be {}'.format(value))
-        self.base_selenium.set_text(element='test_unit:sepc_lower_limit', value=value)
+        self.base_selenium.set_text(element='test_unit:spec_lower_limit', value=value)
 
     def set_spec_unit(self, value=''):
         self.base_selenium.LOGGER.info('Set specification unit to be {}'.format(value))
@@ -140,7 +140,7 @@ class TstUnit(TstUnits):
     
     def get_spec_lower_limit(self):
         self.base_selenium.LOGGER.info('Get testunit specification lower limit')
-        return self.base_selenium.get_value(element='test_unit:sepc_lower_limit').split('\n')[0]
+        return self.base_selenium.get_value(element='test_unit:spec_lower_limit').split('\n')[0]
 
     def get_spec_unit(self):
         self.base_selenium.LOGGER.info('Get testunit specification unit')
