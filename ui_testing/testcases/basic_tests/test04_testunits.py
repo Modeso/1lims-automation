@@ -75,9 +75,6 @@ class TestUnitsTestCases(BaseTest):
         self.base_selenium.LOGGER.info('Generate random upper limit to be used in filling data')
         random_upper_limit = self.generate_random_number(limit=500)
 
-        self.base_selenium.LOGGER.info('Filter by type Qualitative')
-        self.test_unit_page.search(value='Qualitative')
-
         self.base_selenium.LOGGER.info('Open random record')
         random_testunit_record = self.test_unit_page.get_random_table_row(table_element='general:table')
         self.test_unit_page.get_random_x(row=random_testunit_record)
