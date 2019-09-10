@@ -1475,3 +1475,68 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.LOGGER.info('+ Assert test plan is: {}, and it should be {}'.format(analysis_test_plan_after_update, suborder_testplans[1]))
         self.assertEqual(analysis_test_plan_after_update, suborder_testplans[1])
     
+    @parameterized.expand(['save_btn', 'cancel'])
+    def test025_update_article(self, save):
+        """
+        New: Orders: Edit Approach: I can update the article successfully and press on ok button
+        then press on cancel button, Nothing updated
+
+        New: Orders: Edit Approach: I can update the article filed successfully with save button
+
+        LIMS-3423
+        LIMS-4297
+        :return:
+        """
+
+        """
+        test case logic
+        i'll filter with raw material material type just to make sure that it has multiple articles
+        and then select and record
+        and then update it's article and try to press save and press cancel
+        """
+
+        self.base_selenium.LOGGER.info('Filter with Raw Material material type, just to make sure that it has multiple articles')
+        rows=self.order_page.search(value='Raw Material')
+
+        order_data = self.base_selenium.get_row_cells_dict_related_to_header(row=rows[0])
+        self.base_selenium.LOGGER.info('Getting the selected order data to keep track of it')
+        analysis_no=order_data['Analysis No.']
+        article_name = order_data['Article Name']
+
+        self.base_selenium.LOGGER.info('select the required order to update it')
+        self.order_page.get_random_x(row=rows[0])
+
+        order_article = self.order_page.get_article()
+        self.order_page.set_article(
+            article='')
+        new_article = self.order_page.get_article()
+        testplans=self.order_page.get_test_plan()
+        if testplans:
+            self.order_page.confirm_popup(force=True)
+        self.order_page.set_test_plan(
+            test_plan='')
+            
+        if 'save_btn' == save:
+            self.order_page.save(save_btn='order:save_btn')
+            self.base_selenium.LOGGER.info('Refresh to make sure that data are saved correctly')
+            self.base_selenium.refresh()
+            current_article = self.order_page.get_article()
+        else:
+            self.order_page.cancel(force=True)
+
+        if 'save_btn' == save:
+            self.base_selenium.LOGGER.info(
+                ' + Assert {} (current_article) == {} (new_article)'.format(current_article,
+                                                                            new_article))
+            self.assertEqual(new_article, current_article)
+
+        else:
+            self.base_selenium.LOGGER.info('Filter by analysis no to get the same order that was selected')
+            rows=self.order_page.search(value=analysis_no)
+            self.order_page.get_random_x(row=rows[0])
+            self.base_selenium.LOGGER.info('Select the order to make sure that the data didn\'t change' )
+            current_article = self.order_page.get_article()
+            self.base_selenium.LOGGER.info(
+                ' + Assert {} (current_article) == {} (order_article)'.format(current_article,
+                                                                            order_article))
+            self.assertEqual(current_article, order_article)
