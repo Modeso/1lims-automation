@@ -35,29 +35,42 @@ class AnalysesTestCases(BaseTest):
             for item in fixed_row_data:
                 self.assertIn(item, fixed_sheet_row_data)
     
-    def test003_deleted_archived_analysis(self):
+    def searching_by_capital_small_letters(self):
         """
-        I can delete any analysis record successfully 
-        Make sure you can’t delete more then one record at the same time 
+        For all modules, if you search for any element in the table view,
+        with a small letter it should show all matching results even the ones in capital letter without changing
+        the capital letters that match the search to small lettersFor all modules,
+        if you search for any element in the table view, with a capital letter it should show all matching results
+        even the ones in small letter without changing the small letters that match the search to capital letters
 
-        LIMS-5037
+        LIMS-3061
         """
-        self.analyses_page.get_archived_items()
-        analysis_row = self.analyses_page.result_table()[0]
-        self.analyses_page.click_check_box(source=analysis_row)
 
-        analysis_data = self.base_selenium.get_row_cells_dict_related_to_header(
-            row=analysis_row)
-        analysis_numbers_list = analysis_data['Analysis No.'].split(',')
+        material_type='Raw Material'
+        small_letters='raw material'
+        capital_letters='RAW MATERIAL'
+        
+        self.base_selenium.LOGGER.info('Search for raw material as a mtaerial tybe in capital and small\nmake sure that results are written correctly as Raw Material')
 
-        self.base_selenium.LOGGER.info(
-            ' + Delete analysis has number = {}'.format(analysis_data['Analysis No.']))
-        self.analyses_page.delete_selected_item()
-        self.assertFalse(self.analyses_page.confirm_popup())
+        records = self.analyses_page.search(value=small_letters)
 
-        self.base_selenium.LOGGER.info(
-            ' + Is analysis number {} deleted successfully?'.format(analysis_numbers_list))
-        has_active_analysis = self.analyses_page.search_if_analysis_exist(
-            analysis_numbers_list)
-        self.base_selenium.LOGGER.info(' + {} '.format(has_active_analysis))
-        self.assertFalse(has_active_analysis)
+        self.base_selenium.LOGGER.info('Getting the data of the records and make sure it is writtent as Raw Material')
+
+        for index in range(len(records)-1):
+            row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=records[index])
+
+            if row_data['Material Type'] != material_type:
+                self.base_selenium.LOGGER.info('+ Assert material type, table data is: {}, and should be: {}'.format(row_data['Material Type'], material_type))
+            
+            self.assertEqual(row_data['Material Type'], material_type)
+
+        records = self.analyses_page.search(value=capital_letters)
+        self.base_selenium.LOGGER.info('Getting the data of the records and make sure it is writtent as Raw Material')
+
+        for index in range(len(records)-1):
+            row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=records[index])
+
+            if row_data['Material Type'] != material_type:
+                self.base_selenium.LOGGER.info('+ Assert material type, table data is: {}, and should be: {}'.format(row_data['Material Type'], material_type))
+            
+            self.assertEqual(row_data['Material Type'], material_type)
