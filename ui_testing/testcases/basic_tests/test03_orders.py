@@ -1179,6 +1179,27 @@ class OrdersTestCases(BaseTest):
         # get order data to be updated
         self.base_selenium.LOGGER.info('Get order data to remove a test plan from the order')
         self.order_page.get_orders_page()
+    def test026_update_suborder_article(self):
+        """
+        In case you update the article then press on ok button ( In pop-up) test plans should be removed
+        &
+        when you press on cancel button nothing updated
+        LIMS-4297
+        LIMS-3423
+        """
+
+        material_type='Raw Material'
+
+        new_order_data = self.get_random_order_data(material_type=material_type)
+
+        new_article = new_order_data['article_name']
+        new_testplan = new_order_data['testplan']
+        testplan_testunits = new_order_data['testunits_in_testplan']
+
+        self.base_selenium.LOGGER.info('Creating new order with 4 suborders')
+        order_no=self.order_page.create_new_order(multiple_suborders=3, test_plans=['tp1'], test_units=[''], material_type=material_type)
+
+        self.base_selenium.LOGGER.info('Open the 4th order from the order table, to confirm order\'s data that it was created with')
         rows = self.order_page.result_table()
         basic_order_data = self.base_selenium.get_row_cells_dict_related_to_header(row=rows[0])
         self.order_page.get_random_x(row=rows[3])
@@ -1198,12 +1219,14 @@ class OrdersTestCases(BaseTest):
             'Change Material type from {}, to {}, and press cancel'.format(suborder_data['material_types'],
                                                                            new_material_type))
         self.order_page.update_suborder(sub_order_index=3, material_type=new_material_type, form_view=False)
+        self.base_selenium.LOGGER.info('Change article from {}, to {}, and press cancel'.format(suborder_data['article'], new_article))
+        self.order_page.update_suborder(sub_order_index=3, articles=new_article, form_view=False)
         self.base_selenium.click(element='order:confirm_cancel')
 
         self.base_selenium.LOGGER.info('Getting data after pressing cancel to make sure that it did not change')
 
         suborder_data_after_pressing_cancel = self.order_page.get_suborder_data(sub_order_index=3)
-
+        
         self.base_selenium.LOGGER.info('Comparing order data after pressing cancel')
 
         self.base_selenium.LOGGER.info(
@@ -1230,6 +1253,8 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.LOGGER.info(
             'Change article from {}, to {}, and press confirm'.format(suborder_data['article'], new_article))
         self.order_page.update_suborder(sub_order_index=3, material_type=new_material_type, form_view=False)
+        self.base_selenium.LOGGER.info('Change article from {}, to {}, and press confirm'.format(suborder_data['article'], new_article))
+        self.order_page.update_suborder(sub_order_index=3, articles=new_article, form_view=False)
         self.base_selenium.click(element='order:confirm_pop')
 
         self.base_selenium.LOGGER.info(
@@ -1271,6 +1296,27 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.LOGGER.info('Update test plans from {}, to {}'.format(suborder_data['test_plan'],
                                                                                  suborder_data_after_changing_data[
                                                                                      'test_plan']))
+
+        self.base_selenium.LOGGER.info('+Assert Compare Material type, old: {}, new: {}'.format(suborder_data['material_types'], suborder_data_after_pressing_confirm['material_types']))
+        self.assertEqual(suborder_data['material_types'], suborder_data_after_pressing_confirm['material_types'])
+
+        self.base_selenium.LOGGER.info('+Assert Compare Article, old: {}, new: {}'.format(new_article, suborder_data_after_pressing_confirm['article']))
+        self.assertEqual(new_article, suborder_data_after_pressing_confirm['article'])
+
+        # written as earch because the function that retrieves the data removes the first char in case of test unit/ test plan to remove the 'x' 
+        # so in case no test unit or no test plan, it removes the first char in the placeholder word which is search, so i match with earch
+        self.base_selenium.LOGGER.info('+Assert Compare Test Plans, old: {}, new: {}'.format('Search', suborder_data_after_pressing_confirm['test_plan']))
+        self.assertEqual('earch', suborder_data_after_pressing_confirm['test_plan'])
+
+        self.base_selenium.LOGGER.info('+Assert Compare Test units, old: {}, new: {}'.format(suborder_data['test_unit'], suborder_data_after_pressing_confirm['test_unit']))
+        self.assertEqual(suborder_data['test_unit'], suborder_data_after_pressing_confirm['test_unit'])
+
+        self.base_selenium.LOGGER.info('Update Test plans and press save to make sure that it is updated')
+
+        self.order_page.update_suborder(sub_order_index=3, test_plans=[new_testplan], form_view=False)
+        suborder_data_after_changing_testplans = self.order_page.get_suborder_data(sub_order_index=3)
+
+        self.base_selenium.LOGGER.info('Update test plans from {}, to {}'.format(suborder_data['test_plan'], suborder_data_after_changing_testplans['test_plan']))
         self.order_page.save(save_btn="order:save_btn")
 
         self.base_selenium.LOGGER.info('Refreshing the page to make sure that data are saved correctly')
@@ -1428,3 +1474,4 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.LOGGER.info('Getting test plan from analysis to make sure test plans have been removed')
         self.base_selenium.LOGGER.info('+ Assert test plan is: {}, and it should be {}'.format(analysis_test_plan_after_update, suborder_testplans[1]))
         self.assertEqual(analysis_test_plan_after_update, suborder_testplans[1])
+    

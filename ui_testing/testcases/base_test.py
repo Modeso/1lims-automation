@@ -7,6 +7,7 @@ from ui_testing.pages.login_page import Login
 from ui_testing.pages.order_page import Order
 from ui_testing.pages.orders_page import Orders
 from ui_testing.pages.testplan_page import TstPlan
+from ui_testing.pages.testplans_page import TestPlans
 from ui_testing.pages.testunit_page import TstUnit
 from api_testing.apis.test_unit_api import TestUnitAPI
 from api_testing.apis.article_api import ArticleAPI
@@ -26,6 +27,7 @@ class BaseTest(TestCase):
         self.login_page = Login()
         self.order_page = Order()
         self.test_plan = TstPlan()
+        self.testplans_page = TestPlans()
         self.article_page = Article()
         self.analyses_page = Analyses()
         self.orders_page = Orders()
@@ -107,11 +109,16 @@ class BaseTest(TestCase):
                 return test_unit_dict
         return {}
     
-    # this function generates random order data and then redirectes the user to the order's page
-    def get_random_order_data(self):
+
+    def get_random_order_data(self, material_type=''):
         self.base_selenium.LOGGER.info('Generate new random data to update the order with')
         self.article_page.get_articles_page()
-        new_random_material_type = self.generate_random_string()
+        new_random_material_type = ''
+        if material_type:
+            new_random_material_type = material_type
+        else:
+            new_random_material_type = self.generate_random_string()    
+        
         new_article_data = self.article_page.create_new_article(material_type=new_random_material_type)
         
         new_material_type = new_article_data['material_type']
@@ -119,8 +126,8 @@ class BaseTest(TestCase):
         self.base_selenium.LOGGER.info('Generate new article with article name: {}, and material type: {}'.format(new_article, new_material_type))
 
         self.test_plan.get_test_plans_page()
-        new_testplan_name = self.test_plan.create_new_test_plan(material_type=new_material_type, article=new_article, test_unit='tuqual')
-        testplan_testunits = self.test_plan.get_testunits_in_testplans(test_plan_name=new_testplan_name)
+        new_testplan_name = self.test_plan.create_new_test_plan(material_type=new_material_type, article=new_article, test_unit='ALLtu')
+        testplan_testunits = self.testplans_page.get_testunits_in_testplans(test_plan_name=new_testplan_name)
         self.base_selenium.LOGGER.info('Generate new test plan with name: {}, and test units {}'.format(new_testplan_name, testplan_testunits))
 
         basic_order_data = {
