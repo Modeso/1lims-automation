@@ -1180,36 +1180,6 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.LOGGER.info('Get order data to remove a test plan from the order')
         self.order_page.get_orders_page()
     def test026_update_suborder_article(self):
-        """
-        In case you update the article then press on ok button ( In pop-up) test plans should be removed
-        &
-        when you press on cancel button nothing updated
-        LIMS-4297
-        LIMS-3423
-        """
-
-        material_type='Raw Material'
-
-        new_order_data = self.get_random_order_data(material_type=material_type)
-
-        new_article = new_order_data['article_name']
-        new_testplan = new_order_data['testplan']
-        testplan_testunits = new_order_data['testunits_in_testplan']
-
-        self.base_selenium.LOGGER.info('Creating new order with 4 suborders')
-        order_no=self.order_page.create_new_order(multiple_suborders=3, test_plans=['tp1'], test_units=[''], material_type=material_type)
-
-        self.base_selenium.LOGGER.info('Open the 4th order from the order table, to confirm order\'s data that it was created with')
-        rows = self.order_page.result_table()
-        basic_order_data = self.base_selenium.get_row_cells_dict_related_to_header(row=rows[0])
-        self.order_page.get_random_x(row=rows[3])
-
-        self.base_selenium.LOGGER.info('Get order table with add view')
-        self.order_page.get_suborder_table()
-
-        self.base_selenium.LOGGER.info('Get the 4th suborder data, which is the suborder to be updated')
-        suborder_data = self.order_page.get_suborder_data(sub_order_index=3)
-
         self.base_selenium.LOGGER.info('Order created with 4 suborders with the following data')
         self.base_selenium.LOGGER.info('Material type: {}, Article name: {}, Test plans: {}, Test Units: {}'.format(
             suborder_data['material_types'], suborder_data['article'], suborder_data['test_plan'],
@@ -1387,10 +1357,7 @@ class OrdersTestCases(BaseTest):
             '+Assert Test plans, should be: {}, and it is: {}'.format(suborder_data_after_saving['test_plan'],
                                                                       analysis_data['Test Plans']))
         self.assertEqual(suborder_data_after_saving['test_plan'], analysis_data['Test Plans'])
-
-        analysis_child_table = self.analyses_page.get_child_table_data(index=0)
-
-        analysis_test_units = []
+                analysis_test_units = []
 
         for testunit in analysis_child_table:
             analysis_test_units.append(testunit['Test Unit'])
@@ -1402,6 +1369,96 @@ class OrdersTestCases(BaseTest):
     def test_test(self):
         import ipdb; ipdb.set_trace()
         suborder_data = self.order_page.get_suborder_data(sub_order_index=3)
+
+
+    @parameterized.expand(['save_btn', 'cancel'])
+    def test025_update_contact_departments(self, save):
+        """
+        Orders: department Approach: In case I update the department then press on save button
+        ( the department updated successfully )
+        &
+        when I press on cancel button ( this department not updated )
+        
+        LIMS-4765
+        """
+        self.base_selenium.LOGGER.info('Getting contact with departments to make sure that the new selected contact has departments')
+        new_contact=self.contacts_page.get_contact_with_departments()
+        self.order_page.get_orders_page()
+
+        self.base_selenium.LOGGER.info('Create order with 2 suborders with any random data, just to test updating contacts/ departments')
+        order_no_created = self.order_page.create_new_order(multiple_suborders=1, material_type='Raw Material', article='', test_units=[''])
+
+        self.base_selenium.LOGGER.info('Open the 2nd order from the table')
+        rows=self.order_page.result_table()
+        self.order_page.get_random_x(row=rows[1])
+
+        self.base_selenium.LOGGER.info('update the contact to {}, and select departments to make sure that it is update correctly'.format(new_contact))
+        old_contact = self.order_page.get_contact()
+        old_departments = self.order_page.get_departments()
+        self.order_page.set_contact(contact=new_contact)
+        
+        self.base_selenium.LOGGER.info('Update the departments of the 2nd suborder')
+        self.order_page.update_suborder(sub_order_index=1, departments=[''], form_view=True)
+        suborder_data = self.order_page.get_suborder_data(sub_order_index=1)
+
+        if 'save_btn' == save:
+            self.order_page.save(save_btn='order:save_btn')
+            self.base_selenium.LOGGER.info('Refresh to make sure that data are saved correctly')
+            self.base_selenium.refresh()
+
+            contact_after_update = self.order_page.get_contact()
+
+            self.base_selenium.LOGGER.info('+ Assert Contacts: contact is: {}, and should be: {})'.format(contact_after_update, new_contact))
+            self.assertEqual(contact_after_update, new_contact)
+
+            self.base_selenium.LOGGER.info('Get suborder data to compare it')
+            self.order_page.get_suborder_table()
+            order_data_after_refresh=self.order_page.get_suborder_data(sub_order_index=1)
+
+            self.base_selenium.LOGGER.info('+ Assert Departments: departments are: {}, and should be: {})'.format(order_data_after_refresh['departments'], suborder_data['departments']))
+            self.assertEqual(order_data_after_refresh['departments'], suborder_data['departments'])
+
+            self.order_page.get_orders_page()
+            self.base_selenium.LOGGER.info('Filter by order no')
+            rows=self.order_page.search(value=order_no_created)
+
+            for row in range(0, len(rows)-1):
+                if row:
+                    temp_data = self.base_selenium.get_row_cells_dict_related_to_header(row=rows[row])
+                    self.base_selenium.LOGGER.info('+ Assert Contact in order active table: contact is: {}, and should be: {})'.format(temp_data['Contact Name'], new_contact))
+                    self.assertEqual(temp_data['Contact Name'], new_contact)
+            
+            suborder_data_from_table = self.base_selenium.get_row_cells_dict_related_to_header(row=rows[0])
+            self.base_selenium.LOGGER.info('+ Assert Departments in order active table, departments are {}, and should be {}'.format(suborder_data_from_table['Departments'], order_data_after_refresh['departments']))
+            self.assertEqual(suborder_data_from_table['Departments'], order_data_after_refresh['departments'])
+
+            self.base_selenium.LOGGER.info('Get analysis page to make sure that the updates have affected the analysis records')
+            self.analyses_page.get_analyses_page()
+
+            self.base_selenium.LOGGER.info('Filter by order no')
+            rows=self.analyses_page.search(value=order_no_created)
+
+            for row in range(0, len(rows)-1):
+                if row:
+                    temp_data = self.base_selenium.get_row_cells_dict_related_to_header(row=rows[row])
+                    self.base_selenium.LOGGER.info('+ Assert Contact in analysis active table: contact is: {}, and should be: {})'.format(temp_data['Contact Name'], new_contact))
+                    self.assertEqual(temp_data['Contact Name'], new_contact)
+            
+            suborder_data_from_table = self.base_selenium.get_row_cells_dict_related_to_header(row=rows[0])
+            self.base_selenium.LOGGER.info('+ Assert Departments in analysis active table, departments are {}, and should be {}'.format(suborder_data_from_table['Departments'], order_data_after_refresh['departments']))
+            self.assertEqual(suborder_data_from_table['Departments'], order_data_after_refresh['departments'])
+
+        else:
+            self.order_page.cancel(force=True)
+            self.order_page.sleep_tiny()
+            self.base_selenium.LOGGER.info('Filter by order no to select the choosen order to check its data')
+            rows=self.order_page.search(value=order_no_created)
+            
+            self.base_selenium.LOGGER.info('Select the choosen order to check its data')
+            self.order_page.get_random_x(row=rows[1])
+
+            contacta_after_pressing_cancel = self.order_page.get_contact()
+            departmentsa_after_pressing_cancel = self.order_page.get_departments()
 
     @skip('https://modeso.atlassian.net/browse/LIMS-5070')
     def test031_user_can_add_suborder_with_test_units(self):
@@ -1540,3 +1597,10 @@ class OrdersTestCases(BaseTest):
                 ' + Assert {} (current_article) == {} (order_article)'.format(current_article,
                                                                             order_article))
             self.assertEqual(current_article, order_article)
+            self.base_selenium.LOGGER.info('+ Assert contacts before and after pressing cancel, before: {}, after: {}'.format(old_contact, contacta_after_pressing_cancel))
+            self.assertEqual(old_contact, contacta_after_pressing_cancel)
+
+            self.base_selenium.LOGGER.info('+ Assert departments before and after pressing cancel, before: {}, after: {}'.format(old_departments, departmentsa_after_pressing_cancel))
+            self.assertEqual(old_departments, departmentsa_after_pressing_cancel)
+
+        

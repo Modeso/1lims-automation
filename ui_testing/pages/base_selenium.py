@@ -588,4 +588,4 @@ class BaseSelenium:
 
     def refresh(self):
         self.driver.refresh()
-
+        time.sleep(10)
