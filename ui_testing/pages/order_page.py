@@ -276,20 +276,12 @@ class Order(Orders):
             "test_date": "",
             "shipment_date": ""
         }
-        if departments :
-            response["departments"]="|".join(list(map(lambda s: str(s)[1:], required_suborder["departments"].text.split("\n")) ))
-        if test_plan :
-            response["test_plan"]="|".join(list(map(lambda s: str(s)[1:], required_suborder["testPlans"].text.split("\n")) ))
-        if test_unit :
-            response["test_unit"]="|".join(list(map(lambda s: str(s).split(' No:')[0][1:], required_suborder["testUnits"].text.split("\n")) ))
-        if articles :
-            response["article"]=required_suborder["article"].text.split("\n")[0].split(' No:')[0]
-        if material_type :
-            response["material_types"]=required_suborder["materialType"].text.split("\n")[0].split(' No:')[0]
-        if shipment_date :
-            pass
-        if test_date :
-            pass
+        response["departments"]="|".join(list(map(lambda s: str(s)[1:], required_suborder["departments"].text.split("\n")) ))
+        response["test_plan"]="|".join(list(map(lambda s: str(s)[1:], required_suborder["testPlans"].text.split("\n")) ))
+        response["test_unit"]="|".join(list(map(lambda s: str(s).split(' No:')[0][1:], required_suborder["testUnits"].text.split("\n")) ))
+        response["article"]=required_suborder["article"].text.split("\n")[0].split(' No:')[0]
+        response["material_types"]=required_suborder["materialType"].text.split("\n")[0].split(' No:')[0]
+        
         return response
 
     def remove_testplan_by_name(self, index, testplan_name):
@@ -298,6 +290,13 @@ class Order(Orders):
         suborder_elements_dict = self.base_selenium.get_row_cells_id_elements_related_to_header(row=suborder_row,
                                                                                             table_element='order:suborder_table')
         self.base_selenium.update_item_value(item=suborder_elements_dict['testPlans'], item_text=testplan_name.replace("'", ''))
+
+    def remove_testunit_by_name(self, index, testunit_name):
+        suborder_table_rows = self.base_selenium.get_table_rows(element='order:suborder_table')
+        suborder_row = suborder_table_rows[index]
+        suborder_elements_dict = self.base_selenium.get_row_cells_id_elements_related_to_header(row=suborder_row,
+                                                                                            table_element='order:suborder_table')
+        self.base_selenium.update_item_value(item=suborder_elements_dict['testUnits'], item_text=testunit_name.replace("'", ''))
 
     def update_suborder(self, sub_order_index=0, contacts=False, departments=[], material_type=False, articles=False, test_plans=[], test_units=[], shipment_date=False, test_date=False, form_view=True):
         if form_view:

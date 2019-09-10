@@ -586,6 +586,6 @@ class BaseSelenium:
         dom_element.clear()
         dom_element.send_keys(Keys.CONTROL, 'v')
 
-    def refresh(self):
+    def refresh(self, sleep=10):
         self.driver.refresh()
-        time.sleep(10)
+        time.sleep(sleep)
