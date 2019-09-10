@@ -216,3 +216,14 @@ class BasePages:
 
         return child_table_data
         
+    def is_record_exist(self, value):
+        results = self.search(value=value)
+        if len(results) == 0:
+            return False
+        else:
+            if value in results[0].text:
+                return True
+            else:
+                return False
+
+    

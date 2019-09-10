@@ -1,7 +1,6 @@
 from unittest import TestCase
 from ui_testing.pages.base_selenium import BaseSelenium
 from uuid import uuid4
-from ui_testing.pages.analyses_page import Analyses
 from ui_testing.pages.article_page import Article
 from ui_testing.pages.login_page import Login
 from ui_testing.pages.order_page import Order
