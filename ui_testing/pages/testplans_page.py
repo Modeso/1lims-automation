@@ -35,9 +35,10 @@ class TestPlans(BasePages):
     
         return testplan_testunits
     
-    def click_overview_link(self):
+    def click_overview_link(self, with_popup = True):
         self.base_selenium.click(element='test_plan:overview')
-        self.confirm_popup()
+        if with_popup == True:
+            self.confirm_popup()
 
     def get_current_page_name(self):
         current_page_url = self.base_selenium.get_url()

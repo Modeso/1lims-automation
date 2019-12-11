@@ -34,8 +34,9 @@ class TestPlansTestCases(BaseTest):
         test_plan_row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=test_plan_row) # get its data
         test_plan_name = test_plan_row_data['Test Plan Name'] # get its name
         self.test_plan.get_test_plan_edit_page(test_plan_name) # open its edit page
-        self.test_plan.click_overview_link()  # click on overview button
+        self.test_plan.click_overview_link(with_popup=False)  # click on overview button
         # check if redirect to the right page
         current_page_name = self.test_plan.get_current_page_name()
         self.assertEqual(current_page_name, 'testPlans')
         self.test_plan.info('Overview visited from test plan edit')
+        return
