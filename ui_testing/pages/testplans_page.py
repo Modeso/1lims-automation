@@ -34,4 +34,13 @@ class TestPlans(BasePages):
             testplan_testunits.append(testunit['Test Unit Name'])
     
         return testplan_testunits
+    
+    def click_overview_link(self):
+        self.base_selenium.click(element='test_plan:overview')
+        self.confirm_popup()
+
+    def get_current_page_name(self):
+        current_page_url = self.base_selenium.get_url()
+        current_page_name = current_page_url.split('/')[-1]  # get the last name in the url
+        return current_page_name
 

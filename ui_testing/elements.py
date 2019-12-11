@@ -243,7 +243,7 @@ elements = {
                                  'value': '//*[@id="88"]/div[2]/div/div[3]/input'},
         'testunit_lower_limit': {'method': 'xpath',
                                  'value': '//*[@id="88"]/div[2]/div/div[4]/input'},
-
+        'overview': {'method': 'xpath', 'value': '//div[2]/div[2]/div[2]/modeso-add-test-plan/div[1]/div/ul/li[3]/a/span'},
     },
 
     'test_unit': {
