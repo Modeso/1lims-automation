@@ -464,3 +464,49 @@ class ArticlesTestCases(BaseTest):
             fixed_sheet_row_data = self.fix_data_format(values)
             for item in fixed_row_data:
                 self.assertIn(item, fixed_sheet_row_data)
+
+
+    @parameterized.expand(['ok', 'cancel'])
+    def test020_create_approach_overview_button(self, ok):
+        """
+        Master data: Create: Overview button Approach: Make sure
+        after I press on the overview button, it redirects me to the active table
+
+        LIMS-6203
+        """
+        self.base_selenium.LOGGER.info(' + Create new article.')
+        self.base_selenium.click(element='articles:new_article')
+        self.article_page.sleep_small()
+        # click on Overview, this will display an alert to the user
+        self.base_selenium.LOGGER.info(' + click on Overview')
+        self.base_selenium.click(element='articles:overview')
+        time.sleep(self.base_selenium.TIME_SMALL)
+        # switch to the alert
+        if 'ok' == ok:
+            self.base_selenium.click(element='articles:confirm_overview')
+            time.sleep(self.base_selenium.TIME_SMALL)
+            self.assertEqual(self.base_selenium.get_url(), 'https://automation.1lims.com/articles')
+            self.base_selenium.LOGGER.info(' + clicking on Overview confirmed')
+        else:
+            self.base_selenium.click(element='articles:cancel_overview')
+            time.sleep(self.base_selenium.TIME_SMALL)
+            self.assertEqual(self.base_selenium.get_url(), 'https://automation.1lims.com/articles/add')
+            self.base_selenium.LOGGER.info(' + clicking on Overview cancelled')
+
+    def test021_edit_approach_overview_button(self):
+        """
+        Edit: Overview Approach: Make sure after I press on
+        the overview button, it redirects me to the active table
+
+
+        LIMS-6202
+        """
+        self.article_page.get_random_article()
+        article_url = self.base_selenium.get_url()
+        self.base_selenium.LOGGER.info(' + article_url : {}'.format(article_url))
+        # click on Overview, this will display an alert to the user
+        self.base_selenium.LOGGER.info(' + click on Overview')
+        self.base_selenium.click(element='articles:overview')
+        time.sleep(self.base_selenium.TIME_SMALL)
+        self.assertEqual(self.base_selenium.get_url(), 'https://automation.1lims.com/articles')
+        self.base_selenium.LOGGER.info(' + clicking on Overview confirmed')

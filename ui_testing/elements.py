@@ -153,7 +153,13 @@ elements = {
         'right_menu': {'method': 'xpath',
                        'value': '//*[@id="custom-accordion-panel"]/div/a/i'},
         'alert_confirmation': {'method': 'id',
-                               'value': 'noty_layout__topCenter'}
+                               'value': 'noty_layout__topCenter'},
+        'overview':{'method':'xpath',
+                    'value':'/html/body/div[2]/div[2]/div[2]/modeso-add-article/div/div/ul/li[3]/a/span'},
+        'confirm_overview': {'method': 'xpath',
+                     'value': '/html/body/div[8]/div/div[3]/button[1]'},
+        'cancel_overview': {'method': 'xpath',
+                     'value': '/html/body/div[8]/div/div[3]/button[2]'}
 
     },
     'article': {
