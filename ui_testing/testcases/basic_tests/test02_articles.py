@@ -480,16 +480,16 @@ class ArticlesTestCases(BaseTest):
         # click on Overview, this will display an alert to the user
         self.base_selenium.LOGGER.info(' + click on Overview')
         self.base_selenium.click(element='articles:overview')
-        time.sleep(self.base_selenium.TIME_SMALL)
+        self.article_page.sleep_small()
         # switch to the alert
         if 'ok' == ok:
             self.base_selenium.click(element='articles:confirm_overview')
-            time.sleep(self.base_selenium.TIME_SMALL)
+            self.article_page.sleep_small()
             self.assertEqual(self.base_selenium.get_url(), 'https://automation.1lims.com/articles')
             self.base_selenium.LOGGER.info(' + clicking on Overview confirmed')
         else:
             self.base_selenium.click(element='articles:cancel_overview')
-            time.sleep(self.base_selenium.TIME_SMALL)
+            self.article_page.sleep_small()
             self.assertEqual(self.base_selenium.get_url(), 'https://automation.1lims.com/articles/add')
             self.base_selenium.LOGGER.info(' + clicking on Overview cancelled')
 
@@ -507,6 +507,7 @@ class ArticlesTestCases(BaseTest):
         # click on Overview, this will display an alert to the user
         self.base_selenium.LOGGER.info(' + click on Overview')
         self.base_selenium.click(element='articles:overview')
-        time.sleep(self.base_selenium.TIME_SMALL)
+        self.article_page.sleep_small()
         self.assertEqual(self.base_selenium.get_url(), 'https://automation.1lims.com/articles')
         self.base_selenium.LOGGER.info(' + clicking on Overview confirmed')
+

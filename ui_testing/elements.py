@@ -216,7 +216,13 @@ elements = {
         'new_testunit': {'method': 'link_text',
                          'value': 'New Test Unit'},
         'qualitative_value': {'method': 'id',
-                              'value': 'textValueArrayfield'}
+                              'value': 'textValueArrayfield'},
+        'overview':{'method':'xpath',
+                    'value':'/html/body/div[2]/div[2]/div[2]/modeso-add-test-unit/div/div/ul/li[3]/a/span'},
+        'confirm_overview': {'method': 'xpath',
+                     'value': '/html/body/div[8]/div/div[3]/button[1]'},
+        'cancel_overview': {'method': 'xpath',
+                     'value': '/html/body/div[8]/div/div[3]/button[2]'}
     },
 
     'test_plan': {
