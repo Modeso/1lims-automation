@@ -465,7 +465,6 @@ class ArticlesTestCases(BaseTest):
             for item in fixed_row_data:
                 self.assertIn(item, fixed_sheet_row_data)
 
-
     @parameterized.expand(['ok', 'cancel'])
     def test020_create_approach_overview_button(self, ok):
         """
@@ -474,22 +473,22 @@ class ArticlesTestCases(BaseTest):
 
         LIMS-6203
         """
-        self.base_selenium.LOGGER.info(' + Create new article.')
+        self.base_selenium.LOGGER.info('Create new article.')
         self.base_selenium.click(element='articles:new_article')
-        self.article_page.sleep_small()
+        self.article_page.sleep_tiny()
         # click on Overview, this will display an alert to the user
-        self.base_selenium.LOGGER.info(' + click on Overview')
+        self.base_selenium.LOGGER.info('Click on Overview')
         self.base_selenium.click(element='articles:overview')
-        self.article_page.sleep_small()
+        self.article_page.sleep_tiny()
         # switch to the alert
         if 'ok' == ok:
-            self.base_selenium.click(element='articles:confirm_overview')
-            self.article_page.sleep_small()
+            self.base_selenium.click(element='general:confirm_pop')
+            self.article_page.sleep_tiny()
             self.assertEqual(self.base_selenium.get_url(), 'https://automation.1lims.com/articles')
             self.base_selenium.LOGGER.info(' + clicking on Overview confirmed')
         else:
-            self.base_selenium.click(element='articles:cancel_overview')
-            self.article_page.sleep_small()
+            self.base_selenium.click(element='general:confirm_cancel')
+            self.article_page.sleep_tiny()
             self.assertEqual(self.base_selenium.get_url(), 'https://automation.1lims.com/articles/add')
             self.base_selenium.LOGGER.info(' + clicking on Overview cancelled')
 
