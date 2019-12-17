@@ -484,7 +484,7 @@ class ArticlesTestCases(BaseTest):
         if 'ok' == ok:
             self.base_selenium.click(element='articles:confirm_overview')
             self.article_page.sleep_tiny()
-            self.assertEqual(self.base_selenium.get_url(), 'https://automation.1lims.com/articles')
+            self.assertEqual(self.base_selenium.get_url(), '{}articles'.format(self.base_selenium.url))
             self.base_selenium.LOGGER.info('clicking on Overview confirmed')
         else:
             self.base_selenium.click(element='articles:cancel_overview')
@@ -509,4 +509,3 @@ class ArticlesTestCases(BaseTest):
         self.article_page.sleep_small()
         self.assertEqual(self.base_selenium.get_url(), 'https://automation.1lims.com/articles')
         self.base_selenium.LOGGER.info(' + clicking on Overview confirmed')
-
