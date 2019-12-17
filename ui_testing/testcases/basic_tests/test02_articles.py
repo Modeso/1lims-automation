@@ -507,5 +507,5 @@ class ArticlesTestCases(BaseTest):
         self.base_selenium.LOGGER.info('click on Overview')
         self.base_selenium.click(element='articles:overview')
         self.article_page.sleep_small()
-        self.assertEqual(self.base_selenium.get_url(), 'articles'.format(self.base_selenium.url))
+        self.assertEqual(self.base_selenium.get_url(), '{}articles'.format(self.base_selenium.url))
         self.base_selenium.LOGGER.info('clicking on Overview confirmed')
