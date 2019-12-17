@@ -207,10 +207,16 @@ elements = {
                     'value': 'Restore'},
         'active': {'method': 'link_text',
                    'value': 'Active'},
-        'new_testunit': {'method': 'link_text',
-                         'value': 'New Test Unit'},
+        'new_testunit': {'method': 'xpath',
+                         'value': '//*[@id="add-btn"]/span/span'},
         'qualitative_value': {'method': 'id',
-                              'value': 'textValueArrayfield'}
+                              'value': 'textValueArrayfield'},
+        'overview': {'method': 'xpath',
+                     'value': '/html/body/div[2]/div[2]/div[2]/modeso-add-test-unit/div/div/ul/li[3]/a/span'},
+        'confirm_overview': {'method': 'xpath',
+                             'value': "//div[contains(@class, 'swal2-actions')]//button[1]"},
+        'cancel_overview': {'method': 'xpath',
+                            'value': "//div[contains(@class, 'swal2-actions')]//button[2]"}
     },
 
     'test_plan': {
