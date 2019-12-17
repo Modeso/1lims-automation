@@ -502,7 +502,7 @@ class ArticlesTestCases(BaseTest):
         """
         self.article_page.get_random_article()
         article_url = self.base_selenium.get_url()
-        self.base_selenium.LOGGER.info(' + article_url : {}'.format(article_url))
+        self.base_selenium.LOGGER.info('article_url : {}'.format(article_url))
         # click on Overview, this will display an alert to the user
         self.base_selenium.LOGGER.info(' + click on Overview')
         self.base_selenium.click(element='articles:overview')
