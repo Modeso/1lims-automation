@@ -506,7 +506,32 @@ class ArticlesTestCases(BaseTest):
         # click on Overview, this will display an alert to the user
         self.base_selenium.LOGGER.info(' + click on Overview')
         self.base_selenium.click(element='articles:overview')
-        self.article_page.sleep_small()
+        self.article_page.sleep_tiny()
         self.assertEqual(self.base_selenium.get_url(), 'https://automation.1lims.com/articles')
         self.base_selenium.LOGGER.info(' + clicking on Overview confirmed')
 
+    def test022_navigate_after_article_search(self):
+        """
+        Search Approach: Make sure that you can search then navigate to any other page
+
+        LIMS-6201
+
+        :return:
+        """
+        row = self.article_page.get_random_article_row()
+        row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=row)
+        self.base_selenium.LOGGER.info(row_data)
+        for column in row_data:
+            if re.findall(r'\d{1,}.\d{1,}.\d{4}', row_data[column]) or row_data[column] == '':
+                continue
+        self.base_selenium.LOGGER.info(' + search for {} : {}'.format(column, row_data[column]))
+        search_results = self.article_page.search(row_data[column])
+        self.assertGreater(len(search_results), 1, " * There is no search results for it, Report a bug.")
+        for search_result in search_results:
+            search_data = self.base_selenium.get_row_cells_dict_related_to_header(search_result)
+            if search_data[column] == row_data[column]:
+                break
+        self.assertEqual(row_data[column], search_data[column])
+
+        self.test_plan.get_test_plans_page()
+        self.assertIn("testPlans", self.base_selenium.get_url())
