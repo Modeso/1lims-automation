@@ -504,7 +504,7 @@ class ArticlesTestCases(BaseTest):
         article_url = self.base_selenium.get_url()
         self.base_selenium.LOGGER.info('article_url : {}'.format(article_url))
         # click on Overview, this will display an alert to the user
-        self.base_selenium.LOGGER.info(' + click on Overview')
+        self.base_selenium.LOGGER.info('click on Overview')
         self.base_selenium.click(element='articles:overview')
         self.article_page.sleep_small()
         self.assertEqual(self.base_selenium.get_url(), 'articles'.format(self.base_selenium.url))
