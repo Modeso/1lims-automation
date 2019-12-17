@@ -489,7 +489,7 @@ class ArticlesTestCases(BaseTest):
         else:
             self.base_selenium.click(element='articles:cancel_overview')
             self.article_page.sleep_tiny()
-            self.assertEqual(self.base_selenium.get_url(), 'https://automation.1lims.com/articles/add')
+            self.assertEqual(self.base_selenium.get_url(), '{}articles/add'.format(self.base_selenium.url))
             self.base_selenium.LOGGER.info('clicking on Overview cancelled')
 
     def test021_edit_approach_overview_button(self):
