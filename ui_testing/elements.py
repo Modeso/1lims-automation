@@ -471,5 +471,9 @@ elements = {
        'active': {'method': 'link_text',
                  'value': 'Active'},
 
+       'user_table': {'method': 'id',
+                 'value': 'table'},
+
+
        }
 }

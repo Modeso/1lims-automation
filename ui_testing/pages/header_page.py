@@ -57,3 +57,7 @@ class Header(BasePages):
         self.base_selenium.click(element='user_management:right_menu')
         self.base_selenium.click(element='user_management:active')
         self.sleep_small()
+
+    def get_random_user_row(self):
+        return self.get_random_table_row(table_element='user_management:user_table')
+

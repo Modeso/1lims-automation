@@ -10,22 +10,25 @@ class HeaderTestCases(BaseTest):
             self.base_selenium.wait_until_page_url_has(text='dashboard')
             self.header_page.click_on_header_button()
 
-    def test002_restore_user(self):
+    @skip('https://modeso.atlassian.net/browse/LIMS-6384')
+    def test003_user_search(self):
         """
-        User management: Restore Approach: Make sure that you can restore any record successfully
-        LIMS-6380
+        Header:  User management:  Search Approach: Make sure that you can search by any field in the active table successfully
+
+        LIMS-6082
         :return:
-            """
+        """
         self.header_page.click_on_user_management_button()
-        user_names = []
-        self.header_page.get_archived_users()
-        selected_user_data, _ = self.header_page.select_random_multiple_table_rows()
-        for user in selected_user_data:
-            user_names.append(user['Name'])
-
-        self.header_page.restore_selected_user()
-        self.header_page.get_active_users()
-        for user_name in user_names:
-            self.assertTrue(self.test_unit_page.is_test_unit_in_table(value=user_name))
-
-
+        row = self.header_page.get_random_user_row()
+        row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=row)
+        for column in row_data:
+            if re.findall(r'\d{1,}.\d{1,}.\d{4}', row_data[column]) or row_data[column] == '':
+                continue
+            self.base_selenium.LOGGER.info(' + search for {} : {}'.format(column, row_data[column]))
+            search_results = self.header_page.search(row_data[column])
+            self.assertGreater(len(search_results), 1, " * There is no search results for it, Report a bug.")
+            for search_result in search_results:
+                search_data = self.base_selenium.get_row_cells_dict_related_to_header(search_result)
+                if search_data[column] == row_data[column]:
+                    break
+            self.assertEqual(row_data[column], search_data[column])
