@@ -153,7 +153,13 @@ elements = {
         'right_menu': {'method': 'xpath',
                        'value': '//*[@id="custom-accordion-panel"]/div/a/i'},
         'alert_confirmation': {'method': 'id',
-                               'value': 'noty_layout__topCenter'}
+                               'value': 'noty_layout__topCenter'},
+        'overview': {'method': 'xpath',
+                     'value': '/html/body/div[2]/div[2]/div[2]/modeso-add-article/div/div/ul/li[3]/a/span'},
+        'confirm_overview': {'method': 'xpath',
+                             'value': "//div[contains(@class, 'swal2-actions')]//button[1]"},
+        'cancel_overview': {'method': 'xpath',
+                            'value': "//div[contains(@class, 'swal2-actions')]//button[2]"}
 
     },
     'article': {
@@ -191,7 +197,13 @@ elements = {
                                    'value': 'a',
                                    'order': 1},
         'new_test_plan': {'method': 'link_text',
-                          'value': 'New Test Plan'}
+                          'value': 'New Test Plan'},
+        'overview': {'method': 'xpath',
+                     'value': "//span[contains(text(),'Overview')]"},
+        'confirm_overview': {'method': 'xpath',
+                             'value': "//div[contains(@class, 'swal2-actions')]//button[1]"},
+        'cancel_overview': {'method': 'xpath',
+                            'value': "//div[contains(@class, 'swal2-actions')]//button[2]"}
     },
 
     'test_units': {
@@ -210,7 +222,13 @@ elements = {
         'new_testunit': {'method': 'link_text',
                          'value': 'New Test Unit'},
         'qualitative_value': {'method': 'id',
-                              'value': 'textValueArrayfield'}
+                              'value': 'textValueArrayfield'},
+        'overview': {'method': 'xpath',
+                     'value': '/html/body/div[2]/div[2]/div[2]/modeso-add-test-unit/div/div/ul/li[3]/a/span'},
+        'confirm_overview': {'method': 'xpath',
+                             'value': "//div[contains(@class, 'swal2-actions')]//button[1]"},
+        'cancel_overview': {'method': 'xpath',
+                            'value': "//div[contains(@class, 'swal2-actions')]//button[2]"}
     },
 
     'test_plan': {
@@ -242,7 +260,7 @@ elements = {
         'testunit_upper_limit': {'method': 'class_name',
                                  'value': '//*[@id="88"]/div[2]/div/div[3]/input'},
         'testunit_lower_limit': {'method': 'xpath',
-                                 'value': '//*[@id="88"]/div[2]/div/div[4]/input'},
+                                 'value': '//*[@id="88"]/div[2]/div/div[4]/input'}
 
     },
 
@@ -301,6 +319,8 @@ elements = {
                           'value': 'selectedConcs'},
         'qualitative_value': {'method': 'id',
                               'value': 'textValueArrayfield'}
+
+
     },
     'orders': {
         'orders_table': {'method': 'id',
