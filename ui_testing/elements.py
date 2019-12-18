@@ -440,5 +440,31 @@ elements = {
             'method': 'id',
             'value': 'nofield'
         }
-    }
+    },
+
+    'header': {
+        'header_button': {'method': 'xpath',
+                  'value': '//*[@id="m_header_topbar"]/div/ul/li/a/span[1]/img'},
+        'user_management_button': {'method': 'xpath',
+                  'value': '//*[@id="dropdown-body"]/div/ul/li[5]/a/span'},
+        'roles_permissions_button': {'method': 'xpath',
+                  'value': '//*[@id="m_header_topbar"]/div/ul/li/a/span[1]/img'},
+        'myprofile_button': {'method': 'xpath',
+                  'value': '//*[@id="m_header_topbar"]/div/ul/li/a/span[1]/img'},
+        'companyprofile_button': {'method': 'xpath',
+                  'value': '//*[@id="m_header_topbar"]/div/ul/li/a/span[1]/img'},
+
+    },
+   'user_management': {
+       'right_menu': {'method': 'xpath',
+                 'value': '//*[@id="custom-accordion-panel"]/div/a/i'},
+
+       'archive': {'method': 'xpath',
+                 'value': '//*[@id="custom-accordion-panel"]/div/div/a[1]'},
+
+       'archived': {'method': 'link_text',
+                 'value': 'Archived'},
+
+
+       }
 }
