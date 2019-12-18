@@ -46,3 +46,14 @@ class Header(BasePages):
             else:
                 return False
 
+    def restore_selected_user(self):
+        self.base_selenium.scroll()
+        self.base_selenium.click(element='user_management:right_menu')
+        self.base_selenium.click(element='user_management:restore')
+        self.confirm_popup()
+
+    def get_active_users(self):
+        self.base_selenium.scroll()
+        self.base_selenium.click(element='user_management:right_menu')
+        self.base_selenium.click(element='user_management:active')
+        self.sleep_small()

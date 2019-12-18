@@ -10,19 +10,22 @@ class HeaderTestCases(BaseTest):
             self.base_selenium.wait_until_page_url_has(text='dashboard')
             self.header_page.click_on_header_button()
 
-    def test001_archive_user_management(self):
+    def test002_restore_user(self):
         """
-        User management: Make sure that you can archive any record
-        LIMS-6379
+        User management: Restore Approach: Make sure that you can restore any record successfully
+        LIMS-6380
         :return:
             """
         self.header_page.click_on_user_management_button()
-        selected_user_management_data, _ = self.header_page.select_random_multiple_table_rows()
-        self.header_page.archive_selected_users()
+        user_names = []
         self.header_page.get_archived_users()
-        for user in selected_user_management_data:
-            user_name = user['Name']
-            self.base_selenium.LOGGER.info(' + {} user should be activated.'.format(user_name))
-            self.assertTrue(self.header_page.is_user_in_table(value=user_name))
+        selected_user_data, _ = self.header_page.select_random_multiple_table_rows()
+        for user in selected_user_data:
+            user_names.append(user['Name'])
+
+        self.header_page.restore_selected_user()
+        self.header_page.get_active_users()
+        for user_name in user_names:
+            self.assertTrue(self.test_unit_page.is_test_unit_in_table(value=user_name))
 
 
