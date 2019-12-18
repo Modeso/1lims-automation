@@ -13,6 +13,12 @@ class TestPlansTestCases(BaseTest):
 
     @parameterized.expand(['ok', 'cancel'])
     def test001_overview_while_create_test_plans(self,ok):
+        """"
+        Master data: Create: Overview button Approach: Make sure after
+        I press on the overview button, it redirects me to the active table
+
+        LIMS-6203
+        """
         self.test_plan.click_create_test_plan_button()
         self.test_plan.sleep_tiny()
 
