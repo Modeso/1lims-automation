@@ -10,25 +10,21 @@ class HeaderTestCases(BaseTest):
             self.base_selenium.wait_until_page_url_has(text='dashboard')
             self.header_page.click_on_header_button()
 
-    @skip('https://modeso.atlassian.net/browse/LIMS-6384')
-    def test003_user_search(self):
+    def test004_download_user_sheet(self):
         """
-        Header:  User management:  Search Approach: Make sure that you can search by any field in the active table successfully
+        User management: Make sure you can export all the data in the active table & it should display in the same order
 
-        LIMS-6082
+        LIMS-6101
         :return:
         """
         self.header_page.click_on_user_management_button()
-        row = self.header_page.get_random_user_row()
-        row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=row)
-        for column in row_data:
-            if re.findall(r'\d{1,}.\d{1,}.\d{4}', row_data[column]) or row_data[column] == '':
-                continue
-            self.base_selenium.LOGGER.info(' + search for {} : {}'.format(column, row_data[column]))
-            search_results = self.header_page.search(row_data[column])
-            self.assertGreater(len(search_results), 1, " * There is no search results for it, Report a bug.")
-            for search_result in search_results:
-                search_data = self.base_selenium.get_row_cells_dict_related_to_header(search_result)
-                if search_data[column] == row_data[column]:
-                    break
-            self.assertEqual(row_data[column], search_data[column])
+        self.base_selenium.LOGGER.info(' * Download XSLX sheet')
+        self.header_page.download_xslx_sheet()
+        rows_data = self.header_page.get_table_rows_data()
+        for index in range(len(rows_data)):
+            self.base_selenium.LOGGER.info(' * Comparing the user no. {} '.format(index))
+            fixed_row_data = self.fix_data_format(rows_data[index].split('\n'))
+            values = self.header_page.sheet.iloc[index].values
+            fixed_sheet_row_data = self.fix_data_format(values)
+            for item in fixed_row_data:
+                self.assertIn(item, fixed_sheet_row_data)
