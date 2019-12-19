@@ -61,3 +61,44 @@ class Header(BasePages):
     def get_random_user_row(self):
         return self.get_random_table_row(table_element='user_management:user_table')
 
+
+
+    def create_new_user(self, user_role='', sleep=True, user_email='', user_password=''):
+        self.base_selenium.LOGGER.info(' + Create new user.')
+        self.base_selenium.click(element='user_management:create_user_button')
+        time.sleep(self.base_selenium.TIME_SMALL)
+        self.user_name = self.generate_random_text()
+        self.set_user_name(user_name=self.user_name)
+        self.set_user_email(user_email)
+        self.set_user_role(user_role)
+        self.user_role = self.get_user_role()
+        self.set_user_password(user_password=self.user_password)
+        self.set_user_confirm_password(user_confirm_password=self.set_user_confirm_password())
+
+        self.save(sleep)
+
+
+    def set_user_name(self, user_name):
+        self.base_selenium.set_text(element="user_management:user_name", value=user_name)
+
+
+    def set_user_email(self, user_email):
+        self.base_selenium.set_text(element="user_management:user_email", value=user_email)
+
+    def set_user_password(self, user_password):
+        self.base_selenium.set_text(element="user_management:user_password", value=user_password)
+
+    def set_user_confirm_password(self, user_confirm_password):
+        self.base_selenium.set_text(element="user_management:user_confirm_password", value=user_confirm_password)
+
+    def get_user_role(self):
+        return self.base_selenium.get_text(element='user_management:user_role').split('\n')[0]
+
+    def set_user_role(self, user_role='', random=False):
+        if random:
+            self.base_selenium.select_item_from_drop_down(element='user_management:user_role', avoid_duplicate=True)
+            return self.get_user_role()
+        else:
+            self.base_selenium.select_item_from_drop_down(element='user_management:user_role', item_text=user_role)
+
+

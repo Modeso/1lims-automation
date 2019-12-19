@@ -474,6 +474,21 @@ elements = {
        'user_table': {'method': 'id',
                  'value': 'table'},
 
+       'user_name': {'method': 'id',
+                 'value': 'usernamefield'},
+       'user_role': {'method': 'xpath',
+                     'value': '//*[@id="rolefield"]/div/div/div[2]/input'},
+       'user_email': {'method': 'id',
+                     'value': 'emailfield'},
+       'user_password': {'method': 'id',
+                     'value': 'password'},
+       'user_confirm_password': {'method': 'id',
+                     'value': 'confirmPassword'},
+       'create_user_button': {'method': 'xpath',
+                     'value': '//*[@id="add-btn"]/span/span'},
 
-       }
+
+
+
+   }
 }
