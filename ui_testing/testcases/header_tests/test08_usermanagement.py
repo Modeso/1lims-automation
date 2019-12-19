@@ -31,6 +31,7 @@ class HeaderTestCases(BaseTest):
          self.base_selenium.LOGGER.info(
                 ' + user number : {} deleted successfully'.format(user_data['User No.']))
          self.assertEqual(self.base_selenium.get_text(element='user_management:alert_confirmation'), 'Successfully deleted')
+         # In case user used in other entity
         else:
          self.base_selenium.LOGGER.info(
                 ' + pop up will appear that this item related to some data : {}'.format(user_data))
