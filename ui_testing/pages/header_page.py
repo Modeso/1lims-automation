@@ -101,4 +101,30 @@ class Header(BasePages):
         else:
             self.base_selenium.select_item_from_drop_down(element='user_management:user_role', item_text=user_role)
 
+    def get_random_user_row(self):
+        return self.get_random_table_row(table_element='user_management:user_table')
+
+    def click_on_user_right_menu(self):
+        self.base_selenium.LOGGER.info('Press on the right menu')
+        self.base_selenium.click(element='user_management:right_menu')
+        self.sleep_small()
+
+    def click_on_delete_button(self):
+        self.base_selenium.LOGGER.info('Press on the delete button')
+        self.base_selenium.click(element='user_management:delete')
+        self.sleep_small()
+
+    def click_on_the_confirm_message(self):
+        self.base_selenium.LOGGER.info('Press on ok button')
+        self.base_selenium.click(element='general:confirm_pop')
+        self.sleep_small()
+
+    def get_user_page(self):
+        self.base_selenium.LOGGER.info(' + Get users page.')
+        self.base_selenium.get(url=self.user_url)
+        self.sleep_small()
+
+
+
+
 

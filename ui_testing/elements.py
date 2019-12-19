@@ -487,7 +487,17 @@ elements = {
        'create_user_button': {'method': 'xpath',
                      'value': '//*[@id="add-btn"]/span/span'},
 
+       'delete': {'method': 'link_text',
+                 'value': 'Delete'},
 
+       'confirm_pop': {'method': 'class_name',
+                        'value': 'btn-success',
+                        'order': 0},
+       'save_btn': {'method': 'id',
+                 'value': 'saveButton'},
+
+       'alert_confirmation': {'method': 'id',
+                               'value': 'noty_layout__topCenter'},
 
 
    }
