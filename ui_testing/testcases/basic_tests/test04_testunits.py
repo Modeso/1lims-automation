@@ -11,6 +11,7 @@ class TestUnitsTestCases(BaseTest):
         self.base_selenium.wait_until_page_url_has(text='dashboard')
         self.test_unit_page.get_test_units_page()
 
+
     @skip('https://modeso.atlassian.net/browse/LIMS-5237')
     def test001_test_units_search(self):
         """
@@ -773,4 +774,20 @@ class TestUnitsTestCases(BaseTest):
         new_test_units = len(self.test_unit_page.search(test_unit_name))
         self.info('assert there is a new test unit')
         self.assertGreater(new_test_units, old_test_units)
+
+    def test025_edit_approach_overview_button(self):
+        """
+        Edit: Overview Approach: Make sure after I press on
+        the overview button, it redirects me to the active table
+        LIMS-6202
+        """
+        self.test_unit_page.get_random_test_units()
+        test_units_url = self.base_selenium.get_url()
+        self.base_selenium.LOGGER.info('test_units_url: {}'.format(test_units_url))
+        # click on Overview, it will redirect you to testunits' page
+        self.base_selenium.LOGGER.info('click on Overview')
+        self.base_page.click_overview()
+        self.test_unit_page.sleep_tiny()
+        self.assertEqual(self.base_selenium.get_url(), '{}testUnits'.format(self.base_selenium.url))
+        self.base_selenium.LOGGER.info('clicking on Overview confirmed')
 

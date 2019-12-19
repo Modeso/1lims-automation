@@ -464,3 +464,19 @@ class ArticlesTestCases(BaseTest):
             fixed_sheet_row_data = self.fix_data_format(values)
             for item in fixed_row_data:
                 self.assertIn(item, fixed_sheet_row_data)
+
+    def test021_edit_approach_overview_button(self):
+        """
+        Edit: Overview Approach: Make sure after I press on
+        the overview button, it redirects me to the active table
+        LIMS-6202
+        """
+        self.article_page.get_random_article()
+        article_url = self.base_selenium.get_url()
+        self.base_selenium.LOGGER.info('article_url : {}'.format(article_url))
+        # click on Overview, it will redirect you to articles' page
+        self.base_selenium.LOGGER.info('click on Overview')
+        self.base_page.click_overview()
+        self.article_page.sleep_small()
+        self.assertEqual(self.base_selenium.get_url(), '{}articles'.format(self.base_selenium.url))
+        self.base_selenium.LOGGER.info('clicking on Overview confirmed')

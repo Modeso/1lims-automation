@@ -106,7 +106,9 @@ elements = {
                       'value': 'saveButton'},
         'col_6': {'method': 'class_name',
                   'value': 'col-md-6',
-                  'order': -1}
+                  'order': -1},
+        'overview': {'method': 'xpath',
+                     'value': "//span[contains(text(),'Overview')]"}
     },
     'login': {
         'username': {'method': 'name',
@@ -440,5 +442,14 @@ elements = {
             'method': 'id',
             'value': 'nofield'
         }
+    },
+    'contacts': {
+        'new_contact': {'method': 'xpath',
+                        'value': '//span[contains(text(),"New Contact")]'},
+        'contacts_table': {'method': 'id',
+                          'value': 'table'},
+
+
     }
+
 }
