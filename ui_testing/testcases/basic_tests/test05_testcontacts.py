@@ -13,6 +13,11 @@ class ContactsTestCases(BaseTest):
         Edit: Overview Approach: Make sure after I press on
         the overview button, it redirects me to the active table
         LIMS-6202
+        
+        New: Contact: Cancel button: After I edit in any field 
+        then press on cancel button, a pop up will appear that 
+        the data will be lost 
+        LIMS-3585
         """
         self.contacts_page.get_random_contact()
         contact_url = self.base_selenium.get_url()
