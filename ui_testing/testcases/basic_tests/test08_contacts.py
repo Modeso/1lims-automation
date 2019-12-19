@@ -173,3 +173,20 @@ class ContactsTestCases(BaseTest):
                     break
             self.assertEqual(row_data[column], search_data[column])
         
+    def test05_download_contact_sheet(self):
+        """
+        New: Contact: XSLX File: I can download all the data in the table view in the excel sheet
+        I can download all the data in the table view in the excel sheet 
+
+        LIMS:3568
+        """
+        self.base_selenium.LOGGER.info(' * Download XSLX sheet')
+        self.contact_page.download_xslx_sheet()
+        rows_data = self.contact_page.get_table_rows_data()
+        for index in range(len(rows_data)):
+            self.base_selenium.LOGGER.info(' * Comparing the contact no. {} '.format(index))
+            fixed_row_data = self.fix_data_format(rows_data[index].split('\n'))
+            values = self.contact_page.sheet.iloc[index].values
+            fixed_sheet_row_data = self.fix_data_format(values)
+            for item in fixed_row_data:
+                self.assertIn(item, fixed_sheet_row_data)
