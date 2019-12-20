@@ -480,12 +480,15 @@ elements = {
                      'value': '//*[@id="rolefield"]/div/div/div[2]/input'},
        'user_email': {'method': 'id',
                      'value': 'emailfield'},
-       'user_password': {'method': 'id',
-                     'value': 'password'},
+       'user_password': {'method': 'xpath',
+                     'value': '//*[@id="password"]'},
        'user_confirm_password': {'method': 'id',
                      'value': 'confirmPassword'},
        'create_user_button': {'method': 'xpath',
                      'value': '//*[@id="add-btn"]/span/span'},
+       'save_btn': {'method': 'id',
+                 'value': 'saveButton'},
+
 
 
 

@@ -12,10 +12,16 @@ class HeaderTestCases(BaseTest):
 
     def test005_create_new_user(self):
         """
-        User management: Make sure you can export all the data in the active table & it should display in the same order
-
-        LIMS-6101
+        Header: User management Approach:  Make sure that I can create new user successfully
+        LIMS-6000
         :return:
         """
         self.header_page.click_on_user_management_button()
-        self.header_page.create_new_user(user_email='diana.mohamed@modeso.ch', user_role='', user_password='1')
+        self.header_page.create_new_user(user_email='diana.mohamed@modeso.ch', user_role='',
+                                         user_password='1', user_confirm_password='1')
+        user_text = self.header_page.search(value=self.header_page.user_name)[0].text
+        self.assertIn(self.header_page.user_name, user_text)
+
+
+
+
