@@ -113,10 +113,10 @@ elements = {
                     'value' : '//i[@id="icon"]'},
             'calender_title': {'method': 'id',
                     'vlaue' : 'calendar-modal-body'},
-            'prev' : {'method':'xpath'
-                       'value':'//button[@class='fc-prev-button fc-button fc-button-primary']'},
-            'nxt': {'method':'xpath'
-                       'value':'//button[@class='fc-next-button fc-button fc-button-primary']'}
+            'prev' : {'method':'xpath',
+                       'value':'//button[@class="fc-prev-button fc-button fc-button-primary"]'},
+            'nxt': {'method':'xpath',
+                       'value':'//button[@class="fc-next-button fc-button fc-button-primary"]'}
     },
     'login': {
         'username': {'method': 'name',
