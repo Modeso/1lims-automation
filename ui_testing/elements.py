@@ -109,14 +109,16 @@ elements = {
                   'order': -1}
     },
     'calender': {
-            'get_calender': {'method': 'xpath',
-                    'value' : '//i[@id="icon"]'},
-            'calender_title': {'method': 'id',
-                    'vlaue' : 'calendar-modal-body'},
-            'prev' : {'method':'xpath',
-                       'value':'//button[@class="fc-prev-button fc-button fc-button-primary"]'},
-            'nxt': {'method':'xpath',
-                       'value':'//button[@class="fc-next-button fc-button fc-button-primary"]'}
+        'get_calender': {'method': 'xpath',
+                         'value': '//i[@id="icon"]'},
+        'calender_title': {'method': 'id',
+                           'value': 'calendar-modal-body'},
+        'prev': {'method': 'xpath',
+                 'value': '//button[@class="fc-prev-button fc-button fc-button-primary"]'},
+        'nxt': {'method': 'xpath',
+                'value': '//button[@class="fc-next-button fc-button fc-button-primary"]'},
+        'month': {'method': 'xpath',
+                  'value': '//div[@class="fc-center"]'}
     },
     'login': {
         'username': {'method': 'name',

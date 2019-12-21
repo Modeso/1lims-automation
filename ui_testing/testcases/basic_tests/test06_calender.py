@@ -20,6 +20,7 @@ class CalenderTestCases(BaseTest):
         self.base_selenium.click(element='calender:get_calender')
         time.sleep(5)
         self.base_selenium.LOGGER.info(self.base_selenium.check_element_is_exist(element='calender:calender_title'))
+        assert self.base_selenium.check_element_is_exist(element='calender:calender_title')==True
 
     @parameterized.expand(['contacts', 'articles','testUnits','testPlans'])
     def test002_open_calender(self,type):
@@ -36,10 +37,25 @@ class CalenderTestCases(BaseTest):
         self.base_selenium.LOGGER.info('click on calender')
         self.base_selenium.click(element='calender:get_calender')
         time.sleep(5)
-        self.base_selenium.LOGGER.info(self.base_selenium.check_element_is_exist(element='calender:calender_title'))
+        assert self.base_selenium.check_element_is_exist(element='calender:calender_title')==True
 
     def test003_navigate_calender(self):
         """
         Calendar: Make sure that you can navigate between months successfully
         LIMS-6376
         """
+        self.base_selenium.LOGGER.info('click on calender')
+        self.base_selenium.click(element='calender:get_calender')
+        time.sleep(5)
+        assert self.base_selenium.check_element_is_exist(element='calender:calender_title')==True
+        self.base_selenium.click(element='calender:prev')
+        month1=self.base_selenium.get_text(element='calender:month')
+        self.base_selenium.LOGGER.info(month1)
+        time.sleep(5)
+        self.base_selenium.click(element='calender:nxt')
+        month2 = self.base_selenium.get_text(element='calender:month')
+        self.base_selenium.LOGGER.info(month2)
+        time.sleep(5)
+        assert month1!=month2
+
+
