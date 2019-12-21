@@ -108,6 +108,12 @@ elements = {
                   'value': 'col-md-6',
                   'order': -1}
     },
+    'calender': {
+            'get_calender': {'method': 'xpath',
+                    'value' : '//i[@id="icon"]'},
+            'calender_title': {'method': 'xpath',
+                    'vlaue' : '//div[@id="calendar-modal-body"]'}
+    },
     'login': {
         'username': {'method': 'name',
                      'value': 'username',
