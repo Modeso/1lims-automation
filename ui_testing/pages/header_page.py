@@ -1,5 +1,7 @@
 from ui_testing.pages.base_pages import BasePages
 from random import randint
+from testconfig import config
+from datetime import date
 import time
 
 class Header(BasePages):
@@ -82,8 +84,17 @@ class Header(BasePages):
             self.set_user_role(user_role)
             self.set_user_password(user_password)
             self.set_user_confirm_password(user_confirm_password)
-
+            current_date = date.today()
             self.save(sleep)
+            return {
+                    'user_name': self.user_name,
+                    'user_number': self.get_user_number(),
+                    'role': self.get_user_role(),
+                    'changed_by': config['site']['username'],
+                    'email': user_email,
+                    'created_on': "{}.{}.{}".format(current_date.day, current_date.month, current_date.year)
+            }
+            
 
     def set_user_name(self, user_name):
             self.base_selenium.set_text(element='user_management:user_name', value=user_name)
