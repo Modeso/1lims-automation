@@ -452,3 +452,21 @@ class Contact(Contacts):
             person_counter = person_counter +1
 
         return True
+
+    def update_department_list(self, departments=[]):
+        departments_tags = self.base_selenium.find_element_by_xpath("//div[@class='ng2-tags-container']").find_elements_by_tag_name('tag')
+        counter=0
+        actions = webdriver.ActionChains(self.base_selenium.driver)
+        for department in departments:
+            temp_department = departments_tags[counter].find_element_by_xpath("//div[@class='tag__text inline' and @title='"+departments_tags[counter].text+"']")
+            actions.double_click(temp_department).perform()
+            actions.key_down(Keys.CONTROL).send_keys("a").key_up(Keys.CONTROL).perform()
+            actions.send_keys(Keys.BACK_SPACE).perform()
+            actions.send_keys(department).perform()
+            webdriver.ActionChains(self.base_selenium.driver).send_keys(Keys.ENTER).perform()
+            self.sleep_tiny()
+            counter = counter+1
+        
+        self.sleep_tiny()
+        self.save(save_btn='contact:save')
+        return self.get_contact_departments()

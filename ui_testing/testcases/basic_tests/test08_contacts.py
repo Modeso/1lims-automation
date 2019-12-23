@@ -379,4 +379,36 @@ class ContactsTestCases(BaseTest):
         
         self.base_selenium.LOGGER.info('set all columns to shown again')
         self.contact_page.set_all_configure_table_columns_to_specific_value(value=True, always_hidden_columns=['fax'])
+
+    def test_11_update_departments_should_reflect_orders(self):
+        """
+        New: Contacts: Department Approach: Any edit in the department, will reflect in the table view of orders and analysis sections.
+        Any edit in the department, will reflect in the table view of orders and analysis sections.
+        LIMS-3571
+        """
+
+        # self.base_selenium.LOGGER.info('Creating new contact with new department to keep track of the updated departments')
+        # contact_data = self.contact_page.create_update_contact()
+
+        # contact_name = contact_data['name']
+        # departments = contact_data['departments']
+
+        # self.base_selenium.LOGGER.info('create order with the desired contact to keep track of the updated')
+        # self.order_page.get_orders_page()
+        # order_data = self.order_page.create_new_order(material_type='Raw Material', departments=departments, contact=contact_name)
+
+        # self.base_selenium.LOGGER.info('get the contacts to update the desired contact department')
+        # self.contact_page.get_contacts_page()
+
+        # contact_record = self.contact_page.search(value=contact_data['no'])
+        # self.contact_page.open_edit_page(row=contact_record)
+
+        contact_records = self.contact_page.result_table()[0]
+        self.contact_page.open_edit_page(row=contact_records)
+        new_updated_departments = self.contact_page.update_department_list(departments=['7mada', '7mada2'])
+        self.base_selenium.LOGGER.info(new_updated_departments)
+        self.contact_page.sleep_small()
+
+
+
         
