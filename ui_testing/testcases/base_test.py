@@ -29,11 +29,9 @@ class BaseTest(TestCase):
         self.article_page = Article()
         self.test_unit_page = TstUnit()
         self.order_page = Order()
-<<<<<<< HEAD
         self.header_page = Header()
-=======
         self.base_page = BasePages()
->>>>>>> 51f3adaafa7723c9fbfd28395da33edab8d7ab54
+
 
         self.article_api = ArticleAPI()
         self.test_plan_api = TestPlanAPI()

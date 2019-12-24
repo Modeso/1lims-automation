@@ -7,6 +7,7 @@ class Header(BasePages):
             super().__init__()
             self.base_selenium.wait_until_page_url_has(text='dashboard')
             self.user_url = "{}users".format(self.base_selenium.url)
+            self.role_url = "{}roles".format(self.base_selenium.url)
 
     def get_users_page(self):
             self.base_selenium.LOGGER.info(' + Get users page.')
@@ -72,21 +73,29 @@ class Header(BasePages):
             self.sleep_small()
 
 
-    def create_new_user(self, user_role='', sleep=True, user_email='', user_password='', user_confirm_password=''):
-            self.base_selenium.LOGGER.info(' + Create new user.')
-            self.base_selenium.click(element='user_management:create_user_button')
-            time.sleep(self.base_selenium.TIME_SMALL)
-            self.user_name = self.generate_random_text()
-            self.set_user_name(user_name=self.user_name)
-            self.set_user_email(user_email)
-            self.set_user_role(user_role)
-            self.set_user_password(user_password)
-            self.set_user_confirm_password(user_confirm_password)
+    def create_new_user(self, user_role='', sleep=True, user_email='', user_password='', user_confirm_password='', user_name=''):
+        self.base_selenium.LOGGER.info(' + Create new user.')
+        self.base_selenium.click(element='user_management:create_user_button')
+        time.sleep(self.base_selenium.TIME_SMALL)
+        self.user_name = self.generate_random_text()
+        self.set_user_name(self.user_name)
+        self.set_user_email(user_email)
+        self.set_user_role(user_role)
+        self.set_user_password(user_password)
+        self.set_user_confirm_password(user_confirm_password)
 
-            self.save(sleep)
+        user_data = {
+            "user_name":self.get_user_name(),
+            "user_email":self.set_user_email,
+            "user_role": self.get_user_role(),
+            "user_password": self.get_user_password(),
+            "user_confirm_password": self.get_user_confirm_password()
+        }
+        self.save(sleep)
+        return user_data
 
     def set_user_name(self, user_name):
-            self.base_selenium.set_text(element="user_management:user_name", value=user_name)
+            self.base_selenium.set_text(element='user_management:user_name', value=user_name)
 
     def get_user_name(self):
             return self.base_selenium.get_text(element='user_management:user_name').split('\n')[0]
@@ -108,8 +117,14 @@ class Header(BasePages):
     def set_user_password(self, user_password):
             self.base_selenium.set_text(element="user_management:user_password", value=user_password)
 
+    def get_user_password(self):
+        return self.base_selenium.get_text(element='user_management:user_password').split('\n')[0]
+
     def set_user_confirm_password(self, user_confirm_password):
             self.base_selenium.set_text(element="user_management:user_confirm_password", value=user_confirm_password)
+
+    def get_user_confirm_password(self):
+        return self.base_selenium.get_text(element='user_management:user_confirm_password').split('\n')[0]
 
     def get_user_role(self):
             return self.base_selenium.get_text(element='user_management:user_role').split('\n')[0]
@@ -165,7 +180,7 @@ class Header(BasePages):
 
     def click_create_new_user(self):
             self.base_selenium.LOGGER.info('Press on the create new user button')
-            self.base_selenium.click(element='user_management:create_user')
+            self.base_selenium.click(element='user_management:create_user_button')
             self.sleep_small()
 
     def clear_user_role(self):
@@ -180,16 +195,86 @@ class Header(BasePages):
         self.base_selenium.LOGGER.info('Clear user email')
         self.base_selenium.clear_text(element='user_management:user_email')
 
+    def click_on_the_confirm_message(self):
+        self.base_selenium.LOGGER.info('Press on ok button')
+        self.base_selenium.click(element='general:confirm_pop')
+        self.sleep_small()
 
+    def click_on_delete_button(self):
+        self.base_selenium.LOGGER.info('Press on the delete button')
+        self.base_selenium.click(element='user_management:delete')
+        self.sleep_small()
 
+    def click_on_user_right_menu(self):
+        self.base_selenium.LOGGER.info('Press on the right menu')
+        self.base_selenium.click(element='user_management:right_menu')
+        self.sleep_small()
 
+    def click_on_overview_btn(self):
+        self.base_selenium.LOGGER.info('Press on the overview button button')
+        self.base_selenium.click(element='user_management:overview_btn')
+        self.sleep_small()
 
+    def click_on_clear_all(self):
+        self.base_selenium.LOGGER.info('Press on the overview button')
+        self.base_selenium.click(element='user_management:clear_all')
+        self.sleep_small()
 
+    def archive_selected_roles_and_permissions(self):
+            self.base_selenium.scroll()
+            self.base_selenium.click(element='roles_and_permissions:right_menu')
+            self.base_selenium.click(element='roles_and_permissions:archive')
+            self.confirm_popup()
 
+    def get_archived_roles_and_permissions(self):
+            self.base_selenium.scroll()
+            self.base_selenium.click(element='roles_and_permissions:right_menu')
+            self.base_selenium.click(element='roles_and_permissions:archived')
+            self.sleep_small()
 
+    def is_role_in_table(self, value):
+            """
+                - get_archived_test_units then call me to check if the test unit has been archived.
+                - get_active_test_units then call me to check if the test unit is active.
+            :param value: search value
+            :return:
+            """
+            results = self.search(value=value)
+            if len(results) == 0:
+                return False
+            else:
+                if value in results[0].text:
+                    return True
+                else:
+                    return False
 
+    def restore_selected_roles(self):
+        self.base_selenium.scroll()
+        self.base_selenium.click(element='roles_and_permissions:right_menu')
+        self.base_selenium.click(element='roles_and_permissions:restore')
+        self.confirm_popup()
 
+    def get_active_roles(self):
+        self.base_selenium.scroll()
+        self.base_selenium.click(element='roles_and_permissions:right_menu')
+        self.base_selenium.click(element='roles_and_permissions:active')
+        self.sleep_small()
 
+    def get_roles_and_permissions_page(self):
+            self.base_selenium.LOGGER.info(' + Get roles page.')
+            self.base_selenium.get(url=self.role_url)
+            self.sleep_small()
 
+    def get_random_role(self):
+            row = self.get_random_user_row()
+            self.open_edit_page(row=row)
+
+    def get_random_role_row(self):
+            return self.get_random_table_row(table_element='roles_and_permissions:user_table')
+
+    def click_on_roles_permissions_button(self):
+            self.base_selenium.LOGGER.info('Press on roles & permissions button')
+            self.base_selenium.click(element='header:roles_and_permissions_button')
+            self.sleep_small()
 
 
