@@ -107,7 +107,7 @@ class TstUnit(TstUnits):
             return self.get_material_type()
 
     def get_material_type(self):
-        return self.base_selenium.get_text(element='test_unit:material_type_by_id').split('\n')
+        return ', '.join(list(map(lambda s: s[1:],self.base_selenium.get_text(element='test_unit:material_type_by_id').split('\n'))))
 
     def set_category(self, category=''):
         self.base_selenium.LOGGER.info(
@@ -249,3 +249,45 @@ class TstUnit(TstUnits):
         qualitative_value = self.base_selenium.find_element_in_element(destination_element='general:input',
                                                                        source_element='test_unit:qualitative_value')
         qualitative_value.send_keys(value)
+
+    def get_specification_unit_display_value(self):
+        self.base_selenium.LOGGER.info('Get testunit specification unit display value')
+        return self.base_selenium.find_element(element='test_unit:specification_unit_display_value').text
+    
+    def get_quantification_unit_display_value(self):
+        self.base_selenium.LOGGER.info('Get testunit quantification unit display value')
+        return self.base_selenium.find_element(element='test_unit:quantification_unit_display_value').text
+
+
+    def get_testunit_type(self):
+        self.base_selenium.LOGGER.info('get testunit type')
+        return self.base_selenium.get_text(element='test_unit:type').split('\n')[0]
+
+    def get_tesunit_data(self, specification_type):
+        testunit = {
+            "name": self.get_testunit_name(),
+            "no": self.get_testunit_number(),
+            "material_type": self.get_material_type(),
+            "category": self.get_category(),
+            "method": self.get_method(),
+            "iteration": self.get_testunit_iteration(),
+            "type": self.get_testunit_type()
+        }
+        if testunit['type'] == 'Quantitative':
+            if specification_type == 'spec':
+                testunit['spec_upper_limit'] = self.get_spec_upper_limit()
+                testunit['spec_lower_limit'] = self.get_spec_lower_limit()
+                testunit['unit'] = self.get_specification_unit_display_value()
+            elif specification_type == 'quan':
+                testunit['quan_upper_limit'] = self.get_quan_upper_limit()
+                testunit['quan_lower_limit'] = self.get_quan_lower_limit()
+                testunit['quan_unit'] = self.get_quantification_unit_display_value()
+            elif specification_type == 'spec_quan':
+                testunit['spec_upper_limit'] = self.get_spec_upper_limit()
+                testunit['spec_lower_limit'] = self.get_spec_lower_limit()
+                testunit['unit'] = self.get_specification_unit_display_value()
+                testunit['quan_upper_limit'] = self.get_quan_upper_limit()
+                testunit['quan_lower_limit'] = self.get_quan_lower_limit()
+                testunit['quan_unit'] = self.get_quantification_unit_display_value()
+        
+        return testunit

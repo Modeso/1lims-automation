@@ -324,7 +324,11 @@ elements = {
         'selected_cons': {'method': 'id',
                           'value': 'selectedConcs'},
         'qualitative_value': {'method': 'id',
-                              'value': 'textValueArrayfield'}
+                              'value': 'textValueArrayfield'},
+        'specification_unit_display_value': {'method': 'id',
+                                'value': 'unit_display_value'},
+        'quantification_unit_display_value': {'method': 'id',
+                                'value': 'quantificationUnit_display_value'}
     },
     'orders': {
         'orders_table': {'method': 'id',

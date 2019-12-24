@@ -796,3 +796,102 @@ class TestUnitsTestCases(BaseTest):
             self.assertEqual(self.base_selenium.get_url(), 'https://automation.1lims.com/testUnits/add')
             self.base_selenium.LOGGER.info('clicking on Overview cancelled')
 
+    def test025_allow_testunits_to_display_subscrip_superscript_in_active_table(self):
+        """
+        Test unit: Active table/unit: Sub & Super scripts: Allow unit to display with sub & super scripts in the active table 
+        LIMS-5794
+        """
+
+        self.base_selenium.LOGGER.info('create new testunit with sub/super scripts unit of type quantitative')
+        random_method = self.generate_random_string()
+        random_name = self.generate_random_string()
+        random_upper_limit = self.test_unit_page.generate_random_number(lower=50, upper=100)
+        random_lower_limit = self.test_unit_page.generate_random_number(lower=1, upper=49)
+        self.test_unit_page.create_quantitative_testunit(unit='{a'+'}w[e]s{'+'o}m[e]', spec_or_quan='spec_quan', method=random_method, lower_limit=random_lower_limit, upper_limit=random_upper_limit, name=random_name)
+        
+        self.base_selenium.LOGGER.info('get the specification/ quantification limit unit value')
+        spec_unit_value = self.test_unit_page.get_specification_unit_display_value()
+        quan_unit_value = self.test_unit_page.get_quantification_unit_display_value()
+
+        self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
+
+        testunit_record = self.test_unit_page.result_table()[0]
+        testunit_data = self.base_selenium.get_row_cells_dict_related_to_header(row=testunit_record)
+
+        self.base_selenium.LOGGER.info('make sure that quantification/ specification unit in the form has the same value as in the table')
+        self.base_selenium.LOGGER.info('testunit specification unit is {}, and it should be {}'.format(testunit_data['Unit'], spec_unit_value))
+        self.assertEqual(testunit_data['Unit'], spec_unit_value)
+        
+        self.base_selenium.LOGGER.info('testunit quantification unit is {}, and it should be {}'.format(testunit_data['Quantification Limit Unit'], quan_unit_value))
+        self.assertEqual(testunit_data['Quantification Limit Unit'], quan_unit_value)
+
+    @parameterized.expand(['spec', 'quan', 'spec_quan'])
+    def test026_create_testunit_of_type_quantitative_specification_or_quantification_only(self, testunit_type):
+        """
+        New: Test unit: Creation Approach: User can create test units with Quantitative type with specification only 
+        LIMS-4156
+
+        New:Test unit: Create Approach: User can create test unit with limits of quantification type only & with upper lower limits 
+        LIMS-5427
+
+        """
+
+        self.base_selenium.LOGGER.info('create new testunit with sub/super scripts unit of type quantitative')
+        random_method = self.generate_random_string()
+        random_name = self.generate_random_string()
+        random_upper_limit = self.test_unit_page.generate_random_number(lower=50, upper=100)
+        random_lower_limit = self.test_unit_page.generate_random_number(lower=1, upper=49)
+        random_unit = self.generate_random_string()
+        self.test_unit_page.create_quantitative_testunit(unit=random_unit, spec_or_quan=testunit_type, method=random_method, lower_limit=random_lower_limit, upper_limit=random_upper_limit, name=random_name)
+        
+        self.base_selenium.LOGGER.info('get testunit data')
+        testunit_data = self.test_unit_page.get_tesunit_data(specification_type=testunit_type)
+        self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
+
+        testunit_record = self.test_unit_page.result_table()[0]
+        testunit_record_data = self.base_selenium.get_row_cells_dict_related_to_header(row=testunit_record)
+
+        self.base_selenium.LOGGER.info('make sure that the testunit table data are matching the form data')
+        self.base_selenium.LOGGER.info('testunit name is {}, and should be {}'.format(testunit_record_data['Test Unit Name'], testunit_data['name']))
+        self.assertEqual(testunit_record_data['Test Unit Name'], testunit_data['name'])
+        
+        self.base_selenium.LOGGER.info('testunit no is {}, and should be {}'.format(testunit_record_data['Test Unit No.'].replace("'",""), testunit_data['no']))
+        self.assertEqual(testunit_record_data['Test Unit No.'].replace("'",""), testunit_data['no'])
+
+        self.base_selenium.LOGGER.info('testunit material type is {}, and should be {}'.format(testunit_record_data['Material Type'], testunit_data['material_type']))
+        self.assertEqual(testunit_record_data['Material Type'], testunit_data['material_type'])
+
+        self.base_selenium.LOGGER.info('testunit iteration is {}, and should be {}'.format(testunit_record_data['Iterations'], testunit_data['iteration']))
+        self.assertEqual(testunit_record_data['Iterations'], testunit_data['iteration'])
+        
+        self.base_selenium.LOGGER.info('testunit category is {}, and should be {}'.format(testunit_record_data['Category'], testunit_data['category']))
+        self.assertEqual(testunit_record_data['Category'], testunit_data['category'])
+        
+        self.base_selenium.LOGGER.info('testunit type is {}, and should be {}'.format(testunit_record_data['Type'], testunit_data['type']))
+        self.assertEqual(testunit_record_data['Type'], testunit_data['type'])
+        
+        if testunit_data['type'] == 'Quantitative':
+            if testunit_type == 'spec':
+                self.base_selenium.LOGGER.info('testunit specifications is {}, and should be {}'.format(testunit_record_data['Specifications'], testunit_data['spec_lower_limit']+'-'+testunit_data['spec_upper_limit']))
+                self.assertEqual(testunit_record_data['Specifications'], testunit_data['spec_lower_limit']+'-'+testunit_data['spec_upper_limit'])
+                
+                self.base_selenium.LOGGER.info('testunit specification unit is {}, and should be {}'.format(testunit_record_data['Unit'], testunit_data['unit']))
+                self.assertEqual(testunit_record_data['Unit'], testunit_data['unit'])
+            elif testunit_type == 'quan':
+                self.base_selenium.LOGGER.info('testunit specifications is {}, and should be {}'.format(testunit_record_data['Quantification Limit'], testunit_data['quan_lower_limit']+'-'+testunit_data['quan_upper_limit']))
+                self.assertEqual(testunit_record_data['Quantification Limit'], testunit_data['quan_lower_limit']+'-'+testunit_data['quan_upper_limit'])
+                
+                self.base_selenium.LOGGER.info('testunit quantification unit is {}, and should be {}'.format(testunit_record_data['Quantification Limit Unit'], testunit_data['quan_unit']))
+                self.assertEqual(testunit_record_data['Quantification Limit Unit'], testunit_data['quan_unit'])
+            elif testunit_type == 'spec_quan':
+                self.base_selenium.LOGGER.info('testunit specifications is {}, and should be {}'.format(testunit_record_data['Specifications'], testunit_data['spec_lower_limit']+'-'+testunit_data['spec_upper_limit']))
+                self.assertEqual(testunit_record_data['Specifications'], testunit_data['spec_lower_limit']+'-'+testunit_data['spec_upper_limit'])
+                
+                self.base_selenium.LOGGER.info('testunit specification unit is {}, and should be {}'.format(testunit_record_data['Unit'], testunit_data['unit']))
+                self.assertEqual(testunit_record_data['Unit'], testunit_data['unit'])
+
+                self.base_selenium.LOGGER.info('testunit specifications is {}, and should be {}'.format(testunit_record_data['Quantification Limit'], testunit_data['quan_lower_limit']+'-'+testunit_data['quan_upper_limit']))
+                self.assertEqual(testunit_record_data['Quantification Limit'], testunit_data['quan_lower_limit']+'-'+testunit_data['quan_upper_limit'])
+                
+                self.base_selenium.LOGGER.info('testunit quantification unit is {}, and should be {}'.format(testunit_record_data['Quantification Limit Unit'], testunit_data['quan_unit']))
+                self.assertEqual(testunit_record_data['Quantification Limit Unit'], testunit_data['quan_unit'])
