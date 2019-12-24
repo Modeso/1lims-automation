@@ -267,6 +267,7 @@ class Contact(Contacts):
         self.sleep_tiny()
 
     def create_update_contact_person(self, create=True, indexToEdit=-1, name='', position='', email='', phone='', skype='', info='', save=False):
+        self.base_selenium.LOGGER.info('creating/ updating contact person')
         if create:
             self.base_selenium.click(element='contact:add_another_item')
 
@@ -323,6 +324,7 @@ class Contact(Contacts):
         return contact_person_data
         
     def get_contact_persons_data(self):
+        self.base_selenium.LOGGER.info('getting contact person data')
         self.get_contact_persons_page()
         contact_persons_arr = []
         webdriver.ActionChains(self.base_selenium.driver).send_keys(Keys.ESCAPE).perform()
@@ -347,6 +349,7 @@ class Contact(Contacts):
         return len(contact_persons_table_records)
     
     def delete_contact_person(self, index=0, save=False):
+        self.base_selenium.LOGGER.info('deleting contact person')
         contact_persons_table_records = self.base_selenium.get_table_rows(element='contact:contact_persons_table')
         if index < len(contact_persons_table_records):
             delete_button = contact_persons_table_records[index].find_element_by_xpath('//span[@id="delete_table_view"]')
@@ -454,18 +457,21 @@ class Contact(Contacts):
         return True
 
     def update_department_list(self, departments=[]):
+        self.base_selenium.LOGGER.info('updating departments list')
         departments_tags = self.base_selenium.find_element_by_xpath("//div[@class='ng2-tags-container']").find_elements_by_tag_name('tag')
         counter=0
         actions = webdriver.ActionChains(self.base_selenium.driver)
         for department in departments:
-            temp_department = departments_tags[counter].find_element_by_xpath("//div[@class='tag__text inline' and @title='"+departments_tags[counter].text+"']")
-            actions.double_click(temp_department).perform()
-            actions.key_down(Keys.CONTROL).send_keys("a").key_up(Keys.CONTROL).perform()
-            actions.send_keys(Keys.BACK_SPACE).perform()
-            actions.send_keys(department).perform()
-            webdriver.ActionChains(self.base_selenium.driver).send_keys(Keys.ENTER).perform()
-            self.sleep_tiny()
-            counter = counter+1
+            if counter < len(departments_tags):
+                temp_department = departments_tags[counter].find_element_by_xpath("//div[@class='tag__text inline' and @title='"+departments_tags[counter].text+"']")
+                actions.double_click(temp_department).perform()
+                actions.key_down(Keys.CONTROL).send_keys("a").key_up(Keys.CONTROL).perform()
+                actions.send_keys(department).perform()
+                webdriver.ActionChains(self.base_selenium.driver).send_keys(Keys.ENTER).perform()
+                self.sleep_tiny()
+                counter = counter+1
+            else:
+                self.set_contact_departments(departments=[department])
         
         self.sleep_tiny()
         self.save(save_btn='contact:save')
