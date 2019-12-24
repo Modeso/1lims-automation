@@ -31,23 +31,21 @@ class CalenderTestCases(BaseTest):
         Calendar: Make sure that you can navigate between months successfully
         LIMS-6376
         """
-        month1 = self.calender_page.prev_month()
-        self.base_selenium.LOGGER.info(month1)
-        self.calender_page.sleep_tiny()
-        month2 = self.calender_page.nxt_month()
-        self.base_selenium.LOGGER.info(month2)
-        self.calender_page.sleep_tiny()
-        assert month1 != month2
-
-    def test003_navigate_calender(self):
-        """
-        Calendar: Make sure that you can navigate between months successfully
-        LIMS-6376
-        """
-        months = ["JANUARY","FEBRUARY","MARCH","APRIL","MAY","JUNE","JULY","AUGUST","SEPTEMBER","OCTOBER","NOVEMBER","DECEMBER"]
-        current=self.calender_page.current_month().split(' ')[0]
-        self.base_selenium.LOGGER.info(current)
-        for a in months:
-            if current==a:
-                self.base_selenium.LOGGER.info("current month is ok")
-
+        months = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER",
+                  "NOVEMBER", "DECEMBER"]
+        prev_month = self.calender_page.prev_month()
+        current = self.calender_page.current_month()
+        nxt_month = self.calender_page.nxt_month()
+        assert current in months
+        assert prev_month in months
+        assert nxt_month in months
+        current_index = months.index(current)
+        if current_index == 0:
+            assert months.index(prev_month) == 11
+            assert months.index(nxt_month) == 1
+        elif current_index == 11:
+            assert months.index(nxt_month) == 0
+            assert months.index(prev_month) == 10
+        else:
+            assert months.index(prev_month) == current_index - 1
+            assert months.index(nxt_month) == current_index + 1
