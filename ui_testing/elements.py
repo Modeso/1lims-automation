@@ -563,7 +563,7 @@ elements = {
 
     'roles_and_permissions': {
         'right_menu': {'method': 'xpath',
-                          'value': '//[@class="flaticon-grid-menu-v2"]'},
+                          'value': '//*[@id="custom-accordion-panel"]/div/a/i'},
 
         'archive': {'method': 'xpath',
                  'value': '//modeso-table-filter//a[2]'},
