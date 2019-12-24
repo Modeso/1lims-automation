@@ -117,8 +117,16 @@ elements = {
                  'value': '//button[@class="fc-prev-button fc-button fc-button-primary"]'},
         'nxt': {'method': 'xpath',
                 'value': '//button[@class="fc-next-button fc-button fc-button-primary"]'},
+        'current': {'method': 'xpath',
+                    'value': '//button[@class="fc-today-button fc-button fc-button-primary"]'},
         'month': {'method': 'xpath',
-                  'value': '//div[@class="fc-center"]'}
+                  'value': '//div[@class="fc-center"]'},
+        'close': {'method': 'xpath',
+                  'value': '//div[@id="calendar-modal-body"]//button[@class="close"]'},
+        'switch': {'method': 'xpath',
+                   'value': '//li[@class="m-portlet__nav-item"]//i[@class="la la-calendar"]'},
+        'title': {'method': 'xpath',
+                  'value': '//h3[@class="m-portlet__head-text"]'}
     },
     'login': {
         'username': {'method': 'name',
