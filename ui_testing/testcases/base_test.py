@@ -11,6 +11,7 @@ from ui_testing.pages.calender_page import Calender
 from api_testing.apis.test_unit_api import TestUnitAPI
 from api_testing.apis.article_api import ArticleAPI
 from api_testing.apis.test_plan_api import TestPlanAPI
+from api_testing.apis.orders_api import OrdersAPI
 import datetime, re
 
 
@@ -34,6 +35,7 @@ class BaseTest(TestCase):
         self.test_plan_api = TestPlanAPI()
         self.test_unit_api = TestUnitAPI()
         self.test_plan_api = TestPlanAPI()
+        self.orders_api = OrdersAPI()
 
     def tearDown(self):
         self.base_selenium.quit_driver()

@@ -126,7 +126,9 @@ elements = {
         'switch': {'method': 'xpath',
                    'value': '//li[@class="m-portlet__nav-item"]//i[@class="la la-calendar"]'},
         'title': {'method': 'xpath',
-                  'value': '//h3[@class="m-portlet__head-text"]'}
+                  'value': '//h3[@class="m-portlet__head-text"]'},
+        'open_analysis': {'method': 'xpath',
+                          'value': '//span[contains(text(),"Open")]'}
     },
     'login': {
         'username': {'method': 'name',

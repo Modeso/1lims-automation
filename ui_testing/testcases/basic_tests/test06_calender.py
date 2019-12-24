@@ -8,7 +8,6 @@ class CalenderTestCases(BaseTest):
         self.login_page.login(username=self.base_selenium.username, password=self.base_selenium.password)
         self.base_selenium.wait_until_page_url_has(text='dashboard')
         self.base_selenium.LOGGER.info('click on calender')
-        self.calender_page.get_calender()
 
     @parameterized.expand(['contacts', 'articles', 'testUnits', 'testPlans'])
     def test001_open_calender(self, type):
@@ -17,6 +16,11 @@ class CalenderTestCases(BaseTest):
         the calendar open successfully
 
         LIMS-6359
+
+        Calendar: When I press on the calendar, it should
+        redirect me to the correct analysis
+
+        LIMS-6218
         """
         page_name = "{}" + type
         url = page_name.format(self.base_selenium.url)
@@ -25,12 +29,17 @@ class CalenderTestCases(BaseTest):
         self.calender_page.get_calender()
         self.base_selenium.LOGGER.info(self.base_selenium.check_element_is_exist(element='calender:calender_title'))
         assert self.base_selenium.check_element_is_exist(element='calender:calender_title') == True
+        self.base_selenium.click(element='calender:open_analysis')
+        self.calender_page.sleep_small()
 
     def test002_navigate_calender(self):
         """
         Calendar: Make sure that you can navigate between months successfully
+
         LIMS-6376
         """
+        self.base_selenium.LOGGER.info('click on calender')
+        self.calender_page.get_calender()
         months = ["JANUARY", "FEBRUARY", "MARCH", "APRIL", "MAY", "JUNE", "JULY", "AUGUST", "SEPTEMBER", "OCTOBER",
                   "NOVEMBER", "DECEMBER"]
         prev_month = self.calender_page.prev_month()
