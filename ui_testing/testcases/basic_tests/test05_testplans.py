@@ -343,11 +343,17 @@ class TestPlansTestCases(BaseTest):
             self.assertEqual(old_completed_testplan_version + 1, int(inprogress_testplan_version))
             self.assertEqual(testplan_row_data_status, 'In Progress')
 
-    def test010_create_testplans_same_name_article_materialtype(self):
+    @parameterized.expand(['same', 'all'])
+    def test010_create_testplans_same_name_article_materialtype(self,same):
         '''
         LIMS-3499
         Testing the creation of two testplans with the same name, material type
         and article, this shouldn't happen
+
+        LIMS-3500
+        New: Test plan: Creation Approach: I can't create two test plans
+        with the same name & same materiel type & one with any article
+        and the other one all
         '''
 
         # get all articles and choose a random one to take its information
@@ -366,10 +372,14 @@ class TestPlansTestCases(BaseTest):
 
         self.base_selenium.LOGGER.info(
             'Attempting to create another testplan with the same data as the previously created one')
-
-        # create another testplan with the same data
-        self.test_plan.create_new_test_plan(name=testplan_name, material_type=article_data['materialType'],
+        if ("same"==same):
+            # create another testplan with the same data
+            self.test_plan.create_new_test_plan(name=testplan_name, material_type=article_data['materialType'],
                                             article=article_data['name'])
+        else :
+            # create another testplan with the same name and material type and All articles
+            self.test_plan.create_new_test_plan(name=testplan_name, material_type=article_data['materialType'],
+                                                article='All')
 
         self.base_selenium.LOGGER.info(
             'Waiting for the error message to make sure that validation forbids the creation of two testplans having the same name, material type and article')
@@ -426,42 +436,3 @@ class TestPlansTestCases(BaseTest):
 
         self.assertEqual(search_length, 2)
 
-    def test012_create_testplans_same_name_materialtype_all_article(self):
-        '''
-        LIMS-3500
-        New: Test plan: Creation Approach: I can't create two test plans
-        with the same name & same materiel type & one with any article
-        and the other one all
-        '''
-
-        # get all articles and choose a random one to take its information
-        articles = self.get_all_articles()
-        random_index = self.generate_random_number(lower=0, upper=len(articles))
-        article_data = articles[random_index]
-        self.base_selenium.LOGGER.info(
-            'A random article is chosen, its name: {} and its material type: {}'.format(article_data['name'],
-                                                                                        article_data[
-                                                                                            'materialType']))
-
-        testplan_name = self.test_plan.create_new_test_plan(material_type=article_data['materialType'],
-                                                            article=article_data['name'])
-        self.base_selenium.LOGGER.info(
-            'New testplan is created successfully with name: {}, article name: {} and material type: {}'.format(
-                testplan_name, article_data['name'], article_data['materialType']))
-
-        self.base_selenium.LOGGER.info(
-            'Attempting to create another testplan with the same name & material type as the previously created one,'
-            ' and all articles')
-
-        # create another testplan with the same data
-        self.test_plan.create_new_test_plan(name=testplan_name, material_type=article_data['materialType'],
-                                            article='All')
-
-        self.base_selenium.LOGGER.info(
-            'Waiting for the error message to make sure that validation forbids the creation of two testplans having the same name, material type and article')
-        validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
-
-        self.base_selenium.LOGGER.info(
-            'Assert the error message to make sure that validation forbids the creation of two testplans having the same name, material type one of any article and the other for all articles? {}'.format(
-                validation_result))
-        self.assertTrue(validation_result)
