@@ -128,7 +128,11 @@ elements = {
         'title': {'method': 'xpath',
                   'value': '//h3[@class="m-portlet__head-text"]'},
         'open_analysis': {'method': 'xpath',
-                          'value': '//span[contains(text(),"Open")]'}
+                          'value': '//span[contains(text(),"Open")]'},
+        'calender_overview': {'method':'xpath',
+                              'value':'class="m-portlet__head-text"'},
+        'calender_contents': {'method':'xpath',
+                             'value':'//div[@class="fc-content"]'}
     },
     'login': {
         'username': {'method': 'name',

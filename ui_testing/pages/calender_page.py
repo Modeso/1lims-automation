@@ -29,6 +29,11 @@ class Calender(BasePages):
         self.sleep_tiny()
         return (self.base_selenium.get_text(element='calender:title'))
 
+    def which_overview(self):
+        return (self.base_selenium.get_text(element='calender:calender_overview'))
+
+    def switch_overview(self):
+        self.base_selenium.click(element='calender:switch')
 
 
 

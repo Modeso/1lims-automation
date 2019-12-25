@@ -58,3 +58,22 @@ class CalenderTestCases(BaseTest):
         else:
             assert months.index(prev_month) == current_index - 1
             assert months.index(nxt_month) == current_index + 1
+
+    def test003_hover_test_units_analysis(self):
+        """
+        Calendar: Make sure when you hover on any test unit results,
+        all the test unit name inside it appear on the right hand side
+        LIMS-6377
+        """
+        # open calender
+        self.base_selenium.LOGGER.info('click on calender')
+        self.calender_page.get_calender()
+        # make sure Test Units Analysis Overview is selected
+        calender_overview= self.calender_page.which_overview()
+        if "Analysis" in calender_overview:
+            self.calender_page.switch_overview()
+            self.base_selenium.LOGGER.info('switched to Test Unit Overview')
+        else:
+            self.base_selenium.LOGGER.info('Already on Test Unit Overview')
+
+
