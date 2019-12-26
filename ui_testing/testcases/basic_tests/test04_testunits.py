@@ -796,7 +796,23 @@ class TestUnitsTestCases(BaseTest):
             self.assertEqual(self.base_selenium.get_url(), 'https://automation.1lims.com/testUnits/add')
             self.base_selenium.LOGGER.info('clicking on Overview cancelled')
 
-    def test025_allow_testunits_to_display_subscrip_superscript_in_active_table(self):
+    def test025_edit_approach_overview_button(self):
+        """
+        Edit: Overview Approach: Make sure after I press on
+        the overview button, it redirects me to the active table
+        LIMS-6202
+        """
+        self.test_unit_page.get_random_test_units()
+        test_units_url = self.base_selenium.get_url()
+        self.base_selenium.LOGGER.info('test_units_url: {}'.format(test_units_url))
+        # click on Overview, it will redirect you to testunits' page
+        self.base_selenium.LOGGER.info('click on Overview')
+        self.base_page.click_overview()
+        self.test_unit_page.sleep_tiny()
+        self.assertEqual(self.base_selenium.get_url(), '{}testUnits'.format(self.base_selenium.url))
+        self.base_selenium.LOGGER.info('clicking on Overview confirmed')
+
+    def test026_allow_testunits_to_display_subscrip_superscript_in_active_table(self):
         """
         Test unit: Active table/unit: Sub & Super scripts: Allow unit to display with sub & super scripts in the active table 
         LIMS-5794
@@ -826,7 +842,7 @@ class TestUnitsTestCases(BaseTest):
         self.assertEqual(testunit_data['Quantification Limit Unit'], quan_unit_value)
 
     @parameterized.expand(['spec', 'quan', 'spec_quan'])
-    def test026_create_testunit_of_type_quantitative_specification_or_quantification_only(self, testunit_type):
+    def test027_create_testunit_of_type_quantitative_specification_or_quantification_only(self, testunit_type):
         """
         New: Test unit: Creation Approach: User can create test units with Quantitative type with specification only 
         LIMS-4156
@@ -895,3 +911,5 @@ class TestUnitsTestCases(BaseTest):
                 
                 self.base_selenium.LOGGER.info('testunit quantification unit is {}, and should be {}'.format(testunit_record_data['Quantification Limit Unit'], testunit_data['quan_unit']))
                 self.assertEqual(testunit_record_data['Quantification Limit Unit'], testunit_data['quan_unit'])
+   
+
