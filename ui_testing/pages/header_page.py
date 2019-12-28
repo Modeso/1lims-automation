@@ -72,23 +72,29 @@ class Header(BasePages):
             self.sleep_small()
 
 
-    def create_new_user(self, user_role='', sleep=True, user_email='', user_password='', user_confirm_password='', user_name=''):
+    def create_new_user(self, user_role='', sleep=True, user_email='', user_password='', user_confirm_password='', user_name='', contact_name=''):
         self.base_selenium.LOGGER.info(' + Create new user.')
         self.base_selenium.click(element='user_management:create_user_button')
         time.sleep(self.base_selenium.TIME_SMALL)
         self.user_name = self.generate_random_text()
         self.set_user_name(self.user_name)
         self.set_user_email(user_email)
-        self.set_user_role(user_role)
         self.set_user_password(user_password)
         self.set_user_confirm_password(user_confirm_password)
+        if user_role=='contact':
+            self.set_user_role(user_role='contact')
+            self.sleep_small()
+            self.set_contact_name(contact_name=contact_name)
 
+        else:
+             self.set_user_role(user_role)
         user_data = {
             "user_name":self.get_user_name(),
             "user_email":self.set_user_email,
             "user_role": self.get_user_role(),
             "user_password": self.get_user_password(),
-            "user_confirm_password": self.get_user_confirm_password()
+            "user_confirm_password": self.get_user_confirm_password(),
+            "contact_name": self.get_contact_name(),
         }
         self.save(sleep)
         return user_data
@@ -132,9 +138,19 @@ class Header(BasePages):
     def set_user_role(self, user_role='', random=False):
             if random:
                 self.base_selenium.select_item_from_drop_down(element='user_management:user_role', avoid_duplicate=True)
-                return self.get_user_role()
             else:
                 self.base_selenium.select_item_from_drop_down(element='user_management:user_role', item_text=user_role)
+                return self.get_user_role()
+
+    def get_contact_name(self):
+            return self.base_selenium.get_text(element='user_management:contact_name').split('\n')[0]
+
+    def set_contact_name(self, contact_name='', random=False):
+            if random:
+                self.base_selenium.select_item_from_drop_down(element='user_management:contact_name', avoid_duplicate=True)
+            else:
+                self.base_selenium.select_item_from_drop_down(element='user_management:contact_name', item_text=contact_name)
+                return self.get_contact_name()
 
     def click_on_filter_view(self):
             self.base_selenium.LOGGER.info('Press on the filter view button')
@@ -219,10 +235,6 @@ class Header(BasePages):
         self.base_selenium.LOGGER.info('Press on the overview button')
         self.base_selenium.click(element='user_management:clear_all')
         self.sleep_small()
-
-
-
-
 
 
 
