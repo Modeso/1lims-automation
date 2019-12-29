@@ -505,7 +505,7 @@ class TestUnitsTestCases(BaseTest):
         self.base_selenium.LOGGER.info('Create with upper limit : {}'.format(new_random_limit))
         self.test_unit_page.create_quantitative_mibi_testunit(name=new_random_name, method=new_random_method,
                                                               upper_limit=new_random_limit,
-                                                              category=new_random_category)
+                                                             category=new_random_category)
 
         self.test_unit_page.sleep_tiny()
         self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')

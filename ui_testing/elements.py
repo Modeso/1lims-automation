@@ -144,7 +144,9 @@ elements = {
         'login_btn': {'method': 'id',
                       'value': 'm_login_signin_submit'},
         'refresh': {'method': 'xpath',
-                    'value': '/html/body/div[3]/div/div[2]/div[2]/button'}
+                    'value': '/html/body/div[3]/div/div[2]/div[2]/button'},
+        'logout_btn': {'method': 'xpath',
+                    'value': '//a[@class="btn m-btn--pill btn-secondary m-btn m-btn--custom m-btn--label-brand m-btn--bolder"]'},
     },
 
     'articles': {
@@ -573,6 +575,8 @@ elements = {
                  'value': 'Delete'},
        'contact_name': {'method': 'id',
                  'value': 'supplierfield'},
+      'oh_snap_message': {'method': 'id',
+                 'value': 'ohSnapMsg'},
 
    },
     'contacts':{
