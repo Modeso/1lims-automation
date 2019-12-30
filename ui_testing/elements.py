@@ -589,8 +589,6 @@ elements = {
                  'value':'reset_btn'},
        'delete': {'method': 'link_text',
                  'value': 'Delete'},
-       'contact_name': {'method': 'id',
-                 'value': 'supplierfield'},
       'oh_snap_message': {'method': 'id',
                  'value': 'ohSnapMsg'},
 
