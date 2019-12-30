@@ -71,7 +71,7 @@ class Header(BasePages):
             self.base_selenium.click(element='user_management:active')
             self.sleep_small()
 
-    def create_user(self, user_role='', sleep=True, user_email='', user_password='', user_confirm_password='', user_name='', contact_name = ''):
+    def create_user(self, user_role='', sleep=True, user_email='', user_password='', user_confirm_password='', user_name=''):
         self.base_selenium.LOGGER.info(' + Create new user.')
         self.base_selenium.click(element='user_management:create_user_button')
         time.sleep(self.base_selenium.TIME_SMALL)
@@ -80,18 +80,15 @@ class Header(BasePages):
         email =self.set_user_email(user_email)
         password = self.set_user_password(user_password)
         confirm_password = self.set_user_confirm_password(user_confirm_password)
-        role = self.set_user_role(user_role ='')
-        contact = ''
-        if user_role == 'Contact':
-           contact = self.set_contact_name(contact_name)
-
+        role = self.set_user_role(user_role)
+       
         user_data = {
             "user_name": name,
             "user_email": email,
             "user_role": role,
             "user_password": password,
             "user_confirm_password": confirm_password,
-            "user_contact_name": contact,
+            
 
         }
         self.save(sleep)
