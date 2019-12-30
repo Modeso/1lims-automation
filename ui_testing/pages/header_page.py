@@ -71,23 +71,27 @@ class Header(BasePages):
             self.base_selenium.click(element='user_management:active')
             self.sleep_small()
 
-
-    def create_new_user(self, user_role='', sleep=True, user_email='', user_password='', user_confirm_password='', user_name=''):
+    def create_user(self, user_role='', sleep=True, user_email='', user_password='', user_confirm_password='', user_name='', contact_name = ''):
         self.base_selenium.LOGGER.info(' + Create new user.')
         self.base_selenium.click(element='user_management:create_user_button')
         time.sleep(self.base_selenium.TIME_SMALL)
         self.user_name = self.generate_random_text()
-        self.set_user_name(self.user_name)
-        self.set_user_email(user_email)
-        self.set_user_password(user_password)
-        self.set_user_confirm_password(user_confirm_password)
-        self.set_user_role(user_role)
+        name = self.set_user_name(self.user_name)
+        email =self.set_user_email(user_email)
+        password = self.set_user_password(user_password)
+        confirm_password = self.set_user_confirm_password(user_confirm_password)
+        role = self.set_user_role(user_role ='')
+        contact = ''
+        if user_role == 'Contact':
+           contact = self.set_contact_name(contact_name)
+
         user_data = {
-            "user_name":self.get_user_name(),
-            "user_email":self.set_user_email,
-            "user_role": self.get_user_role(),
-            "user_password": self.get_user_password(),
-            "user_confirm_password": self.get_user_confirm_password(),
+            "user_name": name,
+            "user_email": email,
+            "user_role": role,
+            "user_password": password,
+            "user_confirm_password": confirm_password,
+            "user_contact_name": contact,
 
         }
         self.save(sleep)
@@ -167,7 +171,6 @@ class Header(BasePages):
         self.filter_apply()
 
 
-
     def get_created_on_filter(self):
         return self.base_selenium.get_value(element='order:test_date')
 
@@ -233,7 +236,6 @@ class Header(BasePages):
     def get_last_user_row(self):
         rows = self.result_table()
         return rows[0]
-
 
 
 

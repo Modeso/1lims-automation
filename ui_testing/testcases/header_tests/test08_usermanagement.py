@@ -113,7 +113,7 @@ class HeaderTestCases(BaseTest):
         self.base_selenium.LOGGER.info('deleted successfully')
         self.assertFalse(result, 'deleted successfully')
 
-    def test006_create_new_user(self):
+    def test006_create_user_with_admin_role(self):
         """
         Header: User management Approach:  Make sure that I can create new user successfully
         LIMS-6000
@@ -121,7 +121,7 @@ class HeaderTestCases(BaseTest):
         """
         self.header_page.click_on_user_management_button()
         #create new user
-        self.header_page.create_new_user(user_email=(self.header_page.generate_random_email()), user_role='',
+        self.header_page.create_user(user_email=(self.header_page.generate_random_email()), user_role='',
                                          user_password='1', user_confirm_password='1')
 
         #make sure when you search you will find it
@@ -290,6 +290,4 @@ class HeaderTestCases(BaseTest):
         validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
         self.base_selenium.LOGGER.info('Assert error msg')
         self.assertEqual(validation_result, True)
-
-
 

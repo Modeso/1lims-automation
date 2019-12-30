@@ -578,6 +578,7 @@ elements = {
       'oh_snap_message': {'method': 'id',
                  'value': 'ohSnapMsg'},
 
+
    },
     'contacts':{
         'new_contact': {'method': 'xpath',
@@ -677,6 +678,7 @@ elements = {
        'delete_person_button': {'method': 'id',
                      'value': 'delete_table_view'}
 
-    }
+
+}
 }
 
