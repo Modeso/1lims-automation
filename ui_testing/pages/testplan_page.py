@@ -1,6 +1,7 @@
 from ui_testing.pages.testplans_page import TestPlans
 from selenium.common.exceptions import NoSuchElementException
 
+
 class TstPlan(TestPlans):
     def get_no(self):
         return self.base_selenium.get_value(element="test_plan:no")
@@ -48,7 +49,8 @@ class TstPlan(TestPlans):
         self.base_selenium.click('test_plan:next')
         self.base_selenium.click('test_plan:add_test_units')
         self.sleep_small()
-        self.base_selenium.select_item_from_drop_down(element='test_plan:test_units', item_text=test_unit)
+        self.base_selenium.select_item_from_drop_down(element='test_plan:test_units', item_text=test_unit,
+                                                      options_element='general:drop_down_tu')
         self.base_selenium.click('test_plan:add')
         if 'upper' in kwargs:
             self.base_selenium.LOGGER.info(' set upper : {}'.format(kwargs['upper']))
@@ -117,16 +119,16 @@ class TstPlan(TestPlans):
             row_data = self.base_selenium.get_row_cells(row)
             row_data_text = []
             for r in row_data:
-                row_data_text.append(r.text) 
+                row_data_text.append(r.text)
             testunits.append(row_data_text)
-            
+
         return testunits
 
     def delete_the_first_testunit_from_the_tableview(self):
         self.base_selenium.LOGGER.info('Deleting the first testunit from the testunits table')
         self.base_selenium.click(element='test_plan:row_delete_button')
         self.sleep_medium()
-    
+
     def check_if_deleted_testunit_is_available(self, all_testunits, deleted_test_unit):
         deleted_test_unit_found = 0
         for testunit in all_testunits:
@@ -146,18 +148,26 @@ class TstPlan(TestPlans):
         self.base_selenium.click(element='test_plan:ok')
         self.sleep_small()
 
+    def save_complete_and_confirm_popup(self):
+        self.save(save_btn='test_plan:save_and_complete')
+        # press 'Ok' on the popup
+        self.base_selenium.LOGGER.info('Accepting the changes made')
+        self.base_selenium.click(element='test_plan:ok')
+        self.sleep_small()
+
     def delete_all_testunits(self):
         testunits_still_available = 1
         while testunits_still_available:
             try:
                 self.base_selenium.click(element='test_plan:remove_testunit')
             except:
-                testunits_still_available = 0      
+                testunits_still_available = 0
 
     '''
     Changes the fields in the testplan after choosing the duplicate option on
     a specific testplan
     '''
+
     def duplicate_testplan(self, change=[]):
         for c in change:
             self.base_selenium.LOGGER.info('Changing the {} field'.format(c))

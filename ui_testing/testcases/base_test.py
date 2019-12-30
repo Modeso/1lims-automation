@@ -143,7 +143,31 @@ class BaseTest(TestCase):
     def get_all_articles(self):
         articles = self.article_api.get_all_articles().json()['articles']
         return articles
-        
+
+    def get_all_test_plans(self):
+        test_plans_response = self.test_plan_api.get_all_test_plans()
+        test_plans = test_plans_response.json()['testPlans']
+        return test_plans
+
+    def get_completed_testplans(self):
+        test_plans_response = self.test_plan_api.get_all_test_plans()
+        all_test_plans = test_plans_response.json()['testPlans']
+        completed_test_plans = [test_plan for test_plan in all_test_plans if test_plan['status'] == 'Completed']
+        return completed_test_plans
+
+    def get_all_test_units(self):
+        test_units_response = self.test_unit_api.get_all_test_units()
+        test_units = test_units_response.json()['testUnits']
+        return test_units
+
+    def get_quantitative_test_unit_with_limits(self):
+        all_test_units = self.get_all_test_units()
+        for test_unit in all_test_units:
+            if test_unit['typeName'] == 'Quantitative':
+                if test_unit['quantification'] != 'None':
+                    if not test_unit['quantification']:
+                         return test_unit
+
     def info(self, message):
         self.base_selenium.LOGGER.info(message)
 

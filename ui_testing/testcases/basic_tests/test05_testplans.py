@@ -22,6 +22,8 @@ class TestPlansTestCases(BaseTest):
         '''
 
         completed_test_plans = self.test_plan_api.get_completed_testplans()
+        self.base_selenium.LOGGER.info(completed_test_plans)
+
         testplan_name = random.choice(completed_test_plans)['testPlanName']
 
         # navigate to the chosen testplan edit page
@@ -344,7 +346,7 @@ class TestPlansTestCases(BaseTest):
             self.assertEqual(testplan_row_data_status, 'In Progress')
 
     @parameterized.expand(['same', 'all'])
-    def test010_create_testplans_same_name_article_materialtype(self,same):
+    def test010_create_testplans_same_name_article_materialtype(self, same):
         '''
         LIMS-3499
         Testing the creation of two testplans with the same name, material type
@@ -372,11 +374,11 @@ class TestPlansTestCases(BaseTest):
 
         self.base_selenium.LOGGER.info(
             'Attempting to create another testplan with the same data as the previously created one')
-        if ("same"==same):
+        if ("same" == same):
             # create another testplan with the same data
             self.test_plan.create_new_test_plan(name=testplan_name, material_type=article_data['materialType'],
-                                            article=article_data['name'])
-        else :
+                                                article=article_data['name'])
+        else:
             # create another testplan with the same name and material type and All articles
             self.test_plan.create_new_test_plan(name=testplan_name, material_type=article_data['materialType'],
                                                 article='All')
@@ -436,3 +438,33 @@ class TestPlansTestCases(BaseTest):
 
         self.assertEqual(search_length, 2)
 
+    def test0012_update_quantification_limit_new_version_created(self):
+        """
+        New: Test plan: Limits of quantification Approach: In case I update the limits
+        of quantification this will trigger new version in the active table & version table
+        LIMS-4426
+        """
+        # create quantitative test unit with quantification limit
+        self.test_unit_page.get_test_units_page()
+        new_name = self.generate_random_string()
+        new_method = self.generate_random_string()
+        new_random_limit = self.generate_random_number()
+        self.test_unit_page.create_quantitative_testunit(name=new_name, material_type='', category='',
+                                                         upper_limit=new_random_limit, lower_limit=new_random_limit,
+                                                         spec_or_quan='quan', method=new_method)
+
+        self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
+
+        # select random test plan and add created test unit to it
+        self.test_plan.get_test_plans_page()
+        test_plans = self.get_all_test_plans()
+        testplan_name = random.choice(test_plans)['testPlanName']
+        # navigate to the chosen test plan edit page
+        self.test_plan.get_test_plan_edit_page(testplan_name)
+        self.test_plan.set_test_unit(test_unit=new_name)
+        # save the changes
+        self.test_plan.save_complete_and_confirm_popup()
+        # refresh the page to make sure the changes were saved correctly
+        self.base_selenium.LOGGER.info('Refreshing the page')
+        self.base_selenium.refresh()
+        self.test_plan.sleep_small()
