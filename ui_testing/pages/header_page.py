@@ -137,16 +137,6 @@ class Header(BasePages):
                 self.base_selenium.select_item_from_drop_down(element='user_management:user_role', item_text=user_role)
                 return self.get_user_role()
 
-    def get_contact_name(self):
-            return self.base_selenium.get_text(element='user_management:contact_name').split('\n')[0]
-
-    def set_contact_name(self, contact_name='', random=False):
-            if random:
-                self.base_selenium.select_item_from_drop_down(element='user_management:contact_name', avoid_duplicate=True)
-                return self.get_contact_name()
-            else:
-                self.base_selenium.select_item_from_drop_down(element='user_management:contact_name', item_text=contact_name)
-
     def click_on_filter_view(self):
             self.base_selenium.LOGGER.info('Press on the filter view button')
             self.base_selenium.click(element='general:menu_filter_view')
