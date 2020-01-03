@@ -2,6 +2,7 @@ from uuid import uuid4
 from ui_testing.pages.base_selenium import BaseSelenium
 import time, pyperclip
 from random import randint
+from selenium.webdriver import ActionChains
 
 
 class BasePages:
@@ -325,4 +326,17 @@ class BasePages:
     def cancel_overview_pop_up(self):
         self.base_selenium.click(element='general:cancel_overview')
         self.sleep_tiny()
+
+    def draggable_configure_table(self, source_element, destination_element, apply_button, configure_table_button):
+        self.base_selenium.click(element=configure_table_button)
+        self.base_selenium.LOGGER.info('find the source element that I want to drag from it ')
+        source_dom_element = self.base_selenium.find_element(element=source_element)
+        self.base_selenium.LOGGER.info('find the target element that I want to drop to it ')
+        destination_dom_element = self.base_selenium.find_element(element=destination_element)
+        self.sleep_small()
+        actions = ActionChains(self.base_selenium.driver)
+        actions.drag_and_drop(source_dom_element, destination_dom_element).perform()
+        self.base_selenium.click(element=apply_button)
+        self.sleep_tiny()
+
 
