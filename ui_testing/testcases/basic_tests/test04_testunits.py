@@ -1144,3 +1144,150 @@ class TestUnitsTestCases(BaseTest):
                 self.assertEqual(record_data['Quantification Limit Unit'], random_unit)
             version_counter = version_counter+1
             record_counter = record_counter+1
+
+    def test040_filter_by_testunit_no_returns_only_correct_results(self):
+        """
+        New: Test units: Filter Approach: Make sure you can filter by test unit no
+
+        LIMS-6430
+        """
+
+        random_row_to_get_number = self.test_unit_page.get_random_table_row(table_element='general:table')
+        testunit_number = self.base_selenium.get_row_cells_dict_related_to_header(row=random_row_to_get_number)['Test ' \
+                                                                                                                'Unit ' \
+                                                                                                                'No.']
+
+        self.test_unit_page.open_filter_menu()
+        self.test_unit_page.filter(element='test_unit:testunit_number_filter',type='',field_name='Test Unit No.',
+                                   filter_text=testunit_number)
+
+        filter_results = self.base_selenium.get_table_rows('general:table')
+        result_testunit = self.base_selenium.get_row_cells_dict_related_to_header(row=filter_results[0])['Test Unit No.']
+        self.assertEquals(testunit_number,result_testunit)
+        # number is unique, so should have only one result and the header row
+        # subtract one, since we table always has extra not displayed row
+        self.assertEquals(1, len(filter_results) - 1)
+
+    def test041_filter_by_testunit_unit_returns_only_correct_results(self):
+        """
+        New:  Test units: Filter Approach: Make sure you can filter by unit
+
+        LIMS-6427
+        """
+
+        new_random_name = self.generate_random_string()
+        new_random_method = self.generate_random_string()
+        new_random_unit = self.generate_random_string()
+
+        self.base_selenium.LOGGER.info('Create new testunit with qualitative and random generated data')
+        self.test_unit_page.create_qualitative_testunit(name=new_random_name, method=new_random_method,
+                                                        material_type='All',unit=new_random_unit)
+
+        self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
+
+        self.base_selenium.LOGGER.info('Get testunits page')
+        self.test_unit_page.get_test_units_page()
+
+        self.test_unit_page.open_filter_menu()
+        self.test_unit_page.filter(element='test_unit:spec_unit_filter',type='',field_name='Unit',
+                                   filter_text=new_random_unit)
+
+        filter_results = self.base_selenium.get_table_rows('general:table')
+        result_testunit = self.base_selenium.get_row_cells_dict_related_to_header(row=filter_results[0])['Unit']
+        self.assertEquals(new_random_unit,result_testunit.replace("'",''))
+        # number is unique, so should have only one result and the header row
+        # subtract one, since we table always has extra not displayed row
+        self.assertEquals(1, len(filter_results) - 1)
+
+    def test042_filter_by_testunit_category_returns_only_correct_results(self):
+        """
+        New:  Test units: Filter Approach: Make sure you can filter by category
+
+        LIMS-6429
+        """
+
+        new_random_name = self.generate_random_string()
+        new_random_method = self.generate_random_string()
+        new_random_category = self.generate_random_string()
+
+        self.base_selenium.LOGGER.info('Create new testunit with qualitative and random generated data')
+        self.test_unit_page.create_qualitative_testunit(name=new_random_name, method=new_random_method,
+                                                        material_type='All',category=new_random_category)
+
+        self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
+
+        self.base_selenium.LOGGER.info('Get testunits page')
+        self.test_unit_page.get_test_units_page()
+
+        self.test_unit_page.open_filter_menu()
+        self.test_unit_page.filter(element='test_unit:category_filter',type='drop_down',field_name='Category',
+                                   filter_text=new_random_category)
+
+        filter_results = self.base_selenium.get_table_rows('general:table')
+        result_testunit = self.base_selenium.get_row_cells_dict_related_to_header(row=filter_results[0])['Category']
+        self.assertEquals(new_random_category,result_testunit.replace("'",''))
+        # number is unique, so should have only one result and the header row
+        # subtract one, since we table always has extra not displayed row
+        self.assertEquals(1, len(filter_results) - 1)
+
+    def test043_filter_by_testunit_name_returns_only_correct_results(self):
+        """
+        New:  Test units: Filter Approach: Make sure you can filter by name
+
+        LIMS-6432
+        """
+
+        new_random_name = self.generate_random_string()
+        new_random_method = self.generate_random_string()
+        new_random_unit = self.generate_random_string()
+
+        self.base_selenium.LOGGER.info('Create new testunit with qualitative and random generated data')
+        self.test_unit_page.create_qualitative_testunit(name=new_random_name, method=new_random_method,
+                                                        material_type='All',unit=new_random_unit)
+
+        self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
+
+        self.base_selenium.LOGGER.info('Get testunits page')
+        self.test_unit_page.get_test_units_page()
+
+        self.test_unit_page.open_filter_menu()
+        self.test_unit_page.filter(element='test_unit:name_filter',type='',field_name='Test Unit Name',
+                                   filter_text=new_random_name)
+
+        filter_results = self.base_selenium.get_table_rows('general:table')
+        result_testunit = self.base_selenium.get_row_cells_dict_related_to_header(row=filter_results[0])['Test Unit Name']
+        self.assertEquals(new_random_name,result_testunit.replace("'",''))
+        # number is unique, so should have only one result and the header row
+        # subtract one, since we table always has extra not displayed row
+        self.assertEquals(1, len(filter_results) - 1)
+
+    def test044_filter_by_testunit_method_returns_only_correct_results(self):
+        """
+        New:  Test units: Filter Approach: Make sure you can filter by method
+
+        LIMS-6434
+        """
+
+        new_random_name = self.generate_random_string()
+        new_random_method = self.generate_random_string()
+        new_random_unit = self.generate_random_string()
+
+        self.base_selenium.LOGGER.info('Create new testunit with qualitative and random generated data')
+        self.test_unit_page.create_qualitative_testunit(name=new_random_name, method=new_random_method,
+                                                        material_type='All',unit=new_random_unit)
+
+        self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
+
+        self.base_selenium.LOGGER.info('Get testunits page')
+        self.test_unit_page.get_test_units_page()
+
+        self.test_unit_page.open_filter_menu()
+        self.test_unit_page.filter(element='test_unit:method_filter',type='',field_name='Method',
+                                   filter_text=new_random_method)
+
+        filter_results = self.base_selenium.get_table_rows('general:table')
+        result_testunit = self.base_selenium.get_row_cells_dict_related_to_header(row=filter_results[0])['Method']
+        self.assertEquals(new_random_method,result_testunit.replace("'",''))
+        # number is unique, so should have only one result and the header row
+        # subtract one, since we table always has extra not displayed row
+        self.assertEquals(1, len(filter_results) - 1)
