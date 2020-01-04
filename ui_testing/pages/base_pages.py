@@ -2,7 +2,6 @@ from uuid import uuid4
 from ui_testing.pages.base_selenium import BaseSelenium
 import time, pyperclip
 from random import randint
-import pymysql
 
 
 class BasePages:
@@ -143,6 +142,12 @@ class BasePages:
         self.base_selenium.scroll()
         self.base_selenium.click(element='general:right_menu')
         self.base_selenium.click(element='general:active')
+        self.sleep_small()
+
+    def get_version_items(self):
+        self.base_selenium.scroll()
+        self.base_selenium.click(element='general:right_menu')
+        self.base_selenium.click(element='general:versions')
         self.sleep_small()
 
     def restore_selected_items(self):

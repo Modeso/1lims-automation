@@ -4,6 +4,7 @@ from parameterized import parameterized
 import re, random
 from selenium.common.exceptions import NoSuchElementException
 
+
 class TestPlansTestCases(BaseTest):
 
     def setUp(self):
@@ -326,7 +327,7 @@ class TestPlansTestCases(BaseTest):
         main_testplan_data = self.test_plan.select_random_table_row(element='test_plans:test_plans_table')
         testplan_number = main_testplan_data['Test Plan No.']
         self.base_selenium.LOGGER.info('Testplan number: {} will be duplicated'.format(testplan_number))
-        
+
         self.test_plan.open_filter_menu()
         self.test_plan.filter_by_testplan_number(testplan_number)
 
@@ -385,37 +386,60 @@ class TestPlansTestCases(BaseTest):
             self.assertEqual(old_completed_testplan_version + 1, int(inprogress_testplan_version))
             self.assertEqual(testplan_row_data_status, 'In Progress')
 
-    def test012_create_testplans_same_name_article_materialtype(self):
+    @parameterized.expand(['same', 'all'])
+    def test012_create_testplans_same_name_article_materialtype(self, same):
         '''
         LIMS-3499
         Testing the creation of two testplans with the same name, material type
         and article, this shouldn't happen
+
+        LIMS-3500
+        New: Test plan: Creation Approach: I can't create two test plans
+        with the same name & same materiel type & one with any article
+        and the other one all
         '''
 
         testplans = self.test_plan_api.get_all_test_plans_json()
         testplan = random.choice(testplans)
-        
+
         testplan_name = self.test_plan.create_new_test_plan(material_type=testplan['materialType'],
                                                             article=(testplan['article'])[0])
         self.base_selenium.LOGGER.info(
             'New testplan is created successfully with name: {}, article name: {} and material type: {}'.format(
                 testplan_name, (testplan['article'])[0], testplan['materialType']))
 
-        self.base_selenium.LOGGER.info(
-            'Attempting to create another testplan with the same data as the previously created one')
+        if ("same" == same):
+            self.base_selenium.LOGGER.info(
+                'Attempting to create another testplan with the same data as the previously created one')
 
-        # create another testplan with the same data
-        self.test_plan.create_new_test_plan(name=testplan_name, material_type=testplan['materialType'],
-                                            article=(testplan['article'])[0])
+            # create another testplan with the same data
+            self.test_plan.create_new_test_plan(name=testplan_name, material_type=testplan['materialType'],
+                                                article=(testplan['article'])[0])
 
-        self.base_selenium.LOGGER.info(
-            'Waiting for the error message to make sure that validation forbids the creation of two testplans having the same name, material type and article')
-        validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
+            self.base_selenium.LOGGER.info(
+                'Waiting for the error message to make sure that validation forbids the creation of two testplans having the same name, material type and article')
+            validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
 
-        self.base_selenium.LOGGER.info(
-            'Assert the error message to make sure that validation forbids the creation of two testplans having the same name, material type and article? {}'.format(
-                validation_result))
-        self.assertTrue(validation_result)
+            self.base_selenium.LOGGER.info(
+                'Assert the error message to make sure that validation forbids the creation of two testplans having the same name, material type and article? {}'.format(
+                    validation_result))
+            self.assertTrue(validation_result)
+
+        else:
+            self.base_selenium.LOGGER.info(
+                'Attempting to create another testplan with the same data but All Articles')
+
+            self.test_plan.create_new_test_plan(name=testplan_name, material_type=testplan['materialType'],
+                                                article='All')
+
+            self.base_selenium.LOGGER.info(
+                'Waiting for the error message to make sure that validation forbids the creation of two testplans having the same name, material type and one with ALL article')
+            validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
+
+            self.base_selenium.LOGGER.info(
+                'Assert the error message to make sure that validation forbids the creation of two testplans having the same name, material type and one with All article? {}'.format(
+                    validation_result))
+            self.assertTrue(validation_result)
 
     def test013_create_testplans_same_name_different_materialtype(self):
         '''
@@ -446,41 +470,57 @@ class TestPlansTestCases(BaseTest):
 
         data = self.test_plan.search(testplan_name)
         self.assertGreaterEqual(len(data), 2)
-        
-    def test014_create_testplans_same_name_materialtype_all_article(self):
-        '''
-        LIMS-3500
-        New: Test plan: Creation Approach: I can't create two test plans
-        with the same name & same materiel type & one with any article
-        and the other one all
-        '''
 
-        testplans = self.test_plan_api.get_all_test_plans_json()
-        testplan = random.choice(testplans)
-        
-        testplan_name = self.test_plan.create_new_test_plan(material_type=testplan['materialType'],
-                                                            article=(testplan['article'])[0])
-        self.base_selenium.LOGGER.info(
-            'New testplan is created successfully with name: {}, article name: {} and material type: {}'.format(
-                testplan_name, (testplan['article'])[0], testplan['materialType']))
+    def test015_update_quantification_limit_new_version_created(self):
+        """
+        New: Test plan: Limits of quantification Approach: In case I update the limits
+        of quantification this will trigger new version in the active table & version table
+        LIMS-4426
+        """
+        # select random test plan and git material type
+        testplan = random.choice(self.test_plan_api.get_inprogress_testplans())
+        testplan_name = testplan['testPlanName']
+        material_type = testplan['materialType']
+        old_version = testplan['version']
+        # create quantitative test unit with quantification limit
+        self.test_unit_page.get_test_units_page()
+        new_name = self.generate_random_string()
+        new_method = self.generate_random_string()
+        new_random_limit = self.generate_random_number()
+        self.test_unit_page.create_quantitative_testunit(name=new_name, material_type=material_type, category='',
+                                                         upper_limit=new_random_limit, lower_limit=new_random_limit,
+                                                         spec_or_quan='quan', method=new_method)
 
+        self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
+        # navigate to the chosen test plan edit page
+        self.test_plan.get_test_plans_page()
+        self.test_plan.get_test_plan_edit_page(testplan_name)
+        # navigate to the test units selection tab
+        self.test_plan.set_test_unit(test_unit=new_name)
+        self.test_plan.sleep_tiny()
+        # save the changes
+        self.test_plan.save()
+        # navigate to the chosen test plan edit page
+        self.test_plan.get_test_plans_page()
+        self.test_plan.get_test_plan_edit_page(testplan_name)
+        # navigate to the test units selection tab
+        self.test_plan.edit_test_unit_quantification_limits(100, 20)
+        # save the changes
+        self.test_plan.save_and_confirm_popup()
 
-        self.base_selenium.LOGGER.info(
-            'Attempting to create another testplan with the same name & material type as the previously created one,'
-            ' and all articles')
+        # go back to the active table
+        self.test_plan.get_test_plans_page()
 
-        # create another testplan with the same data
-        self.test_plan.create_new_test_plan(name=testplan_name, material_type=testplan['materialType'],
-                                            article='All')
-
-        self.base_selenium.LOGGER.info(
-            'Waiting for the error message to make sure that validation forbids the creation of two testplans having the same name, material type and article')
-        validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
-
-        self.base_selenium.LOGGER.info(
-            'Assert the error message to make sure that validation forbids the creation of two testplans having the same name, material type one of any article and the other for all articles? {}'.format(
-                validation_result))
-        self.assertTrue(validation_result)
+        # get the testplan to check its version
+        self.base_selenium.LOGGER.info('Getting the currently changed testplan to check its status and version')
+        new_version, new_status = self.test_plan.get_testplan_version_and_status(search_text=testplan_name)
+        self.test_plan.click_check_box(source=self.base_selenium.get_table_rows(element='general:table')[0])
+        self.assertEqual(old_version + 1, int(new_version))
+        self.test_plan.get_version_items()
+        new_version_childtable_data = self.test_plan.get_child_table_data(index=1)
+        self.base_selenium.LOGGER.info('Asserting that the Quantification limits updated correctly')
+        self.assertEqual(new_version_childtable_data[0]['Quantification Limit'], "20-100")
+        self.base_selenium.LOGGER.info('the Quantification limits updated correctly')
 
     @skip('https://modeso.atlassian.net/browse/LIMS-6405')
     def test016_delete_used_testplan(self):
@@ -492,15 +532,17 @@ class TestPlansTestCases(BaseTest):
         testplan_name = test_plan_dict['Test Plan Name']
         testplan_article = test_plan_dict['Article Name']
         testplan_materialtype = test_plan_dict['Material Type']
-    
+
         # create a new order with this testplan
         self.order_page.get_orders_page()
-        self.order_page.create_new_order(material_type=testplan_materialtype, article=testplan_article, test_plans=[testplan_name])
+        self.order_page.create_new_order(material_type=testplan_materialtype, article=testplan_article,
+                                         test_plans=[testplan_name])
 
         # delete testplan
         self.test_plan.get_test_plans_page()
         self.base_selenium.LOGGER.info('Testplan number: {} will be archived'.format(testplan_name))
-        testplan_deleted = self.test_plan.delete_selected_item_from_active_table_and_from_archived_table(item_name=testplan_name)
+        testplan_deleted = self.test_plan.delete_selected_item_from_active_table_and_from_archived_table(
+            item_name=testplan_name)
 
         # check for the error popup that this testplan is used and can't be deleted
         self.assertFalse(testplan_deleted)
@@ -515,7 +557,8 @@ class TestPlansTestCases(BaseTest):
         main_testplan_data = (self.test_plan.select_random_table_row(element='test_plans:test_plans_table'))
 
         # get testplan data from an api call
-        testplan_data = (self.test_plan_api.get_testplan_with_filter(filter_option='number', filter_text=str(main_testplan_data['Test Plan No.'])))[0]
+        testplan_data = (self.test_plan_api.get_testplan_with_filter(filter_option='number', filter_text=str(
+            main_testplan_data['Test Plan No.'])))[0]
 
         # get information, material type and article
         testplan_name = testplan_data['testPlanName']
@@ -530,8 +573,9 @@ class TestPlansTestCases(BaseTest):
         self.order_page.get_orders_page()
 
         # create a new order with material type and article same as the saved ones
-        order_data = self.order_page.create_new_order(material_type=testplan_materialtype, article=testplan_article, test_plans=[testplan_name])
-       
+        order_data = self.order_page.create_new_order(material_type=testplan_materialtype, article=testplan_article,
+                                                      test_plans=[testplan_name])
+
         # get the first suborder's testplan and make sure it's an empty string
         suborder_first_testplan = (((order_data['suborders'])[0])['testplans'])[0]
         self.assertEqual(len(suborder_first_testplan), 0)
@@ -550,7 +594,8 @@ class TestPlansTestCases(BaseTest):
         articles_with_chosen_materialtype = active_articles_with_materialtype_dictionary[random_materialtype]
         random_article = random.choice(articles_with_chosen_materialtype)
 
-        self.test_unit_page.create_qualitative_testunit(name=testunit_name, unit='mg[2]{o}', method='a', material_type=random_materialtype)
+        self.test_unit_page.create_qualitative_testunit(name=testunit_name, unit='mg[2]{o}', method='a',
+                                                        material_type=random_materialtype)
         testunit_unit_display = (self.base_selenium.find_element(element='test_unit:unit_display_value')).text
 
         self.test_unit_page.save()
@@ -558,11 +603,11 @@ class TestPlansTestCases(BaseTest):
         self.assertEqual(testunit_unit_display, 'mg2o')
         self.test_plan.get_test_plans_page()
 
-        testplan_name = self.test_plan.create_new_test_plan(material_type=random_materialtype, article=random_article, test_unit=testunit_name)
+        testplan_name = self.test_plan.create_new_test_plan(material_type=random_materialtype, article=random_article,
+                                                            test_unit=testunit_name)
 
         self.test_plan.get_test_plan_edit_page(testplan_name)
         self.test_plan.navigate_to_testunits_selection_page()
-
 
         unit = self.base_selenium.find_element('test_plan:testunit_unit').text
         self.assertEqual(unit, testunit_unit_display)
