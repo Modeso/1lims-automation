@@ -418,8 +418,8 @@ class HeaderTestCases(BaseTest):
 
     def test015_filter_by_role_name(self):
         """
-        User management Approach: I can filter by user name successfully
-        LIMS-6002
+        Roles & Permissions: Make sure that the user can filter by role name
+        LIMS-6120
         :return:
         """
         self.base_selenium.click(element='header:roles_and_permissions_button')
@@ -435,8 +435,8 @@ class HeaderTestCases(BaseTest):
 
     def test016_filter_by_role_no(self):
         """
-        User management Approach: I can filter by no successfully
-        LIMS-6488
+        Header: Roles & Permissions Approach: Make sure that you can filter by role number
+        LIMS-6003
         :return:
         """
         self.base_selenium.click(element='header:roles_and_permissions_button')
