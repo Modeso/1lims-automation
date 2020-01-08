@@ -3,6 +3,7 @@ from unittest import skip
 from parameterized import parameterized
 import re, random
 from selenium.common.exceptions import NoSuchElementException
+import datetime
 
 class TestPlansTestCases(BaseTest):
 
@@ -603,6 +604,7 @@ class TestPlansTestCases(BaseTest):
                     self.assertIn(str(random_testplan['testPlanName']), tp.text)
             if self.base_page.is_next_page_button_enabled():
                 self.base_selenium.click('general:next_page')
+                self.base_selenium.LOGGER.info('Navigating to the next page')
                 self.test_plan.sleep_small()
                 testplans_found = self.test_plan.result_table()
             else:
@@ -626,6 +628,7 @@ class TestPlansTestCases(BaseTest):
                     self.assertNotIn('In Progress', tp.text)
             if self.base_page.is_next_page_button_enabled():
                 self.base_selenium.click('general:next_page')
+                self.base_selenium.LOGGER.info('Navigating to the next page')
                 self.test_plan.sleep_small()
                 testplans_found = self.test_plan.result_table()
             else:
@@ -683,4 +686,81 @@ class TestPlansTestCases(BaseTest):
         self.assertIn(random_user_name, testplan_found[0].text)
         self.assertIn(testplan_name, testplan_found[0].text)
 
-        
+    def test024_filter_by_testplan_material_type(self):
+        '''
+        LIMS-6471
+        User can filter with material type field
+        '''
+        testplans = self.test_plan_api.get_all_test_plans_json()
+        random_testplan = random.choice(testplans)
+
+        testplans_found = self.test_plan.filter_by_element_and_get_results('Material Type', 'test_plans:testplan_material_type_filter', random_testplan['materialType'], 'drop_down')
+        self.base_selenium.LOGGER.info('Checking if the results were filtered successfully')
+        results_found = True
+        while results_found:
+            for tp in testplans_found:
+                if len(tp.text) > 0:
+                    self.assertIn(str(random_testplan['materialType']), tp.text)
+            if self.base_page.is_next_page_button_enabled():
+                self.base_selenium.click('general:next_page')
+                self.base_selenium.LOGGER.info('Navigating to the next page')
+                self.test_plan.sleep_small()
+                testplans_found = self.test_plan.result_table()
+            else:
+                results_found = False
+
+        self.base_selenium.LOGGER.info('Filtering by material type was done successfully')
+
+    def test025_filter_by_testplan_article(self):
+        '''
+        LIMS-6472
+        User can filter with article field
+        '''
+        testplans = self.test_plan_api.get_all_test_plans_json()
+        random_testplan = random.choice(testplans)
+
+        testplans_found = self.test_plan.filter_by_element_and_get_results('Article', 'test_plans:testplan_article_filter', random_testplan['article'][0], 'drop_down')
+        self.base_selenium.LOGGER.info('Checking if the results were filtered successfully')
+        results_found = True
+        while results_found:
+            for tp in testplans_found:
+                if len(tp.text) > 0:
+                    self.assertIn(str(random_testplan['article'][0]), tp.text)
+            if self.base_page.is_next_page_button_enabled():
+                self.base_selenium.click('general:next_page')
+                self.base_selenium.LOGGER.info('Navigating to the next page')
+                self.test_plan.sleep_small()
+                testplans_found = self.test_plan.result_table()
+            else:
+                results_found = False
+
+        self.base_selenium.LOGGER.info('Filtering by article was done successfully')
+
+    @skip('https://modeso.atlassian.net/browse/LIMS-6505')
+    def test025_filter_by_testplan_created_on(self):
+        '''
+        LIMS-6476
+        User can filter with created on field
+        '''
+        testplans = self.test_plan_api.get_all_test_plans_json()
+        random_testplan = random.choice(testplans)
+        date = datetime.datetime.strptime(random_testplan['createdAt'], "%Y-%m-%dT%H:%M:%S.%fZ")
+        date_formatted = datetime.datetime.strftime(date,'%d.%m.%Y')
+
+        testplans_found = self.test_plan.filter_by_element_and_get_results('Created On', 'test_plans:testplan_created_on_filter', date_formatted, 'date')
+        self.base_selenium.LOGGER.info('Checking if the results were filtered successfully')
+        print(testplans_found)
+        results_found = True
+        while results_found:
+            for tp in testplans_found:
+                if len(tp.text) > 0:
+                    self.assertIn(date_formatted, tp.text)
+            if self.base_page.is_next_page_button_enabled():
+                self.base_selenium.click('general:next_page')
+                self.base_selenium.LOGGER.info('Navigating to the next page')
+                self.test_plan.sleep_small()
+                testplans_found = self.test_plan.result_table()
+            else:
+                results_found = False
+
+        self.base_selenium.LOGGER.info('Filtering by created on date was done successfully')

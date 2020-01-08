@@ -258,6 +258,10 @@ elements = {
             'method': 'id',
             'value': 'articlefield'
         },
+        'testplan_created_on_filter': {
+            'method': 'id',
+            'value': 'start_createdAt'
+        }
     },
 
     'test_units': {
