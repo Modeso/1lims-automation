@@ -755,6 +755,24 @@ elements = {
                               'value': '//div[@id="permissionsTable"]//div[9]//div[2]//span[1]//label[1]'},
        'analysis_edit_permissions': {'method': 'xpath',
                               'value':'//div[@id="permissionsTable"]//div[9]//div[3]//span[1]//label[1]'},
+       'reset_btn': {'method':'id',
+                              'value':'reset_btn'},
+       'filter_no': {'method':'id',
+                              'value':'idfield'},
+       'filter_changed_by': {'method':'id',
+                              'value':'lastModifiedUserfield'},
+       'configure_table_btn': {'method':'id',
+                              'value':'config'},
+       'configure_table_changed_by': {'method':'id',
+                              'value':'modifiedBy'},
+       'configure_table_created_on': {'method':'id',
+                              'value':'createdAt'},
+       'apply_btn': {'method':'xpath',
+                              'value':'//span[contains(text(),"Apply")]'},
+       'filter_created_on': {'method':'id',
+                              'value':'start_createdAt'},
+
+
    },
 
     'company_profile': {
