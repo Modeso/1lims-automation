@@ -1,36 +1,11 @@
 from api_testing.apis.base_api import BaseAPI
 import json
 
-class UsersAPI(BaseAPI):
-    def create_new_user(self, user_name, email, password, **kwargs):
-        null = None
-        true = True
-        false = False
-        api = '{}{}'.format(self.url, self.END_POINTS['users_api']['list_all_users'])
-        body = {
-            "username": user_name,
-            "email": email,
-            "role": {
-                "id": 1,
-                "text": "Admin"
-            },
-            "supplier": null,
-            "supplierId": null,
-            "password": password,
-            "confirmPassword": password,
-            "roleId": 1,
-            "roleChanged": true,
-            "hasOwnPermissions": false
-        }
-        json.dumps(body)
-        self.info('POST : {}'.format(api))
-        response = self.session.post(api, json=body, params='', headers=self.headers, verify=False)
-        self.info('Status code: {}'.format(response.status_code))
-        return response
 
-    def get_all_users(self, **kwargs):
-        api = '{}{}'.format(self.url, self.END_POINTS['users_api']['list_all_users'])
-        _payload = {"sort_value": "userId",
+class RolesAPI(BaseAPI):
+    def get_all_roles(self, **kwargs):
+        api = '{}{}'.format(self.url, self.END_POINTS['roles_api']['list_all_roles'])
+        _payload = {"sort_value": "id",
                     "limit": 1000,
                     "start": 0,
                     "sort_order": "DESC",
@@ -42,19 +17,19 @@ class UsersAPI(BaseAPI):
         self.info('Status code: {}'.format(response.status_code))
         return response
 
-    def get_user_form_data(self, id=1):
-        api = '{}{}{}'.format(self.url, self.END_POINTS['users_api']['form_data'], str(id)) 
+    def get_role_form_data(self, id=1):
+        api = '{}{}{}/edit-view'.format(self.url, self.END_POINTS['roles_api']['form_data'], str(id)) 
         self.info('GET : {}'.format(api))
         response = self.session.get(api, params='', headers=self.headers, verify=False)
         self.info('Status code: {}'.format(response.status_code))
         data = response.json()
         if data['status'] == 1:
-            return data['user']
+            return data['role']
         else:
             return False
     
-    def archive_users(self, ids=['1']):
-        api = '{}{}{}/archive'.format(self.url, self.END_POINTS['users_api']['archive_users'], ','.join(ids)) 
+    def archive_roles(self, ids=['1']):
+        api = '{}{}{}/archive'.format(self.url, self.END_POINTS['roles_api']['archive_roles'], ','.join(ids)) 
         self.info('PUT : {}'.format(api))
         response = self.session.put(api, params='', headers=self.headers, verify=False)
         self.info('Status code: {}'.format(response.status_code))
@@ -64,8 +39,8 @@ class UsersAPI(BaseAPI):
         else:
             return False
     
-    def restore_users(self, ids=['1']):
-        api = '{}{}{}/restore'.format(self.url, self.END_POINTS['users_api']['restore_users'], ','.join(ids)) 
+    def restore_roles(self, ids=['1']):
+        api = '{}{}{}/restore'.format(self.url, self.END_POINTS['roles_api']['restore_roles'], ','.join(ids)) 
         self.info('PUT : {}'.format(api))
         response = self.session.put(api, params='', headers=self.headers, verify=False)
         self.info('Status code: {}'.format(response.status_code))
@@ -75,8 +50,8 @@ class UsersAPI(BaseAPI):
         else:
             return False
     
-    def delete_archived_user(self, id=1):
-        api = '{}{}{}'.format(self.url, self.END_POINTS['users_api']['delete_user'], str(id)) 
+    def delete_archived_role(self, id=1):
+        api = '{}{}{}'.format(self.url, self.END_POINTS['roles_api']['delete_role'], str(id)) 
         self.info('DELETE : {}'.format(api))
         response = self.session.delete(api, params='', headers=self.headers, verify=False)
         self.info('Status code: {}'.format(response.status_code))
@@ -86,12 +61,36 @@ class UsersAPI(BaseAPI):
         else:
             return False
 
-    def delete_active_user(self, id=1):
-        if self.archive_users(ids=[str(id)]):
-            if self.delete_archived_user(id=id):
+    def delete_active_role(self, id=1):
+        if self.archive_roles(ids=[str(id)]):
+            if self.delete_archived_role(id=id):
                 return True
             else:
-                self.restore_users(ids=[id])
+                self.restore_roles(ids=[id])
                 return False
         else:
             return False
+
+    # 
+    def create_role(self, role_name='', permissions=[], id=''):
+        request_body = {
+            'name': role_name,
+            'permissions': permissions
+        }
+        if id == '' :
+            api = '{}{}'.format(self.url, self.END_POINTS['roles_api']['create_role']) 
+            self.info('POST : {}'.format(api))
+            response = self.session.post(api, json=request_body, params='', headers=self.headers, verify=False)
+        else:
+            request_body['id']=str(id)
+            api = '{}{}'.format(self.url, self.END_POINTS['roles_api']['update_role']) 
+            self.info('PUT : {}'.format(api))
+            response = self.session.put(api, json=request_body, params='', headers=self.headers, verify=False)
+
+        self.info('Status code: {}'.format(response.status_code))
+        data = response.json()
+        
+        if data['status'] == 1:
+            return data['message']
+        else:
+            return data
