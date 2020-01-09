@@ -85,3 +85,17 @@ class companyProfileTestCases(BaseTest):
         email = self.base_selenium.get_text(element='company_profile:email')
         self.assertTrue(username)
         self.assertTrue(email)
+
+    def test007_company_profile_user_can_upload_logo(self):
+        """
+        Company Profile: Make sure that you can upload logo
+
+        LIMS-6094
+        """
+        # choose file from assets to be uploaded
+        file_name = 'logo.png'
+        # upload the file then save
+        uploaded_file_name = self.company_profile_page.upload_file(
+            file_name=file_name, drop_zone_element='company_profile:logo_field', save=True, remove_current_file=True)
+        # check that the uploaded file has the same name as file choosed
+        self.assertEqual(uploaded_file_name, file_name)
