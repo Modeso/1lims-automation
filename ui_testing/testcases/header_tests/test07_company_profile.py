@@ -86,6 +86,27 @@ class companyProfileTestCases(BaseTest):
         self.assertTrue(username)
         self.assertTrue(email)
 
+    def test006_company_profile_upload_file_then_cancel_should_not_save(self):
+        """
+        Company profile: Make sure after you edit any data and press on cancel button, nothing occur
+
+        LIMS-6096
+        """
+        # choose file from assets to be uploaded
+        file_name = 'logo.png'
+
+        # upload the file then cancel
+        self.company_profile_page.upload_file(
+            file_name=file_name, drop_zone_element='company_profile:logo_field', save=False, remove_current_file=True)
+
+        # go back to the company profile
+        self.company_profile_page.get_company_profile_page()
+
+        # check that the image is not saved
+        is_the_file_exist = self.base_selenium.check_element_is_exist(
+            element='general:file_upload_success_flag')
+        self.assertFalse(is_the_file_exist)
+
     def test007_company_profile_user_can_upload_logo(self):
         """
         Company Profile: Make sure that you can upload logo
