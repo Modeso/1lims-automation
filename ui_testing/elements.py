@@ -361,7 +361,15 @@ elements = {
     'testunit_quantification_lower_limit': {
         'method': 'id',
         'value': 'quantification_lower_limit'
-    }
+    },
+    'cancel_add_testunit': {'method': 'class_name',
+                              'value': 'btn-secondary',
+                              'order': 1},
+    'back_button': {'method': 'id',
+                    'value': 'back_btn'},
+    'testunit_title': {'method': 'css_selector',
+                       'value': '[class="m-portlet__head-text m--font-success"]'
+                       }
     },
 
     'test_unit': {
@@ -626,7 +634,6 @@ elements = {
             'method': 'xpath',
             'value': "//a[@class='btn m-btn--pill btn-secondary m-btn m-btn--custom m-btn--label-brand m-btn--bolder']"
         }
-
     },
     'user_management': {
         'right_menu': {'method': 'xpath',
