@@ -79,6 +79,7 @@ class HeaderTestCases(BaseTest):
         for index in range(len(rows_data)):
             self.base_selenium.LOGGER.info(' * Comparing the user no. {} '.format(index))
             fixed_row_data = self.fix_data_format(rows_data[index].split('\n'))
+
             values = self.header_page.sheet.iloc[index].values
             fixed_sheet_row_data = self.fix_data_format(values)
             for item in fixed_row_data:
@@ -238,10 +239,16 @@ class HeaderTestCases(BaseTest):
                 ' + Assert {} (current_role) == {} (user_role)'.format(current_role, user_role))
             self.assertEqual(current_role, user_role)
 
-
-
-
-
+    # this just to test the draggable method
+    def test006_draggable(self):
+        """
+        :return:
+        """
+        self.header_page.click_on_user_management_button()
+        self.base_page.draggable_configure_table(source_element='user_management:changed_by_config',
+                                                 destination_element='user_management:name_config',
+                                                 apply_button='user_management:apply',
+                                                 configure_table_button='user_management:config')
 
 
 

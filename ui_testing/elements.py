@@ -571,9 +571,18 @@ elements = {
                  'value':'reset_btn'},
        'delete': {'method': 'link_text',
                  'value': 'Delete'},
+       'config': {'method': 'id',
+                 'value': 'config'},
+       'changed_by_config': {'method': 'id',
+                 'value': 'modifiedBy'},
+       'name_config': {'method': 'id',
+                 'value': 'name'},
+       'apply': {'method': 'xpath',
+                 'value': '//span[contains(text(),"Apply")]'},
+
 
    },
-    'contacts':{
+  'contacts':{
         'new_contact': {'method': 'xpath',
                         'value': '//span[contains(text(),"New Contact")]'},
 
