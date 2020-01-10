@@ -121,7 +121,7 @@ class HeaderTestCases(BaseTest):
         """
         self.header_page.click_on_user_management_button()
         #create new user
-        self.header_page.create_new_user(user_email=(self.header_page.generate_random_email()), user_role='',
+        self.header_page.create_new_user(user_email=(self.header_page.generate_random_email()), user_role='Admin',
                                          user_password='1', user_confirm_password='1')
 
         #make sure when you search you will find it
