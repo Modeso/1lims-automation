@@ -85,33 +85,7 @@ class HeaderTestCases(BaseTest):
             for item in fixed_row_data:
                 self.assertIn(item, fixed_sheet_row_data)
 
-    def test005_delete_user(self):
-        """
-        User management : Delete Approach: Make sure that you an delete any record successfully
-        if this user not used in other entities
-        LIMS-6381
-        :return:
-            """
-        self.header_page.click_on_user_management_button()
-        # create new user
-        self.header_page.create_new_user(user_email=(self.header_page.generate_random_email()), user_role='',
-                                         user_password='1', user_confirm_password='1')
-        self.base_selenium.LOGGER.info('make sure that that the user record created in the active table')
-        active_user = self.header_page.search(value=self.header_page.user_name)[0].text
-        self.assertIn(self.header_page.user_name, active_user)
-        self.header_page.select_all_records()
-        self.header_page.archive_selected_users()
-        self.header_page.get_archived_users()
-        self.base_selenium.LOGGER.info('make sure that that the user record navigate to the archive table')
-        archive_user = self.header_page.search(value=self.header_page.user_name)[0].text
-        self.assertIn(self.header_page.user_name, archive_user)
-        self.header_page.select_all_records()
-        self.header_page.click_on_user_right_menu()
-        self.header_page.click_on_delete_button()
-        self.header_page.confirm_popup()
-        result = self.header_page.search(value=self.header_page.user_name)[0].text
-        self.base_selenium.LOGGER.info('deleted successfully')
-        self.assertFalse(result, 'deleted successfully')
+
 
     def test006_create_new_user(self):
         """
