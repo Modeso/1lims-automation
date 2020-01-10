@@ -150,3 +150,73 @@ class MyProfileTestCases(BaseTest):
         is_the_file_exist = self.base_selenium.check_element_is_exist(
             element='general:file_upload_success_flag')
         self.assertFalse(is_the_file_exist)
+
+    def test007_company_profile_user_can_upload_logo(self):
+        """
+        My Profile: Signature Approach: Make sure that you can upload the signature successfully
+        LIMS-6085
+        """
+        # open signature tab
+        self.base_selenium.click('my_profile:signature_tab')
+        # choose file from assets to be uploaded
+        file_name = 'logo.png'
+        # upload the file then save
+        uploaded_file_name = self.company_profile_page.upload_file(
+            file_name=file_name, drop_zone_element='my_profile:signature_field', save=True, remove_current_file=True)
+        # check that the uploaded file has the same name as file choosed
+        self.assertEqual(uploaded_file_name, file_name)
+        
+    def test008_company_profile_user_can_update_logo(self):
+        """
+        My Profile: Signature Approach: Make sure that you can remove any signature
+        LIMS-6095
+        """
+        # open signature tab
+        self.base_selenium.click('my_profile:signature_tab')
+        # choose file from assets to be uploaded
+        file_name = 'logo.png'
+        other_file_name = 'logo2.png'
+
+        # upload the first file
+        uploaded_file_name =self.company_profile_page.upload_file(
+            file_name=file_name, drop_zone_element='my_profile:signature_field', save=True, remove_current_file=True)
+
+        # refresh the page
+        self.company_profile_page.get_company_profile_page()
+
+        # open signature tab
+        self.base_selenium.click('my_profile:signature_tab')
+        
+        # get array of all uploded files
+        files_uploaded_flags = self.base_selenium.find_elements('general:files_upload_success_flags')
+
+        # there is no files
+        self.assertEqual(len(files_uploaded_flags), 0)
+
+    def test009_you_cant_upload_more_than_one_logo(self):
+        """
+        My Profile: Signature Approach: Make sure you can't download more than one signature
+        LIMS-6087
+        """
+        # open signature tab
+        self.base_selenium.click('my_profile:signature_tab')
+        # choose file from assets to be uploaded
+        file_name = 'logo.png'
+        other_file_name = 'logo2.png'
+
+        # upload the first file
+        uploaded_file_name = self.company_profile_page.upload_file(
+            file_name=file_name, drop_zone_element='my_profile:signature_field', save=True, remove_current_file=True)
+
+        # upload other file beside the current one
+        uploaded_other_file_name = self.company_profile_page.upload_file(
+            file_name=other_file_name, drop_zone_element='my_profile:signature_field', save=True, remove_current_file=False)
+
+        # wait to see if the file upload
+        self.company_profile_page.sleep_medium()
+
+        # get array of all uploded files
+        files_uploaded_flags = self.base_selenium.find_elements('general:files_upload_success_flags')
+
+        # only 1 file should be uploded
+        self.assertEqual(len(files_uploaded_flags), 1)
