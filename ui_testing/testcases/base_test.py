@@ -19,11 +19,11 @@ from api_testing.apis.test_plan_api import TestPlanAPI
 from ui_testing.pages.header_page import Header
 from api_testing.apis.orders_api import OrdersAPI
 from ui_testing.pages.analysis_page import SingleAnalysisPage
-from api_testing.apis.contacts_api import ContactsAPI
 from api_testing.apis.users_api import UsersAPI
 from api_testing.apis.roles_api import RolesAPI
 from api_testing.apis.analysis_api import AnalysisAPI
 from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
+from api_testing.apis.contacts_api import ContactsAPI
 import datetime, re
 
 

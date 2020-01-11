@@ -1,5 +1,6 @@
 from ui_testing.pages.analyses_page import AllAnalysesPage
 
+
 class SingleAnalysisPage(AllAnalysesPage):
 
     '''
@@ -23,3 +24,4 @@ class SingleAnalysisPage(AllAnalysesPage):
             testunits.append(row_data)
 
         return testunits
+
