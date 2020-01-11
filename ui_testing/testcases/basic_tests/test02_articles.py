@@ -24,9 +24,12 @@ class ArticlesTestCases(BaseTest):
 
     def tearDown(self):
         # if test case 22, 23 we need to restore archived configuration fields before tear down
-        test_case_tag = self._testMethodName.split('_')[0]
-        if test_case_tag == "test022" or test_case_tag == "test023" \
-                or test_case_tag == "test024" or test_case_tag == "test025":
+        test_case_tag = self._testMethodName
+        if test_case_tag in ["test022_user_hide_any_optional_field_is_not_affecting_the_table",
+                             "test023_user_hide_any_optional_field_in_create_form",
+                             "test024_user_restore_any_optional_field_is_not_affecting_the_table",
+                             "test025_user_restore_any_optional_field_in_create_form"]:
+                   
             self.article_page.info("check if any configuration field still archived before tear down")
             self.article_page.get_articles_page()
             self.article_page.restore_ui()
