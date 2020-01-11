@@ -517,7 +517,6 @@ class ArticlesTestCases(BaseTest):
         New: Articles: Optional fields: User can hide/show any optional field in Edit/Create form
 
         LIMS:4123
-        :return:
         """
         # archive the optional fields
         self.article_page.archive_restore_optional_fields(restore=False)
@@ -591,6 +590,7 @@ class ArticlesTestCases(BaseTest):
     def test025_user_restore_any_optional_field_is_not_affecting_the_table(self):
         # archive then restore the optional fields
         self.article_page.archive_restore_optional_fields(restore=False)
+        self.article_page.sleep_tiny()
         self.article_page.get_articles_page()
         self.article_page.archive_restore_optional_fields(restore=True)
 
@@ -610,6 +610,7 @@ class ArticlesTestCases(BaseTest):
     def test026_user_restore_any_optional_field_in_create_form(self):
         # archive then restore the optional fields
         self.article_page.archive_restore_optional_fields(restore=False)
+        self.article_page.sleep_tiny()
         self.article_page.get_articles_page()
         self.article_page.archive_restore_optional_fields(restore=True)
 
@@ -671,7 +672,7 @@ class ArticlesTestCases(BaseTest):
         self.test_plan.get_test_plans_page()
         self.assertEqual(self.base_selenium.get_url(), '{}testPlans'.format(self.base_selenium.url))
 
-     def test029_hide_all_table_configurations(self):
+    def test029_hide_all_table_configurations(self):
         """
         Table configuration: Make sure that you can't hide all the fields from the table configuration
 

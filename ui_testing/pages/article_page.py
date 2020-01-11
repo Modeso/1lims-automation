@@ -113,6 +113,11 @@ class Article(Articles):
         self.open_configuration()
         if restore:
             self.base_selenium.click(element='general:configurations_archived') # open the archived tab
+            self.sleep_tiny()
         self.toggle_archive_field(field_name='unit', restore=restore)
+        self.sleep_tiny()
         self.toggle_archive_field(field_name='comment', restore=restore)
+        self.sleep_tiny()
         self.toggle_archive_field(field_name='related_article', restore=restore)
+        self.sleep_tiny()
+
