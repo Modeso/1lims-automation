@@ -5,19 +5,23 @@ from unittest import skip
 import random
 import inspect
 
+
 class ArticlesTestCases(BaseTest):
     def setUp(self):
         super().setUp()
         self.login_page.login(username=self.base_selenium.username, password=self.base_selenium.password)
         self.base_selenium.wait_until_page_url_has(text='dashboard')
         self.article_page.get_articles_page()
-        self.archived_optional_fields_flag = False
 
     def tearDown(self):
-        if self.archived_optional_fields_flag: # to restore the UI
+        # if test case 22, 23 we need to restore archived configuration fields before tear down
+        test_case_tag = self._testMethodName.split('_')[0]
+        if test_case_tag == "test022" or test_case_tag == "test023" \
+                or test_case_tag == "test024" or test_case_tag == "test025":
+            self.article_page.info("check if any configuration field still archived before tear down")
             self.article_page.get_articles_page()
-            self.article_page.archive_restore_optional_fields(restore=True)
-            self.archived_optional_fields_flag = False
+            self.article_page.restore_ui()
+
         super().tearDown()
 
     @parameterized.expand(['save', 'cancel'])
@@ -419,8 +423,8 @@ class ArticlesTestCases(BaseTest):
         self.base_selenium.LOGGER.info(
             ' + Create new order with {} article.'.format(self.article_page.article_name))
         self.order_page.create_new_order(article=self.article_page.article_name,
-                                    material_type=self.article_page.article_material_type,
-                                    test_plans=[self.test_plan.test_plan_name])
+                                         material_type=self.article_page.article_material_type,
+                                         test_plans=[self.test_plan.test_plan_name])
 
         self.article_page.get_articles_page()
         self.article_page.sleep_small()
@@ -488,7 +492,7 @@ class ArticlesTestCases(BaseTest):
         self.base_page.click_overview()
         # switch to the alert
         if 'ok' == ok:
-            self.base_page .confirm_overview_pop_up()
+            self.base_page.confirm_overview_pop_up()
             self.assertEqual(self.base_selenium.get_url(), '{}articles'.format(self.base_selenium.url))
             self.base_selenium.LOGGER.info('clicking on Overview confirmed')
         else:
@@ -515,79 +519,60 @@ class ArticlesTestCases(BaseTest):
     def test022_user_hide_any_optional_field_is_not_affecting_the_table(self):
         """
         New: Articles: Optional fields: User can hide/show any optional field in Edit/Create form
-
-        LIMS:4123
+        part 2
+        LIMS-4123
         """
         # archive the optional fields
         self.article_page.archive_restore_optional_fields(restore=False)
-        self.archived_optional_fields_flag = True # to restore the UI in the tearDown
 
         # check if the fields still exist in the table
-        self.article_page.info('+ Open article table')
+        self.article_page.info('Open article table')
         self.article_page.get_articles_page()
         article_headers = self.base_selenium.get_table_head_elements('general:table')
         article_headers_text = [header.text for header in article_headers]
 
-        self.article_page.info('+ Check Comment field existance in the table')
+        self.article_page.info('Check Comment field exist in the article table')
         self.assertIn('Comment', article_headers_text)
 
-        self.article_page.info('+ Check Unit field existance in the table')
+        self.article_page.info('Check Unit field exist in the article table')
         self.assertIn('Unit', article_headers_text)
         # ignore related article since it shouldn't display in the table anyway
 
-    def test023_user_hide_any_optional_field_in_create_form(self):
+    @parameterized.expand(['edit', 'create'])
+    def test023_user_hide_any_optional_field_in_create_form(self, edit):
         """
         New: Articles: Optional fields: User can hide/show any optional field in Edit/Create form
-
-        LIMS:4123
-        :return:
+        part 1
+        LIMS-4123
         """
         # archive the optional fields
         self.article_page.archive_restore_optional_fields(restore=False)
-        self.archived_optional_fields_flag = True # to restore the UI in the tearDown
-
-        # open create page
+        # open edit/create page
         self.article_page.get_articles_page()
-        self.article_page.info('+ Open article create')
-        self.base_selenium.click(element='articles:new_article')
+        if edit == "edit":
+            self.article_page.info('Open article edit page')
+            self.article_page.open_edit_page(row=self.article_page.get_random_article_row())
+        else:
+            self.article_page.info('Open article create page')
+            self.base_selenium.click(element='articles:new_article')
+
         self.article_page.sleep_small()
 
-        self.article_page.info('+ Check Unit field existance in create page')
+        self.article_page.info('Check if Unit field exist in article page')
         self.assertFalse(self.base_selenium.check_element_is_exist('article:unit'))
 
-        self.article_page.info('+ Check Comment field existance in create page')
+        self.article_page.info('Check if Comment field exist in article page')
         self.assertFalse(self.base_selenium.check_element_is_exist('article:comment'))
 
-        self.article_page.info('+ Check Related article field existance in create page')
+        self.article_page.info('Check if Related article field exist in article page')
         self.assertFalse(self.base_selenium.check_element_is_exist('article:related_article'))
 
-    def test024_user_hide_any_optional_field_in_edit_form(self):
+    def test024_user_restore_any_optional_field_is_not_affecting_the_table(self):
         """
         New: Articles: Optional fields: User can hide/show any optional field in Edit/Create form
-
-        LIMS:4123
-        :return:
+        part 4
+        LIMS-4123
         """
-        # archive the optional fields
-        self.article_page.archive_restore_optional_fields(restore=False)
-        self.archived_optional_fields_flag = True # to restore the UI in the tearDown
-
-        # open edit page
-        self.article_page.get_articles_page()
-        self.article_page.info('+ Open article edit')
-        self.article_page.get_articles_page()
-        self.article_page.open_edit_page(row=self.article_page.get_random_article_row())
-
-        self.article_page.info('+ Check Unit field existance in edit page')
-        self.assertFalse(self.base_selenium.check_element_is_exist('article:unit'))
-
-        self.article_page.info('+ Check Comment field existance in edit page')
-        self.assertFalse(self.base_selenium.check_element_is_exist('article:comment'))
-
-        self.article_page.info('+ Check Related article field existance in edit page')
-        self.assertFalse(self.base_selenium.check_element_is_exist('article:related_article'))
-
-    def test025_user_restore_any_optional_field_is_not_affecting_the_table(self):
         # archive then restore the optional fields
         self.article_page.archive_restore_optional_fields(restore=False)
         self.article_page.sleep_tiny()
@@ -595,62 +580,52 @@ class ArticlesTestCases(BaseTest):
         self.article_page.archive_restore_optional_fields(restore=True)
 
         # check if the fields still exist in the table after restore
-        self.article_page.info('+ Open article table')
+        self.article_page.info('Open article table')
         self.article_page.get_articles_page()
         article_headers = self.base_selenium.get_table_head_elements('general:table')
         article_headers_text = [header.text for header in article_headers]
 
-        self.article_page.info('+ Check Comment field existance in the table')
+        self.article_page.info('Check if Comment field exist in the table')
         self.assertIn('Comment', article_headers_text)
 
-        self.article_page.info('+ Check Unit field existance in the table')
+        self.article_page.info('Check Unit field exist in the table')
         self.assertIn('Unit', article_headers_text)
         # ignore related article since it shouldn't display in the table anyway
 
-    def test026_user_restore_any_optional_field_in_create_form(self):
+    @parameterized.expand(['edit', 'create'])
+    def test025_user_restore_any_optional_field_in_create_form(self, edit):
+        """
+        New: Articles: Optional fields: User can hide/show any optional field in Edit/Create form
+        part 3
+        LIMS-4123
+        """
         # archive then restore the optional fields
         self.article_page.archive_restore_optional_fields(restore=False)
         self.article_page.sleep_tiny()
         self.article_page.get_articles_page()
         self.article_page.archive_restore_optional_fields(restore=True)
-
-        # open create page after restore
         self.article_page.get_articles_page()
-        self.article_page.info('+ Open article create')
-        self.base_selenium.click(element='articles:new_article')
+
+        if edit == "edit":
+            # open edit page after restore
+            self.article_page.info('Open article edit page')
+            self.article_page.open_edit_page(row=self.article_page.get_random_article_row())
+        else:
+            # open create page after restore
+            self.article_page.info('Open article create page')
+            self.base_selenium.click(element='articles:new_article')
+
         self.article_page.sleep_small()
-
-        self.article_page.info('+ Check Unit field existance in create page')
+        self.article_page.info('Check if Unit field exist in article page')
         self.assertTrue(self.base_selenium.check_element_is_exist('article:unit'))
 
-        self.article_page.info('+ Check Comment field existance in create page')
+        self.article_page.info('Check if Comment field exist in article page')
         self.assertTrue(self.base_selenium.check_element_is_exist('article:comment'))
 
-        self.article_page.info('+ Check Related article field existance in create page')
+        self.article_page.info('Check if Related article field exist in article page')
         self.assertTrue(self.base_selenium.check_element_is_exist('article:related_article'))
 
-    def test027_user_restore_any_optional_field_in_edit_form(self):
-        # archive then restore the optional fields
-        self.article_page.archive_restore_optional_fields(restore=False)
-        self.article_page.get_articles_page()
-        self.article_page.archive_restore_optional_fields(restore=True)
-
-        # open edit page after restore
-        self.article_page.get_articles_page()
-        self.article_page.info('+ Open article edit')
-        self.article_page.get_articles_page()
-        self.article_page.open_edit_page(row=self.article_page.get_random_article_row())
-
-        self.article_page.info('+ Check Unit field existance in edit page')
-        self.assertTrue(self.base_selenium.check_element_is_exist('article:unit'))
-
-        self.article_page.info('+ Check Comment field existance in edit page')
-        self.assertTrue(self.base_selenium.check_element_is_exist('article:comment'))
-
-        self.article_page.info('+ Check Related article field existance in edit page')
-        self.assertTrue(self.base_selenium.check_element_is_exist('article:related_article'))
-
-    def test028_article_search_then_navigate(self):
+    def test026_article_search_then_navigate(self):
         """
         Search Approach: Make sure that you can search then navigate to any other page
         LIMS-6201
@@ -672,7 +647,7 @@ class ArticlesTestCases(BaseTest):
         self.test_plan.get_test_plans_page()
         self.assertEqual(self.base_selenium.get_url(), '{}testPlans'.format(self.base_selenium.url))
 
-    def test029_hide_all_table_configurations(self):
+    def test027_hide_all_table_configurations(self):
         """
         Table configuration: Make sure that you can't hide all the fields from the table configuration
 
