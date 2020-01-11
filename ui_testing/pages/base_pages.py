@@ -5,6 +5,10 @@ from random import randint
 from selenium.webdriver import ActionChains
 import datetime
 import pymysql
+<<<<<<< HEAD
+=======
+
+>>>>>>> 540fd77ce2c2c1999c1cfaee1eee29f8457367e6
 
 
 class BasePages:
@@ -475,7 +479,10 @@ class BasePages:
         date = str(current_time.year)+'-'+str(current_time.month)+'-'+str(current_time.day)
         return date
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 540fd77ce2c2c1999c1cfaee1eee29f8457367e6
     def draggable_configure_table(self, source_element, destination_element, apply_button, configure_table_button):
         self.base_selenium.click(element=configure_table_button)
         self.base_selenium.LOGGER.info('find the source element that I want to drag from it ')
@@ -491,6 +498,7 @@ class BasePages:
     def get_current_year(self):
         current_year = datetime.datetime.now()
         return str(current_year.year)
+<<<<<<< HEAD
 
     def open_pagination_menu(self):
         self.base_selenium.wait_element(element='general:pagination_button')
@@ -534,3 +542,6 @@ class BasePages:
 
 
         
+=======
+
+>>>>>>> 540fd77ce2c2c1999c1cfaee1eee29f8457367e6

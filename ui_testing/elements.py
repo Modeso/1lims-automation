@@ -610,9 +610,10 @@ elements = {
             'method': 'id',
             'value': 'nofield'
         },
+
         'analysis_tab': {'method': 'xpath',
-                         'value': "//span[@class='m-wizard__step-label'][contains(text(),'Analysis')]"
-                         }
+                         'value': "//span[@class='m-wizard__step-label'][contains(text(),'Analysis')]"},
+
     },
 
     'header': {
@@ -682,6 +683,24 @@ elements = {
         'filter_email': {'method': 'id',
                          'value': 'emailfield'},
 
+       'filter_reset_btn': {'method': 'id',
+                 'value':'reset_btn'},
+       'delete': {'method': 'link_text',
+                 'value': 'Delete'},
+       'config': {'method': 'id',
+                 'value': 'config'},
+       'changed_by_config': {'method': 'id',
+                 'value': 'modifiedBy'},
+       'name_config': {'method': 'id',
+                 'value': 'name'},
+       'apply': {'method': 'xpath',
+                 'value': '//span[contains(text(),"Apply")]'},
+
+
+   },
+  'contacts':{
+        'new_contact': {'method': 'xpath',
+                        'value': '//span[contains(text(),"New Contact")]'},
         'filter_role': {'method': 'xpath',
                         'value': '//*[@id="rolefield"]//input'},
 

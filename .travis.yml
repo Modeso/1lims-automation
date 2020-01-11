@@ -23,6 +23,7 @@ install:
 script:
 
 <<<<<<< HEAD
+<<<<<<< HEAD
   - export TESTS='test05_testplans.py'
 =======
   - export TESTS='test08_usermanagement.py:'
@@ -60,3 +61,29 @@ script:
 #  - xvfb-run -a nosetests-3.4 -vs --nologcapture --tc-file=config.ini ui_testing/testcases/basic_tests/test04_testunits.py:TestUnitsTestCases.test031_editing_limit_of_quantification_fields_should_affect_table_and_version
 
 >>>>>>> 1f06a68650f9d8c85991609a79a3451582ba38e0
+=======
+  - export TESTS='test08_usermanagement.py:'
+  #- export TESTS='test04_testunits.py:TestUnitsTestCases.test011_create_test_unit_with_random_category'
+
+  - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then export TESTS=''; fi
+  #- echo $TESTS
+  - cd $TRAVIS_BUILD_DIR && export PYTHONPATH='./'
+
+  
+#  - export TESTS='test04_testunits.py:TestUnitsTestCases.test010_material_type_approach_1_Quantitative_MiBi'
+#  - xvfb-run -a nosetests-3.4 -vs --nologcapture ui_testing/testcases/basic_tests/$TESTS --tc-file=config.ini
+#  - xvfb-run -a nosetests-3.4 -vs --nologcapture ui_testing/testcases/basic_tests/test06_audit_trail.py --tc-file=config.ini
+#  - xvfb-run -a nosetests-3.4 -vs --nologcapture ui_testing/testcases/header_tests/test09_rolesandpermissions.py --tc-file=config.ini
+#  - xvfb-run -a nosetests-3.4 -vs --nologcapture --tc-file=config.ini ui_testing/testcases/basic_tests/test04_testunits.py:TestUnitsTestCases.test031_editing_limit_of_quantification_fields_should_affect_table_and_version
+  # - xvfb-run -a nosetests-3.4 -vs --nologcapture ui_testing/testcases/header_tests/$TESTS --tc-file=config.ini
+#  - xvfb-run -a nosetests-3.4 -vs --nologcapture --tc-file=config.ini ui_testing/testcases/basic_tests
+
+#  - export TESTS='test04_testunits.py:TestUnitsTestCases.test010_material_type_approach_1_Quantitative_MiBi'
+#  - xvfb-run -a nosetests-3.4 -vs --nologcapture ui_testing/testcases/basic_tests/$TESTS --tc-file=config.ini
+ # - xvfb-run -a nosetests-3.4 -vs --nologcapture --tc-file=config.ini ui_testing/testcases/basic_tests/test05_contacts.py:ContactsTestCases.test015_create_user_with_role_contact
+#  - export TESTS='test04_testunits.py:TestUnitsTestCases.test010_material_type_approach_1_Quantitative_MiBi'
+#  - xvfb-run -a nosetests-3.4 -vs --nologcapture ui_testing/testcases/basic_tests/$TESTS --tc-file=config.ini
+#  - xvfb-run -a nosetests-3.4 -vs --nologcapture ui_testing/testcases/basic_tests/test06_audit_trail.py --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --nologcapture ui_testing/testcases/header_tests/test08_usermanagement.py --tc-file=config.ini
+#  - xvfb-run -a nosetests-3.4 -vs --nologcapture --tc-file=config.ini ui_testing/testcases/basic_tests/test04_testunits.py:TestUnitsTestCases.test031_editing_limit_of_quantification_fields_should_affect_table_and_version
+>>>>>>> 540fd77ce2c2c1999c1cfaee1eee29f8457367e6
