@@ -14,6 +14,7 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.wait_until_page_url_has(text='dashboard')
         self.order_page.get_orders_page()
 
+    # will continue with us    
     @parameterized.expand(['save_btn', 'cancel'])
     @skip('https://modeso.atlassian.net/browse//LIMS-4768')
     def test001_cancel_button_edit_no(self, save):
@@ -47,7 +48,8 @@ class OrdersTestCases(BaseTest):
             self.base_selenium.LOGGER.info(
                 ' + Assert {} (current_no) == {} (order_no)'.format(current_no, order_no))
             self.assertEqual(current_no, order_no)
-
+            
+   # will continue with us
     @parameterized.expand(['save_btn', 'cancel'])
     def test002_cancel_button_edit_contact(self, save):
         """
@@ -82,6 +84,7 @@ class OrdersTestCases(BaseTest):
                 ' + Assert {} (current_contact) == {} (order_contact)'.format(current_contact, order_contact))
             self.assertEqual(current_contact, order_contact)
 
+    # will continue with us
     @parameterized.expand(['save_btn', 'cancel'])
     def test003_cancel_button_edit_departments(self, save):
         """
@@ -116,7 +119,7 @@ class OrdersTestCases(BaseTest):
                 ' + Assert {} (current_departments) == {} (order_departments)'.format(current_departments,
                                                                                       order_departments))
             self.assertEqual(current_departments, order_departments)
-
+  # will change totally and implement the new behavior 
     def test004_archive_order(self):
         """
             New: Orders: Archive
@@ -164,7 +167,7 @@ class OrdersTestCases(BaseTest):
             self.order_page.archive_selected_orders()
             rows = self.order_page.result_table()
             self.assertEqual(len(rows), 1)
-
+    # will continue with us
     def test005_restore_archived_orders(self):
         """
         Restore Order
@@ -185,7 +188,7 @@ class OrdersTestCases(BaseTest):
                 selected_order_data['Analysis No.']))
             self.assertTrue(self.order_page.is_order_exist(
                 value=selected_order_data['Analysis No.']))
-
+   # will continue with us 
     def test006_deleted_archived_order(self):
         """
         New: Order without/with article: Deleting of orders
@@ -214,6 +217,7 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.LOGGER.info(' + {} '.format(has_active_analysis))
         self.assertFalse(has_active_analysis)
 
+    # will continue with us    
     @parameterized.expand(['True', 'False'])
     def test007_order_search(self, small_letters):
         """
@@ -252,7 +256,8 @@ class OrdersTestCases(BaseTest):
                     break
             self.assertEqual(row_data[column].replace("'", '').split(',')[0],
                              search_data[column].replace("'", '').split(',')[0])
-
+            
+   # will implement with the new behavior that it will duplicate with new order number 
     @skip('https://modeso.atlassian.net/browse/LIMS-4766')
     def test008_duplicate_order_one_copy(self):
         """
@@ -312,7 +317,7 @@ class OrdersTestCases(BaseTest):
                                                                                   order_row_from_form_list))
         self.assertListEqual(order_row_from_form_list,
                              order_row_from_table_list)
-
+   # will continue with us 
     def test009_export_order_sheet(self):
         """
         New: Orders: XSLX Approach: user can download all data in table view with the same order with table view
@@ -332,6 +337,7 @@ class OrdersTestCases(BaseTest):
             for item in fixed_row_data:
                 self.assertIn(item, fixed_sheet_row_data)
 
+    # will continue with us             
     def test010_user_can_add_suborder(self):
         """
         New: Orders: Table view: Suborder Approach: User can add suborder from the main order
@@ -382,6 +388,7 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(
             orders_duplicate_data_after[0]['Analysis No.'], latest_order_data['Analysis No.'])
 
+    # will change to dispaly it in the child table & in the export     
     def test011_analysis_number_filter_and_export(self):
         """
         New: Orders: Analysis number should appear in the table view column
@@ -414,6 +421,7 @@ class OrdersTestCases(BaseTest):
             'Check if export of order has analyis number = {}  '.format(analysis_number))
         self.assertIn(analysis_number, sheet_values)
 
+    # will change that the duplicate many copies will be from the the child table not from the active table     
     def test012_duplicate_many_orders(self):
         """
         New: Orders: Duplication from active table Approach: When I duplicate order 5 times, it will create 5 analysis records with the same order number
@@ -478,7 +486,8 @@ class OrdersTestCases(BaseTest):
                                                                                                                  'Test Plans']))
             self.assertEqual(
                 selected_order_data['Test Plans'], row_data['Test Plans'])
-
+            
+    # will continue with us
     # @skip("https://modeso.atlassian.net/browse/LIMS-4782")
     def test013_update_order_number(self):
         """
@@ -550,6 +559,7 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(new_orders_count,
                          records_in_analysis_after_update_count)
 
+    # will continue with us
     def test014_update_order_material_type(self, save):
         """
         New: Orders: Edit material type: Make sure that user able to change material type and related test plan &
@@ -598,6 +608,7 @@ class OrdersTestCases(BaseTest):
                                                                                           order_material_type))
             self.assertEqual(current_material_type, order_material_type)
 
+    # wiill continue with us
     def test015_filter_by_any_fields(self):
         """
         New: Orders: Filter Approach: I can filter by any field in the table view
@@ -621,7 +632,7 @@ class OrdersTestCases(BaseTest):
                 self.assertEqual(order_data[key].replace(
                     "'", ""), row_data[key].replace("'", ""))
             self.order_page.filter_reset()
-
+   # will continue with us 
     def test016_validate_order_test_unit_test_plan(self):
         """
         New: orders Test plan /test unit validation
@@ -654,7 +665,8 @@ class OrdersTestCases(BaseTest):
                                          test_units=[''], multiple_suborders=0)
         self.order_page.set_test_unit(test_unit='r')
         self.order_page.save(save_btn='order:save_btn')
-
+        
+    # will continue wih us
     def test017_validate_order_test_unit_test_plan_edit_mode(self):
         """
         New: orders Test plan /test unit validation in edit mode
@@ -688,6 +700,7 @@ class OrdersTestCases(BaseTest):
         self.assertIn('has-error', test_plan_class_name)
         self.assertIn('has-error', test_unit_class_name)
 
+    # will continue with us 
     @parameterized.expand(['save_btn', 'cancel'])
     def test018_update_test_date(self, save):
         """
@@ -717,6 +730,7 @@ class OrdersTestCases(BaseTest):
                 ' + Assert {} (current_test_date) == {} (order_test_date)'.format(current_test_date, order_test_date))
             self.assertEqual(current_test_date, order_test_date)
 
+    # will continue with us
     @parameterized.expand(['save_btn', 'cancel'])
     def test017_update_shipment_date(self, save):
         """
@@ -749,6 +763,7 @@ class OrdersTestCases(BaseTest):
                                                                                           order_shipment_date))
             self.assertEqual(current_shipment_date, order_shipment_date)
 
+    # will continue with us
     def test018_validate_order_no_exists(self):
         """
         New: Orders: Create new order and change the autogenerated number
@@ -767,6 +782,7 @@ class OrdersTestCases(BaseTest):
         order_error_message = self.base_selenium.get_text(element="order:order_no_error_message")
         self.assertIn('No. already exist', order_error_message)
 
+    # will continue with us
     def test019_validate_order_no_archived_exists(self):
         """
         New: Orders: Create new order and change the autogenerated number
@@ -821,7 +837,8 @@ class OrdersTestCases(BaseTest):
         order_error_message = self.base_selenium.get_text(
             element="order:order_no_error_message")
         self.assertIn('No. already exists in archived, you can go to Archive table and restore it', order_error_message)
-          
+        
+    # will continue with us      
     def test020_create_new_order_with_test_units(self):
         """
         New: Orders: Create a new order with test units
@@ -864,7 +881,8 @@ class OrdersTestCases(BaseTest):
             testunit_name = row_with_headers['Test Unit']
             self.base_selenium.LOGGER.info(" + Test unit : {}".format(testunit_name))
             self.assertIn(testunit_name, test_units_list)
-
+            
+   # will continue with us
     def test021_create_existing_order_with_test_units(self):
         """
         New: Orders: Create an existing order with test units
@@ -907,7 +925,7 @@ class OrdersTestCases(BaseTest):
             testunit_name = row_with_headers['Test Unit']
             self.base_selenium.LOGGER.info(" + Test unit : {}".format(testunit_name))
             self.assertIn(testunit_name, test_units_list)
-
+   # will continue with us
     def test022_create_existing_order_with_test_units_and_change_material_type(self):
         """
         New: Orders with test units: Create a new order from an existing order with test units but change the material type
@@ -953,7 +971,8 @@ class OrdersTestCases(BaseTest):
             article.split(' No:')[0], latest_order_data['Article Name'])
         self.assertEqual(
             'Subassembely', latest_order_data['Material Type'])
-
+        
+    # will continue with us
     def test023_create_existing_order_with_test_units_and_change_article(self):
         """
         New: Orders with test units: Create a new order from an existing order with test units but change the article
@@ -1003,7 +1022,7 @@ class OrdersTestCases(BaseTest):
             testunit_name = row_with_headers['Test Unit']
             self.base_selenium.LOGGER.info(" + Test unit : {}".format(testunit_name))
             self.assertIn(testunit_name, test_units_list)
-
+    # will continue with us
     def test024_archive_sub_order(self):
         """
         New: Orders: Table:  Suborder /Archive Approach: : User can archive any suborder successfully 
@@ -1107,6 +1126,7 @@ class OrdersTestCases(BaseTest):
 
         self.assertEqual(len(rows_count) - 1, 1)
 
+    # will continue with us 
     @skip('https://modeso.atlassian.net/browse/LIMS-4914')
     def test027_update_material_type(self):
         """
@@ -1179,6 +1199,8 @@ class OrdersTestCases(BaseTest):
         # get order data to be updated
         self.base_selenium.LOGGER.info('Get order data to remove a test plan from the order')
         self.order_page.get_orders_page()
+        
+    # will continue with us & then put the test case number for it 
     def test026_update_suborder_article(self):
         self.base_selenium.LOGGER.info('Order created with 4 suborders with the following data')
         self.base_selenium.LOGGER.info('Material type: {}, Article name: {}, Test plans: {}, Test Units: {}'.format(
@@ -1288,6 +1310,8 @@ class OrdersTestCases(BaseTest):
 
         self.base_selenium.LOGGER.info('Update test plans from {}, to {}'.format(suborder_data['test_plan'], suborder_data_after_changing_testplans['test_plan']))
         self.order_page.save(save_btn="order:save_btn")
+        
+    # will continue with us
     # this bug will only affect the delete case, but the adding case is working fine
     @skip('https://modeso.atlassian.net/browse/LIMS-4915')
     @skip('https://modeso.atlassian.net/browse/LIMS-4916')
@@ -1410,7 +1434,7 @@ class OrdersTestCases(BaseTest):
         import ipdb; ipdb.set_trace()
         suborder_data = self.order_page.get_suborder_data(sub_order_index=3)
 
-
+   # will continue with us apply it from the second suborder & need test case number for it to apply from the second suborder
     @parameterized.expand(['save_btn', 'cancel'])
     def test025_update_contact_departments(self, save):
         """
@@ -1500,6 +1524,7 @@ class OrdersTestCases(BaseTest):
             contacta_after_pressing_cancel = self.order_page.get_contact()
             departmentsa_after_pressing_cancel = self.order_page.get_departments()
 
+    # will continue with us
     @skip('https://modeso.atlassian.net/browse/LIMS-5070')
     def test031_user_can_add_suborder_with_test_units(self):
         """
@@ -1572,6 +1597,7 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.LOGGER.info('+ Assert test plan is: {}, and it should be {}'.format(analysis_test_plan_after_update, suborder_testplans[1]))
         self.assertEqual(analysis_test_plan_after_update, suborder_testplans[1])
     
+    # will continue with us ( apply it from the second order & need diff test case number for it 
     @parameterized.expand(['save_btn', 'cancel'])
     def test025_update_article(self, save):
         """
@@ -1704,7 +1730,7 @@ class OrdersTestCases(BaseTest):
     def test_test(self):
         import ipdb; ipdb.set_trace()	        import ipdb; ipdb.set_trace()
         suborder_data = self.order_page.get_suborder_data(sub_order_index=3)	        suborder_data = self.order_page.get_suborder_data(sub_order_index=3) 
-
+   # discard no need form the form
     def test027_update_test_unit_with_add_more_in_form(self):
         """
         New: Orders: Form: Update test unit: update test unit by add more &
@@ -1774,7 +1800,7 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.LOGGER.info(" + Test unit : {}".format(testunit_name))
         self.assertIn(testunit_name, testunit_name)
             
-            
+    # discarded no need for the form         
     def test028_update_test_unit_with_delete_in_form(self):
         """
         New: Orders: Form: Update test unit: update test unit by replace it by another one ( remove it ) &
