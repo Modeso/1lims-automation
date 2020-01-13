@@ -771,8 +771,6 @@ elements = {
                               'value':'//span[contains(text(),"Apply")]'},
        'filter_created_on': {'method':'id',
                               'value':'start_createdAt'},
-
-
    },
 
     'company_profile': {
