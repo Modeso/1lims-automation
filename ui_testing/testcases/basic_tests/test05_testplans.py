@@ -774,39 +774,68 @@ class TestPlansTestCases(BaseTest):
         Limits of quantification should be viewed in the testplan's child table
         '''
         testunit_name = self.generate_random_string()
-        self.test_unit_page.get_test_units_page()
+        testunit_number = self.generate_random_number()
+        testunit_method = self.generate_random_string()
+        testunit_category = self.generate_random_string()
+        category = {
+            'id': 'new',
+            'text': testunit_category
+        }
 
-        active_articles_with_materialtype_dictionary = self.get_active_articles_with_material_type()
-        random_materialtype = random.choice(list(active_articles_with_materialtype_dictionary.keys()))
-        articles_with_chosen_materialtype = active_articles_with_materialtype_dictionary[random_materialtype]
-        random_article = random.choice(articles_with_chosen_materialtype)
-
-        self.test_unit_page.create_quantitative_testunit(name=testunit_name, method='a', material_type=random_materialtype, spec_or_quan='quan', upper_limit=100, lower_limit=50)
-        old_quantification_upper_limit = self.test_unit_page.get_quan_upper_limit()
-        old_quantification_lower_limit = self.test_unit_page.get_quan_lower_limit()
-        testunit_display_old_quantification_limit = str(old_quantification_lower_limit) + '-' + str(old_quantification_upper_limit)
-        self.test_unit_page.save()
+        material_type = [
+            {
+            'id': 0,
+            'text': 'All'
+            }
+        ]
 
         # create new testplan
-        self.test_plan.get_test_plans_page()
-        testplan_name = self.test_plan.create_new_test_plan(material_type=random_materialtype, article=random_article, test_unit=testunit_name)
+        testunit_display_old_quantification_limit = '50-100'
+        self.base_selenium.LOGGER.info('A new quantitative testunit with quantification limits will be created with the following data:\n number: {}, name: {}, limits: {}, material type: {} and category: {}'
+                    .format(testunit_number, testunit_name, testunit_display_old_quantification_limit, material_type[0]['text'], testunit_category))
 
-        self.test_plan.search(testplan_name)
-        self.base_selenium.LOGGER.info('Saving the child data of the main testplan')
-        testplan_childtable_data = self.test_plan.get_child_table_data()
+        created_testunit_id = self.test_unit_api.create_quantitative_testunit(number=testunit_number, name=testunit_name, quantificationUpperLimit='100', quantificationLowerLimit='50', useQuantification=True, useSpec=False, selectedMaterialTypes=material_type, category=category)['testUnitId']
+        testunit_form_data = self.test_unit_api.get_testunit_form_data(id=str(created_testunit_id))
+        testunit_testplan_formated = self.test_unit_page.map_testunit_to_testplan_format(testunit=testunit_form_data)
+
+        active_article = {}
+        active_article_request = self.article_api.get_all_articles().json()['articles']
+        active_article = active_article_request[0]
+
+        all_materialtypes = self.general_utilities_api.list_all_material_types()
+
+        article_materialtype = list(filter(lambda x: x['name'] == active_article['materialType'], all_materialtypes))[0]
+        article_object = [
+            {
+            'id': active_article['id'],
+            'text': active_article['name']
+            }
+        ]
+
+        random_testplan_name = self.generate_random_string()
+        random_testplan_number = self.generate_random_number()
+
+        testplan_name = {
+            'id': 'new',
+            'text': random_testplan_name
+        }
+
+        # create new testplan
+        self.base_selenium.LOGGER.info('A new testplan with the recently created testunit will be created with the following data:\n number: {}, name: {}, testunit: {}, material type: {} and article: {}'
+                    .format(random_testplan_number, random_testplan_name, testunit_testplan_formated['name'], article_materialtype['name'], article_object['text']))
+
+        created_testplan = self.test_plan_api.create_testplan(testUnits=[testunit_testplan_formated], testPlan=testplan_name, selectedArticles=article_object, materialType=article_materialtype, number=random_testplan_number)
+
+        testplan_childtable_data = self.test_plan.search_and_get_childtable_data_for_testplan(random_testplan_name)
         self.base_selenium.LOGGER.info('Asserting the limits of quantification viewed correctly')
         self.assertIn(testunit_display_old_quantification_limit, testplan_childtable_data[0].values())
-
-        self.test_plan.get_test_plan_edit_page(testplan_name)
-        self.test_plan.navigate_to_testunits_selection_page()
-        new_quantification_lower_limit, new_quantification_upper_limit = self.test_plan.update_upper_lower_limits_of_testunit(old_quantification_upper_limit, old_quantification_lower_limit)
+        
+        new_quantification_lower_limit, new_quantification_upper_limit = self.test_plan.update_upper_lower_limits_of_testunit(random_testplan_name, 100, 50)
         testunit_display_new_quantification_limit = str(new_quantification_lower_limit) + '-' + str(new_quantification_upper_limit)
         self.test_plan.save()
         self.test_plan.confirm_popup()
-
         self.test_plan.get_test_plans_page()
-        self.test_plan.search(testplan_name)
-        self.base_selenium.LOGGER.info('Saving the child data of the main testplan')
-        testplan_childtable_data = self.test_plan.get_child_table_data()
-        self.base_selenium.LOGGER.info('Asserting the limits of quantification viewed correctly after update')
+
+        testplan_childtable_data = self.test_plan.search_and_get_childtable_data_for_testplan(random_testplan_name)
+        self.base_selenium.LOGGER.info('Asserting the limits of quantification viewed correctly')
         self.assertIn(testunit_display_new_quantification_limit, testplan_childtable_data[0].values())

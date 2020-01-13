@@ -228,7 +228,9 @@ class TstPlan(TestPlans):
 
         return old_testunits_searchable_from_testplans
 
-    def update_upper_lower_limits_of_testunit(self, old_upper, old_lower):
+    def update_upper_lower_limits_of_testunit(self, testplan_name, old_upper, old_lower):
+        self.get_test_plan_edit_page(testplan_name)
+        self.navigate_to_testunits_selection_page()
         new_upper = int(old_upper) + 5
         new_lower = int(old_lower) + 5
         self.base_selenium.set_text('test_plan:testunit_quantification_upper_limit', str(new_upper))

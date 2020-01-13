@@ -85,3 +85,8 @@ class TestPlans(BasePages):
         results_found = self.result_table()
         self.open_filter_menu() # close filter menu
         return results_found
+
+    def search_and_get_childtable_data_for_testplan(self, testplan_name):
+        self.search(testplan_name)
+        self.base_selenium.LOGGER.info('Saving the child data of the main testplan')
+        return self.get_child_table_data()
