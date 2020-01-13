@@ -728,3 +728,27 @@ class ContactsTestCases(BaseTest):
             counter = counter +1
 
     
+    def test031_add_contact_title(self):
+        """
+        LIMS-6491
+        Contacts: Contact person will have a title field to choose (Mr. or Ms)
+        """
+        # create contact with Mr.
+        contact_data = self.contact_page.create_update_contact(save=False, contact_persons=False)
+        self.contact_page.get_contact_persons_page()
+        contact_person_data = self.contact_page.create_update_contact_person(title='Mr.', save=True)
+        rows = self.contacts_page.search(contact_data['Contact Name'])
+        self.contacts_page.open_edit_page_by_css_selector(row=rows[0])
+        self.contact_page.get_contact_persons_page()
+        contact_person_data = self.contact_page.get_contact_persons_data()[0]
+        self.assertEqual(contact_person_data['title'], 'Mr.')
+
+        # update it to be Ms
+        contact_person_data = self.contact_page.create_update_contact_person(create=False, title='Ms', save=True)
+        self.contact_page.sleep_small()
+        self.contacts_page.get_contacts_page()
+        rows = self.contacts_page.search(contact_data['Contact Name'])
+        self.contacts_page.open_edit_page_by_css_selector(row=rows[0])
+        self.contact_page.get_contact_persons_page()
+        contact_person_data = self.contact_page.get_contact_persons_data()[0]
+        self.assertEqual(contact_person_data['title'], 'Ms')

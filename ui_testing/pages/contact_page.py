@@ -207,7 +207,7 @@ class Contact(Contacts):
         else:
             return ', '.join(contact_types)
 
-    def create_update_contact(self, create=True, no='', name='', address='', postalcode='', location='', country='', email='', phone='', skype='', website='', contact_types=['isClient'], departments=[''], contact_persons=True):
+    def create_update_contact(self, create=True, no='', name='', address='', postalcode='', location='', country='', email='', phone='', skype='', website='', contact_types=['isClient'], departments=[''], contact_persons=True, save=True):
 
         if create:
             self.base_selenium.LOGGER.info(' + Create new contact.')
@@ -256,8 +256,9 @@ class Contact(Contacts):
         else:
             contact_data['contact_persons'] = []
 
-        self.base_selenium.LOGGER.info('Saving the contact created')
-        self.save(save_btn='contact:save')
+        if save:
+            self.base_selenium.LOGGER.info('Saving the contact created')
+            self.save(save_btn='contact:save')
         return contact_data
 
     def get_full_contact_data(self):
@@ -282,7 +283,7 @@ class Contact(Contacts):
         self.base_selenium.click(element='contact:contact_persons')
         self.sleep_tiny()
 
-    def create_update_contact_person(self, create=True, indexToEdit=-1, name='', position='', email='', phone='', skype='', info='', save=False):
+    def create_update_contact_person(self, create=True, indexToEdit=-1, title='', name='', position='', email='', phone='', skype='', info='', save=False):
         if create:
             self.base_selenium.click(element='contact:add_another_item')
 
@@ -291,9 +292,15 @@ class Contact(Contacts):
         
         if create == False or indexToEdit == -1:
             indexToEdit = len(contact_persons_table_records) -1
-            
-        row_data = self.base_selenium.get_row_cells_elements_related_to_header(row=contact_persons_table_records[indexToEdit], table_element='contact:contact_persons_table')
+            contact_persons_table_records[indexToEdit].click()
+            self.sleep_small()
+            contact_persons_table_records = self.base_selenium.get_table_rows(element='contact:contact_persons_table')
+        
+        row_data = self.base_selenium.get_row_cells_elements_related_to_header(row=contact_persons_table_records[indexToEdit], table_element='contact:contact_persons_table')        
 
+        self.base_selenium.LOGGER.info(' Set contact person title : {}'.format(title))
+        self.base_selenium.update_item_value(item=row_data['Title:'], item_text=title)
+        
         name = name or self.generate_random_text()
         
         self.base_selenium.LOGGER.info(' Set contact person name : {}'.format(name))
@@ -342,6 +349,7 @@ class Contact(Contacts):
             for person in contact_persons_table_records:
                 row_data = self.base_selenium.get_row_cells_elements_related_to_header(row=person, table_element='contact:contact_persons_table')
                 contact_persons_arr.append({
+                    'title': row_data['Title:'].text,
                     'name': row_data['Contact Person: *'].text,
                     'position': row_data['Position:'].text,
                     'email': row_data['Email:'].text,
