@@ -360,6 +360,28 @@ class Contact(Contacts):
                     
         return contact_persons_arr
 
+    def get_contact_persons_data_ids(self):
+        self.get_contact_persons_page()
+        contact_persons_arr = []
+        webdriver.ActionChains(self.base_selenium.driver).send_keys(Keys.ESCAPE).perform()
+        self.base_selenium.LOGGER.info('Collecting persons data')
+        contact_persons_table_records = self.base_selenium.get_table_rows(element='contact:contact_persons_table')
+        if self.check_contact_persons_table_is_empty() != True:
+            for person in contact_persons_table_records:
+                row_data = self.base_selenium.get_row_cells_id_dict_related_to_header(row=person, table_element='contact:contact_persons_table')
+                print(row_data)
+                contact_persons_arr.append({
+                    'title': row_data['Title:'].text,
+                    'name': row_data['Contact Person: *'].text,
+                    'position': row_data['Position:'].text,
+                    'email': row_data['Email:'].text,
+                    'phone': row_data['Phone:'].text,
+                    'skype': row_data['Skype:'].text,
+                    'info': row_data['Info:'].text
+                })
+                    
+        return contact_persons_arr
+
     def get_contact_persons_count(self):
         contact_persons_table_records = self.base_selenium.get_table_rows(element='contact:contact_persons_table')
         return len(contact_persons_table_records)
