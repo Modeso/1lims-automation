@@ -822,7 +822,7 @@ class TestPlansTestCases(BaseTest):
 
         # create new testplan
         self.base_selenium.LOGGER.info('A new testplan with the recently created testunit will be created with the following data:\n number: {}, name: {}, testunit: {}, material type: {} and article: {}'
-                    .format(random_testplan_number, random_testplan_name, testunit_testplan_formated['name'], article_materialtype['name'], article_object['text']))
+                    .format(random_testplan_number, random_testplan_name, testunit_testplan_formated, article_materialtype, article_object))
 
         created_testplan = self.test_plan_api.create_testplan(testUnits=[testunit_testplan_formated], testPlan=testplan_name, selectedArticles=article_object, materialType=article_materialtype, number=random_testplan_number)
 
