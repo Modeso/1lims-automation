@@ -362,7 +362,7 @@ class HeaderTestCases(BaseTest):
 
         self.header_page.click_on_header_button()
         self.base_selenium.LOGGER.info('Press on logout button')
-        self.base_selenium.click(element='login:logout_btn')
+        self.base_selenium.click(element='header:logout')
 
         # login with role & user that you created to make sure from the permissions
         self.login_page.login(username=random_user_name, password='1')
@@ -403,7 +403,7 @@ class HeaderTestCases(BaseTest):
 
         self.header_page.click_on_header_button()
         self.base_selenium.LOGGER.info('Press on logout button')
-        self.base_selenium.click(element='login:logout_btn')
+        self.base_selenium.click(element='header:logout')
 
         # login with role & user that you created to make sure from the permissions
         self.login_page.login(username=random_user_name, password='1')
@@ -444,7 +444,7 @@ class HeaderTestCases(BaseTest):
         self.base_selenium.click(element='general:menu_filter_view')
         role_filter = self.header_page.filter_user_by(filter_element='roles_and_permissions:filter_no',
                                                       filter_text=role_data['number'])
-
+        self.assertTrue('Sample Management', self.single_analysis_page.get_analysis_page())
         self.assertTrue(role_data['number'], role_filter)
         self.header_page.click_on_reset_btn()
 
