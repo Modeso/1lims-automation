@@ -202,4 +202,13 @@ class TestUnitAPI(BaseAPI):
         if data['status'] == 1:
             return data['testUnits']
         return []
+
+    def get_first_record_with_data_in_attribute(self, attribute):
+        testunits_request = self.get_all_test_units().json()
+        if (testunits_request['status'] != 1) or (testunits_request['count'] == 0):
+            return False
+        testunit_records = testunits_request['testUnits']
+        for testunit in testunit_records:
+            if testunit[attribute] != '':
+                return testunit[attribute]
         

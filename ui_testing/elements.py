@@ -515,6 +515,10 @@ elements = {
         'configuration_testunit_comment': {'method': 'class_name',
                               'value': 'comment',
                               'order': 0},
+        'filter_created_at': {'method': 'id', 'value': 'start_createdAt'},
+        'filter_material_type': {'method': 'id', 'value': 'materialTypesfield'},
+        'filter_type': {'method': 'id', 'value': 'typeNamefield'},
+        'filter_changed_by': {'method': 'id', 'value': 'lastModifiedUserfield'},
     },
     'orders': {
         'orders_table': {'method': 'id',

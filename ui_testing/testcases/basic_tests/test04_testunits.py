@@ -1706,7 +1706,7 @@ class TestUnitsTestCases(BaseTest):
         assert (self.test_unit_page.deselect_all_configurations(), False)
 
 
-    def test040_filter_by_testunit_no_returns_only_correct_results(self):
+    def test042_filter_by_testunit_no_returns_only_correct_results(self):
         """
         New: Test units: Filter Approach: Make sure you can filter by test unit no
 
@@ -1721,10 +1721,10 @@ class TestUnitsTestCases(BaseTest):
         counter = 0
         while counter < (len(table_records) -1):
             row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=table_records[counter])
-            self.assertEqual(row_data['Test Unit No.'].replace("'",""), data_to_filter_with)
+            self.assertEqual(row_data['Test Unit No.'].replace("'",""), str(data_to_filter_with))
             counter = counter +1
 
-    def test041_filter_by_testunit_unit_returns_only_correct_results(self):
+    def test043_filter_by_testunit_unit_returns_only_correct_results(self):
         """
         New:  Test units: Filter Approach: Make sure you can filter by unit
 
@@ -1739,11 +1739,11 @@ class TestUnitsTestCases(BaseTest):
         counter = 0
         while counter < (len(table_records) -1):
             row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=table_records[counter])
-            self.assertEqual(row_data['Unit'].replace("'",""), data_to_filter_with)
+            self.assertEqual(row_data['Unit'].replace("'",""), str(data_to_filter_with.replace('{','').replace('}','').replace('[', '').replace(']','')))
             counter = counter +1
 
     
-    def test042_filter_by_testunit_category_returns_only_correct_results(self):
+    def test044_filter_by_testunit_category_returns_only_correct_results(self):
         """
         New:  Test units: Filter Approach: Make sure you can filter by category
 
@@ -1753,15 +1753,15 @@ class TestUnitsTestCases(BaseTest):
         data_to_filter_with = self.test_unit_api.get_first_record_with_data_in_attribute(attribute='categoryName')
         self.assertNotEqual(data_to_filter_with, False)
         self.base_selenium.LOGGER.info('filter with {}'.format(data_to_filter_with))
-        self.test_unit_page.apply_filter_scenario(filter_element='test_unit:category_filter', filter_text=data_to_filter_with, field_type='text')
+        self.test_unit_page.apply_filter_scenario(filter_element='test_unit:category_filter', filter_text=data_to_filter_with)
         table_records = self.test_unit_page.result_table()
         counter = 0
         while counter < (len(table_records) -1):
             row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=table_records[counter])
-            self.assertEqual(row_data['Category'].replace("'",""), data_to_filter_with)
+            self.assertEqual(row_data['Category'].replace("'",""), str(data_to_filter_with))
             counter = counter +1
 
-    def test043_filter_by_testunit_name_returns_only_correct_results(self):
+    def test045_filter_by_testunit_name_returns_only_correct_results(self):
         """
         New:  Test units: Filter Approach: Make sure you can filter by name
 
@@ -1776,10 +1776,10 @@ class TestUnitsTestCases(BaseTest):
         counter = 0
         while counter < (len(table_records) -1):
             row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=table_records[counter])
-            self.assertEqual(row_data['Test Unit Name'].replace("'",""), data_to_filter_with)
+            self.assertEqual(row_data['Test Unit Name'].replace("'",""), str(data_to_filter_with))
             counter = counter +1
 
-    def test044_filter_by_testunit_method_returns_only_correct_results(self):
+    def test046_filter_by_testunit_method_returns_only_correct_results(self):
         """
         New:  Test units: Filter Approach: Make sure you can filter by method
 
@@ -1794,23 +1794,79 @@ class TestUnitsTestCases(BaseTest):
         counter = 0
         while counter < (len(table_records) -1):
             row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=table_records[counter])
-            self.assertEqual(row_data['Method'].replace("'",""), data_to_filter_with)
+            self.assertEqual(row_data['Method'].replace("'",""), str(data_to_filter_with))
             counter = counter +1
     
-    def test045_filter_by_testunit_created_on_returns_only_correct_results(self):
+    def test047_filter_by_testunit_created_on_returns_only_correct_results(self):
         """
-        New:  Test units: Filter Approach: Make sure you can filter by method
+        New:  Test units: Filter Approach: Make sure you can filter by created on
 
-        LIMS-6434
+        LIMS-6431
         """
 
-        data_to_filter_with = self.test_unit_api.get_first_record_with_data_in_attribute(attribute='method')
+        data_to_filter_with = self.test_unit_api.get_first_record_with_data_in_attribute(attribute='createdAt')
+        data_to_filter_with = self.test_unit_page.convert_to_dot_date_format(date=data_to_filter_with)
         self.assertNotEqual(data_to_filter_with, False)
         self.base_selenium.LOGGER.info('filter with {}'.format(data_to_filter_with))
-        self.test_unit_page.apply_filter_scenario(filter_element='test_unit:method_filter', filter_text=data_to_filter_with, field_type='text')
+        self.test_unit_page.apply_filter_scenario(filter_element='test_unit:filter_created_at', filter_text=data_to_filter_with, field_type='text')
         table_records = self.test_unit_page.result_table()
         counter = 0
         while counter < (len(table_records) -1):
             row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=table_records[counter])
-            self.assertEqual(row_data['Method'].replace("'",""), data_to_filter_with)
+            self.assertEqual(row_data['Created On'].replace("'",""), str(data_to_filter_with))
+            counter = counter +1
+    
+    def test048_filter_by_testunit_material_type_returns_only_correct_results(self):
+        """
+        New:  Test units: Filter Approach: Make sure you can filter by material type
+
+        LIMS-6433
+        """
+
+        data_to_filter_with = self.test_unit_api.get_first_record_with_data_in_attribute(attribute='materialTypes')
+        self.assertNotEqual(data_to_filter_with, False)
+        self.base_selenium.LOGGER.info('filter with {}'.format(data_to_filter_with[0]))
+        self.test_unit_page.apply_filter_scenario(filter_element='test_unit:filter_material_type', filter_text=data_to_filter_with[0])
+        table_records = self.test_unit_page.result_table()
+        counter = 0
+        while counter < (len(table_records) -1):
+            row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=table_records[counter])
+            testunit_material_types = row_data['Material Type'].split(', ')[0]
+            self.assertEqual(testunit_material_types.replace("'",""), str(data_to_filter_with[0]))
+            counter = counter +1
+    
+    def test049_filter_by_testunit_type_returns_only_correct_results(self):
+        """
+        New:  Test units: Filter Approach: Make sure you can filter by type
+
+        LIMS-6435
+        """
+
+        data_to_filter_with = self.test_unit_api.get_first_record_with_data_in_attribute(attribute='typeName')
+        self.assertNotEqual(data_to_filter_with, False)
+        self.base_selenium.LOGGER.info('filter with {}'.format(data_to_filter_with))
+        self.test_unit_page.apply_filter_scenario(filter_element='test_unit:filter_type', filter_text=data_to_filter_with)
+        table_records = self.test_unit_page.result_table()
+        counter = 0
+        while counter < (len(table_records) -1):
+            row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=table_records[counter])
+            self.assertEqual(row_data['Type'].replace("'",""), str(data_to_filter_with))
+            counter = counter +1
+    
+    def test050_filter_by_testunit_changed_by_returns_only_correct_results(self):
+        """
+        New:  Test units: Filter Approach: Make sure you can filter by changed by
+
+        LIMS-6428
+        """
+
+        data_to_filter_with = self.test_unit_api.get_first_record_with_data_in_attribute(attribute='lastModifiedUser')
+        self.assertNotEqual(data_to_filter_with, False)
+        self.base_selenium.LOGGER.info('filter with {}'.format(data_to_filter_with))
+        self.test_unit_page.apply_filter_scenario(filter_element='test_unit:filter_changed_by', filter_text=data_to_filter_with)
+        table_records = self.test_unit_page.result_table()
+        counter = 0
+        while counter < (len(table_records) -1):
+            row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=table_records[counter])
+            self.assertEqual(row_data['Changed By'].replace("'",""), str(data_to_filter_with))
             counter = counter +1
