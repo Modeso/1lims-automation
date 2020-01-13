@@ -789,7 +789,7 @@ class TestPlansTestCases(BaseTest):
             }
         ]
 
-        # create new testplan
+        # create new testunit
         testunit_display_old_quantification_limit = '50-100'
         self.base_selenium.LOGGER.info('A new quantitative testunit with quantification limits will be created with the following data:\n number: {}, name: {}, limits: {}, material type: {} and category: {}'
                     .format(testunit_number, testunit_name, testunit_display_old_quantification_limit, material_type[0]['text'], testunit_category))
