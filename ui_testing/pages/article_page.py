@@ -144,13 +144,27 @@ class Article(Articles):
         self.open_filter_menu()
         self.sleep_medium()
 
-
     def archive_restore_optional_fields(self, restore=False):
         self.sleep_small()
-        self.info('+ Open article configuration')
+        self.info('Open article configuration')
         self.open_configuration()
         if restore:
-            self.base_selenium.click(element='general:configurations_archived') # open the archived tab
+            self.base_selenium.click(element='general:configurations_archived')  # open the archived tab
+            self.sleep_tiny()
         self.toggle_archive_field(field_name='unit', restore=restore)
         self.toggle_archive_field(field_name='comment', restore=restore)
         self.toggle_archive_field(field_name='related_article', restore=restore)
+
+    def restore_ui(self, restore=True):
+        self.info('Open article configuration')
+        self.open_configuration()
+        self.base_selenium.click(element='general:configurations_archived')  # open the archived tab
+
+        if self.base_selenium.check_element_is_exist('articles:unit_field_options'):
+            self.toggle_archive_field(field_name='unit', restore=restore)
+
+        if self.base_selenium.check_element_is_exist('articles:comment_field_options'):
+            self.toggle_archive_field(field_name='comment', restore=restore)
+
+        if self.base_selenium.check_element_is_exist('articles:related_article_field_options'):
+            self.toggle_archive_field(field_name='related_article', restore=restore)
