@@ -12,6 +12,7 @@ from ui_testing.pages.base_pages import BasePages
 from ui_testing.pages.order_page import Order
 from ui_testing.pages.audit_trail_page import AuditTrail
 from ui_testing.pages.contacts_page import Contacts
+from ui_testing.pages.my_profile_page import MyProfile
 from ui_testing.pages.company_profile_page import CompanyProfile
 from api_testing.apis.test_unit_api import TestUnitAPI
 from api_testing.apis.article_api import ArticleAPI
@@ -21,7 +22,9 @@ from api_testing.apis.orders_api import OrdersAPI
 from ui_testing.pages.analysis_page import SingleAnalysisPage
 from api_testing.apis.contacts_api import ContactsAPI
 from api_testing.apis.users_api import UsersAPI
-
+from api_testing.apis.roles_api import RolesAPI
+from api_testing.apis.analysis_api import AnalysisAPI
+from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 import datetime, re
 
 
@@ -43,6 +46,7 @@ class BaseTest(TestCase):
         self.order_page = Order()
         self.audit_trail_page = AuditTrail()
         self.header_page = Header()
+        self.my_profile_page = MyProfile()
         self.base_page = BasePages()
         self.contacts_page = Contacts()
         self.company_profile_page = CompanyProfile()
@@ -51,9 +55,12 @@ class BaseTest(TestCase):
         self.test_unit_api = TestUnitAPI()
         self.test_plan_api = TestPlanAPI()
         self.orders_api = OrdersAPI()
+        self.analysis_api = AnalysisAPI()
         self.single_analysis_page = SingleAnalysisPage()
         self.contacts_api = ContactsAPI()
         self.users_api = UsersAPI()
+        self.roles_api = RolesAPI()
+        self.general_utilities_api = GeneralUtilitiesAPI()
 
     def tearDown(self):
         self.base_selenium.quit_driver()
@@ -160,6 +167,27 @@ class BaseTest(TestCase):
 
         return first_element, second_element
         
+
+    def get_all_articles(self):
+        articles_response = self.article_api.get_all_articles()
+        articles=articles_response.json()['articles']
+        return articles
+
+    def get_all_test_plans(self):
+        test_plans_response = self.test_plan_api.get_all_test_plans()
+        test_plans = test_plans_response.json()['testPlans']
+        return test_plans
+
+    def get_all_test_units(self):
+        test_units_response = self.test_unit_api.get_all_test_units()
+        test_units = test_units_response.json()['testUnits']
+        return test_units
+
+    def get_all_contacts(self):
+        contacts_response=self.contacts_api.get_all_contacts()
+        contacts= contacts_response.json()['contacts']
+        return contacts
+
     def info(self, message):
         self.base_selenium.LOGGER.info(message)
 

@@ -1,3 +1,5 @@
+from selenium.webdriver.common.keys import Keys
+
 from ui_testing.pages.testplans_page import TestPlans
 from selenium.common.exceptions import NoSuchElementException
 
@@ -9,11 +11,12 @@ class TstPlan(TestPlans):
         self.base_selenium.set_text(element="test_plan:no", value=no)
 
     def get_article(self):
-        articles = self.base_selenium.get_value(element="test_plan:article")
-        if "×" in articles:
-            return articles.replace("× ", "").split('\n')
-        else:
-            return []
+        articles = self.base_selenium.get_text(element="test_plan:article").split('\n')
+        article_list = []
+        for article in articles:
+            if "×" in article:
+                article_list.append(article.replace("× ", ""))
+        return article_list
 
     def set_article(self, article='', random=False):
         if random:
@@ -27,7 +30,7 @@ class TstPlan(TestPlans):
             self.base_selenium.clear_items_in_drop_down(element='test_plan:article')
 
     def get_material_type(self):
-        return self.base_selenium.get_text(element='test_plan:material_type')
+        return self.base_selenium.get_text(element='test_plan:material_type').split('\n')[0]
 
     def set_material_type(self, material_type='', random=False):
         if random:
@@ -44,6 +47,19 @@ class TstPlan(TestPlans):
         self.base_selenium.set_text_in_drop_down(ng_select_element='test_plan:test_plan', text=name)
         return name
 
+    def search_test_unit_not_set(self, test_unit=''):
+        self.base_selenium.LOGGER.info('navigate to testplan second step')
+        self.base_selenium.click('test_plan:next')
+        self.sleep_tiny()
+        self.base_selenium.click('test_plan:add_test_units')
+        self.sleep_tiny()
+        is_option_exist = self.base_selenium.select_item_from_drop_down(element='test_plan:test_units',
+                                                                        item_text=test_unit)
+        self.sleep_tiny()
+        self.base_selenium.click(element='test_plan:cancel_add_testunit')
+        self.base_selenium.click(element='test_plan:back_button')
+        return is_option_exist
+
     def set_test_unit(self, test_unit='', **kwargs):
         self.base_selenium.click('test_plan:next')
         self.base_selenium.click('test_plan:add_test_units')
@@ -55,11 +71,30 @@ class TstPlan(TestPlans):
             elems = self.base_selenium.find_elements('general:col_6')
             upper = self.base_selenium.find_element_in_element(source=elems[4], destination_element='general:input')
             upper.send_keys(kwargs['upper'])
-        if 'lower' in kwargs:
+        if  'lower' in kwargs:
             self.base_selenium.LOGGER.info(' set lower : {}'.format(kwargs['lower']))
             elems = self.base_selenium.find_elements('general:col_6')
             lower = self.base_selenium.find_element_in_element(source=elems[5], destination_element='general:input')
             lower.send_keys(kwargs['lower'])
+
+    def get_testunit_in_testplan_title_multiple_line_properties(self):
+        dom_element = self.base_selenium.find_element(element='test_plan:testunit_title')
+        multiple_line_properties = dict()
+        multiple_line_properties['textOverflow'] = self.base_selenium.driver.execute_script( 'return '
+                                                                                             'window'
+                                                                                             '.getComputedStyle('
+                                                                                             'arguments[0], '
+                                                                                             '"None").textOverflow',
+                                                                                             dom_element)
+        multiple_line_properties['lineBreak'] = self.base_selenium.driver.execute_script('return '
+                                                                                            'window'
+                                                                                            '.getComputedStyle('
+                                                                                            'arguments[0], '
+                                                                                            '"None").lineBreak',
+                                                                                            dom_element)
+
+        return multiple_line_properties
+
 
     def get_test_unit_limits(self):
         self.base_selenium.click('test_plan:next')
@@ -67,6 +102,12 @@ class TstPlan(TestPlans):
         upper = self.base_selenium.find_element_in_element(source=elems[4], destination_element='general:input')
         lower = self.base_selenium.find_element_in_element(source=elems[5], destination_element='general:input')
         return upper.get_attribute('value'), lower.get_attribute('value')
+
+    def get_test_unit_category(self):
+        self.base_selenium.click('test_plan:next')
+        self.sleep_small()
+        category_label_test_unit = self.base_selenium.find_element('test_plan:category-label')
+        return category_label_test_unit.get_attribute('textContent')
 
     def create_new_test_plan(self, name='', material_type='', article='', test_unit='', **kwargs):
         self.base_selenium.LOGGER.info(' Create new test plan')
