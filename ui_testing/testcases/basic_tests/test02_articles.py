@@ -34,7 +34,7 @@ class ArticlesTestCases(BaseTest):
         test_case_tag = self._testMethodName
         if test_case_tag in ["test022_user_hide_any_optional_field_is_not_affecting_the_table",
                              "test023_user_hide_any_optional_field_in_create_form_0_edit",
-                             "test023_user_hide_any_optional_field_in_create_form_1_create"
+                             "test023_user_hide_any_optional_field_in_create_form_1_create",
                              "test024_user_restore_any_optional_field_is_not_affecting_the_table",
                              "test025_user_restore_any_optional_field_in_create_form_0_edit",
                              "test025_user_restore_any_optional_field_in_create_form_1_create"]:
@@ -625,7 +625,7 @@ class ArticlesTestCases(BaseTest):
             self.article_page.info('Open article create page')
             self.base_selenium.click(element='articles:new_article')
 
-        self.article_page.sleep_small()
+        self.article_page.sleep_tiny()
 
         self.article_page.info('Check if Unit field exist in article page')
         self.assertFalse(self.base_selenium.check_element_is_exist('article:unit'))
@@ -684,7 +684,7 @@ class ArticlesTestCases(BaseTest):
             self.article_page.info('Open article create page')
             self.base_selenium.click(element='articles:new_article')
 
-        self.article_page.sleep_small()
+        self.article_page.sleep_tiny()
         self.article_page.info('Check if Unit field exist in article page')
         self.assertTrue(self.base_selenium.check_element_is_exist('article:unit'))
 
