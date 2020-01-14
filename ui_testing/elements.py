@@ -224,7 +224,6 @@ elements = {
                     'value': 'comment'},
         'name': {'method': 'id',
                  'value': 'namefield'},
-
         'filter_test_plan': {'method': 'id',
                              'value': 'testPlansfield'},
         'filter_created_at': {'method': 'id', 'value': 'start_createdAt'},

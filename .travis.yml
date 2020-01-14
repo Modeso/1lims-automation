@@ -26,4 +26,18 @@ script:
   #- echo $TESTS
   - cd $TRAVIS_BUILD_DIR && export PYTHONPATH='./'
   # - xvfb-run -a nosetests-3.4 -vs --nologcapture ui_testing/testcases/header_tests/$TESTS --tc-file=config.ini
-  - xvfb-run -a nosetests-3.4 -vs --nologcapture --tc-file=config.ini ui_testing/testcases/header_tests/test09_my_profile.py:MyProfileTestCases.test005_company_profile_upload_file_then_cancel_should_not_save
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test001_cancel_button_edit_unit_0_save --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test001_cancel_button_edit_unit_1_cancel --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test002_cancel_button_edit_no_0_save --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test002_cancel_button_edit_no_1_cancel --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test003_cancel_button_edit_name_0_save --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test003_cancel_button_edit_name_1_cancel --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test004_cancel_button_edit_comment_0_save --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test004_cancel_button_edit_comment_1_cancel --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test005_cancel_button_edit_material_type_0_save --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test005_cancel_button_edit_material_type_1_cancel --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test006_archived_articles_shoudnt_dispaly_in_test_plan --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test008_created_article_appear_in_test_plan --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test009_create_article_with_test_plan_search_by_test_plan --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test010_create_article_with_test_plan_filter_by_test_plan --tc-file=config.ini
+

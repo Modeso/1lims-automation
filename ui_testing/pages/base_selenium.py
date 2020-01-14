@@ -12,7 +12,6 @@ import random, time, os
 import pandas as pd
 from loguru import logger
 
-
 class BaseSelenium:
     TIME_TINY = 2
     TIME_SMALL = 5
@@ -438,6 +437,8 @@ class BaseSelenium:
                     count += 1
                     if count > 1:
                         break
+                else:
+                    break
             if count == 1:
                 result.append(index)
         return result

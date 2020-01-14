@@ -3,9 +3,6 @@ from parameterized import parameterized
 import re
 from unittest import skip
 import random
-import inspect
-
-
 
 class ArticlesTestCases(BaseTest):
     def setUp(self):
@@ -76,12 +73,11 @@ class ArticlesTestCases(BaseTest):
 
         LIMS-3586
         LIMS-3576
-        :return:
         """
         self.article_page.get_random_article()
         article_url = self.base_selenium.get_url()
         self.base_selenium.LOGGER.info(
-            ' + article_url : {}'.format(article_url))
+            'article_url : {}'.format(article_url))
         current_unit = self.article_page.get_unit()
         new_unit = self.generate_random_string()
         self.article_page.set_unit(new_unit)
@@ -96,11 +92,11 @@ class ArticlesTestCases(BaseTest):
         article_unit = self.article_page.get_unit()
         if 'save' == save:
             self.base_selenium.LOGGER.info(
-                ' + Assert {} (new_unit) == {} (article_unit)'.format(new_unit, article_unit))
+                'Assert {} (new_unit) == {} (article_unit)'.format(new_unit, article_unit))
             self.assertEqual(new_unit, article_unit)
         else:
             self.base_selenium.LOGGER.info(
-                ' + Assert {} (current_unit) == {} (article_unit)'.format(current_unit, article_unit))
+                'Assert {} (current_unit) == {} (article_unit)'.format(current_unit, article_unit))
             self.assertEqual(current_unit, article_unit)
 
     @parameterized.expand(['save', 'cancel'])
@@ -111,12 +107,11 @@ class ArticlesTestCases(BaseTest):
 
         LIMS-3586
         LIMS-3576
-        :return:
         """
         self.article_page.get_random_article()
         article_url = self.base_selenium.get_url()
         self.base_selenium.LOGGER.info(
-            ' + article_url : {}'.format(article_url))
+            'article_url : {}'.format(article_url))
         current_no = self.article_page.get_no()
         new_no = self.generate_random_string()
         self.article_page.set_no(new_no)
@@ -131,11 +126,11 @@ class ArticlesTestCases(BaseTest):
         article_no = self.article_page.get_no()
         if 'save' == save:
             self.base_selenium.LOGGER.info(
-                ' + Assert {} (new_no) == {} (article_no)'.format(new_no, article_no))
+                ' Assert {} (new_no) == {} (article_no)'.format(new_no, article_no))
             self.assertEqual(new_no, article_no)
         else:
             self.base_selenium.LOGGER.info(
-                ' + Assert {} (current_no) == {} (article_no)'.format(current_no, article_no))
+                ' Assert {} (current_no) == {} (article_no)'.format(current_no, article_no))
             self.assertEqual(current_no, article_no)
 
     @parameterized.expand(['save', 'cancel'])
@@ -146,12 +141,11 @@ class ArticlesTestCases(BaseTest):
 
         LIMS-3586
         LIMS-3576
-        :return:
         """
         self.article_page.get_random_article()
         article_url = self.base_selenium.get_url()
         self.base_selenium.LOGGER.info(
-            ' + article_url : {}'.format(article_url))
+            'article_url : {}'.format(article_url))
         current_name = self.article_page.get_name()
         new_name = self.generate_random_string()
         self.article_page.set_name(new_name)
@@ -167,11 +161,11 @@ class ArticlesTestCases(BaseTest):
         article_name = self.article_page.get_name()
         if 'save' == save:
             self.base_selenium.LOGGER.info(
-                ' + Assert {} (new_name) == {} (article_name)'.format(new_name, article_name))
+                'Assert {} (new_name) == {} (article_name)'.format(new_name, article_name))
             self.assertEqual(new_name, article_name)
         else:
             self.base_selenium.LOGGER.info(
-                ' + Assert {} (current_name) == {} (article_name)'.format(current_name, article_name))
+                'Assert {} (current_name) == {} (article_name)'.format(current_name, article_name))
             self.assertEqual(current_name, article_name)
 
     @parameterized.expand(['save', 'cancel'])
@@ -182,12 +176,11 @@ class ArticlesTestCases(BaseTest):
 
         LIMS-3586
         LIMS-3576
-        :return:
         """
         self.article_page.get_random_article()
         article_url = self.base_selenium.get_url()
         self.base_selenium.LOGGER.info(
-            ' + article_url : {}'.format(article_url))
+            'article_url : {}'.format(article_url))
         current_comment = self.article_page.get_comment()
         new_comment = self.generate_random_string()
         self.article_page.set_comment(new_comment)
@@ -202,11 +195,11 @@ class ArticlesTestCases(BaseTest):
         article_comment = self.article_page.get_comment()
         if 'save' == save:
             self.base_selenium.LOGGER.info(
-                ' + Assert {} (new_comment) == {} (article_comment)'.format(new_comment, article_comment))
+                'Assert {} (new_comment) == {} (article_comment)'.format(new_comment, article_comment))
             self.assertEqual(new_comment, article_comment)
         else:
             self.base_selenium.LOGGER.info(
-                ' + Assert {} (current_comment) == {} (article_comment)'.format(current_comment, article_comment))
+                'Assert {} (current_comment) == {} (article_comment)'.format(current_comment, article_comment))
             self.assertEqual(current_comment, article_comment)
 
     @parameterized.expand(['save', 'cancel'])
@@ -217,14 +210,12 @@ class ArticlesTestCases(BaseTest):
 
         LIMS-3586
         LIMS-3576
-        :return:
         """
         self.article_page.get_random_article()
         article_url = self.base_selenium.get_url()
         self.base_selenium.LOGGER.info(
-            ' + article_url : {}'.format(article_url))
+            'article_url : {}'.format(article_url))
         current_material_type = self.article_page.get_material_type()
-        self.article_page.set_material_type(random=True)
         new_material_type = self.article_page.get_material_type()
         if 'save' == save:
             self.article_page.save()
@@ -236,13 +227,13 @@ class ArticlesTestCases(BaseTest):
         article_material = self.article_page.get_material_type()
         if 'save' == save:
             self.base_selenium.LOGGER.info(
-                ' + Assert {} (new_material_type) == {} (article_material_type)'.format(new_material_type,
+                'Assert {} (new_material_type) == {} (article_material_type)'.format(new_material_type,
                                                                                         article_material))
             self.assertEqual(new_material_type,
                              self.article_page.get_material_type())
         else:
             self.base_selenium.LOGGER.info(
-                ' + Assert {} (current_material_type) == {} (article_material_type)'.format(current_material_type,
+                'Assert {} (current_material_type) == {} (article_material_type)'.format(current_material_type,
                                                                                             article_material))
             self.assertEqual(current_material_type,
                              self.article_page.get_material_type())
@@ -252,21 +243,20 @@ class ArticlesTestCases(BaseTest):
         New: Article: In case I archived any article this article shouldn't display in the test plan module when
          I create test plan or edit it
 
-         LIMS-3668
-        :return:
+        LIMS-3668
         """
         self.article_page.create_new_article(material_type='Raw Material')
-        self.base_selenium.LOGGER.info(' + Archive the article.')
+        self.base_selenium.LOGGER.info(' Archive the article.')
         self.article_page.archive_article(name=self.article_page.article_name)
         self.test_plan.get_test_plans_page()
         self.base_selenium.LOGGER.info(
-            ' + Create test plan with the same material type.')
+            'Create test plan with the same material type.')
         self.test_plan.click_create_test_plan_button()
         self.test_plan.set_material_type(
             material_type=self.article_page.article_material_type)
         self.article_page.sleep_tiny()
         self.base_selenium.LOGGER.info(
-            ' + Assert article is not existing in the list.')
+            'Assert article is not existing in the list.')
         self.assertFalse(self.test_plan.is_article_existing(
             article=self.article_page.article_name))
 
@@ -275,8 +265,7 @@ class ArticlesTestCases(BaseTest):
         """
         New: Article: Archived any article this article shouldn't display in the order module
 
-         LIMS-3668
-        :return:
+        LIMS-3668
         """
         self.article_page.create_new_article(material_type='Raw Material')
         self.article_page.archive_article(name=self.article_page.article_name)
@@ -291,10 +280,9 @@ class ArticlesTestCases(BaseTest):
 
     def test008_created_article_appear_in_test_plan(self):
         """
-            New: Article/Test plan: Any article I created should appear in the test plan according to the materiel type.
+        New: Article/Test plan: Any article I created should appear in the test plan according to the materiel type.
 
-            LIMS-3581
-        :return:
+        LIMS-3581
         """
         self.article_page.create_new_article(material_type='Raw Material')
         self.test_plan.get_test_plans_page()
@@ -310,7 +298,6 @@ class ArticlesTestCases(BaseTest):
         In case I create test plan with the article that I created, this test plan should display in the table view
 
         LIMS-3583
-        :return:
         """
         self.article_page.create_new_article(material_type='Raw Material')
         self.test_plan.get_test_plans_page()
@@ -338,7 +325,6 @@ class ArticlesTestCases(BaseTest):
         In case I create test plan with the article that I created, user could filter with test plan
 
         LIMS-3583
-        :return:
         """
         self.article_page.create_new_article(material_type='Raw Material')
         self.test_plan.get_test_plans_page()
@@ -360,7 +346,6 @@ class ArticlesTestCases(BaseTest):
         New: Article: Archive Approach: I can archive/restore any article successfully
 
         LIMS-3587
-        :return:
         """
         selected_articles_data, _ = self.article_page.select_random_multiple_table_rows()
         self.article_page.archive_selected_articles()
@@ -368,7 +353,7 @@ class ArticlesTestCases(BaseTest):
         for article in selected_articles_data:
             article_name = article['Article Name']
             self.base_selenium.LOGGER.info(
-                ' + {} article should be activated.'.format(article_name))
+                '{} article should be activated.'.format(article_name))
             self.assertTrue(
                 self.article_page.is_article_in_table(value=article_name))
 
@@ -377,7 +362,6 @@ class ArticlesTestCases(BaseTest):
         New: Article: Restore Approach: I can archive/restore any article successfully
 
         LIMS-3587
-        :return:
         """
         article_names = []
         self.article_page.get_archived_articles()
