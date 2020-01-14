@@ -195,7 +195,7 @@ elements = {
         'delete': {'method': 'link_text',
                    'value': 'Delete'},
         'right_menu': {'method': 'xpath',
-                       'value': '//*[@id="custom-accordion-panel"]/div/a/i'},
+                       'value': '//i[@class="flaticon-grid-menu-v2"]'},
         'alert_confirmation': {'method': 'id',
                                'value': 'noty_layout__topCenter'},
 

@@ -40,4 +40,32 @@ script:
   - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test008_created_article_appear_in_test_plan --tc-file=config.ini
   - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test009_create_article_with_test_plan_search_by_test_plan --tc-file=config.ini
   - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test010_create_article_with_test_plan_filter_by_test_plan --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test011_archive_articles --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test012_restore_articles --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test013_create_new_material_type --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test014_article_search --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test015_green_border --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test016_create_full_options_article --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test017_delete_article_with_test_plan --tc-file=config.ini
+
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test020_create_approach_overview_button_0_ok --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test020_create_approach_overview_button_1_cancel --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test021_edit_approach_overview_button --tc-file=config.ini
+
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test028_filter_article_by_any_field_0_name --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test028_filter_article_by_any_field_1_number --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test028_filter_article_by_any_field_2_unit --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test028_filter_article_by_any_field_3_created_at --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test028_filter_article_by_any_field_4_material_type --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test028_filter_article_by_any_field_5_changed_by --tc-file=config.ini
+
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test029_filter_article_by_any_default_filter_0_name --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test029_filter_article_by_any_default_filter_1_number --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test029_filter_article_by_any_default_filter_2_unit --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test029_filter_article_by_any_default_filter_3_created_at --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test029_filter_article_by_any_default_filter_4_material_type --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test029_filter_article_by_any_default_filter_5_changed_by --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test028_article_search_then_navigate --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test030_hide_all_table_configurations --tc-file=config.ini
+
 
