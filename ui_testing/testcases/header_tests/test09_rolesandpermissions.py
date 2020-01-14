@@ -462,7 +462,7 @@ class HeaderTestCases(BaseTest):
                                          user_role='Admin', user_password='1', user_confirm_password='1')
 
         self.header_page.click_on_header_button()
-        self.base_selenium.click(element='login:logout_btn')
+        self.base_selenium.click(element='header:logout')
         self.login_page.login(username=random_user_name, password='1')
         self.header_page.click_on_header_button()
         self.base_selenium.click(element='header:roles_and_permissions_button')
