@@ -369,15 +369,14 @@ class Contact(Contacts):
         if self.check_contact_persons_table_is_empty() != True:
             for person in contact_persons_table_records:
                 row_data = self.base_selenium.get_row_cells_id_dict_related_to_header(row=person, table_element='contact:contact_persons_table')
-                print(row_data)
                 contact_persons_arr.append({
-                    'title': row_data['Title:'].text,
-                    'name': row_data['Contact Person: *'].text,
-                    'position': row_data['Position:'].text,
-                    'email': row_data['Email:'].text,
-                    'phone': row_data['Phone:'].text,
-                    'skype': row_data['Skype:'].text,
-                    'info': row_data['Info:'].text
+                    'title': row_data['gender'],
+                    'name': row_data['name'],
+                    'position': row_data['position'],
+                    'email': row_data['email'],
+                    'phone': row_data['phone'],
+                    'skype': row_data['skype'],
+                    'info': row_data['moreInfo']
                 })
                     
         return contact_persons_arr
@@ -457,3 +456,8 @@ class Contact(Contacts):
 
     def get_country_data(self, id):
         return list(filter(lambda x: x['id'] == id, countries))[0]
+
+    def navigate_to_contact_person_tab_get_data(self):
+        self.get_contact_persons_page()
+        contact_person_data_first_contact = self.get_contact_persons_data_ids()[0]
+        return contact_person_data_first_contact

@@ -112,5 +112,6 @@ class Contacts(BasePages):
                         'laboratory': 'Laboratory'}
         return types[contact_type]
 
-
-    
+    def search_find_row_open_edit_page(self, search_text):
+        rows = self.search(search_text)
+        self.open_edit_page_by_css_selector(row=rows[0])
