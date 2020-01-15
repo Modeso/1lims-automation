@@ -409,12 +409,8 @@ class TestPlansTestCases(BaseTest):
                 testplan_name, (testplan['article'])[0], testplan['materialType']))
         # create another testplan with the same data
         if ("same" == same):
-            self.base_selenium.LOGGER.info(
-                'Attempting to create another testplan with the same data as the previously created one')
             article_name=testplan['article'])[0]
         else:
-            self.base_selenium.LOGGER.info(
-                'Attempting to create another testplan with the same data but All Articles')
             article_name="All"
         
         self.test_plan.create_new_test_plan(name=testplan_name, material_type=testplan['materialType'],
