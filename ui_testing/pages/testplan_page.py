@@ -2,6 +2,8 @@ from selenium.webdriver.common.keys import Keys
 
 from ui_testing.pages.testplans_page import TestPlans
 from selenium.common.exceptions import NoSuchElementException
+import ipdb
+
 
 class TstPlan(TestPlans):
     def get_no(self):
@@ -71,7 +73,7 @@ class TstPlan(TestPlans):
             elems = self.base_selenium.find_elements('general:col_6')
             upper = self.base_selenium.find_element_in_element(source=elems[4], destination_element='general:input')
             upper.send_keys(kwargs['upper'])
-        if  'lower' in kwargs:
+        if 'lower' in kwargs:
             self.base_selenium.LOGGER.info(' set lower : {}'.format(kwargs['lower']))
             elems = self.base_selenium.find_elements('general:col_6')
             lower = self.base_selenium.find_element_in_element(source=elems[5], destination_element='general:input')
@@ -80,21 +82,20 @@ class TstPlan(TestPlans):
     def get_testunit_in_testplan_title_multiple_line_properties(self):
         dom_element = self.base_selenium.find_element(element='test_plan:testunit_title')
         multiple_line_properties = dict()
-        multiple_line_properties['textOverflow'] = self.base_selenium.driver.execute_script( 'return '
-                                                                                             'window'
-                                                                                             '.getComputedStyle('
-                                                                                             'arguments[0], '
-                                                                                             '"None").textOverflow',
-                                                                                             dom_element)
-        multiple_line_properties['lineBreak'] = self.base_selenium.driver.execute_script('return '
+        multiple_line_properties['textOverflow'] = self.base_selenium.driver.execute_script('return '
                                                                                             'window'
                                                                                             '.getComputedStyle('
                                                                                             'arguments[0], '
-                                                                                            '"None").lineBreak',
+                                                                                            '"None").textOverflow',
                                                                                             dom_element)
+        multiple_line_properties['lineBreak'] = self.base_selenium.driver.execute_script('return '
+                                                                                         'window'
+                                                                                         '.getComputedStyle('
+                                                                                         'arguments[0], '
+                                                                                         '"None").lineBreak',
+                                                                                         dom_element)
 
         return multiple_line_properties
-
 
     def get_test_unit_limits(self):
         self.base_selenium.click('test_plan:next')
@@ -158,16 +159,16 @@ class TstPlan(TestPlans):
             row_data = self.base_selenium.get_row_cells(row)
             row_data_text = []
             for r in row_data:
-                row_data_text.append(r.text) 
+                row_data_text.append(r.text)
             testunits.append(row_data_text)
-            
+
         return testunits
 
     def delete_the_first_testunit_from_the_tableview(self):
         self.base_selenium.LOGGER.info('Deleting the first testunit from the testunits table')
         self.base_selenium.click(element='test_plan:row_delete_button')
         self.sleep_medium()
-    
+
     def check_if_deleted_testunit_is_available(self, all_testunits, deleted_test_unit):
         deleted_test_unit_found = 0
         for testunit in all_testunits:
@@ -193,12 +194,13 @@ class TstPlan(TestPlans):
             try:
                 self.base_selenium.click(element='test_plan:remove_testunit')
             except:
-                testunits_still_available = 0      
+                testunits_still_available = 0
 
     '''
     Changes the fields in the testplan after choosing the duplicate option on
     a specific testplan
     '''
+
     def duplicate_testplan(self, change=[]):
         for c in change:
             self.base_selenium.LOGGER.info('Changing the {} field'.format(c))
@@ -206,24 +208,27 @@ class TstPlan(TestPlans):
                 duplicated_test_plan_name = self.generate_random_text()
                 self.set_test_plan(name=duplicated_test_plan_name)
         self.save()
-        
+
     def get_testunit_category_and_iterations(self, testplan_name):
         self.get_test_plan_edit_page(testplan_name)
         self.navigate_to_testunits_selection_page()
         testunit_category = self.base_selenium.get_text(element='test_plan:testunit_category')
         testunit_iteration = self.base_selenium.get_value(element='test_plan:testunit_iteration')
-        
+
         return testunit_category, testunit_iteration
 
     '''
     Update the testunits field searchable in the database
     '''
+
     def get_and_update_testunits_dropdown_field(self, cursor, db, searchable):
-        testunits_select_query_from_testplans = ("SELECT searchable FROM `field_data` WHERE componentId = 5 AND name = 'testUnits'")
+        testunits_select_query_from_testplans = (
+            "SELECT searchable FROM `field_data` WHERE componentId = 5 AND name = 'testUnits'")
         cursor.execute(testunits_select_query_from_testplans)
         old_testunits_searchable_from_testplans = str(cursor.fetchone()[0])
 
-        testunits_searchable_update_query_in_testplans = ("UPDATE `field_data` SET `searchable`= '" + searchable + "' WHERE componentId = 5 AND name = 'testUnits'")
+        testunits_searchable_update_query_in_testplans = (
+                "UPDATE `field_data` SET `searchable`= '" + searchable + "' WHERE componentId = 5 AND name = 'testUnits'")
         cursor.execute(testunits_searchable_update_query_in_testplans)
         db.commit()
 
@@ -245,8 +250,10 @@ class TstPlan(TestPlans):
         elems = self.base_selenium.find_elements('general:col_6')
         old_upper = self.base_selenium.find_element_in_element(source=elems[4], destination_element='general:input')
         old_lower = self.base_selenium.find_element_in_element(source=elems[5], destination_element='general:input')
-        old_lower.clear()
-        old_upper.clear()
-        old_upper.send_keys(upper)
-        old_lower.send_keys(lower)
+        # old_lower.clear()
+        # old_upper.clear()
+        # old_upper.send_keys(upper)
+        # old_lower.send_keys(lower)
+        self.base_selenium.set_text(old_upper, upper)
+        self.base_selenium.set_text(old_lower, lower)
         self.sleep_small()

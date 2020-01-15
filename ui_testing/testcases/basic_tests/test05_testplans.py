@@ -411,20 +411,9 @@ class TestPlansTestCases(BaseTest):
         if ("same" == same):
             self.base_selenium.LOGGER.info(
                 'Attempting to create another testplan with the same data as the previously created one')
-
             # create another testplan with the same data
             self.test_plan.create_new_test_plan(name=testplan_name, material_type=testplan['materialType'],
                                                 article=(testplan['article'])[0])
-
-            self.base_selenium.LOGGER.info(
-                'Waiting for the error message to make sure that validation forbids the creation of two testplans having the same name, material type and article')
-            validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
-
-            self.base_selenium.LOGGER.info(
-                'Assert the error message to make sure that validation forbids the creation of two testplans having the same name, material type and article? {}'.format(
-                    validation_result))
-            self.assertTrue(validation_result)
-
         else:
             self.base_selenium.LOGGER.info(
                 'Attempting to create another testplan with the same data but All Articles')
@@ -432,14 +421,14 @@ class TestPlansTestCases(BaseTest):
             self.test_plan.create_new_test_plan(name=testplan_name, material_type=testplan['materialType'],
                                                 article='All')
 
-            self.base_selenium.LOGGER.info(
-                'Waiting for the error message to make sure that validation forbids the creation of two testplans having the same name, material type and one with ALL article')
-            validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
+        self.base_selenium.LOGGER.info(
+            'Waiting for the error message to make sure that validation forbids the creation of two testplans having the same name, material type and one with ALL article')
+        validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
 
-            self.base_selenium.LOGGER.info(
-                'Assert the error message to make sure that validation forbids the creation of two testplans having the same name, material type and one with All article? {}'.format(
-                    validation_result))
-            self.assertTrue(validation_result)
+        self.base_selenium.LOGGER.info(
+            'Assert the error message to make sure that validation forbids the creation of two testplans having the same name, material type and one with All article? {}'.format(
+                validation_result))
+        self.assertTrue(validation_result)
 
     def test013_create_testplans_same_name_different_materialtype(self):
         '''
@@ -504,6 +493,7 @@ class TestPlansTestCases(BaseTest):
         self.test_plan.get_test_plans_page()
         self.test_plan.get_test_plan_edit_page(testplan_name)
         # navigate to the test units selection tab
+
         self.test_plan.edit_test_unit_quantification_limits(100, 20)
         # save the changes
         self.test_plan.save_and_confirm_popup()
@@ -558,7 +548,8 @@ class TestPlansTestCases(BaseTest):
         testplan_number = (main_testplan_data['Test Plan No.']).replace("'", '')
 
         # get testplan data from an api call
-        testplan_data = (self.test_plan_api.get_testplan_with_filter(filter_option='number', filter_text=testplan_number))[0]
+        testplan_data = \
+        (self.test_plan_api.get_testplan_with_filter(filter_option='number', filter_text=testplan_number))[0]
 
         # get information, material type and article
         testplan_name = testplan_data['testPlanName']
@@ -639,7 +630,9 @@ class TestPlansTestCases(BaseTest):
         testplans = self.test_plan_api.get_all_test_plans_json()
         random_testplan = random.choice(testplans)
 
-        testplans_found = self.test_plan.filter_by_element_and_get_results('Testplan Name', 'test_plans:testplan_name_filter', random_testplan['testPlanName'], 'drop_down')
+        testplans_found = self.test_plan.filter_by_element_and_get_results('Testplan Name',
+                                                                           'test_plans:testplan_name_filter',
+                                                                           random_testplan['testPlanName'], 'drop_down')
         self.base_selenium.LOGGER.info('Checking if the results were filtered successfully')
         results_found = True
         while results_found:
@@ -661,7 +654,9 @@ class TestPlansTestCases(BaseTest):
         User can filter with status
         '''
 
-        testplans_found = self.test_plan.filter_by_element_and_get_results('Status', 'test_plans:testplan_status_filter', 'Completed', 'drop_down')
+        testplans_found = self.test_plan.filter_by_element_and_get_results('Status',
+                                                                           'test_plans:testplan_status_filter',
+                                                                           'Completed', 'drop_down')
         self.base_selenium.LOGGER.info('Checking if the results were filtered successfully')
         results_found = True
         while results_found:
@@ -678,10 +673,12 @@ class TestPlansTestCases(BaseTest):
                 results_found = False
 
         self.base_selenium.LOGGER.info('Filtering by status completed was done successfully')
-        
+
         self.test_plan.sleep_small()
 
-        testplans_found = self.test_plan.filter_by_element_and_get_results('Status', 'test_plans:testplan_status_filter', 'In Progress', 'drop_down')
+        testplans_found = self.test_plan.filter_by_element_and_get_results('Status',
+                                                                           'test_plans:testplan_status_filter',
+                                                                           'In Progress', 'drop_down')
         self.base_selenium.LOGGER.info('Checking if the results were filtered successfully')
         results_found = True
         while results_found:
@@ -706,9 +703,10 @@ class TestPlansTestCases(BaseTest):
         random_user_name = self.generate_random_string()
         random_user_email = self.header_page.generate_random_email()
         random_user_password = self.generate_random_string()
-        self.base_selenium.LOGGER.info('Calling the users api to create a new user with username: {}'.format(random_user_name))
+        self.base_selenium.LOGGER.info(
+            'Calling the users api to create a new user with username: {}'.format(random_user_name))
         self.users_api.create_new_user(random_user_name, random_user_email, random_user_password)
-        
+
         self.header_page.click_on_header_button()
         self.base_selenium.click('header:logout')
         self.login_page.login(username=random_user_name, password=random_user_password)
@@ -717,7 +715,7 @@ class TestPlansTestCases(BaseTest):
 
         testplans = self.test_plan_api.get_all_test_plans_json()
         testplan = random.choice(testplans)
-        
+
         testplan_name = self.test_plan.create_new_test_plan(material_type=testplan['materialType'],
                                                             article=(testplan['article'])[0])
         self.base_selenium.LOGGER.info(
@@ -726,9 +724,9 @@ class TestPlansTestCases(BaseTest):
 
         self.base_page.set_all_configure_table_columns_to_specific_value(value=True)
 
-        testplan_found = self.test_plan.filter_by_element_and_get_results('Changed By', 'test_plans:testplan_changed_by_filter', random_user_name, 'drop_down')        
+        testplan_found = self.test_plan.filter_by_element_and_get_results('Changed By',
+                                                                          'test_plans:testplan_changed_by_filter',
+                                                                          random_user_name, 'drop_down')
         self.assertEqual(len(testplan_found), 2)
         self.assertIn(random_user_name, testplan_found[0].text)
         self.assertIn(testplan_name, testplan_found[0].text)
-
-        
