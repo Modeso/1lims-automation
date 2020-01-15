@@ -244,16 +244,3 @@ class TstPlan(TestPlans):
             if (testunit_display_name in testunit['Test Unit Name']):
                 quantification_limit = testunit['Quantification Limit']
                 return quantification_limit
-
-    def edit_test_unit_quantification_limits(self, upper, lower):
-        self.navigate_to_testunits_selection_page()
-        elems = self.base_selenium.find_elements('general:col_6')
-        old_upper = self.base_selenium.find_element_in_element(source=elems[4], destination_element='general:input')
-        old_lower = self.base_selenium.find_element_in_element(source=elems[5], destination_element='general:input')
-        # old_lower.clear()
-        # old_upper.clear()
-        # old_upper.send_keys(upper)
-        # old_lower.send_keys(lower)
-        self.base_selenium.set_text(old_upper, upper)
-        self.base_selenium.set_text(old_lower, lower)
-        self.sleep_small()

@@ -176,5 +176,6 @@ class TestPlanAPI(BaseAPI):
             return data['testUnits']
         return []
 
+    def add_testunit(self,testplan,testunit):
 
 
