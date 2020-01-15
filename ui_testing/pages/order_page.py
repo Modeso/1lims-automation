@@ -465,5 +465,6 @@ class Order(Orders):
         self.base_selenium.clear_single_select_drop_down(element='order:article')
         if testplans:
             self.base_selenium.wait_element(element='general:form_popup_warning_window')
+            self.sleep_tiny()
             self.base_selenium.click(element='general:confirmation_button')
         self.sleep_small()
