@@ -149,7 +149,11 @@ elements = {
         'remove_file': {'method': 'class_name', 'value': 'dz-remove', 'order': 0},
         'uploaded_file_name': {'method': 'xpath', 'value': '//span[@data-dz-name="" and last()]'},
         'pagination_button': {'method': 'xpath', 'value': '//button[@class="btn dropdown-toggle btn-default"]'},
-        'pagination_menu': {'method': 'xpath', 'value': '//ul[@class="dropdown-menu inner"]'}
+        'pagination_menu': {'method': 'xpath', 'value': '//ul[@class="dropdown-menu inner"]'},
+        'form_popup_warning_window': {'method': 'class_name', 'value':'swal2-header', 'order':0},
+        'confirmation_button': {'method': 'xpath',
+                                'value': '//button[@class="swal2-confirm btn btn-success m-btn m-btn--custom"]'},
+        'clear_single_dropdown': {'method': 'class_name', 'value': 'ng-clear-wrapper', 'order': 0}
 
     },
     'login': {

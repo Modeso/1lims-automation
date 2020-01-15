@@ -72,11 +72,14 @@ class ArticleAPI(BaseAPI):
 
     def create_article(self, **kwargs):
         request_body = {}
+        for key in kwargs:
+            request_body[key]=kwargs[key]
         request_body['selectedArticles'] = []
         request_body['selectedArticlesNos'] = []
         request_body['dynamicFieldsValues'] = []
-        for key in kwargs:
-            request_body[key] = kwargs[key]
+        request_body['materialType'] = kwargs['materialType']
+        request_body['selectedMaterialType'] = [kwargs['materialType']]
+        request_body['materialTypeId'] = kwargs['materialType']['id']
 
         api = '{}{}'.format(self.url, self.END_POINTS['article_api']['create_article']) 
         self.info('POST : {}'.format(api))

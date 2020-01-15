@@ -1883,3 +1883,63 @@ class OrdersTestCases(BaseTest):
         testunit_name = row_with_headers['Test Unit']
         self.base_selenium.LOGGER.info(" + Test unit : {}".format(testunit_name))
         self.assertIn(testunit_name, testunit_name)
+ 
+    def test029_update_article_in_suborder(self):
+        """
+        Apply this on the suborder number 5 for example:
+        Make sure once you delete the article, the test plan that corresponding to it will  deleted also to choose another one
+        Make sure once you delete the article, the test unit will not delete 
+        updated it then press on save button, and make sure that the article updated successfully according to that 
+        
+        LIMS-6524
+        """
+
+        random_record = self.order_page.get_random_table_row(table_element='orders:orders_table')
+        self.order_page.open_edit_page(row=random_record)
+        order_data = self.order_page.get_suborder_data()
+
+        random_index_to_edit = self.generate_random_number(lower=0, upper=len(order_data['suborders'])-1) or 0
+        self.info('index to edit {}'.format(random_index_to_edit))
+        selected_suborder_data = order_data['suborders'][random_index_to_edit]
+
+        self.base_selenium.LOGGER.info('get completed testplans with articles based on the suborder materialtype')
+        materialtype_list = self.general_utilities_api.list_all_material_types()
+        materialtype_object = list(filter(lambda x: x['name'] == selected_suborder_data['material_type'], materialtype_list))[0]
+        
+        testunit_with_materialtype_all = self.test_unit_api.get_all_test_units(filter='{"materialTypes":"all"}').json()['testUnits'][0]
+        testunit_form_data = self.test_unit_api.get_testunit_form_data(id=testunit_with_materialtype_all['id'])
+        # create random article
+        random_article_name = self.order_page.generate_random_text()
+        random_article_number = self.order_page.generate_random_number()
+        materialtype_object = {
+            'id': materialtype_object['id'],
+            'text': materialtype_object['name']
+        }
+        article_data = self.article_api.create_article(No=random_article_number, name=random_article_name, materialType=materialtype_object)
+
+        # create random testplan
+        article = {
+            'id': article_data['id'],
+            'text': random_article_name
+        }
+        material_type = materialtype_object
+        testunit = self.test_unit_page.map_testunit_to_testplan_format(testunit=testunit_form_data)
+        testplan_name = self.test_unit_page.generate_random_text()
+        testplan_number = self.test_unit_page.generate_random_number()
+        testplan_object = {
+            'text': testplan_name,
+            'id': 'new'
+        }
+        self.base_selenium.LOGGER.info(self.test_plan_api.create_testplan(number=testplan_number, testPlan=testplan_object, materialType=material_type, selectedArticles=[article], testUnits=[testunit]))
+
+        self.base_selenium.LOGGER.info('update suborder with article {}, and testplan {}'.format(random_article_name, testplan_name))
+        self.order_page.update_suborder(sub_order_index=random_index_to_edit, articles=random_article_name, test_plans=[testplan_name])
+        self.order_page.save(save_btn='order:save_btn')
+        self.base_selenium.refresh()
+        
+        self.base_selenium.LOGGER.info('asserting suborder data after update')
+        order_data_after_update = self.order_page.get_suborder_data()
+        self.assertEqual(order_data_after_update['suborders'][random_index_to_edit]['article']['name'], random_article_name)
+        self.assertEqual(order_data_after_update['suborders'][random_index_to_edit]['testplans'][0], testplan_name)
+
+
