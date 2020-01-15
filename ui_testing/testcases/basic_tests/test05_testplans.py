@@ -409,7 +409,7 @@ class TestPlansTestCases(BaseTest):
                 testplan_name, (testplan['article'])[0], testplan['materialType']))
         # create another testplan with the same data
         if ("same" == same):
-            article_name=testplan['article'])[0]
+            article_name=(testplan['article'])[0]
         else:
             article_name="All"
         
