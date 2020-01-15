@@ -3,7 +3,7 @@ elements = {
         'child_table_arrow': {'method': 'class_name',
                               'value': 'm-datatable__toggle-subtable',
                               'order': 0},
-        'table_child': {'method': 'class_name', 'value': 'dataTable', 'order': 1},
+        'table_child': {'method': 'id', 'value': 'child-data-table'},
 
         'span': {'method': 'tag_name',
                  'value': 'span',
@@ -19,10 +19,6 @@ elements = {
                    'value': 'generalSearch'},
         'table': {'method': 'id',
                   'value': 'table'},
-        'table_child': {"method": "class_name",
-                        "value": "dataTable",
-                        "order": 1
-                        },
         'save': {'method': 'class_name',
                  'value': 'btn-primary',
                  'order': 0},
@@ -149,7 +145,8 @@ elements = {
         'remove_file': {'method': 'class_name', 'value': 'dz-remove', 'order': 0},
         'uploaded_file_name': {'method': 'xpath', 'value': '//span[@data-dz-name="" and last()]'},
         'pagination_button': {'method': 'xpath', 'value': '//button[@class="btn dropdown-toggle btn-default"]'},
-        'pagination_menu': {'method': 'xpath', 'value': '//ul[@class="dropdown-menu inner"]'}
+        'pagination_menu': {'method': 'xpath', 'value': '//ul[@class="dropdown-menu inner"]'},
+        'table_menu_options': {'method': 'class_name', 'value': 'dropdown', 'order': 0}
 
     },
     'login': {
@@ -543,7 +540,12 @@ elements = {
         'test_date_filter': {'method': 'id',
                              'value': 'start_testDate'},
         'shipment_date_filter': {'method': 'id',
-                                 'value': 'start_shipmentDate'}
+                                 'value': 'start_shipmentDate'},
+        'suborder_duplicate': {'method': 'id', 'value': 'child_table_duplicate'},
+        'suborder_coa': {'method': 'id', 'value': 'child_table_pdf'},
+        'suborder_mail': {'method': 'id', 'value': 'child_table_mail'},
+        'suborder_related_orders': {'method': 'id', 'value': 'child_table_related_orders'},
+        'suborder_archive': {'method': 'id', 'value': 'child_table_archive'},
     },
 
     'audit_trail': {
