@@ -246,8 +246,11 @@ class BasePages:
     def get_child_table_data(self, index=0):
         rows = self.result_table()
         self.open_child_table(source=rows[index])
-        rows_with_childtable = self.result_table(element='general:table_child')
-        headers = self.base_selenium.get_table_head_elements(element='general:table_child')
+        return self.get_table_data()
+
+    def get_table_data(self, table_element='general:table_child'):
+        rows_with_childtable = self.result_table(element=table_element)
+        headers = self.base_selenium.get_table_head_elements(element=table_element)
 
         child_table_data = []
         for subrecord in range(0,len(rows_with_childtable)):

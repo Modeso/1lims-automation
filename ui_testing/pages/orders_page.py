@@ -72,11 +72,6 @@ class Orders(BasePages):
         self.filter_by(filter_element='orders:filter_order_no', filter_text=filter_text, field_type='text')
         self.filter_apply()
 
-    def open_filter_menu(self):
-        filter = self.base_selenium.find_element_in_element(source_element='general:menu_filter_view',
-                                                            destination_element='general:filter')
-        filter.click()
-
     def filter_by_analysis_number(self, filter_text):
         self.base_selenium.LOGGER.info(' + Filter by analysis number : {}'.format(filter_text))
         self.filter_by(filter_element='orders:analysis_filter', filter_text=filter_text, field_type='text')

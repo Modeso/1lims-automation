@@ -1034,17 +1034,15 @@ class OrdersTestCases(BaseTest):
         New: Orders: Table:  Suborder /Archive Approach: : User can archive any suborder successfully 
         LIMS-3739
         """
-        order_record = self.order_page.result_table()[0]
+        order_record = self.order_page.get_random_table_row(table_element='orders:orders_table')
         order_data = self.base_selenium.get_row_cells_dict_related_to_header(row=order_record)
         order_no = order_data['Order No.']
         self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no, field_type='text')
         suborders_data = self.order_page.get_child_table_data(index=0)
         self.order_page.archive_table_suborder(index=0)
-        self.base_selenium.refresh()
         self.base_selenium.LOGGER.info('make sure that suborder is archived successfully')
-        self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no, field_type='text')
         if len(suborders_data) > 1:
-            suborder_data_after_archive = self.order_page.get_child_table_data(index=0)
+            suborder_data_after_archive = self.order_page.get_table_data()
             self.assertNotEqual(suborder_data_after_archive[0], suborders_data[0])
         else:
             table_records_count = len(self.order_page.result_table()) -1

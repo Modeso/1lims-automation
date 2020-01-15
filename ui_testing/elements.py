@@ -146,7 +146,8 @@ elements = {
         'uploaded_file_name': {'method': 'xpath', 'value': '//span[@data-dz-name="" and last()]'},
         'pagination_button': {'method': 'xpath', 'value': '//button[@class="btn dropdown-toggle btn-default"]'},
         'pagination_menu': {'method': 'xpath', 'value': '//ul[@class="dropdown-menu inner"]'},
-        'table_menu_options': {'method': 'class_name', 'value': 'dropdown', 'order': 0}
+        'table_menu_options': {'method': 'class_name', 'value': 'dropdown', 'order': 0},
+        'filter_button': {'method': 'class_name', 'value': 'filter-btn', 'order': 0}
 
     },
     'login': {
