@@ -175,7 +175,3 @@ class TestPlanAPI(BaseAPI):
         if data['status'] == 1:
             return data['testUnits']
         return []
-
-    def add_testunit(self,testplan,testunit):
-
-
