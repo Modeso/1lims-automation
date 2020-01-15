@@ -407,20 +407,18 @@ class TestPlansTestCases(BaseTest):
         self.base_selenium.LOGGER.info(
             'New testplan is created successfully with name: {}, article name: {} and material type: {}'.format(
                 testplan_name, (testplan['article'])[0], testplan['materialType']))
-
+        # create another testplan with the same data
         if ("same" == same):
             self.base_selenium.LOGGER.info(
                 'Attempting to create another testplan with the same data as the previously created one')
-            # create another testplan with the same data
-            self.test_plan.create_new_test_plan(name=testplan_name, material_type=testplan['materialType'],
-                                                article=(testplan['article'])[0])
+            article_name=testplan['article'])[0]
         else:
             self.base_selenium.LOGGER.info(
                 'Attempting to create another testplan with the same data but All Articles')
-
-            self.test_plan.create_new_test_plan(name=testplan_name, material_type=testplan['materialType'],
-                                                article='All')
-
+            article_name="All"
+        
+        self.test_plan.create_new_test_plan(name=testplan_name, material_type=testplan['materialType'],
+                                                article=article_name)
         self.base_selenium.LOGGER.info(
             'Waiting for the error message to make sure that validation forbids the creation of two testplans having the same name, material type and one with ALL article')
         validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
