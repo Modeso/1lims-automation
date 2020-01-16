@@ -1616,7 +1616,7 @@ class OrdersTestCases(BaseTest):
     #     New: Orders: Edit Approach: I can update the article filed successfully with save button
 
     #     LIMS-3423
-    #     LIMS-4297
+    #     implemented in another testcase
     #     :return:
     #     """
 
@@ -1885,20 +1885,26 @@ class OrdersTestCases(BaseTest):
         self.assertIn(testunit_name, testunit_name)
  
     @skip('https://modeso.atlassian.net/browse/LIMS-6561')
-    def test029_update_article_in_suborder(self):
+    @parameterized.expand(['save_btn', 'cancel_btn'])
+    def test029_update_article_in_suborder(self, action):
         """
         Apply this on the suborder number 5 for example:
         Make sure once you delete the article, the test plan that corresponding to it will  deleted also to choose another one
         Make sure once you delete the article, the test unit will not delete 
         updated it then press on save button, and make sure that the article updated successfully according to that 
-        
         LIMS-6524
+
+        Apply this on the table view ( from the second suborder ) 
+        In case I update the article then press on ok button ( In pop-up) & when you press on cancel button nothing updated
+        LIMS-4297
         """
 
         random_record = self.order_page.get_random_table_row(table_element='orders:orders_table')
-        self.order_page.open_edit_page(row=random_record)
+        order_row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=random_record)
+        order_no = order_row_data['Order No.']
+        self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no, field_type='text')
+        self.order_page.open_edit_page(row=self.order_page.result_table()[0])
         order_data = self.order_page.get_suborder_data()
-
         random_index_to_edit = self.generate_random_number(lower=0, upper=len(order_data['suborders'])-1) or 0
         self.info('index to edit {}'.format(random_index_to_edit))
         selected_suborder_data = order_data['suborders'][random_index_to_edit]
@@ -1935,12 +1941,17 @@ class OrdersTestCases(BaseTest):
 
         self.base_selenium.LOGGER.info('update suborder with article {}, and testplan {}'.format(random_article_name, testplan_name))
         self.order_page.update_suborder(sub_order_index=random_index_to_edit, articles=random_article_name, test_plans=[testplan_name])
-        self.order_page.save(save_btn='order:save_btn')
-        self.base_selenium.refresh()
-        
-        self.base_selenium.LOGGER.info('asserting suborder data after update')
-        order_data_after_update = self.order_page.get_suborder_data()
-        self.assertEqual(order_data_after_update['suborders'][random_index_to_edit]['article']['name'], random_article_name)
-        self.assertEqual(order_data_after_update['suborders'][random_index_to_edit]['testplans'][0], testplan_name)
 
+        self.order_page.save(save_btn='order:'+action)
+        if action == 'save_btn':
+            self.base_selenium.refresh()
+            self.base_selenium.LOGGER.info('asserting suborder data after update')
+            order_data_after_update = self.order_page.get_suborder_data()
+            self.assertEqual(order_data_after_update['suborders'][random_index_to_edit]['article']['name'], random_article_name)
+            self.assertEqual(order_data_after_update['suborders'][random_index_to_edit]['testplans'][0], testplan_name)
+        else:
+            self.order_page.confirm_popup()
+            self.order_page.open_edit_page(row=self.order_page.result_table()[0])
+            suborder_data_after_cancel = self.order_page.get_suborder_data()
+            self.assertEqual(suborder_data_after_cancel['suborders'][random_index_to_edit], selected_suborder_data)
 
