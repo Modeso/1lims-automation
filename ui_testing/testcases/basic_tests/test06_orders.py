@@ -1976,7 +1976,10 @@ class OrdersTestCases(BaseTest):
 
         self.base_selenium.LOGGER.info('open random record')
         random_record = self.order_page.get_random_table_row(table_element='orders:orders_table')
-        self.order_page.open_edit_page(row=random_record)
+        random_record_data = self.base_selenium.get_row_cells_dict_related_to_header(row=random_record)
+        order_no = random_record_data['Order No.']
+        self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no, field_type='text')
+        self.order_page.open_edit_page(row=self.order_page.result_table()[0])
 
         self.base_selenium.LOGGER.info('getting analysis tab to check out the count of the analysis')
         self.order_page.navigate_to_analysis_tab()
