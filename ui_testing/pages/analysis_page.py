@@ -6,7 +6,7 @@ class SingleAnalysisPage(AllAnalysesPage):
     Opens the accordion for a specific analysis given its index
     '''
     def open_accordion_for_analysis_index(self, index=0):
-        all_accordion_items = self.base_selenium.find_element('analysis_page:all_rows')  
+        all_accordion_items = self.base_selenium.find_element('analysis_page:all_rows')
         required_row = all_accordion_items[index + 1] # index is increased by 1 because index 0 is the header element
         required_accordion_item_clickable_item = self.base_selenium.find_element_in_element(source=required_row, destination_element='analysis_page:accordion_item')
         required_accordion_item_clickable_item.click()
@@ -23,3 +23,11 @@ class SingleAnalysisPage(AllAnalysesPage):
             testunits.append(row_data)
 
         return testunits
+
+    def get_analysis_count(self):
+        all_accordion_items = self.base_selenium.find_element('analysis_page:all_rows')
+        return len(all_accordion_items)-1
+
+    def navigate_to_order_tab(self):
+        self.base_selenium.click('order:orders_tab')
+        self.sleep_small()

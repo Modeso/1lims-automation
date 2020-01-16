@@ -1955,3 +1955,57 @@ class OrdersTestCases(BaseTest):
             suborder_data_after_cancel = self.order_page.get_suborder_data()
             self.assertEqual(suborder_data_after_cancel['suborders'][random_index_to_edit], selected_suborder_data)
 
+    def test30_create_new_suborder_with_testunit(self):
+        """
+        In case I create new suborder with test unit, make sure one analysis record created according to that 
+        LIMS-4255
+        """
+
+
+        self.info('preparing data needed for creating new suborder')
+        materialtype_record = self.general_utilities_api.list_all_material_types()[0]
+        materialtype = {
+            'id': materialtype_record['id'],
+            'text': materialtype_record['name']
+        }
+        random_article_name = self.generate_random_string()
+        random_article_number = self.generate_random_number()
+        self.article_api.create_article(No=random_article_number, name=random_article_name, materialType=materialtype)
+        testunits_list = self.test_unit_api.get_all_test_units(filter='{"materialTypes":"all"}').json()['testUnits']
+        testunit_record = testunits_list[0]
+
+        self.base_selenium.LOGGER.info('open random record')
+        random_record = self.order_page.get_random_table_row(table_element='orders:orders_table')
+        self.order_page.open_edit_page(row=random_record)
+
+        self.base_selenium.LOGGER.info('getting analysis tab to check out the count of the analysis')
+        self.order_page.navigate_to_analysis_tab()
+        analysis_count_before_adding = self.single_analysis_page.get_analysis_count()
+
+        self.base_selenium.LOGGER.info('get back to order tab')
+        self.single_analysis_page.navigate_to_order_tab()
+        order_data_before_adding_new_suborder = self.order_page.get_suborder_data()
+        self.base_selenium.LOGGER.info('create new suborder with materialtype {}, and article {}, and testunit {}'.format(materialtype['text'],random_article_name, testunit_record['name']))
+        self.order_page.create_new_suborder_with_test_units(material_type=materialtype['text'], article_name=random_article_name, test_unit=testunit_record['name'])
+        self.order_page.save(save_btn='order:save_btn')
+        self.order_page.sleep_small()
+        self.base_selenium.refresh()
+        order_data_after_adding_new_suborder = self.order_page.get_suborder_data()
+        self.assertEqual(len(order_data_before_adding_new_suborder['suborders'])+1, len(order_data_after_adding_new_suborder['suborders']))
+        
+        self.base_selenium.LOGGER.info('navigate to analysis page to make sure that only one analysis is added')
+        self.order_page.navigate_to_analysis_tab()
+        analysis_count = self.single_analysis_page.get_analysis_count()
+        
+        self.base_selenium.LOGGER.info('check analysis count')
+        self.assertEqual(analysis_count, analysis_count_before_adding+1)
+
+        analysis_record = self.single_analysis_page.open_accordion_for_analysis_index(analysis_count-1)
+        testunit_in_analysis=self.single_analysis_page.get_testunits_in_analysis(source=analysis_record)
+        self.assertEqual(len(testunit_in_analysis), 1)
+        testunit_name = testunit_in_analysis[0]['']
+        self.assertIn(testunit_record['name'], testunit_name)
+
+
+
+
