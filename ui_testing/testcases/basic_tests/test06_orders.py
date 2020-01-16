@@ -392,10 +392,11 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(
             orders_duplicate_data_after[0]['Analysis No.'], latest_order_data['Analysis No.'])
 
-    # will change to dispaly it in the child table & in the export     
-    def test011_analysis_number_filter_and_export(self):
+    def test011_analysis_number_should_appear_in_the_table(self):
         """
         New: Orders: Analysis number should appear in the table view column
+        this it will change to display the analysis number in the order child table ( suborder )
+
         LIMS-2622
         :return:
         """
