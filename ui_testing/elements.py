@@ -547,6 +547,7 @@ elements = {
         'suborder_mail': {'method': 'id', 'value': 'child_table_mail'},
         'suborder_related_orders': {'method': 'id', 'value': 'child_table_related_orders'},
         'suborder_archive': {'method': 'id', 'value': 'child_table_archive'},
+        'suborder_restore': {'method': 'id', 'value': 'child_table_restore'},
     },
 
     'audit_trail': {

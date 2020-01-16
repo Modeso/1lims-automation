@@ -176,20 +176,22 @@ class OrdersTestCases(BaseTest):
         I can restore any order successfully
         LIMS-4374
         """
-        self.base_selenium.LOGGER.info(' + Get Archived orders ')
-        self.order_page.get_archived_items()
-        self.base_selenium.LOGGER.info(' + Select Rows ')
-        selected_orders_data, _ = self.order_page.select_random_multiple_table_rows()
 
-        self.base_selenium.LOGGER.info(' + Restore Selected Rows ')
-        self.order_page.restore_selected_items()
-        self.base_selenium.LOGGER.info(' + Get Active orders')
-        self.order_page.get_active_items()
-        for selected_order_data in selected_orders_data:
-            self.base_selenium.LOGGER.info(' + Order with analysis number =  {} restored successfully?'.format(
-                selected_order_data['Analysis No.']))
-            self.assertTrue(self.order_page.is_order_exist(
-                value=selected_order_data['Analysis No.']))
+        self.order_page.get_archived_items()
+        order_record = self.order_page.get_random_table_row(table_element='orders:orders_table')
+        order_data = self.base_selenium.get_row_cells_dict_related_to_header(row=order_record)
+        order_no = order_data['Order No.']
+        self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no, field_type='text')
+        suborders_data = self.order_page.get_child_table_data(index=0)
+        self.order_page.restore_table_suborder(index=0)
+        self.base_selenium.LOGGER.info('make sure that suborder is restored successfully')
+        if len(suborders_data) > 1:
+            suborder_data_after_archive = self.order_page.get_table_data()
+            self.assertNotEqual(suborder_data_after_archive[0], suborders_data[0])
+        else:
+            table_records_count = len(self.order_page.result_table()) -1
+            self.assertEqual(table_records_count, 0)
+        
    
     # will continue with us 
     def test006_deleted_archived_order(self):
