@@ -198,7 +198,6 @@ class ArticlesTestCases(BaseTest):
                 'Assert {} (current_comment) == {} (article_comment)'.format(current_comment, article_comment))
             self.assertEqual(current_comment, article_comment)
 
-    @skip("editing material type is disabled")
     @parameterized.expand(['save', 'cancel'])
     def test005_cancel_button_edit_material_type(self, save):
         """
@@ -208,19 +207,19 @@ class ArticlesTestCases(BaseTest):
         LIMS-3586
         LIMS-3576
         """
-        self.article_page.get_random_article()
-        article_url = self.base_selenium.get_url()
-        self.article_page.info('article_url : {}'.format(article_url))
+        article_id = random.choice(self.article_api.get_articles_with_no_testplans(limit=100))["id"]
+        # open edit page
+        a = "{}articles/edit/"+str(article_id)
+        edit_page_url = a.format(self.base_selenium.url)
+        self.base_selenium.get(url=edit_page_url)
         current_material_type = self.article_page.get_material_type()
-        new_material_type = self.article_page.get_material_type()
-        self.assertNotEqual(current_material_type, new_material_type)
-
+        new_material_type = self.article_page.set_material_type(random=True)
         if 'save' == save:
             self.article_page.save()
         else:
             self.article_page.cancel(force=True)
 
-        self.base_selenium.get(url=article_url, sleep=5)
+        self.base_selenium.get(url=edit_page_url, sleep=5)
 
         article_material = self.article_page.get_material_type()
         if 'save' == save:
@@ -388,16 +387,11 @@ class ArticlesTestCases(BaseTest):
 
         LIMS-3594
         """
-        # row_data = self.articles_page.search(value="zdfhgsfzg")[0].text
-        # self.article_page.info(row_data)
         row = self.article_page.get_random_article_row()
         row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=row)
         for column in row_data:
-            if re.findall(r'\d{1,}.\d{1,}.\d{4}', row_data[column]) or row_data[column] == '-':
+            if re.findall(r'\d{1,}.\d{1,}.\d{4}', row_data[column]) or row_data[column] == '-' or not (row_data[column]):
                 continue
-            # if test plan field have many test plans we need to split them first
-            if ',' in row_data[column]:
-                row_data[column] = row_data[column].split(",")[0]
 
             self.base_selenium.LOGGER.info(
                 'search for {} : {}'.format(column, row_data[column]))
@@ -439,18 +433,15 @@ class ArticlesTestCases(BaseTest):
 
         LIMS-3577
         """
-        self.article_page.create_new_article(material_type='Raw Material')
-        self.test_plan.get_test_plans_page()
-        self.test_plan.create_new_test_plan(material_type=self.article_page.article_material_type,
-                                            article=self.article_page.article_name)
-        self.article_page.get_articles_page()
-        self.article_page.sleep_small()
-        article = self.article_page.search(value=self.article_page.article_name)[0]
+        # get article with testPlan
+        article_name = random.choice(self.article_api.get_articles_with_testplans(limit=100))["name"]
+        article = self.article_page.search(value=article_name)[0]
+        # archive article
         self.article_page.click_check_box(source=article)
         self.article_page.archive_selected_articles()
-
+        # get archived articles, select our article then delete it
         self.article_page.get_archived_articles()
-        archived_article = self.article_page.search(value=self.test_plan.article_name)[0]
+        archived_article = self.article_page.search(value=article_name)[0]
         self.article_page.click_check_box(source=archived_article)
         self.assertFalse(self.article_page.delete_selected_article())
 

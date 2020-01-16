@@ -437,8 +437,7 @@ class BaseSelenium:
                     count += 1
                     if count > 1:
                         break
-                else:
-                    break
+
             if count == 1:
                 result.append(index)
         return result

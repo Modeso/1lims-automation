@@ -34,7 +34,7 @@ script:
   - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test003_cancel_button_edit_name_1_cancel --tc-file=config.ini
   - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test004_cancel_button_edit_comment_0_save --tc-file=config.ini
   - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test004_cancel_button_edit_comment_1_cancel --tc-file=config.ini
-  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test005_cancel_button_edit_material_type_0_save --tc-file=config.ini
+
   - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test005_cancel_button_edit_material_type_1_cancel --tc-file=config.ini
   - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test006_archived_articles_shoudnt_dispaly_in_test_plan --tc-file=config.ini
   - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test008_created_article_appear_in_test_plan --tc-file=config.ini
@@ -48,6 +48,7 @@ script:
   - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test016_create_full_options_article --tc-file=config.ini
   - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test017_delete_article_with_test_plan --tc-file=config.ini
 
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test019_download_article_sheet --tc-file=config.ini
   - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test020_create_approach_overview_button_0_ok --tc-file=config.ini
   - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test020_create_approach_overview_button_1_cancel --tc-file=config.ini
   - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test02_articles.py:ArticlesTestCases.test021_edit_approach_overview_button --tc-file=config.ini
