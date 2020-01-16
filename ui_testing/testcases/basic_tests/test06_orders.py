@@ -1884,8 +1884,8 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.LOGGER.info(" + Test unit : {}".format(testunit_name))
         self.assertIn(testunit_name, testunit_name)
  
-    @skip('https://modeso.atlassian.net/browse/LIMS-6561')
     @parameterized.expand(['save_btn', 'cancel_btn'])
+    @skip('https://modeso.atlassian.net/browse/LIMS-6561')
     def test029_update_article_in_suborder(self, action):
         """
         Apply this on the suborder number 5 for example:
