@@ -220,20 +220,18 @@ class ArticlesTestCases(BaseTest):
             self.article_page.cancel(force=True)
 
         self.base_selenium.get(url=edit_page_url, sleep=5)
-
         article_material = self.article_page.get_material_type()
         if 'save' == save:
             self.article_page.info(
                 'Assert {} (new_material_type) == {} (article_material_type)'.format(new_material_type,
                                                                                      article_material))
-            self.assertEqual(new_material_type,
-                             self.article_page.get_material_type())
+            self.assertEqual(new_material_type,article_material)
+            self.assertNotEqual(current_material_type,article_material) #make sure that matrial type edited right
         else:
             self.article_page.info(
                 'Assert {} (current_material_type) == {} (article_material_type)'.format(current_material_type,
                                                                                          article_material))
-            self.assertEqual(current_material_type,
-                             self.article_page.get_material_type())
+            self.assertEqual(current_material_type,article_material)
 
     def test006_archived_articles_shoudnt_dispaly_in_test_plan(self):
         """
