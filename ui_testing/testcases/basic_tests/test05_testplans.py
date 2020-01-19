@@ -785,11 +785,11 @@ class TestPlansTestCases(BaseTest):
             Limits of quantification should be viewed in the testplan's child table
         '''
         self.base_selenium.LOGGER.info("Create new quantitative testunit with quantification limits")
-        tu_response, tu_payload = self.test_unit_api.create_quantitative_testunit()['testUnit']
+        tu_response, tu_payload = self.test_unit_api.create_quantitative_testunit()
         testunit_display_old_quantification_limit = '{}-{}'.format(tu_payload['quantificationLowerLimit'],
                                                                    tu_payload['quantificationUpperLimit'])
-        
-        testunit_form_data = self.test_unit_api.get_testunit_form_data(id=str(tu_response['testUnitId']))
+
+        testunit_form_data = self.test_unit_api.get_testunit_form_data(id=str(tu_response['testUnit']['testUnitId']))
         testunit_testplan_formated = self.test_unit_page.map_testunit_to_testplan_format(testunit=testunit_form_data)
 
         active_article = {}
