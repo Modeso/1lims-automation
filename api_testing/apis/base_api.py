@@ -1,6 +1,8 @@
 from testconfig import config
 from api_testing.end_points import end_points
 import requests
+from uuid import uuid4
+from random import randint
 from loguru import logger
 
 
@@ -56,3 +58,11 @@ class BaseAPI:
     @staticmethod
     def info(message):
         BaseAPI.LOGGER.info(message)
+
+    @staticmethod
+    def generate_random_string():
+        return str(uuid4()).replace("-", "")[:10]
+
+    @staticmethod
+    def generate_random_number(lower=1, upper=100000):
+        return randint(lower, upper)

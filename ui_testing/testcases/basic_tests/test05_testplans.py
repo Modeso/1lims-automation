@@ -5,6 +5,7 @@ import re, random
 from selenium.common.exceptions import NoSuchElementException
 import datetime
 
+
 class TestPlansTestCases(BaseTest):
 
     def setUp(self):
@@ -327,7 +328,7 @@ class TestPlansTestCases(BaseTest):
         main_testplan_data = self.test_plan.select_random_table_row(element='test_plans:test_plans_table')
         testplan_number = main_testplan_data['Test Plan No.']
         self.base_selenium.LOGGER.info('Testplan number: {} will be duplicated'.format(testplan_number))
-        
+
         self.test_plan.open_filter_menu()
         self.test_plan.filter_by_testplan_number(testplan_number)
 
@@ -395,7 +396,7 @@ class TestPlansTestCases(BaseTest):
 
         testplans = self.test_plan_api.get_all_test_plans_json()
         testplan = random.choice(testplans)
-        
+
         testplan_name = self.test_plan.create_new_test_plan(material_type=testplan['materialType'],
                                                             article=(testplan['article'])[0])
         self.base_selenium.LOGGER.info(
@@ -447,7 +448,7 @@ class TestPlansTestCases(BaseTest):
 
         data = self.test_plan.search(testplan_name)
         self.assertGreaterEqual(len(data), 2)
-        
+
     def test014_create_testplans_same_name_materialtype_all_article(self):
         '''
         LIMS-3500
@@ -458,13 +459,12 @@ class TestPlansTestCases(BaseTest):
 
         testplans = self.test_plan_api.get_all_test_plans_json()
         testplan = random.choice(testplans)
-        
+
         testplan_name = self.test_plan.create_new_test_plan(material_type=testplan['materialType'],
                                                             article=(testplan['article'])[0])
         self.base_selenium.LOGGER.info(
             'New testplan is created successfully with name: {}, article name: {} and material type: {}'.format(
                 testplan_name, (testplan['article'])[0], testplan['materialType']))
-
 
         self.base_selenium.LOGGER.info(
             'Attempting to create another testplan with the same name & material type as the previously created one,'
@@ -493,15 +493,17 @@ class TestPlansTestCases(BaseTest):
         testplan_name = test_plan_dict['Test Plan Name']
         testplan_article = test_plan_dict['Article Name']
         testplan_materialtype = test_plan_dict['Material Type']
-    
+
         # create a new order with this testplan
         self.order_page.get_orders_page()
-        self.order_page.create_new_order(material_type=testplan_materialtype, article=testplan_article, test_plans=[testplan_name])
+        self.order_page.create_new_order(material_type=testplan_materialtype, article=testplan_article,
+                                         test_plans=[testplan_name])
 
         # delete testplan
         self.test_plan.get_test_plans_page()
         self.base_selenium.LOGGER.info('Testplan number: {} will be archived'.format(testplan_name))
-        testplan_deleted = self.test_plan.delete_selected_item_from_active_table_and_from_archived_table(item_name=testplan_name)
+        testplan_deleted = self.test_plan.delete_selected_item_from_active_table_and_from_archived_table(
+            item_name=testplan_name)
 
         # check for the error popup that this testplan is used and can't be deleted
         self.assertFalse(testplan_deleted)
@@ -517,7 +519,8 @@ class TestPlansTestCases(BaseTest):
         testplan_number = (main_testplan_data['Test Plan No.']).replace("'", '')
 
         # get testplan data from an api call
-        testplan_data = (self.test_plan_api.get_testplan_with_filter(filter_option='number', filter_text=testplan_number))[0]
+        testplan_data = \
+        (self.test_plan_api.get_testplan_with_filter(filter_option='number', filter_text=testplan_number))[0]
 
         # get information, material type and article
         testplan_name = testplan_data['testPlanName']
@@ -532,8 +535,9 @@ class TestPlansTestCases(BaseTest):
         self.order_page.get_orders_page()
 
         # create a new order with material type and article same as the saved ones
-        order_data = self.order_page.create_new_order(material_type=testplan_materialtype, article=testplan_article, test_plans=[testplan_name])
-       
+        order_data = self.order_page.create_new_order(material_type=testplan_materialtype, article=testplan_article,
+                                                      test_plans=[testplan_name])
+
         # get the first suborder's testplan and make sure it's an empty string
         suborder_first_testplan = (((order_data['suborders'])[0])['testplans'])[0]
         self.assertEqual(len(suborder_first_testplan), 0)
@@ -552,7 +556,8 @@ class TestPlansTestCases(BaseTest):
         articles_with_chosen_materialtype = active_articles_with_materialtype_dictionary[random_materialtype]
         random_article = random.choice(articles_with_chosen_materialtype)
 
-        self.test_unit_page.create_qualitative_testunit(name=testunit_name, unit='mg[2]{o}', method='a', material_type=random_materialtype)
+        self.test_unit_page.create_qualitative_testunit(name=testunit_name, unit='mg[2]{o}', method='a',
+                                                        material_type=random_materialtype)
         testunit_unit_display = (self.base_selenium.find_element(element='test_unit:unit_display_value')).text
 
         self.test_unit_page.save()
@@ -560,7 +565,8 @@ class TestPlansTestCases(BaseTest):
         self.assertEqual(testunit_unit_display, 'mg2o')
         self.test_plan.get_test_plans_page()
 
-        testplan_name = self.test_plan.create_new_test_plan(material_type=random_materialtype, article=random_article, test_unit=testunit_name)
+        testplan_name = self.test_plan.create_new_test_plan(material_type=random_materialtype, article=random_article,
+                                                            test_unit=testunit_name)
 
         self.test_plan.get_test_plan_edit_page(testplan_name)
         self.test_plan.navigate_to_testunits_selection_page()
@@ -595,7 +601,9 @@ class TestPlansTestCases(BaseTest):
         testplans = self.test_plan_api.get_all_test_plans_json()
         random_testplan = random.choice(testplans)
 
-        testplans_found = self.test_plan.filter_by_element_and_get_results('Testplan Name', 'test_plans:testplan_name_filter', random_testplan['testPlanName'], 'drop_down')
+        testplans_found = self.test_plan.filter_by_element_and_get_results('Testplan Name',
+                                                                           'test_plans:testplan_name_filter',
+                                                                           random_testplan['testPlanName'], 'drop_down')
         self.base_selenium.LOGGER.info('Checking if the results were filtered successfully')
         results_found = True
         while results_found:
@@ -618,7 +626,9 @@ class TestPlansTestCases(BaseTest):
         User can filter with status
         '''
 
-        testplans_found = self.test_plan.filter_by_element_and_get_results('Status', 'test_plans:testplan_status_filter', 'Completed', 'drop_down')
+        testplans_found = self.test_plan.filter_by_element_and_get_results('Status',
+                                                                           'test_plans:testplan_status_filter',
+                                                                           'Completed', 'drop_down')
         self.base_selenium.LOGGER.info('Checking if the results were filtered successfully')
         results_found = True
         while results_found:
@@ -636,10 +646,12 @@ class TestPlansTestCases(BaseTest):
                 results_found = False
 
         self.base_selenium.LOGGER.info('Filtering by status completed was done successfully')
-        
+
         self.test_plan.sleep_small()
 
-        testplans_found = self.test_plan.filter_by_element_and_get_results('Status', 'test_plans:testplan_status_filter', 'In Progress', 'drop_down')
+        testplans_found = self.test_plan.filter_by_element_and_get_results('Status',
+                                                                           'test_plans:testplan_status_filter',
+                                                                           'In Progress', 'drop_down')
         self.base_selenium.LOGGER.info('Checking if the results were filtered successfully')
         results_found = True
         while results_found:
@@ -664,9 +676,10 @@ class TestPlansTestCases(BaseTest):
         random_user_name = self.generate_random_string()
         random_user_email = self.header_page.generate_random_email()
         random_user_password = self.generate_random_string()
-        self.base_selenium.LOGGER.info('Calling the users api to create a new user with username: {}'.format(random_user_name))
+        self.base_selenium.LOGGER.info(
+            'Calling the users api to create a new user with username: {}'.format(random_user_name))
         self.users_api.create_new_user(random_user_name, random_user_email, random_user_password)
-        
+
         self.header_page.click_on_header_button()
         self.base_selenium.click('header:logout')
         self.login_page.login(username=random_user_name, password=random_user_password)
@@ -675,7 +688,7 @@ class TestPlansTestCases(BaseTest):
 
         testplans = self.test_plan_api.get_all_test_plans_json()
         testplan = random.choice(testplans)
-        
+
         testplan_name = self.test_plan.create_new_test_plan(material_type=testplan['materialType'],
                                                             article=(testplan['article'])[0])
         self.base_selenium.LOGGER.info(
@@ -684,7 +697,9 @@ class TestPlansTestCases(BaseTest):
 
         self.base_page.set_all_configure_table_columns_to_specific_value(value=True)
 
-        testplan_found = self.test_plan.filter_by_element_and_get_results('Changed By', 'test_plans:testplan_changed_by_filter', random_user_name, 'drop_down')        
+        testplan_found = self.test_plan.filter_by_element_and_get_results('Changed By',
+                                                                          'test_plans:testplan_changed_by_filter',
+                                                                          random_user_name, 'drop_down')
         self.assertEqual(len(testplan_found), 2)
         self.assertIn(random_user_name, testplan_found[0].text)
         self.assertIn(testplan_name, testplan_found[0].text)
@@ -697,7 +712,9 @@ class TestPlansTestCases(BaseTest):
         testplans = self.test_plan_api.get_all_test_plans_json()
         random_testplan = random.choice(testplans)
 
-        testplans_found = self.test_plan.filter_by_element_and_get_results('Material Type', 'test_plans:testplan_material_type_filter', random_testplan['materialType'], 'drop_down')
+        testplans_found = self.test_plan.filter_by_element_and_get_results('Material Type',
+                                                                           'test_plans:testplan_material_type_filter',
+                                                                           random_testplan['materialType'], 'drop_down')
         self.base_selenium.LOGGER.info('Checking if the results were filtered successfully')
         results_found = True
         while results_found:
@@ -722,21 +739,19 @@ class TestPlansTestCases(BaseTest):
         testplans = self.test_plan_api.get_all_test_plans_json()
         random_testplan = random.choice(testplans)
 
-        testplans_found = self.test_plan.filter_by_element_and_get_results('Article', 'test_plans:testplan_article_filter', random_testplan['article'][0], 'drop_down')
-        self.base_selenium.LOGGER.info('Checking if the results were filtered successfully')
-        results_found = True
-        while results_found:
-            for tp in testplans_found:
-                if len(tp.text) > 0:
-                    self.assertIn(str(random_testplan['article'][0]), tp.text)
-            if self.base_page.is_next_page_button_enabled():
-                self.base_selenium.click('general:next_page')
-                self.base_selenium.LOGGER.info('Navigating to the next page')
-                self.test_plan.sleep_small()
-                testplans_found = self.test_plan.result_table()
-            else:
-                results_found = False
+        testplans_found = self.test_plan.filter_by_element_and_get_results('Article',
+                                                                           'test_plans:testplan_article_filter',
+                                                                           random_testplan['article'][0], 'drop_down')
+        while self.base_page.is_next_page_button_enabled():
+            self.base_selenium.click('general:next_page')
+            self.base_selenium.LOGGER.info('Navigating to the next page')
+            self.test_plan.sleep_small()
+            testplans_found.extend(self.test_plan.result_table())
 
+        self.base_selenium.LOGGER.info('Checking if the results were filtered successfully')
+        for tp in testplans_found:
+            if tp.text:
+                self.assertIn(str(random_testplan['article'][0]), tp.text)
         self.base_selenium.LOGGER.info('Filtering by article was done successfully')
 
     @skip('https://modeso.atlassian.net/browse/LIMS-6505')
@@ -748,54 +763,33 @@ class TestPlansTestCases(BaseTest):
         testplans = self.test_plan_api.get_all_test_plans_json()
         random_testplan = random.choice(testplans)
         date = datetime.datetime.strptime(random_testplan['createdAt'], "%Y-%m-%dT%H:%M:%S.%fZ")
-        date_formatted = datetime.datetime.strftime(date,'%d.%m.%Y')
+        date_formatted = datetime.datetime.strftime(date, '%d.%m.%Y')
 
-        testplans_found = self.test_plan.filter_by_element_and_get_results('Created On', 'test_plans:testplan_created_on_filter', date_formatted, 'date')
-        self.base_selenium.LOGGER.info('Checking if the results were filtered successfully')
-        print(testplans_found)
-        results_found = True
-        while results_found:
-            for tp in testplans_found:
-                if len(tp.text) > 0:
-                    self.assertIn(date_formatted, tp.text)
-            if self.base_page.is_next_page_button_enabled():
-                self.base_selenium.click('general:next_page')
-                self.base_selenium.LOGGER.info('Navigating to the next page')
-                self.test_plan.sleep_small()
-                testplans_found = self.test_plan.result_table()
-            else:
-                results_found = False
-
+        testplans_found = self.test_plan.filter_by_element_and_get_results('Created On',
+                                                                           'test_plans:testplan_created_on_filter',
+                                                                           date_formatted, 'date')
+        while self.base_page.is_next_page_button_enabled():
+            self.base_selenium.click('general:next_page')
+            self.base_selenium.LOGGER.info('Navigating to the next page')
+            self.test_plan.sleep_small()
+            testplans_found.extend(self.test_plan.result_table())
+        self.info('Checking if the results were filtered successfully')
+        for tp in testplans_found:
+            if tp.text:
+                self.assertIn(date_formatted, tp.text)
         self.base_selenium.LOGGER.info('Filtering by created on date was done successfully')
 
     def test026_childtable_limits_of_quantification(self):
         '''
-        LIMS-4179
-        Limits of quantification should be viewed in the testplan's child table
+            LIMS-4179
+            Limits of quantification should be viewed in the testplan's child table
         '''
-        testunit_name = self.generate_random_string()
-        testunit_number = self.generate_random_number()
-        testunit_method = self.generate_random_string()
-        testunit_category = self.generate_random_string()
-        category = {
-            'id': 'new',
-            'text': testunit_category
-        }
-
-        material_type = [
-            {
-            'id': 0,
-            'text': 'All'
-            }
-        ]
-
-        # create new testunit
-        testunit_display_old_quantification_limit = '50-100'
-        self.base_selenium.LOGGER.info('A new quantitative testunit with quantification limits will be created with the following data:\n number: {}, name: {}, limits: {}, material type: {} and category: {}'
-                    .format(testunit_number, testunit_name, testunit_display_old_quantification_limit, material_type[0]['text'], testunit_category))
-
-        created_testunit_id = self.test_unit_api.create_quantitative_testunit(number=testunit_number, name=testunit_name, quantificationUpperLimit='100', quantificationLowerLimit='50', useQuantification=True, useSpec=False, selectedMaterialTypes=material_type, category=category)['testUnitId']
-        testunit_form_data = self.test_unit_api.get_testunit_form_data(id=str(created_testunit_id))
+        self.base_selenium.LOGGER.info("Create new quantitative testunit with quantification limits")
+        tu_response, tu_payload = self.test_unit_api.create_quantitative_testunit()['testUnit']
+        testunit_display_old_quantification_limit = '{}-{}'.format(tu_payload['quantificationLowerLimit'],
+                                                                   tu_payload['quantificationUpperLimit'])
+        
+        testunit_form_data = self.test_unit_api.get_testunit_form_data(id=str(tu_response['testUnitId']))
         testunit_testplan_formated = self.test_unit_page.map_testunit_to_testplan_format(testunit=testunit_form_data)
 
         active_article = {}
@@ -807,8 +801,8 @@ class TestPlansTestCases(BaseTest):
         article_materialtype = list(filter(lambda x: x['name'] == active_article['materialType'], all_materialtypes))[0]
         article_object = [
             {
-            'id': active_article['id'],
-            'text': active_article['name']
+                'id': active_article['id'],
+                'text': active_article['name']
             }
         ]
 
@@ -821,17 +815,24 @@ class TestPlansTestCases(BaseTest):
         }
 
         # create new testplan
-        self.base_selenium.LOGGER.info('A new testplan with the recently created testunit will be created with the following data:\n number: {}, name: {}, testunit: {}, material type: {} and article: {}'
-                    .format(random_testplan_number, random_testplan_name, testunit_testplan_formated, article_materialtype, article_object))
+        self.base_selenium.LOGGER.info(
+            'A new testplan with the recently created testunit will be created with the following data:\n number: {}, name: {}, testunit: {}, material type: {} and article: {}'
+            .format(random_testplan_number, random_testplan_name, testunit_testplan_formated, article_materialtype,
+                    article_object))
 
-        created_testplan = self.test_plan_api.create_testplan(testUnits=[testunit_testplan_formated], testPlan=testplan_name, selectedArticles=article_object, materialType=article_materialtype, number=random_testplan_number)
+        created_testplan = self.test_plan_api.create_testplan(testUnits=[testunit_testplan_formated],
+                                                              testPlan=testplan_name, selectedArticles=article_object,
+                                                              materialType=article_materialtype,
+                                                              number=random_testplan_number)
 
         testplan_childtable_data = self.test_plan.search_and_get_childtable_data_for_testplan(random_testplan_name)
         self.base_selenium.LOGGER.info('Asserting the limits of quantification viewed correctly')
         self.assertIn(testunit_display_old_quantification_limit, testplan_childtable_data[0].values())
-        
-        new_quantification_lower_limit, new_quantification_upper_limit = self.test_plan.update_upper_lower_limits_of_testunit(random_testplan_name, 100, 50)
-        testunit_display_new_quantification_limit = str(new_quantification_lower_limit) + '-' + str(new_quantification_upper_limit)
+
+        new_quantification_lower_limit, new_quantification_upper_limit = self.test_plan.update_upper_lower_limits_of_testunit(
+            random_testplan_name, 100, 50)
+        testunit_display_new_quantification_limit = str(new_quantification_lower_limit) + '-' + str(
+            new_quantification_upper_limit)
         self.test_plan.save()
         self.test_plan.confirm_popup()
         self.test_plan.get_test_plans_page()

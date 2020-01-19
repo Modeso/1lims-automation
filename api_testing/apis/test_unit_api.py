@@ -32,9 +32,9 @@ class TestUnitAPI(BaseAPI):
     def get_all_testunits_json(self):
         testunits = self.get_all_test_units().json()['testUnits']
         return testunits
-      
+
     def get_testunit_form_data(self, id=1):
-        api = '{}{}{}'.format(self.url, self.END_POINTS['test_unit_api']['form_data'], str(id)) 
+        api = '{}{}{}'.format(self.url, self.END_POINTS['test_unit_api']['form_data'], str(id))
         self.info('GET : {}'.format(api))
         response = self.session.get(api, params='', headers=self.headers, verify=False)
         self.info('Status code: {}'.format(response.status_code))
@@ -43,9 +43,9 @@ class TestUnitAPI(BaseAPI):
             return data['testUnit']
         else:
             return False
-    
+
     def archive_testunits(self, ids=['1']):
-        api = '{}{}{}/archive'.format(self.url, self.END_POINTS['test_unit_api']['archive_testunits'], ','.join(ids)) 
+        api = '{}{}{}/archive'.format(self.url, self.END_POINTS['test_unit_api']['archive_testunits'], ','.join(ids))
         self.info('PUT : {}'.format(api))
         response = self.session.put(api, params='', headers=self.headers, verify=False)
         self.info('Status code: {}'.format(response.status_code))
@@ -54,25 +54,25 @@ class TestUnitAPI(BaseAPI):
             return True
         else:
             return False
-    
+
     def restore_testunits(self, ids=['1']):
-        api = '{}{}{}/restore'.format(self.url, self.END_POINTS['test_unit_api']['restore_testunits'], ','.join(ids)) 
+        api = '{}{}{}/restore'.format(self.url, self.END_POINTS['test_unit_api']['restore_testunits'], ','.join(ids))
         self.info('PUT : {}'.format(api))
         response = self.session.put(api, params='', headers=self.headers, verify=False)
         self.info('Status code: {}'.format(response.status_code))
         data = response.json()
-        if data['status'] == 1 and data['message']=='operation_success':
+        if data['status'] == 1 and data['message'] == 'operation_success':
             return True
         else:
             return False
-    
+
     def delete_archived_testunit(self, id=1):
-        api = '{}{}{}'.format(self.url, self.END_POINTS['test_unit_api']['delete_testunit'], str(id)) 
+        api = '{}{}{}'.format(self.url, self.END_POINTS['test_unit_api']['delete_testunit'], str(id))
         self.info('DELETE : {}'.format(api))
         response = self.session.delete(api, params='', headers=self.headers, verify=False)
         self.info('Status code: {}'.format(response.status_code))
         data = response.json()
-        if data['status'] == 1 and data['message']=='hard_delete_success':
+        if data['status'] == 1 and data['message'] == 'hard_delete_success':
             return True
         else:
             return False
@@ -88,15 +88,15 @@ class TestUnitAPI(BaseAPI):
             return False
 
     def list_testunits_types(self):
-        api = '{}{}'.format(self.url, self.END_POINTS['test_unit_api']['list_testunit_types']) 
+        api = '{}{}'.format(self.url, self.END_POINTS['test_unit_api']['list_testunit_types'])
         self.info('GET : {}'.format(api))
         response = self.session.get(api, params='', headers=self.headers, verify=False)
         self.info('Status code: {}'.format(response.status_code))
         data = response.json()
         return data
-    
+
     def list_testunits_concentrations(self):
-        api = '{}{}'.format(self.url, self.END_POINTS['test_unit_api']['list_testunit_concentrations']) 
+        api = '{}{}'.format(self.url, self.END_POINTS['test_unit_api']['list_testunit_concentrations'])
         self.info('GET : {}'.format(api))
         response = self.session.get(api, params='', headers=self.headers, verify=False)
         self.info('Status code: {}'.format(response.status_code))
@@ -122,27 +122,46 @@ class TestUnitAPI(BaseAPI):
             })
         request_body['textValueArray'] = values_arr
         return self.create_testunit(request_body=request_body, **kwargs)
-    
+
     def create_quantitative_testunit(self, **kwargs):
-        request_body = {}
-        request_body['selectedConcs'] = []
-        request_body['textValueArray'] = []
-        request_body['textValue'] = ''
-        request_body['unit'] = ''
-        request_body['upperLimit'] = ''
-        request_body['lowerLimit'] = ''
-        request_body['useSpec'] = True
-        request_body['quantificationUpperLimit'] = ''
-        request_body['quantificationLowerLimit'] = ''
-        request_body['dynamicFieldsValues'] = []
-        request_body['type'] = {
-            'id': 2,
-            'text': "Quantitative"
+        api = '{}{}'.format(self.url, self.END_POINTS['test_unit_api']['create_testunit'])
+        self.info('POST : {}'.format(api))
+
+        _payload = {
+            'name': self.generate_random_string(),
+            'number': self.generate_random_string(),
+            'selectedConcs': [],
+            'textValueArray': [],
+            'textValue': '',
+            'unit': '',
+            'upperLimit': '',
+            'lowerLimit': '',
+            'useSpec': True,
+            'useQuantification': True,
+            'quantificationLowerLimit': str(self.generate_random_number(0, 50)),
+            'quantificationUpperLimit': str(self.generate_random_number(51, 100)),
+            'dynamicFieldsValues': [],
+            'type': {
+                'id': 2,
+                'text': "Quantitative"
+            },
+            'testUnitTypeId': 2,
+            'method': 'random method',
+            'iterations': '1',
+            'category': {
+                'id': 'new',
+                'text': self.generate_random_string()},
+            'selectedMaterialTypes': [{
+                    'id': 0,
+                    'text': 'All'}]
         }
-        request_body['testUnitTypeId'] = 2
-        return self.create_testunit(request_body=request_body, **kwargs)
-    
-    
+        payload = self.update_payload(_payload, **kwargs)
+        payload['selectedCategory'] = [payload['category']]
+
+        response = self.session.post(api, json=payload, params='', headers=self.headers, verify=False).json()
+        self.info('Status code: {}'.format(response['status']))
+        return response, payload
+
     def create_mibi_testunit(self, **kwargs):
         request_body = {}
         request_body['textValueArray'] = []
@@ -180,21 +199,26 @@ class TestUnitAPI(BaseAPI):
                 request_body['selectedCategory'] = [kwargs['category']]
             else:
                 request_body[key] = kwargs[key]
-        
-        api = '{}{}'.format(self.url, self.END_POINTS['test_unit_api']['create_testunit']) 
+
+        api = '{}{}'.format(self.url, self.END_POINTS['test_unit_api']['create_testunit'])
         self.info('POST : {}'.format(api))
         response = self.session.post(api, json=request_body, params='', headers=self.headers, verify=False)
 
         self.info('Status code: {}'.format(response.status_code))
         data = response.json()
-        
+
         if data['status'] == 1:
             return data['testUnit']
         else:
             return data['message']
 
-    def list_testunit_by_name_and_material_type(self, materialtype_id, name='', negelectIsDeleted=0, searchableValue=''):
-        api = '{}{}{}?name={}&negelectIsDeleted={}&searchableValue={}'.format(self.url, self.END_POINTS['test_unit_api']['list_testunit_by_name_and_materialtype'], materialtype_id, name, negelectIsDeleted, searchableValue) 
+    def list_testunit_by_name_and_material_type(self, materialtype_id, name='', negelectIsDeleted=0,
+                                                searchableValue=''):
+        api = '{}{}{}?name={}&negelectIsDeleted={}&searchableValue={}'.format(self.url,
+                                                                              self.END_POINTS['test_unit_api'][
+                                                                                  'list_testunit_by_name_and_materialtype'],
+                                                                              materialtype_id, name, negelectIsDeleted,
+                                                                              searchableValue)
         self.info('GET : {}'.format(api))
         response = self.session.get(api, params='', headers=self.headers, verify=False)
         self.info('Status code: {}'.format(response.status_code))
@@ -202,4 +226,3 @@ class TestUnitAPI(BaseAPI):
         if data['status'] == 1:
             return data['testUnits']
         return []
-        
