@@ -142,25 +142,30 @@ class ContactsTestCases(BaseTest):
                 self.assertIn(item, fixed_sheet_row_data)
 
     def test_007_create_contact_with_person(self):
+        """
+        New: Contact: Creation Approach: I can create new contact successfully with contact person
+        LIMS-6386
+        """
         contact_data = self.contact_page.create_update_contact()
-
-        self.base_selenium.LOGGER.info('filter by contact no.: {} to get the record'.format(contact_data['Contact No']))
+        self.contacts_page.info('filter by contact no.: {} to get the record'.format(contact_data['Contact No']))
         self.base_selenium.refresh()
 
         contact_record = self.contact_page.search(value=contact_data['Contact No'])[0]
-        self.base_selenium.LOGGER.info('open the record in edit to compare the data')
+        self.contacts_page.info('open the record in edit to compare the data')
         self.contact_page.open_edit_page(row=contact_record)
-
         contact_data_after_create = self.contact_page.get_full_contact_data()
-        self.assertTrue(self.contact_page.compare_contact_main_data(data_after_save=contact_data_after_create, data_before_save=contact_data))
+
+        self.assertTrue(self.contact_page.compare_contact_main_data(data_after_save=contact_data_after_create,
+                                                                    data_before_save=contact_data))
 
         self.contact_page.get_contact_persons_page()
 
         contact_persons_data_after_create = self.contact_page.get_contact_persons_data()
         
-        self.base_selenium.LOGGER.info('compare contact persons data after refresh')
-        self.assertTrue(self.contact_page.compare_contact_persons_data(data_after_save=contact_persons_data_after_create, data_before_save=contact_data["contact_persons"]))
-        self.base_selenium.LOGGER.info('contact persons have been saved successfully')
+        self.contacts_page.info('compare contact persons data after refresh')
+        self.assertTrue(self.contact_page.compare_contact_persons_data(data_after_save=contact_persons_data_after_create,
+                                                                       data_before_save=contact_data["contact_persons"]))
+        self.contacts_page.info('contact persons have been saved successfully')
         
 
     def test_008_create_contact_person_from_edit_update_old_value(self):
