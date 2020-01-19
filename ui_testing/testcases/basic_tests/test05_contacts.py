@@ -163,8 +163,8 @@ class ContactsTestCases(BaseTest):
         contact_persons_data_after_create = self.contact_page.get_contact_persons_data()
         
         self.contacts_page.info('compare contact persons data after refresh')
-        self.assertTrue(self.contact_page.compare_contact_persons_data(data_after_save=contact_persons_data_after_create,
-                                                                       data_before_save=contact_data["contact_persons"]))
+        self.assertTrue(self.contact_page.compare_contact_persons_data(
+            data_after_save=contact_persons_data_after_create, data_before_save=contact_data["contact_persons"]))
         self.contacts_page.info('contact persons have been saved successfully')
         
 
