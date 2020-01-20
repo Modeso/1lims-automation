@@ -1761,7 +1761,7 @@ class TestUnitsTestCases(BaseTest):
             
 
     @parameterized.expand(['categoryName', 'typeName', 'lastModifiedUser'])
-    def test044_filter_by_testunit_category_returns_only_correct_results(self, filter_case):
+    def test044_filter_by_testunit_drop_down_fields(self, filter_case):
         """
         New:  Test units: Filter Approach: Make sure you can filter by category
         LIMS-6429
@@ -1789,7 +1789,7 @@ class TestUnitsTestCases(BaseTest):
                 self.assertEqual(row_data['Changed By'].replace("'",""), str(data_to_filter_with))
             
             
-    def test048_filter_by_testunit_material_type_returns_only_correct_results(self):
+    def test045_filter_by_testunit_material_type_returns_only_correct_results(self):
         """
         New:  Test units: Filter Approach: Make sure you can filter by material type
 
