@@ -31,3 +31,12 @@ class SingleAnalysisPage(AllAnalysesPage):
     def navigate_to_order_tab(self):
         self.base_selenium.click('order:orders_tab')
         self.sleep_small()
+
+    def get_all_analysis_records(self):
+        all_accordion_items = self.base_selenium.find_element('analysis_page:all_rows')
+        analysis_records = []
+        for record in all_accordion_items:
+            temp_record = self.base_selenium.get_row_cells_dict_related_to_header(row=record, table_element='analysis_page:all_rows')
+            analysis_records.append(temp_record)
+        
+        self.info(analysis_records)

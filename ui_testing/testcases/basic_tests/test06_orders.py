@@ -490,78 +490,6 @@ class OrdersTestCases(BaseTest):
                                                                                                                  'Test Plans']))
             self.assertEqual(
                 selected_order_data['Test Plans'], row_data['Test Plans'])
-            
-    # will continue with us
-    # @skip("https://modeso.atlassian.net/browse/LIMS-4782")
-    def test013_update_order_number(self):
-        """
-        New: Orders: Table: Update order number Approach: When I update order number all suborders inside it updated it's order number,
-        and also in the analysis section.
-
-        LIMS-4270
-        """
-        self.base_selenium.LOGGER.info(
-            ' Running test case to check that when order no is updated, all suborders are updated')
-
-        # create order with multiple suborders
-        self.base_selenium.LOGGER.info(
-            ' Create order with 5 sub orders to make sure of the count of the created/ updated orders')
-        order_no_created = self.order_page.create_new_order(material_type='r', article='a', contact='a',
-                                                            test_plans=['a'],
-                                                            test_units=['a'], multiple_suborders=5)
-        self.base_selenium.LOGGER.info(
-            ' + orders_created_with_number : {}'.format(order_no_created))
-        order_no_created = order_no_created.replace("'", '')
-
-        # filter by the created order number and get the count
-        orders_result = self.orders_page.search(order_no_created)
-        self.base_selenium.LOGGER.info(
-            ' + filter_by_order_no : {}'.format(order_no_created))
-        orders_count = self.order_page.get_table_records()
-        self.base_selenium.LOGGER.info(
-            ' + count_of_the_created_orders : {}'.format(orders_count))
-
-        # open the last created order to update its number and checking whether it will affect the rest of the orders or not
-        self.order_page.get_random_x(row=orders_result[0])
-        new_order_no = self.order_page.generate_random_text()
-        self.order_page.set_no(no=new_order_no)
-        self.order_page.save(save_btn='order:save_btn')
-        self.base_selenium.LOGGER.info(
-            ' + order_updated_with_number : {}'.format(new_order_no))
-
-        # filtering by the new order no to get the count and making sure it is a match
-        self.orders_page.get_orders_page()
-        self.orders_page.search(new_order_no)
-        self.base_selenium.LOGGER.info(
-            ' + filter_by_new_order_no : {}'.format(new_order_no))
-        new_orders_count = self.order_page.get_table_records()
-        self.base_selenium.LOGGER.info(
-            ' + count_of_the_updated_orders : {}'.format(new_orders_count))
-        self.assertEqual(orders_count, new_orders_count,
-                         ' new orders count should be equal orders count')
-
-        # filtering by the old order no to make sure that the orders no has been replaced not added to the system
-        self.orders_page.search(order_no_created)
-        self.base_selenium.LOGGER.info(
-            ' + filter_by_old_order_no_after_update : {}'.format(order_no_created))
-        orders_before_update_count = self.order_page.get_table_records()
-        self.base_selenium.LOGGER.info(
-            ' + count_of_the_old_order_no_suborders : {}'.format(orders_before_update_count))
-        self.assertEqual(orders_before_update_count, 0)
-
-        # transfering to analysis page
-        self.analyses_page.get_analyses_page()
-
-        # filter in analysis using new order number, count should be equal to the records count in order
-        self.analyses_page.search(new_order_no)
-        self.base_selenium.LOGGER.info(
-            ' + filter_by_order_no_after_update_in_analysis : {}'.format(new_order_no))
-        records_in_analysis_after_update_count = self.analyses_page.get_table_records()
-
-        # by filtering with the new random generated order number, if the count of the orders remained the same,
-        # that's mean that all orders with the same number have been successfully updated.
-        self.assertEqual(new_orders_count,
-                         records_in_analysis_after_update_count)
 
     # will continue with us
     def test014_update_order_material_type(self, save):
@@ -1826,11 +1754,8 @@ class OrdersTestCases(BaseTest):
         LIMS-4297
         """
 
-        random_record = self.order_page.get_random_table_row(table_element='orders:orders_table')
-        order_row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=random_record)
-        order_no = order_row_data['Order No.']
-        self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no, field_type='text')
-        self.order_page.open_edit_page(row=self.order_page.result_table()[0])
+        self.info('open random order')
+        self.order_page.get_random_order()
         order_data = self.order_page.get_suborder_data()
         random_index_to_edit = self.generate_random_number(lower=0, upper=len(order_data['suborders'])-1) or 0
         self.info('index to edit {}'.format(random_index_to_edit))
@@ -1902,11 +1827,7 @@ class OrdersTestCases(BaseTest):
         testunit_record = testunits_list[0]
 
         self.base_selenium.LOGGER.info('open random record')
-        random_record = self.order_page.get_random_table_row(table_element='orders:orders_table')
-        random_record_data = self.base_selenium.get_row_cells_dict_related_to_header(row=random_record)
-        order_no = random_record_data['Order No.']
-        self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no, field_type='text')
-        self.order_page.open_edit_page(row=self.order_page.result_table()[0])
+        self.order_page.get_random_order()
 
         self.base_selenium.LOGGER.info('getting analysis tab to check out the count of the analysis')
         self.order_page.navigate_to_analysis_tab()
@@ -1988,3 +1909,29 @@ class OrdersTestCases(BaseTest):
             self.order_page.open_edit_page(row=self.order_page.result_table()[0])
             suborder_data_after_cancel = self.order_page.get_suborder_data()
             self.assertEqual(suborder_data_after_cancel['suborders'][1], selected_suborder_data['suborders'][1])
+
+    def test32_update_order_no_should_reflect_all_suborders_and_analysis(self):
+        """
+        In case I update the order number of record that has multiple suborders inside it
+        all those suborders numbers updated according to that 
+        and ( this will effect in the analysis records also that mean all order number of those records 
+        will updated according to that in the active table )
+        LIMS-4270
+        """
+
+        self.info('generate new order number to use it for update')
+        new_order_no = self.orders_api.get_auto_generated_order_no()
+        year_value = self.base_page.get_current_year()[2:]
+        formated_order_no = new_order_no + '-' + year_value
+        self.info('newly generated order number = {}'.format(formated_order_no))
+
+        self.order_page.get_random_order()
+        self.order_page.set_no(no=formated_order_no)
+        self.order_page.save(save_btn='order:save_btn')
+        self.base_selenium.refresh()
+        order_no_after_update = self.order_page.get_no()
+        self.assertEqual(order_no_after_update, formated_order_no)
+
+        self.order_page.navigate_to_analysis_tab()
+
+        analysis_records = self.single_analysis_page.get_all_analysis_records()
