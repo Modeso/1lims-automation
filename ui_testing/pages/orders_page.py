@@ -100,13 +100,16 @@ class Orders(BasePages):
     # Return all filter fields used in order
     def order_filters_element(self, key='all'):
         filter_fileds = {'Order No.': {'element': 'orders:order_filter', 'type': 'text'},
-                         'Analysis No.': {'element': 'orders:analysis_filter', 'type': 'text'},
                          'Contact Name': {'element': 'orders:contact_filter', 'type': 'drop_down'},
-                         'Changed By': {'element': 'orders:changed_by', 'type': 'drop_down'},
                          'Material Type': {'element': 'orders:material_type_filter', 'type': 'drop_down'},
+                         'Test Plans': {'element': 'orders:test_plans_filter', 'type': 'drop_down'},
+                         'Test Date': {'element': 'orders:test_date_filter', 'type': 'text'},
                          'Article Name': {'element': 'orders:article_filter', 'type': 'drop_down'},
-                         'Changed On': {'element': 'orders:chnaged_on_filter', 'type': 'text'},
-                         'Shipment Date': {'element': 'orders:shipment_date_filter', 'type': 'text'}
+                         'Changed By': {'element': 'orders:changed_by', 'type': 'drop_down'},
+                         'Created On': {'element': 'orders:chnaged_on_filter', 'type': 'text'},
+                         'Shipment Date': {'element': 'orders:shipment_date_filter', 'type': 'text'},
+                         'Test Units': {'element': 'orders:test_units_filter', 'type': 'drop_down'},
+                         'Analysis No.': {'element': 'orders:analysis_filter', 'type': 'text'},
                          }
 
         if key == 'all':
@@ -162,7 +165,7 @@ class Orders(BasePages):
         order_data['suborders'] = suborders_data
         return order_data
 
-    def get_random_main_order_with_sub_orders_data(self):
+    def get_random_main_order_with_sub_orders_data(self, row_data=False):
         self.info('+ Get Main order data with related subOrders')
         # get all the order rows
         all_orders = self.base_selenium.get_table_rows(element='orders:orders_table')
@@ -175,7 +178,8 @@ class Orders(BasePages):
         # attach the sub orders to the main order
         main_order['suborders'] = sub_orders
         # construct the order object
-        main_order = self.construct_main_order_from_table_view(main_order)
+        if not row_data:
+            main_order = self.construct_main_order_from_table_view(main_order)
         # attach the row element
         main_order['row_element'] = all_orders[row_id]
         # return the main order

@@ -1,8 +1,10 @@
 import re
 from unittest import skip
 from parameterized import parameterized
+from testconfig import config
 from ui_testing.testcases.base_test import BaseTest
 from random import randint
+from datetime import date
 import time
 
 
@@ -598,30 +600,59 @@ class OrdersTestCases(BaseTest):
                                                                                           order_material_type))
             self.assertEqual(current_material_type, order_material_type)
 
-    # wiill continue with us
-    def test015_filter_by_any_fields(self):
+    @parameterized.expand(['Order No.', 'Contact Name', 'Material Type', 'Test Plans', 
+                           'Test Date', 'Article Name', 'Created On', 'Changed By',
+                           'Shipment Date', ])
+    def test015_filter_by_any_fields(self, key):
         """
         New: Orders: Filter Approach: I can filter by any field in the table view
         LIMS-3495
         """
-        order_row = self.order_page.get_random_order_row()
-        order_data = self.base_selenium.get_row_cells_dict_related_to_header(
-            row=order_row)
-        filter_fields_dict = self.order_page.order_filters_element()
+        # create new order
+        self.info('Create new order')
+
+        order = {}
+        order['Order No.'] = self.orders_api.get_auto_generated_order_no()
+        order['Contact Name'] = self.contacts_api.get_all_contacts().json()['contacts'][0]
+        order['Material Type'] = self.general_utilities_api.list_all_material_types()[0]
+        order['Article Name'] = self.article_api.list_articles_by_materialtype(materialtype_id=order['Material Type']['id'])[0]
+        order['Test Plans'] = self.article_api.list_testplans_by_article_and_materialtype(materialtype_id=order['Material Type']['id'], article_id=order['Article Name']['id'])[0]
+        order['Test Date'] = self.test_unit_page.get_current_date_formated()
+        order['Test Units'] = self.test_unit_api.list_testunit_by_name_and_material_type(materialtype_id=order['Material Type']['id'])[0]
+        order['Shipment Date'] = self.test_unit_page.get_current_date_formated()
+        order['Current Year'] = self.test_unit_page.get_current_year()[2:]
+        
+        # create the order using the order data
+        self.orders_api.create_new_order(yearOption=1, orderNo=order['Order No.'], year=order['Current Year'],
+                                         testUnits=[order['Test Units']], testPlans=[order['Test Plans']], article=order['Article Name'],
+                                         materialType=order['Material Type'], shipmentDate=order['Shipment Date'],
+                                         testDate=order['Test Date'], contact=[order['Contact Name']])
+
+        # add additional order fields and format the dates to match the table format
+        today_date = date.today().strftime("%d.%m.%Y")
+        order['Order No.'] = '{}-{}'.format(order['Order No.'], order['Current Year'])
+        order['Created On'] = today_date
+        order['Shipment Date'] = today_date
+        order['Test Date'] = today_date
+        order['Changed By'] = {'name': config['site']['username']}
+
+        # get the filter element
+        filter_field = self.order_page.order_filters_element(key=key)
+        # open the filter menu
         self.order_page.open_filter_menu()
-        for key in filter_fields_dict:
-            field = filter_fields_dict[key]
-            self.order_page.filter(
-                key, field['element'], order_data[key], field['type'])
-            filtered_rows = self.order_page.result_table()
-            for index in range(len(filtered_rows) - 1):
-                row_data = self.base_selenium.get_row_cells_dict_related_to_header(
-                    row=filtered_rows[index])
-                self.base_selenium.LOGGER.info(
-                    ' Assert {} in  (table row: {}) == {} '.format(key, index + 1, order_data[key]))
-                self.assertEqual(order_data[key].replace(
-                    "'", ""), row_data[key].replace("'", ""))
-            self.order_page.filter_reset()
+        # set the filter value
+        filter_value = order[key]['name'] if filter_field['type'] == 'drop_down' else order[key]
+        # filter by selected key
+        self.order_page.filter(key, filter_field['element'], filter_value, filter_field['type'])
+
+        # get the main order with its suborder of the first order and suborder
+        main_order = self.order_page.get_random_main_order_with_sub_orders_data(True)
+        order_row_data = {**main_order, **main_order['suborders'][0]}
+
+        # make sure that the row have the filter value
+        self.base_selenium.LOGGER.info(' Assert {} value {} '.format(key, order[key]))
+        self.assertEqual(filter_value, order_row_data[key].replace("'", "").replace('"', ''))
+
     # will continue with us 
     def test016_validate_order_test_unit_test_plan(self):
         """
