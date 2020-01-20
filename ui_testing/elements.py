@@ -963,6 +963,8 @@ elements = {
                               'value':'//span[contains(text(),"Apply")]'},
        'filter_created_on': {'method':'id',
                               'value':'start_createdAt'},
+       'checked_role_changed_by': {'method':'xpath',
+                              'value':'//li[@id="modifiedBy"]//span[@class="checkbox"]//span'},
    },
 
     'analysis_page': {

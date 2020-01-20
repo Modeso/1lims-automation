@@ -313,17 +313,19 @@ class Header(BasePages):
         self.base_selenium.click(element='roles_and_permissions:reset_btn')
         self.sleep_small()
 
-    def get_role_data_from_row(self):
+    # this function should be used in case all the fields in the table configuration checked
+    def get_role_data_from_fully_checked_headers_random_row(self):
 
         role_row = self.get_random_table_row(table_element='general:table')
         role_row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=role_row)
-        return {
+        random_role_data_to_return = {
             'created_on': role_row_data['Created On'].split(',')[0],
             'changed_by': role_row_data['Changed By'],
             'number': role_row_data['No'],
             'name': role_row_data['Name'],
-
         }
+
+        return random_role_data_to_return
 
     def click_on_user_management(self):
         self.base_selenium.LOGGER.info('click on the user management button')
@@ -334,12 +336,4 @@ class Header(BasePages):
         self.base_selenium.LOGGER.info('click on the table configuration button')
         self.base_selenium.click(element='roles_and_permissions:configure_table_btn')
         self.sleep_small()
-
-    def checked_changed_by(self):
-        self.base_selenium.LOGGER.info('checked the chnaged by field from the table configuration to display in the active table ')
-        self.base_selenium.click(element='roles_and_permissions:configure_table_changed_by')
-        self.sleep_small()
-
-
-
 
