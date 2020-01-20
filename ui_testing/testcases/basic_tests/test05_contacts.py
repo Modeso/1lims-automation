@@ -824,3 +824,4 @@ class ContactsTestCases(BaseTest):
         self.base_selenium.LOGGER.info('Navigating to My Profile to change the language back to English')
         self.my_profile_page.get_my_profile_page()
         self.my_profile_page.chang_lang('EN')
+        
