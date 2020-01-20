@@ -660,7 +660,7 @@ class OrdersTestCases(BaseTest):
 
         # make sure that the row have the filter value
         self.base_selenium.LOGGER.info(' Assert {} value {} '.format(key, order[key]))
-        self.assertEqual(filter_value, order_row_data[key].replace("'", "").replace('"', ''))
+        self.assertEqual(filter_value.lower(), order_row_data[key].lower().replace("'", "").replace('"', ''))
 
     # will continue with us 
     def test016_validate_order_test_unit_test_plan(self):
