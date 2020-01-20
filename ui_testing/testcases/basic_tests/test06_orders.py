@@ -602,18 +602,17 @@ class OrdersTestCases(BaseTest):
 
     @parameterized.expand(['Order No.', 'Contact Name', 'Material Type', 'Test Plans', 
                            'Test Date', 'Article Name', 'Created On', 'Changed By',
-                           'Shipment Date', 'Status', 'Analysis No.'])
+                           'Shipment Date', 'Status', 'Analysis No.', 'Departments'])
     def test015_filter_by_any_fields(self, key):
         """
         New: Orders: Filter Approach: I can filter by any field in the table view
         LIMS-3495
         """
-        # create new order
         self.info('Create new order')
-
         order = {}
         today_date = date.today().strftime("%d.%m.%Y")
 
+        # prepare order data
         order['Order No.'] = self.orders_api.get_auto_generated_order_no()
         order['Contact Name'] = self.contacts_api.get_all_contacts().json()['contacts'][0]
         order['Material Type'] = self.general_utilities_api.list_all_material_types()[0]
@@ -638,7 +637,10 @@ class OrdersTestCases(BaseTest):
         order['Test Date'] = today_date
         order['Changed By'] = {'name': config['site']['username']}
         order['Status'] = {'name': 'open'}
+        # add static already existing department since the ocntact selected might not have department
+        order['Departments'] = 'labx' 
 
+        # in case of analysis no., open the edit mode to get the number
         if key == 'Analysis No.':
             self.base_selenium.get(url='{}/{}'.format(self.order_page.orders_url, order['id']), sleep=self.base_selenium.TIME_MEDIUM)
             order_edit_data = self.order_page.get_suborder_data()

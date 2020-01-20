@@ -111,6 +111,7 @@ class Orders(BasePages):
                          'Test Units': {'element': 'orders:test_units_filter', 'type': 'drop_down'},
                          'Status': {'element': 'orders:status_filter', 'type': 'drop_down'},
                          'Analysis No.': {'element': 'orders:analysis_filter', 'type': 'text'},
+                         'Departments': {'element': 'orders:departments_filter', 'type': 'text'},
                          }
 
         if key == 'all':

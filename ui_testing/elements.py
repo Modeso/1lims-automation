@@ -550,6 +550,7 @@ elements = {
                                  'value': 'start_shipmentDate'},
         'status_filter': {'method': 'id',
                           'value': 'status_idfield'},
+        'departments_filter': {'method': 'id', 'value': 'departmentsfield'}
     },
 
     'audit_trail': {
