@@ -4,6 +4,8 @@ from parameterized import parameterized
 from ui_testing.testcases.base_test import BaseTest
 from random import randint
 import time
+import random
+
 
 
 class OrdersTestCases(BaseTest):
@@ -327,7 +329,6 @@ class OrdersTestCases(BaseTest):
             for item in fixed_row_data:
                 self.assertIn(item, fixed_sheet_row_data)
 
-    # will continue with us             
     def test010_user_can_add_suborder(self):
         """
         New: Orders: Table view: Suborder Approach: User can add suborder from the main order
@@ -337,37 +338,28 @@ class OrdersTestCases(BaseTest):
         Only "Apply this from add new item in the order table view"
         :return:
         """
-        test_plan_dict = self.get_active_article_with_tst_plan(
-            test_plan_status='complete')
 
-        self.order_page.get_orders_page()
+        test_plan = random.choice(self.test_plan_api.get_completed_testplans(limit=1000))
+        print(test_plan)
         order_row = self.order_page.get_random_order_row()
-        order_data = self.base_selenium.get_row_cells_dict_related_to_header(
-            row=order_row)
+        order_data = self.base_selenium.get_row_cells_dict_related_to_header(row=order_row)
         orders_duplicate_data_before, orders = self.order_page.get_orders_duplicate_data(
             order_no=order_data['Order No.'])
-        orders_records_before = self.order_page.get_table_records()
 
         self.base_selenium.LOGGER.info(
             ' + Select random order with {} no.'.format(order_data['Order No.']))
-        self.order_page.get_random_x(orders[0])
-
+        self.order_page.open_edit_page(row=orders[0])
         order_url = self.base_selenium.get_url()
         self.base_selenium.LOGGER.info(' + Order url : {}'.format(order_url))
 
-        self.order_page.create_new_suborder(material_type=test_plan_dict['Material Type'],
-                                            article_name=test_plan_dict['Article Name'],
-                                            test_plan=test_plan_dict['Test Plan Name'])
+        self.order_page.create_new_suborder(material_type=test_plan['materialType'],
+                                            article_name=test_plan['article'][0],
+                                            test_plan=test_plan['testPlanName'], add_new_suborder_btn='order:add_another_suborder')
         self.order_page.save(save_btn='order:save_btn')
 
         self.order_page.get_orders_page()
         orders_duplicate_data_after, _ = self.order_page.get_orders_duplicate_data(
             order_no=order_data['Order No.'])
-        orders_records_after = self.order_page.get_table_records()
-
-        self.base_selenium.LOGGER.info(
-            ' + Assert there is a new suborder with the same order no.')
-        self.assertEqual(orders_records_after, orders_records_before + 1)
 
         self.analyses_page.get_analyses_page()
         self.base_selenium.LOGGER.info(

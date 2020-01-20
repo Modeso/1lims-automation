@@ -235,12 +235,12 @@ class Order(Orders):
         self.base_selenium.LOGGER.info(' Get suborder table list.')
         self.base_selenium.click(element='order:suborder_list')
 
-    def create_new_suborder(self, material_type='', article_name='', test_plan='', **kwargs):
-        self.get_suborder_table()
+    def create_new_suborder(self, material_type='', article_name='', test_plan='', add_new_suborder_btn='order:add_new_item', **kwargs):
+        # self.get_suborder_table()
         rows_before = self.base_selenium.get_table_rows(element='order:suborder_table')
 
         self.base_selenium.LOGGER.info(' Add new suborder.')
-        self.base_selenium.click(element='order:add_new_item')
+        self.base_selenium.click(element=add_new_suborder_btn)
 
         rows_after = self.base_selenium.get_table_rows(element='order:suborder_table')
         suborder_row = rows_after[len(rows_before)]
