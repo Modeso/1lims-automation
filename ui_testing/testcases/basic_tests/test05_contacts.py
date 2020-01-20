@@ -741,6 +741,7 @@ class ContactsTestCases(BaseTest):
         self.contacts_page.open_edit_page_by_css_selector(row=rows[0])
         self.contact_page.get_contact_persons_page()
         contact_person_data = self.contact_page.get_contact_persons_data()[0]
+        self.base_selenium.LOGGER.info('Asserting the title was saved successfully as Mr.')
         self.assertEqual(contact_person_data['title'], 'Mr.')
 
         # update it to be Ms
@@ -751,6 +752,7 @@ class ContactsTestCases(BaseTest):
         self.contacts_page.open_edit_page_by_css_selector(row=rows[0])
         self.contact_page.get_contact_persons_page()
         contact_person_data = self.contact_page.get_contact_persons_data()[0]
+        self.base_selenium.LOGGER.info('Asserting the title was changed successfully to Ms')
         self.assertEqual(contact_person_data['title'], 'Ms')
 
     def test032_contact_title_translation(self):
@@ -808,15 +810,17 @@ class ContactsTestCases(BaseTest):
         self.contacts_page.get_contacts_page()
         self.contacts_page.search_find_row_open_edit_page(first_contact_data_with_mr['name'])
         contact_person_data_first_contact = self.contact_page.navigate_to_contact_person_tab_get_data()
+        self.base_selenium.LOGGER.info('Asserting the title of the first contact person in the first contact: {} was translated successfully to Herr'.format(random_first_company_name))
         self.assertEqual(contact_person_data_first_contact['title'], 'Herr')
         
         # go back to the contacts page to assert that the second contact's contact person is saved with title 'Frau'
         self.contacts_page.get_contacts_page()
         self.contacts_page.search_find_row_open_edit_page(second_contact_data_with_ms['name'])
         contact_person_data_second_contact = self.contact_page.navigate_to_contact_person_tab_get_data()
+        self.base_selenium.LOGGER.info('Asserting the title of the first contact person in the second contact: {} was translated successfully to Frau'.format(random_second_company_name))
         self.assertEqual(contact_person_data_second_contact['title'], 'Frau')
         
         # set the language back to english
-        self.base_selenium.LOGGER.info('Navigating to My profile to change the language back to English')
+        self.base_selenium.LOGGER.info('Navigating to My Profile to change the language back to English')
         self.my_profile_page.get_my_profile_page()
         self.my_profile_page.chang_lang('EN')
