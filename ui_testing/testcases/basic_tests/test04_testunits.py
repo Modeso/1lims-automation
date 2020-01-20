@@ -1727,9 +1727,18 @@ class TestUnitsTestCases(BaseTest):
             data_to_filter_with = self.test_unit_page.convert_to_dot_date_format(date=data_to_filter_with)
         self.assertNotEqual(data_to_filter_with, False)
         self.base_selenium.LOGGER.info('filter with {}'.format(data_to_filter_with))
-        self.test_unit_page.apply_filter_scenario(filter_element='test_unit:testunit_number_filter', filter_text=data_to_filter_with, field_type='text')
+        if filter_case == 'number':
+            self.test_unit_page.apply_filter_scenario(filter_element='test_unit:testunit_number_filter', filter_text=data_to_filter_with, field_type='text')
+        elif filter_case == 'name':
+            self.test_unit_page.apply_filter_scenario(filter_element='test_unit:name_filter', filter_text=data_to_filter_with, field_type='text')
+        elif filter_case == 'method':
+            self.test_unit_page.apply_filter_scenario(filter_element='test_unit:method_filter', filter_text=data_to_filter_with, field_type='text')
+        elif filter_case == 'createdAt':
+            self.test_unit_page.apply_filter_scenario(filter_element='test_unit:filter_created_at', filter_text=data_to_filter_with, field_type='text')
+        
         table_records = self.test_unit_page.result_table()
         del table_records[-1]
+        
         for record in table_records:
             row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=record)
             if filter_case == 'number':
@@ -1752,6 +1761,7 @@ class TestUnitsTestCases(BaseTest):
         data_to_filter_with = self.test_unit_api.get_first_record_with_data_in_attribute(attribute='unit')
         self.assertNotEqual(data_to_filter_with, False)
         self.base_selenium.LOGGER.info('filter with {}'.format(data_to_filter_with))
+
         self.test_unit_page.apply_filter_scenario(filter_element='test_unit:spec_unit_filter', filter_text=data_to_filter_with, field_type='text')
         table_records = self.test_unit_page.result_table()
         del table_records[-1]
@@ -1776,7 +1786,12 @@ class TestUnitsTestCases(BaseTest):
         data_to_filter_with = self.test_unit_api.get_first_record_with_data_in_attribute(attribute=filter_case)
         self.assertNotEqual(data_to_filter_with, False)
         self.base_selenium.LOGGER.info('filter with {}'.format(data_to_filter_with))
-        self.test_unit_page.apply_filter_scenario(filter_element='test_unit:category_filter', filter_text=data_to_filter_with)
+        if filter_case == 'categoryName':
+            self.test_unit_page.apply_filter_scenario(filter_element='test_unit:category_filter', filter_text=data_to_filter_with)
+        elif filter_case == 'typeName':
+            self.test_unit_page.apply_filter_scenario(filter_element='test_unit:filter_type', filter_text=data_to_filter_with)
+        elif filter_case == 'lastModifiedUser':
+            self.test_unit_page.apply_filter_scenario(filter_element='test_unit:filter_changed_by', filter_text=data_to_filter_with)
         table_records = self.test_unit_page.result_table()
 
         del table_records[-1]
