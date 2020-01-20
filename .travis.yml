@@ -33,7 +33,7 @@ script:
   - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/header_tests/test09_rolesandpermissions.py:HeaderTestCases.test015_filter_by_role_name --tc-file=config.ini
   - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/header_tests/test09_rolesandpermissions.py:HeaderTestCases.test016_filter_by_no --tc-file=config.ini
   - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/header_tests/test09_rolesandpermissions.py:HeaderTestCases.test017_filter_by_changed_by --tc-file=config.ini
-  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/header_tests/test09_rolesandpermissions.py:HeaderTestCases.test018_created_on --tc-file=config.ini
+  - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/header_tests/test09_rolesandpermissions.py:HeaderTestCases.test018_filter_created_on --tc-file=config.ini
 
   
 
