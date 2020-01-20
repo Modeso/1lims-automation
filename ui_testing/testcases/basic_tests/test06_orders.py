@@ -602,7 +602,7 @@ class OrdersTestCases(BaseTest):
 
     @parameterized.expand(['Order No.', 'Contact Name', 'Material Type', 'Test Plans', 
                            'Test Date', 'Article Name', 'Created On', 'Changed By',
-                           'Shipment Date', ])
+                           'Shipment Date', 'Status', 'Analysis No.'])
     def test015_filter_by_any_fields(self, key):
         """
         New: Orders: Filter Approach: I can filter by any field in the table view
@@ -612,6 +612,8 @@ class OrdersTestCases(BaseTest):
         self.info('Create new order')
 
         order = {}
+        today_date = date.today().strftime("%d.%m.%Y")
+
         order['Order No.'] = self.orders_api.get_auto_generated_order_no()
         order['Contact Name'] = self.contacts_api.get_all_contacts().json()['contacts'][0]
         order['Material Type'] = self.general_utilities_api.list_all_material_types()[0]
@@ -623,18 +625,24 @@ class OrdersTestCases(BaseTest):
         order['Current Year'] = self.test_unit_page.get_current_year()[2:]
         
         # create the order using the order data
-        self.orders_api.create_new_order(yearOption=1, orderNo=order['Order No.'], year=order['Current Year'],
-                                         testUnits=[order['Test Units']], testPlans=[order['Test Plans']], article=order['Article Name'],
-                                         materialType=order['Material Type'], shipmentDate=order['Shipment Date'],
-                                         testDate=order['Test Date'], contact=[order['Contact Name']])
+        result = self.orders_api.create_new_order(yearOption=1, orderNo=order['Order No.'], year=order['Current Year'],
+                                                  testUnits=[order['Test Units']], testPlans=[order['Test Plans']], article=order['Article Name'],
+                                                  materialType=order['Material Type'], shipmentDate=order['Shipment Date'],
+                                                  testDate=order['Test Date'], contact=[order['Contact Name']])
 
         # add additional order fields and format the dates to match the table format
-        today_date = date.today().strftime("%d.%m.%Y")
+        order['id'] = result['mainOrderId']
         order['Order No.'] = '{}-{}'.format(order['Order No.'], order['Current Year'])
         order['Created On'] = today_date
         order['Shipment Date'] = today_date
         order['Test Date'] = today_date
         order['Changed By'] = {'name': config['site']['username']}
+        order['Status'] = {'name': 'open'}
+
+        if key == 'Analysis No.':
+            self.base_selenium.get(url='{}/{}'.format(self.order_page.orders_url, order['id']), sleep=self.base_selenium.TIME_MEDIUM)
+            order_edit_data = self.order_page.get_suborder_data()
+            order['Analysis No.'] = order_edit_data['suborders'][0]['analysis_no']
 
         # get the filter element
         filter_field = self.order_page.order_filters_element(key=key)

@@ -109,6 +109,7 @@ class Orders(BasePages):
                          'Created On': {'element': 'orders:chnaged_on_filter', 'type': 'text'},
                          'Shipment Date': {'element': 'orders:shipment_date_filter', 'type': 'text'},
                          'Test Units': {'element': 'orders:test_units_filter', 'type': 'drop_down'},
+                         'Status': {'element': 'orders:status_filter', 'type': 'drop_down'},
                          'Analysis No.': {'element': 'orders:analysis_filter', 'type': 'text'},
                          }
 

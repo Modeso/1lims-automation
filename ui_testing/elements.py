@@ -547,7 +547,9 @@ elements = {
         'test_date_filter': {'method': 'id',
                              'value': 'start_testDate'},
         'shipment_date_filter': {'method': 'id',
-                                 'value': 'start_shipmentDate'}
+                                 'value': 'start_shipmentDate'},
+        'status_filter': {'method': 'id',
+                          'value': 'status_idfield'},
     },
 
     'audit_trail': {
