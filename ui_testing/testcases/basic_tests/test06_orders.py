@@ -1928,10 +1928,18 @@ class OrdersTestCases(BaseTest):
         self.order_page.get_random_order()
         self.order_page.set_no(no=formated_order_no)
         self.order_page.save(save_btn='order:save_btn')
+
+        self.base_selenium.LOGGER.info('refresh to make sure that data are saved correctly')
         self.base_selenium.refresh()
         order_no_after_update = self.order_page.get_no()
+
+        self.base_selenium.LOGGER.info('order no is {}, and it should be {}'.format(order_no_after_update, formated_order_no))
         self.assertEqual(order_no_after_update, formated_order_no)
-
+        
+        self.base_selenium.LOGGER.info('navigate to analysis tab to make sure that order no updated correctly')
         self.order_page.navigate_to_analysis_tab()
-
         analysis_records = self.single_analysis_page.get_all_analysis_records()
+        
+        self.base_selenium.LOGGER.info('checking order no of each analysis')
+        for record in analysis_records:
+            self.assertEqual(record['Order No.'], formated_order_no)

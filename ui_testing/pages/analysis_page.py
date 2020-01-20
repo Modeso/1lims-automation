@@ -33,10 +33,37 @@ class SingleAnalysisPage(AllAnalysesPage):
         self.sleep_small()
 
     def get_all_analysis_records(self):
-        all_accordion_items = self.base_selenium.find_element('analysis_page:all_rows')
-        analysis_records = []
-        for record in all_accordion_items:
-            temp_record = self.base_selenium.get_row_cells_dict_related_to_header(row=record, table_element='analysis_page:all_rows')
-            analysis_records.append(temp_record)
+        headers = self.get_analysis_headers()
+        analysis_count = self.get_analysis_count()
+
+        full_analysis_main_data = self.get_records_data(analysis_count)
+        analysis_mapped_data = []
+        for record in full_analysis_main_data:
+            temp_record = {}
+            for header in headers:
+                temp_record[header] = record[headers.index(header)]
+            analysis_mapped_data.append(temp_record)
         
-        self.info(analysis_records)
+        return analysis_mapped_data
+
+
+    def get_analysis_headers(self):
+        headers = self.base_selenium.find_elements_in_element(source_element='analysis_page:headers', destination_element='general:th')
+        header_list = []
+        for header in headers:
+            if header.text != 'Attachments' and header.text != 'Save' and header.text != 'Arrival Date' and header.text != '':
+                header_list.append(header.text)
+
+        return header_list
+
+    def get_records_data(self, analysis_count):
+        records_data=[]
+        for i in range(0, analysis_count):
+            analysis_record = self.base_selenium.find_element_by_xpath(xpath='//div[@id="m_accordion_7_item_head_{}"]'.format(i))
+            cells = self.base_selenium.find_elements_in_element(source=analysis_record, destination_element='general:td')
+            temp_record = []
+            for cell in cells:
+                if cell.text != '':
+                    temp_record.append(cell.text)
+            records_data.append(temp_record)
+        return records_data

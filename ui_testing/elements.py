@@ -153,7 +153,10 @@ elements = {
         'form_popup_warning_window': {'method': 'class_name', 'value':'swal2-header', 'order':0},
         'confirmation_button': {'method': 'xpath',
                                 'value': '//button[@class="swal2-confirm btn btn-success m-btn m-btn--custom"]'},
-        'clear_single_dropdown': {'method': 'class_name', 'value': 'ng-clear-wrapper', 'order': 0}
+        'clear_single_dropdown': {'method': 'class_name', 'value': 'ng-clear-wrapper', 'order': 0},
+        'td': {'method': 'tag_name', 'value': 'td', 'order': 0},
+        'th': {'method': 'tag_name', 'value': 'th', 'order': 0},
+        'div': {'method': 'tag_name', 'value': 'div', 'order': 0}
 
     },
     'login': {
@@ -989,6 +992,8 @@ elements = {
             'method': 'id',
             'value': 'table-with-add'
         },
+        'analysis_page_table': {'method': 'class_name', 'value': 'm_accordion_7', 'order': 0},
+        'headers': {'method': 'id', 'value': 'headers'}
     },
     'company_profile': {
         'country_field': {'method': 'id', 'value': 'selectedCountryfield'},
