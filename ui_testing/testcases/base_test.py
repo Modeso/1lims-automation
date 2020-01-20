@@ -25,6 +25,7 @@ from api_testing.apis.users_api import UsersAPI
 from api_testing.apis.roles_api import RolesAPI
 from api_testing.apis.analysis_api import AnalysisAPI
 from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
+from ui_testing.pages.analyses_page import AllAnalysesPage
 import datetime, re
 
 
@@ -61,6 +62,7 @@ class BaseTest(TestCase):
         self.users_api = UsersAPI()
         self.roles_api = RolesAPI()
         self.general_utilities_api = GeneralUtilitiesAPI()
+        self.analyses_page = AllAnalysesPage()
 
     def tearDown(self):
         self.base_selenium.quit_driver()

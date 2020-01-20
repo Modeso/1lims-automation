@@ -359,8 +359,9 @@ class OrdersTestCases(BaseTest):
         self.order_page.get_orders_page()
         orders_duplicate_data_after, _ = self.order_page.get_orders_duplicate_data(
             order_no=order_data['Order No.'])
+        # self.base_selenium.get(order_url)
 
-        self.analyses_page.get_analyses_page()
+        self.analyses_page.get_analysis_page()
         self.base_selenium.LOGGER.info(
             ' + Assert There is an analysis for this new suborder.')
         orders_analyess = self.analyses_page.search(order_data['Order No.'])
