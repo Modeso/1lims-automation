@@ -357,7 +357,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.save(save_btn='order:save_btn')
 
         self.order_page.get_orders_page()
-        orders_duplicate_data_after, _ = self.order_page.get_orders_duplicate_data(
+        orders_duplicate_data_after, _ = self.order_page.get_orders_and_suborders_data(
             order_no=order_data['Order No.'])
         # self.base_selenium.get(order_url)
 
