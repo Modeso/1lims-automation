@@ -1729,8 +1729,8 @@ class TestUnitsTestCases(BaseTest):
         self.base_selenium.LOGGER.info('filter with {}'.format(data_to_filter_with))
         self.test_unit_page.apply_filter_scenario(filter_element='test_unit:testunit_number_filter', filter_text=data_to_filter_with, field_type='text')
         table_records = self.test_unit_page.result_table()
-        records = table_records.splice(-1, 1)
-        for record in records:
+        del table_records[-1]
+        for record in table_records:
             row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=record)
             if filter_case == 'number':
                 self.assertEqual(row_data['Test Unit No.'].replace("'",""), str(data_to_filter_with))
@@ -1754,8 +1754,8 @@ class TestUnitsTestCases(BaseTest):
         self.base_selenium.LOGGER.info('filter with {}'.format(data_to_filter_with))
         self.test_unit_page.apply_filter_scenario(filter_element='test_unit:spec_unit_filter', filter_text=data_to_filter_with, field_type='text')
         table_records = self.test_unit_page.result_table()
-        records = table_records.splice(-1, 1)
-        for record in records:
+        del table_records[-1]
+        for record in table_records:
             row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=record)
             self.assertEqual(row_data['Unit'].replace("'",""), str(data_to_filter_with.replace('{','').replace('}','').replace('[', '').replace(']','')))
             
@@ -1778,8 +1778,9 @@ class TestUnitsTestCases(BaseTest):
         self.base_selenium.LOGGER.info('filter with {}'.format(data_to_filter_with))
         self.test_unit_page.apply_filter_scenario(filter_element='test_unit:category_filter', filter_text=data_to_filter_with)
         table_records = self.test_unit_page.result_table()
-        records = table_records.splice(-1, 1)
-        for record in records:
+
+        del table_records[-1]
+        for record in table_records:
             row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=record)
             if filter_case == 'categoryName':
                 self.assertEqual(row_data['Category'].replace("'",""), str(data_to_filter_with))
@@ -1801,8 +1802,8 @@ class TestUnitsTestCases(BaseTest):
         self.base_selenium.LOGGER.info('filter with {}'.format(data_to_filter_with[0]))
         self.test_unit_page.apply_filter_scenario(filter_element='test_unit:filter_material_type', filter_text=data_to_filter_with[0])
         table_records = self.test_unit_page.result_table()
-        records = table_records.splice(-1, 1)
-        for record in records:
+        del table_records[-1]
+        for record in table_records:
             row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=record)
             testunit_material_types = row_data['Material Type'].split(', ')[0]
             self.assertEqual(testunit_material_types.replace("'",""), str(data_to_filter_with[0]))
