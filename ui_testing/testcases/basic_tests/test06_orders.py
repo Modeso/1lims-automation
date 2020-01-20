@@ -643,6 +643,7 @@ class OrdersTestCases(BaseTest):
             self.base_selenium.get(url='{}/{}'.format(self.order_page.orders_url, order['id']), sleep=self.base_selenium.TIME_MEDIUM)
             order_edit_data = self.order_page.get_suborder_data()
             order['Analysis No.'] = order_edit_data['suborders'][0]['analysis_no']
+            self.order_page.get_orders_page()
 
         # get the filter element
         filter_field = self.order_page.order_filters_element(key=key)
