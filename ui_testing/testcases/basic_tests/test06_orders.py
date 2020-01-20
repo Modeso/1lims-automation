@@ -340,7 +340,6 @@ class OrdersTestCases(BaseTest):
         """
 
         test_plan = random.choice(self.test_plan_api.get_completed_testplans(limit=1000))
-        print(test_plan)
         order_row = self.order_page.get_random_order_row()
         order_data = self.base_selenium.get_row_cells_dict_related_to_header(row=order_row)
         orders_duplicate_data_before, orders = self.order_page.get_orders_duplicate_data(
