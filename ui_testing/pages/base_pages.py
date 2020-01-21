@@ -4,7 +4,7 @@ import time, pyperclip, os
 from random import randint
 import datetime
 import pymysql
-import ipdb
+
 
 class BasePages:
     def __init__(self):
