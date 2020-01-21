@@ -150,7 +150,7 @@ class ContactsTestCases(BaseTest):
 
         contact_record = self.contact_page.search(value=contact_data['Contact No'])[0]
         self.contacts_page.info('open the record in edit to compare the data')
-        self.contact_page.open_edit_page(row=contact_record)
+        self.contact_page.open_edit_page_by_css_selector(row=contact_record)
         contact_data_after_create = self.contact_page.get_full_contact_data()
 
         self.assertTrue(self.contact_page.compare_contact_main_data(data_after_save=contact_data_after_create,
