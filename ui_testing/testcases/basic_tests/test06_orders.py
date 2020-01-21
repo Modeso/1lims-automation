@@ -123,7 +123,7 @@ class OrdersTestCases(BaseTest):
     # will change totally and implement the new behavior 
     def test004_archive_order(self):
         '''
-        LIMS-6517
+        LIMS-6516
         User can archive a main order
         '''
         order_row = self.order_page.get_random_order_row()
