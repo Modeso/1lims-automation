@@ -330,10 +330,10 @@ class OrdersTestCases(BaseTest):
                 self.assertIn(item, fixed_sheet_row_data)
 
     def test010_user_can_add_suborder(self):
-        """
+        '''
         LIMS-3817
         User can add suborder from the main order
-        """
+        '''
 
         test_plan = random.choice(self.test_plan_api.get_completed_testplans(limit=1000))
         order_row = self.order_page.get_random_order_row()
