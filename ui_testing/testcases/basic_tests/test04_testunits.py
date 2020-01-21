@@ -1706,8 +1706,11 @@ class TestUnitsTestCases(BaseTest):
         assert (self.test_unit_page.deselect_all_configurations(), False)
 
 
-    @parameterized.expand(['number', 'name', 'method', 'createdAt'])
-    def test042_filter_by_testunit_text_fields(self, filter_case):
+    @parameterized.expand([('number', 'testunit_number_filter', 'Test Unit No.'),
+                           ('name', 'name_filter', 'Test Unit Name'),
+                           ('method', 'method_filter', 'Method'),
+                           ('createdAt', 'filter_created_at', 'Created On')])
+    def test042_filter_by_testunit_text_fields(self, filter_case, filter, header_name):
         """
         New: Test units: Filter Approach: Make sure you can filter by test unit no
         LIMS-6430
@@ -1727,29 +1730,14 @@ class TestUnitsTestCases(BaseTest):
             data_to_filter_with = self.test_unit_page.convert_to_dot_date_format(date=data_to_filter_with)
         self.assertNotEqual(data_to_filter_with, False)
         self.base_selenium.LOGGER.info('filter with {}'.format(data_to_filter_with))
-        if filter_case == 'number':
-            self.test_unit_page.apply_filter_scenario(filter_element='test_unit:testunit_number_filter', filter_text=data_to_filter_with, field_type='text')
-        elif filter_case == 'name':
-            self.test_unit_page.apply_filter_scenario(filter_element='test_unit:name_filter', filter_text=data_to_filter_with, field_type='text')
-        elif filter_case == 'method':
-            self.test_unit_page.apply_filter_scenario(filter_element='test_unit:method_filter', filter_text=data_to_filter_with, field_type='text')
-        elif filter_case == 'createdAt':
-            self.test_unit_page.apply_filter_scenario(filter_element='test_unit:filter_created_at', filter_text=data_to_filter_with, field_type='text')
+        self.test_unit_page.apply_filter_scenario(filter_element='test_unit:{}'.format(filter),
+                                                  filter_text=data_to_filter_with, field_type='text')
         
-        table_records = self.test_unit_page.result_table()
-        del table_records[-1]
+        table_records = self.test_unit_page.result_table()[:-1]
         
         for record in table_records:
             row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=record)
-            if filter_case == 'number':
-                self.assertEqual(row_data['Test Unit No.'].replace("'",""), str(data_to_filter_with))
-            elif filter_case == 'name':
-                self.assertEqual(row_data['Test Unit Name'].replace("'",""), str(data_to_filter_with))
-            elif filter_case == 'method':
-                self.assertEqual(row_data['Method'].replace("'",""), str(data_to_filter_with))
-            elif filter_case == 'createdAt':
-                self.assertEqual(row_data['Created On'].replace("'",""), str(data_to_filter_with))
-            
+            self.assertEqual(row_data[header_name].replace("'", ""), str(data_to_filter_with))
 
     def test043_filter_by_testunit_unit_returns_only_correct_results(self):
         """
