@@ -342,14 +342,12 @@ class OrdersTestCases(BaseTest):
         test_plan = random.choice(self.test_plan_api.get_completed_testplans(limit=1000))
         order_row = self.order_page.get_random_order_row()
         order_data = self.base_selenium.get_row_cells_dict_related_to_header(row=order_row)
-        orders_duplicate_data_before, orders = self.order_page.get_orders_duplicate_data(
-            order_no=order_data['Order No.'])
+        orders_duplicate_data_before, orders = self.order_page.get_orders_duplicate_data(order_no=order_data['Order No.'])
 
-        self.base_selenium.LOGGER.info(
-            ' + Select random order with {} no.'.format(order_data['Order No.']))
+        self.base_selenium.LOGGER.info('Select random order with number: {}'.format(order_data['Order No.']))
         self.order_page.open_edit_page(row=orders[0])
         order_url = self.base_selenium.get_url()
-        self.base_selenium.LOGGER.info(' + Order url : {}'.format(order_url))
+        self.base_selenium.LOGGER.info('Order url: {}'.format(order_url))
 
         self.order_page.create_new_suborder(material_type=test_plan['materialType'],
                                             article_name=test_plan['article'][0],
@@ -357,18 +355,15 @@ class OrdersTestCases(BaseTest):
         self.order_page.save(save_btn='order:save_btn')
 
         self.order_page.get_orders_page()
-        orders_duplicate_data_after, _ = self.order_page.get_orders_and_suborders_data(
-            order_no=order_data['Order No.'])
-        # self.base_selenium.get(order_url)
+        orders_duplicate_data_after, _ = self.order_page.get_orders_and_suborders_data(order_no=order_data['Order No.'])
 
-        self.analyses_page.get_analysis_page()
-        self.base_selenium.LOGGER.info(
-            ' + Assert There is an analysis for this new suborder.')
+        # self.analyses_page.get_analysis_page()
+        # self.single_analysis_page.get_analysis_page()
+        self.base_selenium.get('https://automation.1lims.com/sample/analysis')
+        self.base_selenium.LOGGER.info('Assert There is an analysis for this new suborder')
         orders_analyess = self.analyses_page.search(order_data['Order No.'])
-        latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
-            row=orders_analyess[0])
-        self.assertEqual(
-            orders_duplicate_data_after[0]['Analysis No.'], latest_order_data['Analysis No.'])
+        latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(row=orders_analyess[0])
+        self.assertEqual(orders_duplicate_data_after[0]['Analysis No.'], latest_order_data['Analysis No.'])
 
     # will change to dispaly it in the child table & in the export     
     def test011_analysis_number_filter_and_export(self):
