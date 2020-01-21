@@ -84,41 +84,60 @@ class OrdersTestCases(BaseTest):
                 ' + Assert {} (current_contact) == {} (order_contact)'.format(current_contact, order_contact))
             self.assertEqual(current_contact, order_contact)
 
-    # will continue with us
-    @parameterized.expand(['save_btn', 'cancel'])
-    def test003_cancel_button_edit_departments(self, save):
+    # @parameterized.expand(['save_btn', 'cancel'])
+    def test003_cancel_button_edit_departments(self):
         """
         Orders: department Approach: In case I update the department then press on save button ( the department updated successfully) &
         when I press on cancel button ( this department not updated )
 
         LIMS-4765
-        LIMS-4765
         :return:
         """
-        self.order_page.get_random_order()
-        order_url = self.base_selenium.get_url()
-        self.base_selenium.LOGGER.info(' + order_url : {}'.format(order_url))
-        self.order_page.sleep_tiny()
-        current_departments = self.order_page.get_department()
-        self.order_page.set_departments()
-        new_departments = self.order_page.get_department()
-        if 'save_btn' == save:
-            self.order_page.save(save_btn='order:save_btn')
-        else:
-            self.order_page.cancel(force=True)
+        department = {
+            "id": 'new',
+            "display": self.order_page.generate_random_text(),
+            "value": self.order_page.generate_random_text(),
+            "text": self.order_page.generate_random_text(),
+        }
+        contact = self.contacts_api.create_contact(departments=[department], name=self.order_page.generate_random_text(), companyNo=self.order_page.generate_random_number())
+        order_no = self.orders_api.get_auto_generated_order_no()
+        material_type = self.general_utilities_api.list_all_material_types()[0]
+        article = self.article_api.list_articles_by_materialtype(materialtype_id=material_type['id'])[0]
+        testunits = self.test_unit_api.list_testunit_by_name_and_material_type(materialtype_id=material_type['id'])[0]
+        test_date = self.test_unit_page.get_current_date_formated()
+        shipment_date = self.test_unit_page.get_current_date_formated()
+        current_year = self.test_unit_page.get_current_year()[2:]
 
-        self.base_selenium.get(url=order_url, sleep=5)
+        # create the order using the order data
+        order = self.orders_api.create_new_order(yearOption=1, orderNo=order_no, year=current_year,
+                                                 testUnits=[testunits], testPlans=[], article=article,
+                                                 materialType=material_type, shipmentDate=shipment_date,
+                                                 testDate=test_date, contact=[contact], departments=[department])
+        order_no_with_year = '{}-{}'.format(order_no, current_year)
+        # self.order_page.get_random_order()
+        # order_url = self.base_selenium.get_url()
+        # self.base_selenium.LOGGER.info(' + order_url : {}'.format(order_url))
+        # self.order_page.sleep_tiny()
+        # current_departments = self.order_page.get_department()
+        # self.order_page.update_suborder()
+        # new_departments = self.order_page.get_department()
+        # if 'save_btn' == save:
+        #     self.order_page.save(save_btn='order:save_btn')
+        # else:
+        #     self.order_page.cancel(force=True)
 
-        order_departments = self.order_page.get_department()
-        if 'save_btn' == save:
-            self.base_selenium.LOGGER.info(
-                ' + Assert {} (new_departments) == {} (order_departments)'.format(new_departments, order_departments))
-            self.assertEqual(new_departments, order_departments)
-        else:
-            self.base_selenium.LOGGER.info(
-                ' + Assert {} (current_departments) == {} (order_departments)'.format(current_departments,
-                                                                                      order_departments))
-            self.assertEqual(current_departments, order_departments)
+        # self.base_selenium.get(url=order_url, sleep=5)
+
+        # order_departments = self.order_page.get_department()
+        # if 'save_btn' == save:
+        #     self.base_selenium.LOGGER.info(
+        #         ' + Assert {} (new_departments) == {} (order_departments)'.format(new_departments, order_departments))
+        #     self.assertEqual(new_departments, order_departments)
+        # else:
+        #     self.base_selenium.LOGGER.info(
+        #         ' + Assert {} (current_departments) == {} (order_departments)'.format(current_departments,
+        #                                                                               order_departments))
+        #     self.assertEqual(current_departments, order_departments)
     
     # will change totally and implement the new behavior 
     def test004_archive_order(self):
