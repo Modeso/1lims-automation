@@ -100,6 +100,7 @@ class OrdersTestCases(BaseTest):
             "text": self.order_page.generate_random_text(),
         }
         contact = self.contacts_api.create_contact(departments=[department], name=self.order_page.generate_random_text(), companyNo=self.order_page.generate_random_number())
+        department = self.contacts_api.get_departments_of_certain_contact(contact['companyId'])
         order_no = self.orders_api.get_auto_generated_order_no()
         material_type = self.general_utilities_api.list_all_material_types()[0]
         article = self.article_api.list_articles_by_materialtype(materialtype_id=material_type['id'])[0]
@@ -107,12 +108,13 @@ class OrdersTestCases(BaseTest):
         test_date = self.test_unit_page.get_current_date_formated()
         shipment_date = self.test_unit_page.get_current_date_formated()
         current_year = self.test_unit_page.get_current_year()[2:]
+        contacts = self.contacts_api.get_all_contacts().json()['contacts'][0]
 
         # create the order using the order data
         order = self.orders_api.create_new_order(yearOption=1, orderNo=order_no, year=current_year,
                                                  testUnits=[testunits], testPlans=[], article=article,
                                                  materialType=material_type, shipmentDate=shipment_date,
-                                                 testDate=test_date, contact=[contact], departments=[department])
+                                                 testDate=test_date, contact=[contacts], departments=department['contacts'])
         order_no_with_year = '{}-{}'.format(order_no, current_year)
         # self.order_page.get_random_order()
         # order_url = self.base_selenium.get_url()
