@@ -545,8 +545,8 @@ elements = {
         'shipment_date_filter': {'method': 'id',
                                  'value': 'start_shipmentDate'},
         'analysis_tab': {
-            'method': 'id',
-            'value': 'analysisTab'
+            'method': 'xpath',
+            'value': "//label[@class='btn tab']"
         }
     },
 
