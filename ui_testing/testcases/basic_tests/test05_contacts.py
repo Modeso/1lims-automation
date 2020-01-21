@@ -146,7 +146,6 @@ class ContactsTestCases(BaseTest):
         """
         contact_data = self.contact_page.create_update_contact()
         self.info('filter by contact no.: {} to get the record'.format(contact_data['Contact No']))
-        self.base_selenium.refresh()
 
         contact_record = self.contact_page.search(value=contact_data['Contact No'])[0]
         self.contacts_page.info('open the record in edit to compare the data')
@@ -164,7 +163,6 @@ class ContactsTestCases(BaseTest):
         self.assertTrue(self.contact_page.compare_contact_persons_data(
             data_after_save=contact_persons_data_after_create, data_before_save=contact_data["contact_persons"]))
         self.info('contact persons have been saved successfully')
-   
 
     def test_008_create_contact_person_from_edit_update_old_value(self):
         """
