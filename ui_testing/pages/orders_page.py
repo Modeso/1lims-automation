@@ -180,3 +180,10 @@ class Orders(BasePages):
         main_order['row_element'] = all_orders[row_id]
         # return the main order
         return main_order
+
+    def get_orders_and_suborders_data(self, order_no):
+        self.base_selenium.LOGGER.info('Get orders and its suborders data having order number: {}.'.format(order_no))
+        orders = self.search(order_no)[:-1]
+        orders_data = self.get_child_table_data()
+
+        return orders_data, orders

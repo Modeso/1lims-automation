@@ -122,52 +122,26 @@ class OrdersTestCases(BaseTest):
     
     # will change totally and implement the new behavior 
     def test004_archive_order(self):
-        """
-            New: Orders: Archive
-            The user cannot archive an order unless all corresponding analysis are archived
-            LIMS-3425
-
-            New: Archive order has active analysis
-            The user cannot archive an order unless all corresponding analysis are archived
-            LIMS-4329
-        :return:
-        """
+        '''
+        LIMS-6517
+        User can archive a main order
+        '''
         order_row = self.order_page.get_random_order_row()
         self.order_page.click_check_box(source=order_row)
-        order_data = self.base_selenium.get_row_cells_dict_related_to_header(
-            row=order_row)
-        analysis_numbers_list = order_data['Analysis No.'].split(',')
-        self.base_selenium.LOGGER.info(
-            ' + Try to archive order with number : {}'.format(order_data['Order No.']))
-        order_deleted = self.order_page.archive_selected_orders(
-            check_pop_up=True)
+        order_data = self.base_selenium.get_row_cells_dict_related_to_header(row=order_row)
+        suborder_data_before_archiving, _ = self.order_page.get_orders_and_suborders_data(order_data['Order No.'])
+        
+        self.base_selenium.LOGGER.info('Trying to archive order with number: {}'.format(order_data['Order No.']))
+        order_deleted = self.order_page.archive_selected_orders(check_pop_up=True)
         self.base_selenium.LOGGER.info(' + {} '.format(order_deleted))
+        
+        self.base_selenium.refresh()
+        self.base_page.get_archived_items()
 
-        if order_deleted:
-            self.base_selenium.LOGGER.info(
-                ' + Order number : {} deleted successfully'.format(order_data['Order No.']))
-            self.analyses_page.get_analyses_page()
-            self.base_selenium.LOGGER.info(
-                ' + Assert analysis numbers : {} is not active'.format(analysis_numbers_list))
-            has_active_analysis = self.analyses_page.search_if_analysis_exist(
-                analysis_numbers_list)
-            self.base_selenium.LOGGER.info(
-                ' + Has activated analysis? : {}.'.format(has_active_analysis))
-            self.assertFalse(has_active_analysis)
-        else:
-            self.analyses_page.get_analyses_page()
-            self.base_selenium.LOGGER.info(
-                ' + Archive Analysis with numbers : {}'.format(analysis_numbers_list))
-            self.analyses_page.search_by_number_and_archive(
-                analysis_numbers_list)
-            self.order_page.get_orders_page()
-            rows = self.order_page.search(analysis_numbers_list[0])
-            self.order_page.click_check_box(source=rows[0])
-            self.base_selenium.LOGGER.info(
-                ' + archive order has analysis number =  {}'.format(analysis_numbers_list[0]))
-            self.order_page.archive_selected_orders()
-            rows = self.order_page.result_table()
-            self.assertEqual(len(rows), 1)
+        suborder_data_after_archiving, _ = self.order_page.get_orders_and_suborders_data(order_data['Order No.'])
+
+        self.base_selenium.LOGGER.info('Asserting the suborders were correctly archived')
+        self.assertEqual(suborder_data_before_archiving, suborder_data_after_archiving)
     
     # will continue with us
     def test005_restore_archived_orders(self):
