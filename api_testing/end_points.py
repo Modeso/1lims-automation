@@ -60,6 +60,9 @@ end_points = {
         'create_contact': '/api/contacts',
         'update_contact': '/api/contacts'
     },
+    'departments_api': {
+        'list_contact_depts': '/api/contacts/get/supplier/departments/',
+    },
     'users_api': {
         'list_all_users': '/api/users',
         'form_data': '/api/users/',

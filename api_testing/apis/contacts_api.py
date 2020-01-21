@@ -151,3 +151,11 @@ class ContactsAPI(BaseAPI):
             return data['message']
 
             
+    def get_departments_of_certain_contact(self, contact_id):
+        api = '{}{}[{}]'.format(self.url, self.END_POINTS['departments_api']['list_contact_depts'], contact_id)
+        self.info('GET : {}'.format(api))
+        response = self.session.get(api, headers=self.headers, verify=False)
+        self.info('Status code: {}'.format(response.status_code))
+        return response.json()
+
+    
