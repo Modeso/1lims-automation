@@ -331,12 +331,8 @@ class OrdersTestCases(BaseTest):
 
     def test010_user_can_add_suborder(self):
         """
-        New: Orders: Table view: Suborder Approach: User can add suborder from the main order
-
         LIMS-3817
-        LIMS-4279
-        Only "Apply this from add new item in the order table view"
-        :return:
+        User can add suborder from the main order
         """
 
         test_plan = random.choice(self.test_plan_api.get_completed_testplans(limit=1000))
@@ -357,9 +353,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.get_orders_page()
         orders_duplicate_data_after, _ = self.order_page.get_orders_and_suborders_data(order_no=order_data['Order No.'])
 
-        # self.analyses_page.get_analysis_page()
-        # self.single_analysis_page.get_analysis_page()
-        self.base_selenium.get('https://automation.1lims.com/sample/analysis')
+        self.order_page.navigate_to_analysis_active_table()
         self.base_selenium.LOGGER.info('Assert There is an analysis for this new suborder')
         orders_analyess = self.analyses_page.search(order_data['Order No.'])
         latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(row=orders_analyess[0])

@@ -187,3 +187,8 @@ class Orders(BasePages):
         orders_data = self.get_child_table_data()
 
         return orders_data, orders
+
+    def navigate_to_analysis_active_table(self):
+        self.base_selenium.click(element='orders:analysis_tab')
+        self.sleep_small()
+        
