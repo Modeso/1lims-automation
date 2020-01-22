@@ -896,36 +896,20 @@ class OrdersTestCases(BaseTest):
 
         LIMS-3268
         """
-        contact = self.contacts_api.get_all_contacts().json()['contacts'][0]
+        contact = self.contacts_api.get_all_contacts().json()['contacts'][0]['name']
         material_type = self.general_utilities_api.list_all_material_types()[0]
-        article = self.article_api.list_articles_by_materialtype(materialtype_id=material_type['id'])[0]
-        testunits = self.test_unit_api.list_testunit_by_name_and_material_type(materialtype_id=material_type['id'])[:2]
+        testunit1 = self.test_unit_api.list_testunit_by_name_and_material_type(materialtype_id=material_type['id'])[0]['name']
+        testunit2 = self.test_unit_api.list_testunit_by_name_and_material_type(materialtype_id=material_type['id'])[1]['name']
+        testunits = [testunit1, testunit2]
 
         self.order_page.get_orders_page()
-        # TODO: map the contact/material_type/article/testUnits
-        created_order = self.order_page.create_existing_order(no='', material_type=material_type, article=article, contact=contact,
-                                                              test_units=testunits)
+        created_order = self.order_page.create_existing_order(no='', material_type='r', article='a', test_units=testunits, contact=contact)
 
         self.order_page.save(save_btn='orders:save_order')
+        self.order_page.get_orders_page()
+        
+        # TODO: get the analysis number of the created suborder and search by it 
         # TODO: assert that the test units has been saved and the order is created
-
-        # self.analysis_page.get_analyses_page()
-        # self.base_selenium.LOGGER.info(
-        #     'Assert There is an analysis for this new order.')
-        # orders_analyess = self.analyses_page.search(created_order)
-        # latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
-        #     row=orders_analyess[0])
-        # self.assertEqual(
-        #     created_order.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
-
-        # self.analyses_page.open_child_table(source=orders_analyess[0])
-        # rows_with_childtable = self.analyses_page.result_table(element='general:table_child')
-        # for row in rows_with_childtable[:-1]:
-        #     row_with_headers = self.base_selenium.get_row_cells_dict_related_to_header(row=row,
-        #                                                                                table_element='general:table_child')
-        #     testunit_name = row_with_headers['Test Unit']
-        #     self.base_selenium.LOGGER.info(" + Test unit : {}".format(testunit_name))
-        #     self.assertIn(testunit_name, test_units_list)
     
     # will continue with us
     def test022_create_existing_order_with_test_units_and_change_material_type(self):

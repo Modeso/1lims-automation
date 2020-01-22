@@ -129,8 +129,8 @@ class Order(Orders):
         self.set_existing_order()
         order_no = self.set_existing_number(no)
         self.set_material_type(material_type=material_type)
-        self.set_article(article=article)
         self.set_contact(contact=contact)
+        self.set_article(article=article)
 
         for test_unit in test_units:
             self.set_test_unit(test_unit)
