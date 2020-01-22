@@ -4,6 +4,7 @@ from parameterized import parameterized
 import re, random
 from selenium.common.exceptions import NoSuchElementException
 
+
 class TestPlansTestCases(BaseTest):
 
     def setUp(self):
@@ -401,26 +402,22 @@ class TestPlansTestCases(BaseTest):
         testplans = self.test_plan_api.get_all_test_plans_json()
         testplan = random.choice(testplans)
 
-        testplan_name = self.test_plan.create_new_test_plan(material_type=testplan['materialType'],
-                                                            article=(testplan['article'])[0])
-        self.base_selenium.LOGGER.info(
-            'New testplan is created successfully with name: {}, article name: {} and material type: {}'.format(
-                testplan_name, (testplan['article'])[0], testplan['materialType']))
-        # create another testplan with the same data
-        if ("same" == same):
-            article_name=(testplan['article'])[0]
-        else:
-            article_name="All"
-        
-        self.test_plan.create_new_test_plan(name=testplan_name, material_type=testplan['materialType'],
-                                                article=article_name)
-        self.base_selenium.LOGGER.info(
-            'Waiting for the error message to make sure that validation forbids the creation of two testplans having the same name, material type and one with ALL article')
-        validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
+        testplan_name = self.test_plan.create_new_test_plan(
+            material_type=testplan['materialType'], article=(testplan['article'])[0])
+        self.info('New testplan is created successfully with name: {}, article name: {} and material type: {}'.format(
+            testplan_name, (testplan['article'])[0], testplan['materialType']))
 
-        self.base_selenium.LOGGER.info(
-            'Assert the error message to make sure that validation forbids the creation of two testplans having the same name, material type and one with All article? {}'.format(
-                validation_result))
+        # create another testplan with the same data
+        if "same" == same:
+            article_name = (testplan['article'])[0]
+        else:
+            article_name = "All"
+
+        self.test_plan.create_new_test_plan(
+            name=testplan_name, material_type=testplan['materialType'],article=article_name)
+        self.info('Waiting for the error message')
+        validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
+        self.info('Assert the error message')
         self.assertTrue(validation_result)
 
     def test013_create_testplans_same_name_different_materialtype(self):
@@ -488,7 +485,7 @@ class TestPlansTestCases(BaseTest):
         self.test_plan.get_test_plan_edit_page(testplan_name)
         # navigate to the test units selection tab
         uper, lower = self.test_plan.get_test_unit_limits()
-        self.test_plan.update_upper_lower_limits_of_testunit(95,15)
+        self.test_plan.update_upper_lower_limits_of_testunit(95, 15)
         # save the changes
         self.test_plan.save_and_confirm_popup()
 
@@ -512,11 +509,11 @@ class TestPlansTestCases(BaseTest):
         material_type = self.general_utilities_api.list_all_material_types()[0]
         random_limit = self.generate_random_number()
         testunit_name = self.generate_random_string()
-        testunit_object={
-            'text':'Quantitative',
+        testunit_object = {
+            'text': 'Quantitative',
             'id': 2,
-            'quantificationUpperLimit':random_limit,
-            'quantificationLowerLimit':random_limit
+            'quantificationUpperLimit': random_limit,
+            'quantificationLowerLimit': random_limit
         }
 
         testunit = self.test_unit_api.create_quantitative_testunit(self)
@@ -573,7 +570,7 @@ class TestPlansTestCases(BaseTest):
 
         # get testplan data from an api call
         testplan_data = \
-        (self.test_plan_api.get_testplan_with_filter(filter_option='number', filter_text=testplan_number))[0]
+            (self.test_plan_api.get_testplan_with_filter(filter_option='number', filter_text=testplan_number))[0]
 
         # get information, material type and article
         testplan_name = testplan_data['testPlanName']
