@@ -656,15 +656,13 @@ class OrdersTestCases(BaseTest):
         self.order_page.set_test_unit(test_unit='r')
         self.order_page.save(save_btn='order:save_btn')
         
-    # will continue wih us
     def test017_validate_order_test_unit_test_plan_edit_mode(self):
         """
         New: orders Test plan /test unit validation in edit mode
 
         LIMS-4826
         """
-        self.base_selenium.LOGGER.info(
-            ' Running test case to check that at least test unit or test plan is mandatory in order')
+        self.base_selenium.LOGGER.info(' Running test case to check that at least test unit or test plan is mandatory in order')
 
         # validate in edit mode, go to order over view
         self.order_page.get_orders_page()
@@ -672,23 +670,26 @@ class OrdersTestCases(BaseTest):
         order_url = self.base_selenium.get_url()
         self.base_selenium.LOGGER.info(' + order_url : {}'.format(order_url))
 
-        self.base_selenium.LOGGER.info(
-            ' Remove all selected test plans and test units')
+        self.base_selenium.LOGGER.info(' Remove all selected test plans and test units')
+
+        # edit suborder
+        suborder_row = self.base_selenium.get_table_rows(element='order:suborder_table')[0]
+        suborder_row.click()
+
         # delete test plan and test unit
         if self.order_page.get_test_plan():
             self.order_page.clear_test_plan()
             self.order_page.confirm_popup(force=True)
+            self.order_page.save(save_btn='order:save_btn')
+            test_plan_class_name = self.base_selenium.get_attribute(element="order:test_plan", attribute='class')
+            self.assertIn('has-error', test_plan_class_name)
 
         if self.order_page.get_test_unit():
             self.order_page.clear_test_unit()
             self.order_page.confirm_popup(force=True)
-
-        self.order_page.save(save_btn='order:save_btn')
-        # check both test plans and test units fields have error
-        test_plan_class_name = self.base_selenium.get_attribute(element="order:test_plan", attribute='class')
-        test_unit_class_name = self.base_selenium.get_attribute(element="order:test_unit", attribute='class')
-        self.assertIn('has-error', test_plan_class_name)
-        self.assertIn('has-error', test_unit_class_name)
+            self.order_page.save(save_btn='order:save_btn')
+            test_unit_class_name = self.base_selenium.get_attribute(element="order:test_unit", attribute='class')
+            self.assertIn('has-error', test_unit_class_name)
 
     @parameterized.expand(['save_btn', 'cancel'])
     def test032_update_test_date(self, save):
