@@ -599,52 +599,40 @@ class TestPlansTestCases(BaseTest):
 
         self.base_selenium.LOGGER.info('Filtering by name was done successfully')
 
-    def test020_filter_by_testplan_status(self):
+    @parameterized.expand(['Completed', 'In Progress'])
+    def test020_filter_by_testplan_status(self,status):
         '''
         LIMS-6474
         User can filter with status
         '''
 
-        testplans_found = self.test_plan.filter_by_element_and_get_results('Status',
-                                                                           'test_plans:testplan_status_filter',
-                                                                           'Completed', 'drop_down')
-        self.base_selenium.LOGGER.info('Checking if the results were filtered successfully')
-        results_found = True
+        testplans_found = \
+            self.test_plan.filter_by_element_and_get_results('Status', 'test_plans:testplan_status_filter',
+                                                             status, 'drop_down')
+
+        if len(testplans_found):
+            results_found = True
+        else:
+            self.info("filter failed or no elements with this status!")
+
         while results_found:
             for tp in testplans_found:
                 if len(tp.text) > 0:
-                    self.assertIn('Completed', tp.text)
-                    self.assertNotIn('In Progress', tp.text)
+                    self.assertIn(status, tp.text)
+                    if status == "In Progress":
+                        self.assertNotIn('Completed', tp.text)
+                    else:
+                        self.assertNotIn('In Progress', tp.text)
+
             if self.base_page.is_next_page_button_enabled():
-                self.base_selenium.LOGGER.info('Navigating to the next page')
+                self.info('Navigating to the next page')
                 self.base_selenium.click('general:next_page')
-                self.test_plan.sleep_small()
+                self.test_plan.sleep_tiny()
                 testplans_found = self.test_plan.result_table()
             else:
                 results_found = False
 
-        self.base_selenium.LOGGER.info('Filtering by status completed was done successfully')
-
-        self.test_plan.sleep_small()
-
-        testplans_found = self.test_plan.filter_by_element_and_get_results('Status',
-                                                                           'test_plans:testplan_status_filter',
-                                                                           'In Progress', 'drop_down')
-        self.base_selenium.LOGGER.info('Checking if the results were filtered successfully')
-        results_found = True
-        while results_found:
-            for tp in testplans_found:
-                if len(tp.text) > 0:
-                    self.assertIn('In Progress', tp.text)
-                    self.assertNotIn('Completed', tp.text)
-            if self.base_page.is_next_page_button_enabled():
-                self.base_selenium.LOGGER.info('Navigating to the next page')
-                self.base_selenium.click('general:next_page')
-                self.test_plan.sleep_small()
-                testplans_found = self.test_plan.result_table()
-            else:
-                results_found = False
-        self.base_selenium.LOGGER.info('Filtering by status in progress was done successfully')
+        self.info('Filtering by status was done successfully')
 
     def test021_filter_by_testplan_changed_by(self):
         '''
