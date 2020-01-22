@@ -896,26 +896,18 @@ class OrdersTestCases(BaseTest):
 
         LIMS-3268
         """
-        self.base_selenium.LOGGER.info('Running test case to create an existing order with test units')
-        test_units_list = []
-        test_unit_dict = self.get_active_tst_unit_with_material_type(search='Qualitative', material_type='All')
-        if test_unit_dict:
-            self.base_selenium.LOGGER.info('Retrieved test unit ' + test_unit_dict['Test Unit Name'])
-            test_units_list.append(test_unit_dict['Test Unit Name'])
-        test_unit_dict = self.get_active_tst_unit_with_material_type(search='Quantitative')
-        if test_unit_dict:
-            self.base_selenium.LOGGER.info('Retrieved test unit ' + test_unit_dict['Test Unit Name'])
-            test_units_list.append(test_unit_dict['Test Unit Name'])
-        test_unit_dict = self.get_active_tst_unit_with_material_type(search='Quantitative Mibi')
-        if test_unit_dict:
-            self.base_selenium.LOGGER.info('Retrieved test unit ' + test_unit_dict['Test Unit Name'])
-            test_units_list.append(test_unit_dict['Test Unit Name'])
+        contact = self.contacts_api.get_all_contacts().json()['contacts'][0]
+        material_type = self.general_utilities_api.list_all_material_types()[0]
+        article = self.article_api.list_articles_by_materialtype(materialtype_id=material_type['id'])[0]
+        testunits = self.test_unit_api.list_testunit_by_name_and_material_type(materialtype_id=material_type['id'])[:2]
 
         self.order_page.get_orders_page()
-        created_order = self.order_page.create_existing_order(no='', material_type='r', article='a', contact='a',
-                                                              test_units=test_units_list)
+        # TODO: map the contact/material_type/article/testUnits
+        created_order = self.order_page.create_existing_order(no='', material_type=material_type, article=article, contact=contact,
+                                                              test_units=testunits)
 
         self.order_page.save(save_btn='orders:save_order')
+        # TODO: assert that the test units has been saved and the order is created
 
         # self.analysis_page.get_analyses_page()
         # self.base_selenium.LOGGER.info(
