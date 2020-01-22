@@ -4,6 +4,7 @@ from unittest import skip
 from parameterized import parameterized
 import random
 
+
 class TestPlansTestCases(BaseTest):
     def setUp(self):
         super().setUp()
@@ -297,9 +298,17 @@ class TestPlansTestCases(BaseTest):
         self.info('The duplicated testplan should have the number: {}'.format(duplicated_test_plan_number))
 
         self.info('Choosing a random testplan table row')
-        main_testplan_data = self.test_plan.search(largest_number)
+        main_testplan_data = self.test_plan.select_random_table_row(element='test_plans:test_plans_table')
         testplan_number = main_testplan_data['Test Plan No.']
         self.info('Testplan number: {} will be duplicated'.format(testplan_number))
+        #self.test_plan.open_filter_menu()
+        #self.test_plan.filter_by_testplan_number(testplan_number)
+        # if test plan in end of table of test plan, then I open filter when
+        # I get child table it reads other table realted to other test plan
+        # I need to adjust page so we don't need to scroll it first
+        # search function don't affect page height like filter
+        self.base_selenium.scroll()
+        self.test_plan.search(testplan_number)
         self.info('Saving the child data of the main testplan')
         main_testplan_childtable_data = self.test_plan.get_child_table_data()
 
@@ -307,16 +316,19 @@ class TestPlansTestCases(BaseTest):
         self.test_plan.duplicate_selected_item()
 
         self.test_plan.duplicate_testplan(change=['name'])
-        self.test_plan.sleep_small()
+        self.test_plan.sleep_tiny()
 
-        duplicated_testplan_data, duplicated_testplan_childtable_data = self.test_plan.get_specific_testplan_data_and_childtable_data(
-            filter_by='number', filter_text=duplicated_test_plan_number)
+        duplicated_testplan_data, duplicated_testplan_childtable_data = \
+            self.test_plan.get_specific_testplan_data_and_childtable_data(
+                filter_by='number', filter_text=duplicated_test_plan_number)
+
         data_changed = ['Test Plan No.', 'Test Plan Name', 'Version', 'Changed On', 'Changed By', 'Created On']
-        main_testplan_data, duplicated_testplan_data = self.remove_unduplicated_data(data_changed=data_changed,
-                                                                                     first_element=main_testplan_data,
-                                                                                     second_element=duplicated_testplan_data)
+        main_testplan_data, duplicated_testplan_data = \
+            self.remove_unduplicated_data(data_changed=data_changed,
+                                          first_element=main_testplan_data,
+                                          second_element=duplicated_testplan_data)
 
-        self.base_selenium.LOGGER.info('Asserting that the data is duplicated correctly')
+        self.info('Asserting that the data is duplicated correctly')
         self.assertEqual(main_testplan_childtable_data, duplicated_testplan_childtable_data)
         self.assertEqual(main_testplan_data, duplicated_testplan_data)
 
@@ -488,7 +500,7 @@ class TestPlansTestCases(BaseTest):
 
         # get testplan data from an api call
         testplan_data = \
-        (self.test_plan_api.get_testplan_with_filter(filter_option='number', filter_text=testplan_number))[0]
+            (self.test_plan_api.get_testplan_with_filter(filter_option='number', filter_text=testplan_number))[0]
 
         # get information, material type and article
         testplan_name = testplan_data['testPlanName']
@@ -737,4 +749,3 @@ class TestPlansTestCases(BaseTest):
         LIMS-6288
         """
         assert (self.test_unit_page.deselect_all_configurations(), False)
-
