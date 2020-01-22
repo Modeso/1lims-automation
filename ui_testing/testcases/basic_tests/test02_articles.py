@@ -209,11 +209,12 @@ class ArticlesTestCases(BaseTest):
         """
         article_id = random.choice(self.article_api.get_articles_with_no_testplans(limit=100))["id"]
         # open edit page
-        a = "{}articles/edit/"+str(article_id)
+        a = "{}articles/edit/" + str(article_id)
         edit_page_url = a.format(self.base_selenium.url)
         self.base_selenium.get(url=edit_page_url)
         current_material_type = self.article_page.get_material_type()
         new_material_type = self.article_page.set_material_type(random=True)
+        self.article_page.sleep_tiny()
         if 'save' == save:
             self.article_page.save()
         else:
@@ -222,16 +223,14 @@ class ArticlesTestCases(BaseTest):
         self.base_selenium.get(url=edit_page_url, sleep=5)
         article_material = self.article_page.get_material_type()
         if 'save' == save:
-            self.article_page.info(
-                'Assert {} (new_material_type) == {} (article_material_type)'.format(new_material_type,
-                                                                                     article_material))
-            self.assertEqual(new_material_type,article_material)
-            self.assertNotEqual(current_material_type,article_material) #make sure that matrial type edited right
+            self.info('Assert {} (new_material_type) == {} (article_material_type)'.format(
+                new_material_type, article_material))
+            self.assertEqual(new_material_type, article_material)
+            self.assertNotEqual(current_material_type, article_material)  # make sure that material type edited right
         else:
-            self.article_page.info(
-                'Assert {} (current_material_type) == {} (article_material_type)'.format(current_material_type,
-                                                                                         article_material))
-            self.assertEqual(current_material_type,article_material)
+            self.info('Assert {} (current_material_type) == {} (article_material_type)'.format(
+                current_material_type, article_material))
+            self.assertEqual(current_material_type, article_material)
 
     def test006_archived_articles_shoudnt_dispaly_in_test_plan(self):
         """
@@ -388,7 +387,8 @@ class ArticlesTestCases(BaseTest):
         row = self.article_page.get_random_article_row()
         row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=row)
         for column in row_data:
-            if re.findall(r'\d{1,}.\d{1,}.\d{4}', row_data[column]) or row_data[column] == '-' or not (row_data[column]):
+            if re.findall(r'\d{1,}.\d{1,}.\d{4}', row_data[column]) or row_data[column] == '-' or not (
+            row_data[column]):
                 continue
 
             self.base_selenium.LOGGER.info(
