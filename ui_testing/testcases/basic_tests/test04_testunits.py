@@ -1758,8 +1758,10 @@ class TestUnitsTestCases(BaseTest):
             self.assertEqual(row_data['Unit'].replace("'",""), str(data_to_filter_with.replace('{','').replace('}','').replace('[', '').replace(']','')))
             
 
-    @parameterized.expand(['categoryName', 'typeName', 'lastModifiedUser'])
-    def test044_filter_by_testunit_drop_down_fields(self, filter_case):
+    @parameterized.expand([('categoryName', 'category_filter', 'Category'),
+                           ('typeName', 'filter_type', 'Type'), 
+                           ('lastModifiedUser', 'filter_changed_by', 'Changed By')])
+    def test044_filter_by_testunit_drop_down_fields(self, filter_case, filter, header_name):
         """
         New:  Test units: Filter Approach: Make sure you can filter by category
         LIMS-6429
@@ -1774,23 +1776,13 @@ class TestUnitsTestCases(BaseTest):
         data_to_filter_with = self.test_unit_api.get_first_record_with_data_in_attribute(attribute=filter_case)
         self.assertNotEqual(data_to_filter_with, False)
         self.base_selenium.LOGGER.info('filter with {}'.format(data_to_filter_with))
-        if filter_case == 'categoryName':
-            self.test_unit_page.apply_filter_scenario(filter_element='test_unit:category_filter', filter_text=data_to_filter_with)
-        elif filter_case == 'typeName':
-            self.test_unit_page.apply_filter_scenario(filter_element='test_unit:filter_type', filter_text=data_to_filter_with)
-        elif filter_case == 'lastModifiedUser':
-            self.test_unit_page.apply_filter_scenario(filter_element='test_unit:filter_changed_by', filter_text=data_to_filter_with)
+        self.test_unit_page.apply_filter_scenario(filter_element='test_unit:{}'.format(filter), filter_text=data_to_filter_with)
         table_records = self.test_unit_page.result_table()
 
         del table_records[-1]
         for record in table_records:
             row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=record)
-            if filter_case == 'categoryName':
-                self.assertEqual(row_data['Category'].replace("'",""), str(data_to_filter_with))
-            elif filter_case == 'typeName':
-                self.assertEqual(row_data['Type'].replace("'",""), str(data_to_filter_with))
-            elif filter_case == 'lastModifiedUser':
-                self.assertEqual(row_data['Changed By'].replace("'",""), str(data_to_filter_with))
+            self.assertEqual(row_data[header_name].replace("'",""), str(data_to_filter_with))
             
             
     def test045_filter_by_testunit_material_type_returns_only_correct_results(self):
@@ -1810,6 +1802,4 @@ class TestUnitsTestCases(BaseTest):
             row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=record)
             testunit_material_types = row_data['Material Type'].split(', ')[0]
             self.assertEqual(testunit_material_types.replace("'",""), str(data_to_filter_with[0]))
-            
-    
             
