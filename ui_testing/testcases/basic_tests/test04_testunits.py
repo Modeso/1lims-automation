@@ -1726,9 +1726,11 @@ class TestUnitsTestCases(BaseTest):
         """
 
         data_to_filter_with = self.test_unit_api.get_first_record_with_data_in_attribute(attribute=filter_case)
+        self.assertNotEqual(data_to_filter_with, False)
+        
         if filter_case == 'createdAt':
             data_to_filter_with = self.test_unit_page.convert_to_dot_date_format(date=data_to_filter_with)
-        self.assertNotEqual(data_to_filter_with, False)
+            
         self.base_selenium.LOGGER.info('filter with {}'.format(data_to_filter_with))
         self.test_unit_page.apply_filter_scenario(filter_element='test_unit:{}'.format(filter),
                                                   filter_text=data_to_filter_with, field_type='text')
@@ -1737,7 +1739,7 @@ class TestUnitsTestCases(BaseTest):
         
         for record in table_records:
             row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=record)
-            self.assertEqual(row_data[header_name].replace("'", ""), str(data_to_filter_with))
+            self.assertIn(str(data_to_filter_with), row_data[header_name].replace("'", ""))
 
     def test043_filter_by_testunit_unit_returns_only_correct_results(self):
         """
@@ -1782,7 +1784,7 @@ class TestUnitsTestCases(BaseTest):
         del table_records[-1]
         for record in table_records:
             row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=record)
-            self.assertEqual(row_data[header_name].replace("'",""), str(data_to_filter_with))
+            self.assertIn(str(data_to_filter_with), row_data[header_name].replace("'",""))
             
             
     def test045_filter_by_testunit_material_type_returns_only_correct_results(self):
