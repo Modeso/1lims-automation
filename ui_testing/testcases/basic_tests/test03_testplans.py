@@ -292,23 +292,18 @@ class TestPlansTestCases(BaseTest):
         '''
         # get the maximum number given to the latest testplan
         latest_testplan_row_data = self.test_plan.get_the_latest_row_data()
-        largest_number = latest_testplan_row_data['Test Plan No.']
+        largest_number = latest_testplan_row_data['Test Plan No.'].replace("'", "")
         duplicated_test_plan_number = int(largest_number) + 1
-        self.base_selenium.LOGGER.info(
-            'The duplicated testplan should have the number: {}'.format(duplicated_test_plan_number))
+        self.info('The duplicated testplan should have the number: {}'.format(duplicated_test_plan_number))
 
-        self.base_selenium.LOGGER.info('Choosing a random testplan table row')
-        main_testplan_data = self.test_plan.select_random_table_row(element='test_plans:test_plans_table')
+        self.info('Choosing a random testplan table row')
+        main_testplan_data = self.test_plan.search(largest_number)
         testplan_number = main_testplan_data['Test Plan No.']
-        self.base_selenium.LOGGER.info('Testplan number: {} will be duplicated'.format(testplan_number))
-
-        self.test_plan.open_filter_menu()
-        self.test_plan.filter_by_testplan_number(testplan_number)
-
-        self.base_selenium.LOGGER.info('Saving the child data of the main testplan')
+        self.info('Testplan number: {} will be duplicated'.format(testplan_number))
+        self.info('Saving the child data of the main testplan')
         main_testplan_childtable_data = self.test_plan.get_child_table_data()
 
-        self.base_selenium.LOGGER.info('Duplicating testplan number: {}'.format(testplan_number))
+        self.info('Duplicating testplan number: {}'.format(testplan_number))
         self.test_plan.duplicate_selected_item()
 
         self.test_plan.duplicate_testplan(change=['name'])
