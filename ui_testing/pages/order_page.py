@@ -381,9 +381,10 @@ class Order(Orders):
         if contacts:
             self.set_contact(contact=contacts_record)
         if departments:
-            self.base_selenium.LOGGER.info(
-                ' Set departments : {}'.format(departments))
-            self.set_departments(departments=departments)
+            for department in departments:
+                self.base_selenium.LOGGER.info(
+                    ' Set departments : {}'.format(department['name']))
+                self.set_departments(departments=department['name'])
 
 
     def update_material_type_suborder(self, row, material_type):
