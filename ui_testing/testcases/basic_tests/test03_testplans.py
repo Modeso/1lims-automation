@@ -4,7 +4,6 @@ from unittest import skip
 from parameterized import parameterized
 import random
 
-
 class TestPlansTestCases(BaseTest):
     def setUp(self):
         super().setUp()
@@ -605,7 +604,6 @@ class TestPlansTestCases(BaseTest):
         LIMS-6474
         User can filter with status
         '''
-
         testplans_found = \
             self.test_plan.filter_by_element_and_get_results('Status', 'test_plans:testplan_status_filter',
                                                              status, 'drop_down')
