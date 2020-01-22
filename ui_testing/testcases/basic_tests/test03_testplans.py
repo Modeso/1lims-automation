@@ -314,7 +314,6 @@ class TestPlansTestCases(BaseTest):
 
         self.info('Duplicating testplan number: {}'.format(testplan_number))
         self.test_plan.duplicate_selected_item()
-
         self.test_plan.duplicate_testplan(change=['name'])
         self.test_plan.sleep_tiny()
 
