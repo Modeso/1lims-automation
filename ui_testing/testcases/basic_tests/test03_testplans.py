@@ -3,7 +3,6 @@ from ui_testing.pages.articles_page import Articles
 from unittest import skip
 from parameterized import parameterized
 import random
-import ipdb
 
 
 class TestPlansTestCases(BaseTest):
