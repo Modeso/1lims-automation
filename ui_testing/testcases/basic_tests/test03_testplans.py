@@ -695,7 +695,7 @@ class TestPlansTestCases(BaseTest):
         self.assertIn(random_user_name, testplan_found[0].text)
         self.assertIn(testplan_name, testplan_found[0].text)
 
-    @ parameterized.expand(['ok', 'cancel'])
+    @parameterized.expand(['ok', 'cancel'])
     def test022_create_approach_overview_button(self, ok):
         """
         Master data: Create: Overview button Approach: Make sure
