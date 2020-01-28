@@ -201,20 +201,21 @@ class ArticlesTestCases(BaseTest):
     @parameterized.expand(['save', 'cancel'])
     def test005_cancel_button_edit_material_type(self, save):
         """
-        New: Article: Save/Cancel button: After I edit material_type then press on cancel button,
-        a pop up will appear that the data will be
+        New: Article: Save/Cancel button: After I edit material_type 
+        then press on cancel button,a pop up will appear that the 
+        data will not saved
 
         LIMS-3586
         LIMS-3576
         """
-        article_id = random.choice(self.article_api.get_articles_with_no_testplans(limit=100))["id"]
+        article_id = random.choice(self.article_api.get_articles_with_no_testplans())["id"]
         # open edit page
         a = "{}articles/edit/" + str(article_id)
         edit_page_url = a.format(self.base_selenium.url)
         self.base_selenium.get(url=edit_page_url)
         current_material_type = self.article_page.get_material_type()
         new_material_type = self.article_page.set_material_type(random=True)
-        self.article_page.sleep_tiny()
+
         if 'save' == save:
             self.article_page.save()
         else:
