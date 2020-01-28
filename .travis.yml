@@ -29,4 +29,3 @@ script:
   - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test03_testplans.py:TestPlansTestCases.test002_test_plan_inprogress_to_completed --tc-file=config.ini
   - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test03_testplans.py:TestPlansTestCases.test003_test_plan_completed_to_completed --tc-file=config.ini
   - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test03_testplans.py:TestPlansTestCases.test004_archive_test_plan_one_record --tc-file=config.ini
-
