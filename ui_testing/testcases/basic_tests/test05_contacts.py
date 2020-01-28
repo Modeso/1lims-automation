@@ -4,6 +4,7 @@ import re
 import random
 from unittest import skip
 
+
 class ContactsTestCases(BaseTest):
     def setUp(self):
         super().setUp()
@@ -141,24 +142,22 @@ class ContactsTestCases(BaseTest):
 
     def test_007_create_contact_with_person(self):
         """
-        New: Contact: Creation Approach: I can create new contact successfully with contact person
+        New: Contact: Creation Approach: I can create new contact
+        successfully with contact person
+
         LIMS-6386
         """
         contact_data = self.contact_page.create_update_contact()
         self.info('filter by contact no.: {} to get the record'.format(contact_data['Contact No']))
-
         contact_record = self.contact_page.search(value=contact_data['Contact No'])[0]
         self.contacts_page.info('open the record in edit to compare the data')
         self.contact_page.open_edit_page_by_css_selector(row=contact_record)
         contact_data_after_create = self.contact_page.get_full_contact_data()
-
         self.assertTrue(self.contact_page.compare_contact_main_data(data_after_save=contact_data_after_create,
                                                                     data_before_save=contact_data))
 
         self.contact_page.get_contact_persons_page()
-
         contact_persons_data_after_create = self.contact_page.get_contact_persons_data()
-        
         self.info('compare contact persons data after refresh')
         self.assertTrue(self.contact_page.compare_contact_persons_data(
             data_after_save=contact_persons_data_after_create, data_before_save=contact_data["contact_persons"]))
@@ -530,7 +529,7 @@ class ContactsTestCases(BaseTest):
         """
 
         data_to_filter_with = \
-        self.contacts_api.get_first_record_with_data_in_attribute(attribute='departments').split(',')[0]
+            self.contacts_api.get_first_record_with_data_in_attribute(attribute='departments').split(',')[0]
         self.assertNotEqual(data_to_filter_with, False)
         self.base_selenium.LOGGER.info('filter with {}'.format(data_to_filter_with))
         self.contact_page.apply_filter_scenario(filter_element='contact:departments', filter_text=data_to_filter_with)
