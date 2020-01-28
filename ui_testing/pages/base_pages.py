@@ -271,7 +271,7 @@ class BasePages:
     def open_configuration(self):
         self.base_selenium.click(element='general:right_menu')
         self.base_selenium.click(element='general:configurations')
-        self.sleep_medium()
+        self.sleep_small()
         
     def open_configure_table(self):
         self.base_selenium.LOGGER.info('open configure table')

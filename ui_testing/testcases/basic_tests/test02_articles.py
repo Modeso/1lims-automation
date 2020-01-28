@@ -591,18 +591,16 @@ class ArticlesTestCases(BaseTest):
         """
         # archive the optional fields
         self.article_page.archive_restore_optional_fields(restore=False)
-        self.article_page.sleep_tiny()
         # check if the fields still exist in the table
-        self.article_page.info('Open article table')
+        self.info('Open article table')
         self.article_page.get_articles_page()
-        article_headers = self.base_selenium.get_table_head_elements(
-            'general:table')
+        article_headers = self.base_selenium.get_table_head_elements('general:table')
         article_headers_text = [header.text for header in article_headers]
 
-        self.article_page.info('Check Comment field exist in the article table')
+        self.info('Check Comment field exist in the article table')
         self.assertIn('Comment', article_headers_text)
 
-        self.article_page.info('Check Unit field exist in the article table')
+        self.info('Check Unit field exist in the article table')
         self.assertIn('Unit', article_headers_text)
         # ignore related article since it shouldn't display in the table anyway
 
@@ -615,25 +613,25 @@ class ArticlesTestCases(BaseTest):
         """
         # archive the optional fields
         self.article_page.archive_restore_optional_fields(restore=False)
-        self.article_page.sleep_small()
+        self.article_page.sleep_tiny()
         # open edit/create page
         self.article_page.get_articles_page()
         if edit == "edit":
-            self.article_page.info('Open article edit page')
+            self.info('Open article edit page')
             self.article_page.open_edit_page(row=self.article_page.get_random_article_row())
         else:
-            self.article_page.info('Open article create page')
+            self.info('Open article create page')
             self.base_selenium.click(element='articles:new_article')
 
         self.article_page.sleep_tiny()
 
-        self.article_page.info('Check if Unit field exist in article page')
+        self.info('Check if Unit field exist in article page')
         self.assertFalse(self.base_selenium.check_element_is_exist('article:unit'))
 
-        self.article_page.info('Check if Comment field exist in article page')
+        self.info('Check if Comment field exist in article page')
         self.assertFalse(self.base_selenium.check_element_is_exist('article:comment'))
 
-        self.article_page.info('Check if Related article field exist in article page')
+        self.info('Check if Related article field exist in article page')
         self.assertFalse(self.base_selenium.check_element_is_exist('article:related_article'))
 
     def test024_user_restore_any_optional_field_is_not_affecting_the_table(self):
@@ -649,15 +647,15 @@ class ArticlesTestCases(BaseTest):
         self.article_page.archive_restore_optional_fields(restore=True)
 
         # check if the fields still exist in the table after restore
-        self.article_page.info('Open article table')
+        self.info('Open article table')
         self.article_page.get_articles_page()
         article_headers = self.base_selenium.get_table_head_elements('general:table')
         article_headers_text = [header.text for header in article_headers]
 
-        self.article_page.info('Check if Comment field exist in the table')
+        self.info('Check if Comment field exist in the table')
         self.assertIn('Comment', article_headers_text)
 
-        self.article_page.info('Check Unit field exist in the table')
+        self.info('Check Unit field exist in the table')
         self.assertIn('Unit', article_headers_text)
         # ignore related article since it shouldn't display in the table anyway
 
@@ -677,21 +675,21 @@ class ArticlesTestCases(BaseTest):
 
         if edit == "edit":
             # open edit page after restore
-            self.article_page.info('Open article edit page')
+            self.info('Open article edit page')
             self.article_page.open_edit_page(row=self.article_page.get_random_article_row())
         else:
             # open create page after restore
-            self.article_page.info('Open article create page')
+            self.info('Open article create page')
             self.base_selenium.click(element='articles:new_article')
-
         self.article_page.sleep_tiny()
-        self.article_page.info('Check if Unit field exist in article page')
+
+        self.info('Check if Unit field exist in article page')
         self.assertTrue(self.base_selenium.check_element_is_exist('article:unit'))
 
-        self.article_page.info('Check if Comment field exist in article page')
+        self.info('Check if Comment field exist in article page')
         self.assertTrue(self.base_selenium.check_element_is_exist('article:comment'))
 
-        self.article_page.info('Check if Related article field exist in article page')
+        self.info('Check if Related article field exist in article page')
         self.assertTrue(self.base_selenium.check_element_is_exist('article:related_article'))
 
     @parameterized.expand(['name', 'number', 'unit', 'created_at', 'material_type', 'changed_by'])

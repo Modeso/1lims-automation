@@ -145,7 +145,7 @@ class Article(Articles):
         self.sleep_medium()
 
     def archive_restore_optional_fields(self, restore=False):
-        self.sleep_small()
+        self.sleep_tiny()
         self.info('Open article configuration')
         self.open_configuration()
         if restore:
