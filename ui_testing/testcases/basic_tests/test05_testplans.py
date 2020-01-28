@@ -414,7 +414,7 @@ class TestPlansTestCases(BaseTest):
             article_name = "All"
 
         self.test_plan.create_new_test_plan(
-            name=testplan_name, material_type=testplan['materialType'],article=article_name)
+            name=testplan_name, material_type=testplan['materialType'], article=article_name)
         self.info('Waiting for the error message')
         validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
         self.info('Assert the error message')
@@ -471,7 +471,6 @@ class TestPlansTestCases(BaseTest):
                                                          spec_or_quan='quan', method=new_method)
 
         self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
-
         # navigate to the chosen test plan edit page
         self.test_plan.get_test_plans_page()
         self.test_plan.get_test_plan_edit_page(testplan_name)
@@ -488,50 +487,18 @@ class TestPlansTestCases(BaseTest):
         self.test_plan.update_upper_lower_limits_of_testunit(95, 15)
         # save the changes
         self.test_plan.save_and_confirm_popup()
-
         # go back to the active table
         self.test_plan.get_test_plans_page()
-
         # get the testplan to check its version
-        self.base_selenium.LOGGER.info('Getting the currently changed testplan to check its status and version')
+        self.info('Getting the currently changed testplan to check its status and version')
         new_version, new_status = self.test_plan.get_testplan_version_and_status(search_text=testplan_name)
         self.test_plan.click_check_box(source=self.base_selenium.get_table_rows(element='general:table')[0])
         self.assertEqual(old_version + 1, int(new_version))
         self.test_plan.get_version_items()
         new_version_childtable_data = self.test_plan.get_child_table_data(index=1)
-        self.base_selenium.LOGGER.info('Asserting that the Quantification limits updated correctly')
+        self.info('Asserting that the Quantification limits updated correctly')
         self.assertEqual(new_version_childtable_data[0]['Quantification Limit'], "20-100")
-        self.base_selenium.LOGGER.info('the Quantification limits updated correctly')
-
-    def test024_update_quantification_limit_new_version_created(self):
-        # create test unit using api
-        article = self.article_api.list_articles_by_materialtype(materialtype_id=1)[0]
-        material_type = self.general_utilities_api.list_all_material_types()[0]
-        random_limit = self.generate_random_number()
-        testunit_name = self.generate_random_string()
-        testunit_object = {
-            'text': 'Quantitative',
-            'id': 2,
-            'quantificationUpperLimit': random_limit,
-            'quantificationLowerLimit': random_limit
-        }
-
-        testunit = self.test_unit_api.create_quantitative_testunit(self)
-        testunit_form_data = self.test_unit_api.get_testunit_form_data(id=int(testunit['id']))
-        self.base_selenium.LOGGER.info(testunit_form_data)
-
-        # Create test plan using api
-        # testunit = self.test_unit_api.get_all_test_units().json()['testUnits'][0]
-        # testunit_form_data = self.test_unit_api.get_testunit_form_data(id=int(testunit['id']))
-        # testunit = self.test_unit_page.map_testunit_to_testplan_format(testunit=testunit_form_data)
-
-        # testplan_name = self.test_unit_page.generate_random_text()
-        # testplan_number = self.test_unit_page.generate_random_number()
-        # testplan_object = {
-        #     'text': testplan_name,
-        #     'id': 'new'
-        # }
-        # self.base_selenium.LOGGER.info(self.test_plan_api.create_testplan(number=testplan_number, testPlan=testplan_object, materialType=material_type, selectedArticles=[article], testUnits=[testunit]))
+        self.info('the Quantification limits updated correctly')
 
     @skip('https://modeso.atlassian.net/browse/LIMS-6405')
     def test016_delete_used_testplan(self):
