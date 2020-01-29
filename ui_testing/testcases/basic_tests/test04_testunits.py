@@ -680,11 +680,10 @@ class TestUnitsTestCases(BaseTest):
 
     def test021_change_quantification_limits_not_effect_test_plan(self):
         """
-        New: Test units/effect on test plan: Limits of quantification Approach: In case I make any edit in the limits
-         of quantification, this shouldn't effect on test plan
+        New: Test units/effect on test plan: Limits of quantification Approach: In case I
+        make any edit in the limits of quantification, this shouldn't effect on test plan
 
-         LIMS-4420
-        :return:
+        LIMS-4420
         """
         active_articles_with_material_types = self.get_active_articles_with_material_type()
         material_type = next(iter(active_articles_with_material_types))
@@ -693,33 +692,33 @@ class TestUnitsTestCases(BaseTest):
         new_method = self.generate_random_string()
         new_random_limit = self.generate_random_number()
 
-        self.test_unit_page.create_quantitative_testunit(name=test_unit_new_name, material_type=material_type,
-                                                         upper_limit=new_random_limit, lower_limit=new_random_limit,
-                                                         spec_or_quan='quan', method=new_method)
-        self.test_unit_page.sleep_tiny()
+        self.test_unit_page.create_quantitative_testunit(
+            name=test_unit_new_name, material_type=material_type,
+            upper_limit=new_random_limit, lower_limit=new_random_limit,
+            spec_or_quan='quan', method=new_method)
+
         self.test_unit_page.save(save_btn='general:save_form', logger_msg='save new testunit')
 
         self.test_plan.get_test_plans_page()
-        self.test_plan.create_new_test_plan(name=test_unit_new_name, material_type=material_type,
-                                            test_unit=test_unit_new_name, article=article, upper=100, lower=10)
+        testplan= self.test_plan.create_new_test_plan(
+            name=test_unit_new_name, material_type=material_type,
+            test_unit=test_unit_new_name, article=article)
 
-        self.info('change upper limits of the test unut')
+        self.info('change upper limits of the test unit')
         self.test_unit_page.get_test_units_page()
         test_unit = self.test_unit_page.search(test_unit_new_name)[0]
         self.test_unit_page.open_edit_page(test_unit)
-
         self.test_unit_page.set_quan_upper_limit('10000')
         self.test_unit_page.set_quan_lower_limit('10000')
         self.test_unit_page.save(save_btn='general:save_form', logger_msg='save the changes')
 
         self.test_plan.get_test_plans_page()
-        test_plan = self.test_plan.search(test_unit_new_name)[0]
-        self.test_plan.open_edit_page(test_plan)
-
+        row = self.test_plan.search(testplan)[0]
+        self.test_plan.open_edit_page(row)
         upper, lower = self.test_plan.get_test_unit_limits()
         self.info('assert that limits have not changed')
-        self.assertEqual(upper, '100')
-        self.assertEqual(lower, '10')
+        self.assertEqual(upper.replace("'", ""), str(new_random_limit))
+        self.assertEqual(lower.replace("'", ""), str(new_random_limit))
 
     def test022_create_multi_test_units_with_same_name(self):
         """
@@ -1046,7 +1045,7 @@ class TestUnitsTestCases(BaseTest):
         elif testunit_type == 'Quantitative MiBi':
             self.assertTrue(self.test_unit_page.check_for_quantitative_mibi_fields())
 
-    
+
     def test_029_allow_user_to_change_between_specification_and_quantification(self):
         """
         New: Test unit: Edit mode:  Limit of quantification Approach: Allow user to change between the two options specification and limit of quantification from edit mode.
@@ -1084,7 +1083,7 @@ class TestUnitsTestCases(BaseTest):
         self.assertEqual(self.test_unit_page.get_testunit_specification_type(), 'quan')
         self.assertEqual(self.test_unit_page.get_quan_upper_limit(), str(random_upper_limit))
         self.assertEqual(self.test_unit_page.get_quan_lower_limit(), str(random_lower_limit))
-    
+
     
     def test_030_allow_user_to_change_between_specification_and_quantification(self):
         """
