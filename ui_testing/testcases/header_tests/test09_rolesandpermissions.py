@@ -453,39 +453,7 @@ class HeaderTestCases(BaseTest):
         self.base_selenium.LOGGER.info('filter results displayed with the role no')
         self.base_selenium.click(element='roles_and_permissions:reset_btn')
 
-    def test017_filter_by_changed_by(self):
-        """
-        Header: Roles & Permissions Approach: Make sure that you can filter by role changed by
-        LIMS-6507
-        :return:
-        """
-        # create user with this role to filter by it
-        random_user_name = self.generate_random_string()
-        random_user_email = self.base_page.generate_random_email()
-        random_user_password = self.generate_random_string()
-        self.users_api.create_new_user(random_user_name, random_user_email, random_user_password)
-
-        self.base_selenium.click(element='header:logout')
-        self.login_page.login(username=random_user_name, password=random_user_password)
-
-        self.header_page.click_on_header_button()
-        self.base_selenium.click(element='header:roles_and_permissions_button')
-        random_role_name = self.generate_random_string()
-        self.header_page.create_new_role(role_name=random_role_name)
-        self.base_selenium.LOGGER.info('make sure that that the user record created in the active table')
-
-        self.header_page.click_on_table_configuration_button()
-        self.base_selenium.click(element='roles_and_permissions:checked_role_changed_by')
-        self.base_selenium.click(element='roles_and_permissions:apply_btn')
-
-        self.base_selenium.click(element='general:menu_filter_view')
-
-        self.header_page.filter_user_drop_down(filter_name='roles_and_permissions:filter_changed_by',
-                                               filter_text=random_user_name)
-        roles_result = self.header_page.result_table()
-        self.assertIn(random_user_name, roles_result[0].text.replace("'", ""))
-
-    def test018_filter_created_on(self):
+    def test017_filter_created_on(self):
         """
         Header: Roles & Permissions Approach: Make sure that you can filter by role created on
         LIMS-6508
@@ -503,3 +471,44 @@ class HeaderTestCases(BaseTest):
 
         self.base_selenium.LOGGER.info('filter results displayed with the role created_on')
         self.base_selenium.click(element='roles_and_permissions:reset_btn')
+
+class LoginRandomUser(BaseTest):
+
+    def setUp(self):
+        super().setUp()
+        random_user_name = self.generate_random_string()
+        random_user_email = self.base_page.generate_random_email()
+        random_user_password = self.generate_random_string()
+        self.users_api.create_new_user(random_user_name, random_user_email, random_user_password)
+        self.login_page.login(username=random_user_name, password=random_user_password)
+        self.base_selenium.wait_until_page_url_has(text='dashboard')
+        self.header_page.click_on_header_button()
+
+    def test018_filter_by_changed_by(self):
+        """
+        Header: Roles & Permissions Approach: Make sure that you can filter by role changed by
+        LIMS-6507
+        :return:
+        """
+        self.base_selenium.click(element='header:roles_and_permissions_button')
+        random_role_name= self.generate_random_string()
+        self.header_page.create_new_role(role_name=random_role_name)
+
+        self.header_page.click_on_table_configuration_button()
+        self.base_selenium.click(element='roles_and_permissions:checked_role_changed_by')
+        self.base_selenium.click(element='roles_and_permissions:apply_btn')
+
+        last_row = self.header_page.get_last_role_row()
+        row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=last_row)
+        role_changed_by = row_data['Changed By']
+
+        self.base_selenium.click(element='general:menu_filter_view')
+        self.header_page.filter_user_drop_down(filter_name='roles_and_permissions:filter_changed_by',
+                                               filter_text=role_changed_by)
+
+        roles_result = self.header_page.get_table_rows_data()
+        self.assertIn(row_data['Changed By'], roles_result[0])
+        self.base_selenium.click(element='roles_and_permissions:reset_btn')
+
+
+

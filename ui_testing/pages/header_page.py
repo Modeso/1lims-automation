@@ -337,3 +337,6 @@ class Header(BasePages):
         self.base_selenium.click(element='roles_and_permissions:configure_table_btn')
         self.sleep_small()
 
+    def get_last_role_row(self):
+        rows = self.result_table()
+        return rows[0]
