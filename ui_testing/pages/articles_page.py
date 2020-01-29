@@ -91,5 +91,5 @@ class Articles(BasePages):
         else:
             self.base_selenium.LOGGER.info('Archive field {}'.format(field_name))
             self.base_selenium.click(element='articles:{}_field_archive'.format(field_name))
-        self.confirm_popup()
         self.sleep_tiny()
+        self.confirm_popup()
