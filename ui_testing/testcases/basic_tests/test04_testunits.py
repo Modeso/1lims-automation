@@ -943,11 +943,11 @@ class TestUnitsTestCases(BaseTest):
 
     def test_028_allow_user_to_change_between_specification_and_quantification(self):
         """
-        New: Test unit: Edit mode:  Limit of quantification Approach: Allow user to change between the two options specification and limit of quantification from edit mode.
-        Allow user to change between the two options specification and limit of quantification from edit mode.
-        specification to quantifications
-        """
+        New: Test unit: Edit mode:  Limit of quantification Approach: Allow user to
+        change between the two options specification and limit of quantification from edit mode.
 
+        LIMS-4160
+        """
         testunits_request = self.test_unit_api.get_all_test_units(filter='{"typeName":2}').json()
         self.assertEqual(testunits_request['status'], 1)
         testunits = testunits_request['testUnits']
@@ -959,20 +959,18 @@ class TestUnitsTestCases(BaseTest):
                 break
 
         if testunit_name == '':
-            self.base_selenium.LOGGER.info('there is no testunit with specification only value')
+            self.info('there is no testunit with specification only value')
             self.assertTrue(False)
 
         testunit_record = self.test_unit_page.search(value=testunit_name)[0]
-
         self.test_unit_page.open_edit_page(row=testunit_record)
-
-        self.base_selenium.LOGGER.info('generate random lower/ upper limit')
+        self.info('generate random lower/ upper limit')
         random_lower_limit = self.test_unit_page.generate_random_number(lower=0, upper=49)
         random_upper_limit = self.test_unit_page.generate_random_number(lower=50, upper=100)
 
-        self.base_selenium.LOGGER.info('switch to quantification')
+        self.info('switch to quantification')
         self.test_unit_page.switch_from_spec_to_quan(lower_limit=random_lower_limit, upper_limit=random_upper_limit)
-        self.base_selenium.LOGGER.info('refresh to make sure that data are updated successfully')
+        self.info('refresh to make sure that data are updated successfully')
         self.base_selenium.refresh()
 
         self.assertEqual(self.test_unit_page.get_testunit_specification_type(), 'quan')
