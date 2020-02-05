@@ -23,12 +23,13 @@ python:
 
 # install chromium
 install:
-  - wget -N "http://security.ubuntu.com/ubuntu/pool/universe/c/chromium-browser/chromium-browser_79.0.3945.130-0ubuntu0.18.04.1_amd64.deb" -O ~/chromium-browser_79.0.3945.130-0ubuntu0.18.04.1_amd64.deb
-  - sudo apt install -y ~/chromium-browser_79.0.3945.130-0ubuntu0.18.04.1_amd64.deb
-  - wget -N "https://chromedriver.storage.googleapis.com/79.0.3945.36/chromedriver_linux64.zip" -P ~/
-  - unzip ~/chromedriver_linux64.zip -d ~/
-  - rm ~/chromedriver_linux64.zip
-  - sudo mv -f ~/chromedriver /usr/local/share/
+  #- wget -N "http://security.ubuntu.com/ubuntu/pool/universe/c/chromium-browser/chromium-browser_79.0.3945.130-0ubuntu0.18.04.1_amd64.deb" -O ~/chromium-browser_79.0.3945.130-0ubuntu0.18.04.1_amd64.deb
+  #- sudo apt install -y ~/chromium-browser_79.0.3945.130-0ubuntu0.18.04.1_amd64.deb
+  #- wget -N "https://chromedriver.storage.googleapis.com/79.0.3945.36/chromedriver_linux64.zip" -P ~/
+  #- unzip ~/chromedriver_linux64.zip -d ~/
+  #- rm ~/chromedriver_linux64.zip
+  #- sudo mv -f ~/chromedriver /usr/local/share/
+  - sudo apt-get install -y chromium-browser chromium-chromedriver
   - sudo chmod +x /usr/local/share/chromedriver
   - sudo ln -s /usr/local/share/chromedriver /usr/local/bin/chromedriver
   - echo $(/usr/local/bin/chromedriver -v)
