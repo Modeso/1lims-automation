@@ -312,4 +312,10 @@ class TestUnitAPI(BaseAPI):
         if data['status'] == 1:
             return data['testUnits']
         return []
-        
+
+    def get_testunit_with_empty_specification(self):
+        testunits_request = self.get_all_test_units(filter='{"typeName":2}').json()
+        testunits = testunits_request['testUnits']
+        for testunit in testunits:
+            if testunit['specifications'] == '':
+                return testunit['name']
