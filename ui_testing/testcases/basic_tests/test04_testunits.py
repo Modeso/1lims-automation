@@ -1158,8 +1158,8 @@ class TestUnitsTestCases(BaseTest):
 
     def test032_editing_limit_of_quantification_fields_should_affect_table_and_version(self):
         """
-        New: Test unit: Limits of quantification Approach: Versions:
-        In case I edit any field in the limits of quantification and press on save and create new version,
+        New: Test unit: Limits of quantification Approach: Versions:In case I edit any field 
+        in the limits of quantification and press on save and create new version,
         new version should create & display in the active table & versions table
 
         LIMS-4423
@@ -1174,19 +1174,15 @@ class TestUnitsTestCases(BaseTest):
         testunit_data = self.base_selenium.get_row_cells_dict_related_to_header(row=testunit_record)
         testunit_no = testunit_data['Test Unit No.']
         version_value = int(testunit_data['Version'])
+        
         self.info('open the testunit in edit form to update it')
         self.test_unit_page.open_edit_page(row=testunit_record)
-
         self.info('set upper limit to {}'.format(random_upper_limit))
         self.test_unit_page.set_quan_upper_limit(value=random_upper_limit)
-
         self.info('set lower limit to {}'.format(random_lower_limit))
         self.test_unit_page.set_quan_lower_limit(value=random_lower_limit)
-
         self.info('set unit limit to {}'.format(random_unit))
         self.test_unit_page.set_quan_unit(value=random_unit)
-
-        self.test_unit_page.sleep_tiny()
         self.test_unit_page.save_and_create_new_version()
         self.info('refresh to make sure that data are saved correctly')
         self.base_selenium.refresh()
