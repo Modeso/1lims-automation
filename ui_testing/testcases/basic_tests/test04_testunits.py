@@ -1197,9 +1197,10 @@ class TestUnitsTestCases(BaseTest):
             row=testunit_record_after_update)
 
         self.info('making sure that version is updated successfully')
-        self.info('version is {}, ant it should be {}'.format(
-            testunit_data_after_update['Version'], str(version_value + 1)))
         updated_version = str(version_value + 1)
+        self.info('version is {}, ant it should be {}'.format(
+            testunit_data_after_update['Version'], str(updated_version)))
+        
         self.assertEqual(testunit_data_after_update['Version'], str(updated_version))
         self.assertEqual(testunit_data_after_update['Quantification Limit'],
                          str(random_lower_limit) + '-' + str(random_upper_limit))
