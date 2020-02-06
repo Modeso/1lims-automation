@@ -1212,7 +1212,7 @@ class TestUnitsTestCases(BaseTest):
 
         version_counter = 1
         record_counter = 0
-        while record_counter < len(testunits_records_versions) - 1:
+        while record_counter < len(testunits_records_versions):
             record_data = self.base_selenium.get_row_cells_dict_related_to_header(
                 row=testunits_records_versions[record_counter])
             self.assertEqual(record_data['Version'], str(version_counter))
