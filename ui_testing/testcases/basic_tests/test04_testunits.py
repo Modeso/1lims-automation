@@ -1165,6 +1165,7 @@ class TestUnitsTestCases(BaseTest):
         LIMS-4423
         """
         testunit_name = self.test_unit_api.get_testunit_with_empty_specification()
+        
         self.info('generate random data to update testunit with')
         random_upper_limit = self.test_unit_page.generate_random_number(lower=50, upper=100)
         random_lower_limit = self.test_unit_page.generate_random_number(lower=0, upper=49)
@@ -1174,6 +1175,7 @@ class TestUnitsTestCases(BaseTest):
         testunit_data = self.base_selenium.get_row_cells_dict_related_to_header(row=testunit_record)
         testunit_no = testunit_data['Test Unit No.']
         version_value = int(testunit_data['Version'])
+        updated_version = version_value + 1
         
         self.info('open the testunit in edit form to update it')
         self.test_unit_page.open_edit_page(row=testunit_record)
@@ -1184,9 +1186,9 @@ class TestUnitsTestCases(BaseTest):
         self.info('set unit limit to {}'.format(random_unit))
         self.test_unit_page.set_quan_unit(value=random_unit)
         self.test_unit_page.save_and_create_new_version()
+        
         self.info('refresh to make sure that data are saved correctly')
         self.base_selenium.refresh()
-
         self.assertEqual(self.test_unit_page.get_quan_upper_limit(), str(random_upper_limit))
         self.assertEqual(self.test_unit_page.get_quan_lower_limit(), str(random_lower_limit))
         self.assertEqual(self.test_unit_page.get_quan_unit(), str(random_unit))
@@ -1195,9 +1197,9 @@ class TestUnitsTestCases(BaseTest):
         testunit_record_after_update = self.test_unit_page.search(value=testunit_no)[0]
         testunit_data_after_update = self.base_selenium.get_row_cells_dict_related_to_header(
             row=testunit_record_after_update)
-
+        
+        self.sleep_tiny()
         self.info('making sure that version is updated successfully')
-        updated_version = version_value + 1
         self.info('version is {}, ant it should be {}'.format(
             testunit_data_after_update['Version'], str(updated_version)))
         
