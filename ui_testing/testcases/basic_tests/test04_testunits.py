@@ -1193,13 +1193,12 @@ class TestUnitsTestCases(BaseTest):
         self.assertEqual(self.test_unit_page.get_quan_lower_limit(), str(random_lower_limit))
         self.assertEqual(self.test_unit_page.get_quan_unit(), str(random_unit))
 
+        self.info('making sure that version is updated successfully')
         self.test_unit_page.get_test_units_page()
         testunit_record_after_update = self.test_unit_page.search(value=testunit_no)[0]
         testunit_data_after_update = self.base_selenium.get_row_cells_dict_related_to_header(
             row=testunit_record_after_update)
-        
-        self.sleep_tiny()
-        self.info('making sure that version is updated successfully')
+        self.test_unit_page.sleep_small()
         self.info('version is {}, ant it should be {}'.format(
             testunit_data_after_update['Version'], str(updated_version)))
         
