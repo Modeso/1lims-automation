@@ -1,10 +1,10 @@
 language: python
 sudo: enabled
-dist: xenail
+dist: xenial
 group: edge
 
 python:
-  - "3.5"
+  - "3.7"
 
 install:
   #https://www.slimjet.com/chrome/google-chrome-old-version.php
@@ -24,6 +24,5 @@ install:
 script:
   - export TESTS='test09_my_profile.py:'
   - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then export TESTS=''; fi
-  #- echo $TESTS
   - cd $TRAVIS_BUILD_DIR && export PYTHONPATH='./'
   - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/header_tests/test08_usermanagement.py:HeaderTestCases.test003_user_search --tc-file=config.ini
