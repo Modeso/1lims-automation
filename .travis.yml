@@ -1,6 +1,10 @@
+language: python
 sudo: enabled
-dist: xenail
+dist: xenial
 group: edge
+
+python:
+  - "3.7"
 
 install:
   #https://www.slimjet.com/chrome/google-chrome-old-version.php
@@ -14,7 +18,7 @@ install:
   - sudo chmod +x /usr/local/share/chromedriver
   - sudo ln -s /usr/local/share/chromedriver /usr/local/bin/chromedriver
   - echo $(/usr/local/bin/chromedriver -v)
-  - sudo apt-get install -y xvfb xclip python3 python3-dev
+  - sudo apt-get install -y xvfb xclip
   - pip3 install -r $TRAVIS_BUILD_DIR/ui_testing/requirements.txt
 
 script:
