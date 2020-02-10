@@ -29,8 +29,14 @@ script:
   #- echo $TESTS
   - cd $TRAVIS_BUILD_DIR && export PYTHONPATH='./'
 
+
   # - xvfb-run -a nosetests-3.4 -vs --nologcapture ui_testing/testcases/header_tests/$TESTS --tc-file=config.ini
   - xvfb-run -a nosetests -vs --nologcapture --tc-file=config.ini ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases.test023_create_existing_order_with_test_units_and_change_article --tc-file=config.ini
  # - xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/basic_tests/test04_testunits.py:TestUnitsTestCases.test002_archive_test_units --tc-file=config.ini
+  #- xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/header_tests/test06_audit_trail.py:AuditTrailTestCases.test002_audit_trail_filter_0_action_date --tc-file=config.ini
+  #- xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/header_tests/test06_audit_trail.py:AuditTrailTestCases.test002_audit_trail_filter_1_changed_by --tc-file=config.ini
+  #- xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/header_tests/test06_audit_trail.py:AuditTrailTestCases.test002_audit_trail_filter_2_action --tc-file=config.ini
+  #- xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/header_tests/test06_audit_trail.py:AuditTrailTestCases.test002_audit_trail_filter_3_entity --tc-file=config.ini
+  #- xvfb-run -a nosetests-3.4 -vs --logging-level=WARNING ui_testing/testcases/header_tests/test06_audit_trail.py:AuditTrailTestCases.test002_audit_trail_filter_4_entity_number --tc-file=config.ini
 
 
