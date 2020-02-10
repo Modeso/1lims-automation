@@ -56,7 +56,8 @@ class AuditTrailTestCases(BaseTest):
             filter_name=filter, filter_text=audit_trail[filter], field_type=field_type)
         self.assertIn(audit_trail[filter], result)
 
-    def test007_search_audit_trail_by_changed_by(self):
+    @parameterized.expand(['changed_by', 'action', 'entity', 'entity_number'])
+    def test003_search_audit_trail(self, search_feild):
         """
         Header: Audit trail: Approach: Make sure that you can search by all the followings entities 
         ( entity & action & entity no & changed by )
@@ -66,44 +67,5 @@ class AuditTrailTestCases(BaseTest):
         # get random row data
         audit_trail = self.audit_trail_page.get_random_mapped_audit_trail_data()
         # search by changed by
-        result = self.audit_trail_page.search(audit_trail['changed_by'])[0].text
-        self.assertIn(audit_trail['changed_by'], result)
-
-    def test008_search_audit_trail_by_action(self):
-        """
-        Header: Audit trail: Approach: Make sure that you can search by all the followings entities 
-        ( entity & action & entity no & changed by )
-
-        LIMS-6356
-        """
-        # get random row data
-        audit_trail = self.audit_trail_page.get_random_mapped_audit_trail_data()
-        # search by action
-        result = self.audit_trail_page.search(audit_trail['action'])[0].text
-        self.assertIn(audit_trail['action'], result)
-
-    def test009_search_audit_trail_by_entity(self):
-        """
-        Header: Audit trail: Approach: Make sure that you can search by all the followings entities 
-        ( entity & action & entity no & changed by )
-
-        LIMS-6356
-        """
-        # get random row data
-        audit_trail = self.audit_trail_page.get_random_mapped_audit_trail_data()
-        # search by entity
-        result = self.audit_trail_page.search(audit_trail['entity'])[0].text
-        self.assertIn(audit_trail['entity'], result)
-
-    def test010_search_audit_trail_by_entity_number(self):
-        """
-        Header: Audit trail: Approach: Make sure that you can search by all the followings entities 
-        ( entity & action & entity no & changed by )
-
-        LIMS-6356
-        """
-        # get random row data
-        audit_trail = self.audit_trail_page.get_random_mapped_audit_trail_data()
-        # search by entity number
-        result = self.audit_trail_page.search(audit_trail['entity_number'])[0].text
-        self.assertIn(audit_trail['entity_number'], result)
+        result = self.audit_trail_page.search(audit_trail[search_feild])[0].text
+        self.assertIn(audit_trail[search_feild], result)
