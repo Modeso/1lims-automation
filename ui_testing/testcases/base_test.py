@@ -78,9 +78,9 @@ class BaseTest(TestCase):
             if len(str(item)) > 0:
                 if re.search(r'\d{2}.\d{2}.\d{4},\s\d{1,2}:\d{1,2}\s(A|P)M', str(item)):
                     tmp.append(datetime.datetime.strptime(item, '%d.%m.%Y, %H:%M %p'))
-                elif re.search(r'\d{2}.\d{2}.\d{4}', str(item)):
+                elif re.search(r'\d{2}\.\d{2}\.\d{4}', str(item)):
                     tmp.append(datetime.datetime.strptime(item, '%d.%m.%Y'))
-                elif "-" == str(item):
+                elif "-" == str(item) or "nan" == str(item) or "N/A" == str(item):
                     continue
                 elif ' ' == str(item)[-1]:
                     tmp.append(item[:-1])

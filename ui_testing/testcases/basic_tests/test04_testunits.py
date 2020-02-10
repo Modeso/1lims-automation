@@ -2,7 +2,7 @@ from ui_testing.testcases.base_test import BaseTest
 from ui_testing.pages.articles_page import Articles
 from unittest import skip
 from parameterized import parameterized
-import re, random
+import re, random, ipdb
 
 
 class TestUnitsTestCases(BaseTest):
