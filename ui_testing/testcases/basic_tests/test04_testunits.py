@@ -933,7 +933,8 @@ class TestUnitsTestCases(BaseTest):
         self.assertEqual(self.base_selenium.get_url(), '{}testUnits'.format(self.base_selenium.url))
         self.base_selenium.LOGGER.info('clicking on Overview confirmed')
 
-    def test_027_changing_testunit_type_update_fields_accordingly(self):
+    @parameterized.expand(['Quantitative', 'Qualitative', 'MiBi'])
+    def test_027_changing_testunit_type_update_fields_accordingly(self, testunit_type):
         """
         New: Test unit: Type Approach: When I change type from edit mode, the values
         should changed according to this type that selected
@@ -943,17 +944,15 @@ class TestUnitsTestCases(BaseTest):
         self.info('edit random testunit')
         self.test_unit_page.get_random_test_units()
         self.base_selenium.get_url()
-        testunit_types = ['Quantitative', 'Qualitative', 'Quantitative MiBi']
-        for testunit_type in testunit_types:
-            self.info('set the type to {}'.format(testunit_type))
-            self.test_unit_page.set_testunit_type(testunit_type=testunit_type)
-            self.test_unit_page.sleep_tiny()
-            if testunit_type == 'Quantitative':
-                self.assertTrue(self.test_unit_page.check_for_quantitative_fields())
-            elif testunit_type == 'Qualitative':
-                self.assertTrue(self.test_unit_page.check_for_qualitative_fields())
-            elif testunit_type == 'Quantitative MiBi':
-                self.assertTrue(self.test_unit_page.check_for_quantitative_mibi_fields())
+        self.info('set the type to {}'.format(testunit_type))
+        self.test_unit_page.set_testunit_type(testunit_type=testunit_type)
+        self.test_unit_page.sleep_tiny()
+        if testunit_type == 'Quantitative':
+            self.assertTrue(self.test_unit_page.check_for_quantitative_fields())
+        elif testunit_type == 'Qualitative':
+            self.assertTrue(self.test_unit_page.check_for_qualitative_fields())
+        else:
+            self.assertTrue(self.test_unit_page.check_for_quantitative_mibi_fields())
 
     def test_028_allow_user_to_change_between_specification_and_quantification(self):
         """
