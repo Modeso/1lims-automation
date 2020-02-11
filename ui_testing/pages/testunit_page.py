@@ -170,8 +170,7 @@ class TstUnit(TstUnits):
                 element='test_unit:type')
 
     def use_specification_or_quantification(self, type_to_use='spec'):
-        self.base_selenium.LOGGER.info('Check to use {}'.format(type_to_use))
-        self.sleep_tiny()
+        self.info('Check to use {}'.format(type_to_use))
         if type_to_use == 'spec':
             spec = self.base_selenium.find_element_in_element(destination_element='general:span',
                                                               source_element='test_unit:use_specification')
@@ -187,8 +186,6 @@ class TstUnit(TstUnits):
             quan = self.base_selenium.find_element_in_element(destination_element='general:span',
                                                               source_element='test_unit:use_quantification')
             quan.click()
-
-        self.sleep_tiny()
 
     def set_spec_upper_limit(self, value=''):
         self.base_selenium.LOGGER.info('Set specification upper limit to be {}'.format(value))
@@ -208,11 +205,11 @@ class TstUnit(TstUnits):
         self.base_selenium.set_text(element='test_unit:spec_unit', value=value)
 
     def set_quan_upper_limit(self, value=''):
-        self.base_selenium.LOGGER.info('Set quantification upper limit to be {}'.format(value))
+        self.info('Set quantification upper limit to be {}'.format(value))
         self.base_selenium.set_text(element='test_unit:quan_upper_limit', value=value)
 
     def set_quan_lower_limit(self, value=''):
-        self.base_selenium.LOGGER.info('Set quantification lower limit to be {}'.format(value))
+        self.info('Set quantification lower limit to be {}'.format(value))
         self.base_selenium.set_text(element='test_unit:quan_lower_limit', value=value)
 
     def set_quan_unit(self, value=''):
@@ -496,12 +493,12 @@ class TstUnit(TstUnits):
             return 'quan'
 
     def switch_from_spec_to_quan(self, lower_limit=0, upper_limit=1):
-        self.use_specification_or_quantification(type_to_use='spec')
-        self.use_specification_or_quantification(type_to_use='quan')
+        self.use_specification_or_quantification(type_to_use='spec') #to deslect spec
+        self.use_specification_or_quantification(type_to_use='quan') #to select quan
         self.set_quan_lower_limit(value=lower_limit)
         self.set_quan_upper_limit(value=upper_limit)
-        self.sleep_small()
         self.save(save_btn='general:save_form', logger_msg='Save testunit')
+        self.sleep_tiny()
 
     def switch_from_quan_to_spec(self, lower_limit=0, upper_limit=1):
         

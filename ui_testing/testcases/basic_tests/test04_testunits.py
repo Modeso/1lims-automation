@@ -966,7 +966,7 @@ class TestUnitsTestCases(BaseTest):
         testunit_name = ''
         for testunit in testunits:
             if spec_or_quan == 'spec' and testunit['specifications'] != '' and testunit['quantification'] == '':
-                testunit_name = testunit['number']
+                testunit_name = testunit['name']
                 break
             elif spec_or_quan == 'quan' and testunit['specifications'] == '' and testunit['quantification'] != '':
                 testunit_name = testunit['name']
@@ -976,8 +976,13 @@ class TestUnitsTestCases(BaseTest):
             self.info('there is no testunit with required specs')
             self.assertTrue(False)
 
-        testunit_record = self.test_unit_page.search(value=testunit_name)[0]
-        self.test_unit_page.open_edit_page(row=testunit_record)
+        self.test_unit_page.open_filter_menu()
+        self.info('Filtering by testunit name: {}'.format(testunit_name))
+        self.test_unit_page.filter_by(filter_element='test_units:testunit_name_filter',
+                                      filter_text=testunit_name, field_type='text')
+        self.test_unit_page.filter_apply()
+        testunit_row = self.base_selenium.get_table_rows(element='general:table')[0]
+        self.test_unit_page.open_edit_page(row=testunit_row)
         self.info('generate random lower/ upper limit')
         random_lower_limit = self.test_unit_page.generate_random_number(lower=0, upper=49)
         random_upper_limit = self.test_unit_page.generate_random_number(lower=50, upper=100)
@@ -985,7 +990,6 @@ class TestUnitsTestCases(BaseTest):
             self.info('switch to quantification')
             self.test_unit_page.switch_from_spec_to_quan(lower_limit=random_lower_limit,
                                                          upper_limit=random_upper_limit)
-            self.test_unit_page.sleep_tiny()
             self.info('refresh to make sure that data are updated successfully')
             self.base_selenium.refresh()
             self.assertEqual(self.test_unit_page.get_testunit_specification_type(), 'quan')
@@ -993,7 +997,8 @@ class TestUnitsTestCases(BaseTest):
             self.assertEqual(self.test_unit_page.get_quan_lower_limit(), str(random_lower_limit))
         else:
             self.info('switch to specification')
-            self.test_unit_page.switch_from_quan_to_spec(lower_limit=random_lower_limit, upper_limit=random_upper_limit)
+            self.test_unit_page.switch_from_quan_to_spec(lower_limit=random_lower_limit,
+                                                         upper_limit=random_upper_limit)
             self.info('refresh to make sure that data are updated successfully')
             self.base_selenium.refresh()
             self.assertEqual(self.test_unit_page.get_testunit_specification_type(), 'spec')
