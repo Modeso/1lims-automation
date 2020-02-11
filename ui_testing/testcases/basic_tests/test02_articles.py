@@ -388,18 +388,22 @@ class ArticlesTestCases(BaseTest):
         row = self.article_page.get_random_article_row()
         row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=row)
         for column in row_data:
-            if re.findall(r'\d{1,}.\d{1,}.\d{4}', row_data[column]) or row_data[column] == '-' or not (
-            row_data[column]):
+            if re.findall(r'\d{1,}.\d{1,}.\d{4}', row_data[column]) or \
+                    row_data[column] == '-' or not (row_data[column]):
                 continue
+            multiple_testplans = False
+            if "," in row_data[column]: # for multiple testplans only search for one of them
+                row_data[column] = row_data[column].split(',', 1)[0]
+                multiple_testplans = True
 
-            self.base_selenium.LOGGER.info(
-                'search for {} : {}'.format(column, row_data[column]))
+            self.info('search for {} : {}'.format(column, row_data[column]))
             search_results = self.article_page.search(row_data[column])
-            self.assertGreater(
-                len(search_results), 1, " * There is no search results for it, Report a bug.")
+            self.assertGreater(len(search_results), 1, " * There is no search results for it, Report a bug.")
             for search_result in search_results:
                 search_data = self.base_selenium.get_row_cells_dict_related_to_header(
                     search_result)
+                if multiple_testplans:
+                    search_data[column] = search_data[column].split(',', 1)[0]
                 if search_data[column] == row_data[column]:
                     break
             self.assertEqual(row_data[column], search_data[column])
