@@ -7,7 +7,6 @@ python:
   - "3.7"
 
 install:
-  #https://www.slimjet.com/chrome/google-chrome-old-version.php
   - wget -N "https://www.slimjet.com/chrome/download-chrome.php?file=files%2F79.0.3945.88%2Fgoogle-chrome-stable_current_amd64.deb" -O ~/google-chrome-stable_current_amd64.deb
   - sudo apt install -y ~/google-chrome-stable_current_amd64.deb
   - echo $(google-chrome --version)
