@@ -954,8 +954,8 @@ class TestUnitsTestCases(BaseTest):
     @parameterized.expand(['quan', 'spec'])
     def test_028_allow_user_to_change_between_specification_and_quantification(self, spec_or_quan):
         """
-        New: Test unit: Edit mode:  Limit of quantification Approach: Allow user to
-        change between the two options specification and limit of quantification from edit mode.
+        New: Test unit: Edit mode:  Limit of quantification Approach: Allow user to change between
+        the two options specification and limit of quantification from edit mode.
 
         LIMS-4160
         """
@@ -976,7 +976,6 @@ class TestUnitsTestCases(BaseTest):
             self.info('there is no testunit with required specs')
             self.assertTrue(False)
 
-
         testunit_record = self.test_unit_page.search(value=testunit_name)[0]
         self.test_unit_page.open_edit_page(row=testunit_record)
         self.info('generate random lower/ upper limit')
@@ -984,7 +983,9 @@ class TestUnitsTestCases(BaseTest):
         random_upper_limit = self.test_unit_page.generate_random_number(lower=50, upper=100)
         if spec_or_quan == 'spec':
             self.info('switch to quantification')
-            self.test_unit_page.switch_from_spec_to_quan(lower_limit=random_lower_limit, upper_limit=random_upper_limit)
+            self.test_unit_page.switch_from_spec_to_quan(lower_limit=random_lower_limit,
+                                                         upper_limit=random_upper_limit)
+            self.test_unit_page.sleep_tiny()
             self.info('refresh to make sure that data are updated successfully')
             self.base_selenium.refresh()
             self.assertEqual(self.test_unit_page.get_testunit_specification_type(), 'quan')

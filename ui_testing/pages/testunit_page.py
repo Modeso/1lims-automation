@@ -496,13 +496,11 @@ class TstUnit(TstUnits):
             return 'quan'
 
     def switch_from_spec_to_quan(self, lower_limit=0, upper_limit=1):
-        
         self.use_specification_or_quantification(type_to_use='spec')
         self.use_specification_or_quantification(type_to_use='quan')
-
         self.set_quan_lower_limit(value=lower_limit)
         self.set_quan_upper_limit(value=upper_limit)
-        self.sleep_tiny()
+        self.sleep_small()
         self.save(save_btn='general:save_form', logger_msg='Save testunit')
 
     def switch_from_quan_to_spec(self, lower_limit=0, upper_limit=1):
