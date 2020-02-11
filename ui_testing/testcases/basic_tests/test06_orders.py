@@ -415,10 +415,12 @@ class OrdersTestCases(BaseTest):
         """
         number_of_copies = randint(2, 5)
         self.base_selenium.LOGGER.info(' Select Random Order')
-        selected_row = self.order_page.get_random_order_row()
+        selected_row = self.order_page.get_last_order_row()
         selected_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
             row=selected_row)
-        self.order_page.click_check_box(source=selected_row)
+
+        result = self.order_page.open_child_table(source=selected_row)
+        self.order_page.duplicate(source=result)
         self.base_selenium.LOGGER.info(
             'Duplicate selected order  {} times  '.format(number_of_copies))
         self.order_page.duplicate_order_from_table_overview(number_of_copies)

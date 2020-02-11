@@ -180,3 +180,9 @@ class Orders(BasePages):
         main_order['row_element'] = all_orders[row_id]
         # return the main order
         return main_order
+
+
+    def duplicate(self, source):
+        self.base_selenium.find_element_in_element(destination_element='orders:sub_order_menu', source='general:child_table_arrow')
+        self.base_selenium.click(element='orders:sub_order_menu')
+        self.sleep_medium()

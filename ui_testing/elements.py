@@ -544,6 +544,8 @@ elements = {
                              'value': 'start_testDate'},
         'shipment_date_filter': {'method': 'id',
                                  'value': 'start_shipmentDate'},
+        'sub_order_menu': {'method': 'xpath',
+                                 'value':'//td[contains(@class,"m-datatable__cell--sorted m-datatable__cell child-cell-td")]//i[@class="la la-ellipsis-h icon-hover"]'},
         'analysis_tab': {
             'method': 'xpath',
             'value': "//label[@class='btn tab']"
