@@ -1003,7 +1003,6 @@ class OrdersTestCases(BaseTest):
             'Subassembely', latest_order_data['Material Type'])
         
     # will continue with us
-    @skip('https://modeso.atlassian.net/browse/LIMS-6823')
     def test023_create_existing_order_with_test_units_and_change_article(self):
         """
         New: Orders with test units: Create a new order from an existing order with test units but change the article
@@ -1011,20 +1010,20 @@ class OrdersTestCases(BaseTest):
         LIMS-3269
         """
         self.base_selenium.LOGGER.info(
-            'Running test case to create an existing order with test units and change article')
+            'Running test case to create an existing order with test units and change material type')
         test_units_list = []
         test_unit_dict = self.get_active_tst_unit_with_material_type(search='Qualitative', material_type='All')
         if test_unit_dict:
             self.base_selenium.LOGGER.info('Retrieved test unit ' + test_unit_dict['Test Unit Name'])
             test_units_list.append(test_unit_dict['Test Unit Name'])
 
-        print(test_unit_dict)
         self.order_page.get_orders_page()
         created_order = self.order_page.create_order_with_test_unit(material_type='r', article='a', contact='a',
-                                                         test_units=test_units_list)
-
+                                                                    test_units=test_unit_dict['Test Unit Name'])
+        print(created_order)
         self.order_page.get_orders_page()
-        created_existing_order = self.order_page.create_existing_order_with_auto_fill(no=created_order['orderNo'].replace("'", ""))
+        created_existing_order = self.order_page.create_existing_order_with_auto_fill(
+            no=created_order['orderNo'].replace("'", ""))
         self.order_page.sleep_tiny()
         self.order_page.set_article(article='')
 
@@ -1032,21 +1031,20 @@ class OrdersTestCases(BaseTest):
         self.order_page.save(save_btn='order:save_btn')
         self.base_page.sleep_small()
         self.order_page.get_orders_page()
-        self.order_page.navigate_to_analysis_active_table()
         self.base_selenium.LOGGER.info(' + Order created with no : {} '.format(created_existing_order))
         self.base_page.sleep_small()
-        self.single_analysis_page.get_analysis_page()
+        self.order_page.navigate_to_analysis_active_table()
         self.base_selenium.LOGGER.info(
             'Assert There is an analysis for this new order.')
-        orders_analyess = self.single_analysis_page.search(created_order['orderNo'].replace("'", ""))
+        orders_analysis = self.single_analysis_page.search(created_order['orderNo'].replace("'", ""))
         latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
-            row=orders_analyess[0])
+            row=orders_analysis[0])
         self.assertEqual(
-            created_order.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
+            created_order['orderNo'].replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
         self.assertEqual(
             article.split(' No:')[0], latest_order_data['Article Name'])
 
-        self.single_analysis_page.open_child_table(source=orders_analyess[0])
+        self.single_analysis_page.open_child_table(source=orders_analysis[0])
         rows_with_childtable = self.single_analysis_page.result_table(element='general:table_child')
         for row in rows_with_childtable[:-1]:
             row_with_headers = self.base_selenium.get_row_cells_dict_related_to_header(row=row,
