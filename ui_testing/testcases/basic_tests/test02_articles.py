@@ -564,7 +564,6 @@ class ArticlesTestCases(BaseTest):
         rows_data = self.article_page.get_table_rows_data()
         for index in range(len(rows_data)):
             self.info(' * Comparing the article no. {} '.format(index))
-            import ipdb;ipdb.set_trace()
             fixed_row_data = self.fix_data_format(rows_data[index].split('\n'))
             values = self.article_page.sheet.iloc[index].values
             fixed_sheet_row_data = self.fix_data_format(values)
