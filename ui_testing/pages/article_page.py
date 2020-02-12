@@ -150,7 +150,7 @@ class Article(Articles):
         self.sleep_tiny()
         if restore:
             self.base_selenium.click(element='general:configurations_archived')  # open the archived tab
-            self.sleep_tiny()
+            self.sleep_small()
         self.toggle_archive_field(field_name='unit', restore=restore)
         self.toggle_archive_field(field_name='comment', restore=restore)
         self.toggle_archive_field(field_name='related_article', restore=restore)

@@ -617,6 +617,7 @@ class ArticlesTestCases(BaseTest):
         self.article_page.sleep_tiny()
         # open edit/create page
         self.article_page.get_articles_page()
+        self.article_page.sleep_tiny()
         if edit == "edit":
             self.info('Open article edit page')
             self.article_page.open_edit_page(row=self.article_page.get_random_article_row())
@@ -645,11 +646,13 @@ class ArticlesTestCases(BaseTest):
         self.article_page.archive_restore_optional_fields(restore=False)
         self.article_page.sleep_tiny()
         self.article_page.get_articles_page()
+        self.article_page.sleep_tiny()
         self.article_page.archive_restore_optional_fields(restore=True)
 
         # check if the fields still exist in the table after restore
         self.info('Open article table')
         self.article_page.get_articles_page()
+        self.article_page.sleep_tiny()
         article_headers = self.base_selenium.get_table_head_elements('general:table')
         article_headers_text = [header.text for header in article_headers]
 
@@ -671,9 +674,10 @@ class ArticlesTestCases(BaseTest):
         self.article_page.archive_restore_optional_fields(restore=False)
         self.article_page.sleep_tiny()
         self.article_page.get_articles_page()
+        self.article_page.sleep_tiny()
         self.article_page.archive_restore_optional_fields(restore=True)
         self.article_page.get_articles_page()
-
+        self.article_page.sleep_tiny()
         if edit == "edit":
             # open edit page after restore
             self.info('Open article edit page')
