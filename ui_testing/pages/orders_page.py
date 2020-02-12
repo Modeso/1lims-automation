@@ -182,7 +182,9 @@ class Orders(BasePages):
         return main_order
 
 
-    def duplicate(self, source):
-        self.base_selenium.find_element_in_element(destination_element='orders:sub_order_menu', source='general:child_table_arrow')
-        self.base_selenium.click(element='orders:sub_order_menu')
+    def click_on_duplicate_sub_order(self):
+        childtable_arrow = self.base_selenium.find_element_in_element(destination_element='orders:first_sub_order_menu', source_element='orders:first_sub_order_menu_parent')
+        childtable_arrow.click()
+        self.base_selenium.click(element='orders:duplicate_sub_order')
         self.sleep_medium()
+

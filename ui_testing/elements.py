@@ -544,8 +544,16 @@ elements = {
                              'value': 'start_testDate'},
         'shipment_date_filter': {'method': 'id',
                                  'value': 'start_shipmentDate'},
-        'sub_order_menu': {'method': 'xpath',
-                                 'value':'//td[contains(@class,"m-datatable__cell--sorted m-datatable__cell child-cell-td")]//i[@class="la la-ellipsis-h icon-hover"]'},
+
+        'first_sub_order_menu_parent': {'method': 'class_name',
+                                    'value': 'dropdown',
+                                    'order': 2},
+        'first_sub_order_menu': {'method': 'tag_name',
+                             'value': 'a',
+                             'order': 0},
+         'duplicate_sub_order': {'method': 'id',
+                            'value': 'child_table_duplicate'},
+
         'analysis_tab': {
             'method': 'xpath',
             'value': "//label[@class='btn tab']"

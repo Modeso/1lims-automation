@@ -406,7 +406,8 @@ class OrdersTestCases(BaseTest):
             'Check if export of order has analyis number = {}  '.format(analysis_number))
         self.assertIn(analysis_number, sheet_values)
 
-    # will change that the duplicate many copies will be from the the child table not from the active table     
+    # will change that the duplicate many copies will be from the the child table not from the active table
+    @skip("https://modeso.atlassian.net/browse/LIMS-4786")
     def test012_duplicate_many_orders(self):
         """
         New: Orders: Duplication from active table Approach: When I duplicate order 5 times, it will create 5 analysis records with the same order number
@@ -419,8 +420,8 @@ class OrdersTestCases(BaseTest):
         selected_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
             row=selected_row)
 
-        result = self.order_page.open_child_table(source=selected_row)
-        self.order_page.duplicate(source=result)
+        self.order_page.open_child_table(source=selected_row)
+        self.order_page.click_on_duplicate_sub_order()
         self.base_selenium.LOGGER.info(
             'Duplicate selected order  {} times  '.format(number_of_copies))
         self.order_page.duplicate_order_from_table_overview(number_of_copies)
