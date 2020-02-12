@@ -4,8 +4,6 @@ import re
 from unittest import skip
 import random
 import inspect
-import ipdb
-
 
 
 class ArticlesTestCases(BaseTest):
@@ -561,7 +559,7 @@ class ArticlesTestCases(BaseTest):
 
         LIMS:3589-case of all sheet
         """
-        self.base_selenium.LOGGER.info(' * Download XSLX sheet')
+        self.info(' * Download XSLX sheet')
         self.article_page.download_xslx_sheet()
         rows_data = self.article_page.get_table_rows_data()
         for index in range(len(rows_data)):
