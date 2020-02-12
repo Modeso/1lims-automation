@@ -2,7 +2,7 @@ from ui_testing.testcases.base_test import BaseTest
 from ui_testing.pages.articles_page import Articles
 from unittest import skip
 from parameterized import parameterized
-import re, random
+import re, random, ipdb
 
 
 class TestUnitsTestCases(BaseTest):
@@ -932,34 +932,29 @@ class TestUnitsTestCases(BaseTest):
     @parameterized.expand(['Quantitative', 'Qualitative', 'MiBi'])
     def test_027_changing_testunit_type_update_fields_accordingly(self, testunit_type):
         """
-        New: Test unit: Type Approach: When I change type from edit mode, the values
-        should changed according to this type that selected
-
+        New: Test unit: Type Approach: When I change type from edit mode, the values should changed according to this type that selected
+        When I change type from edit mode, the values should changed according to this type that selected
         LIMS-3680
+        comment: this case will be handled in create
         """
-        # if test unit is used in analysis, it can't be edited so, we should create test unit first
-        self.info('create new testunit')
-        new_random_name = self.generate_random_string()
-        new_random_method = self.generate_random_string()
-        if testunit_type == 'Quantitative':
-            self.test_unit_page.create_qualitative_testunit(
-                name=new_random_name, method=new_random_method)
-        else:
-             self.test_unit_page.create_quantitative_testunit(
-                 name=new_random_name, method=new_random_method,
-                 upper_limit='100', lower_limit='5', spec_or_quan='spec')
 
-        testunit_number = self.test_unit_page.get_testunit_number()
-        self.test_unit_page.save()
+        if testunit_type == 'MiBi':
+            testunit_type = 'Quantitative MiBi'
+
+        self.base_selenium.LOGGER.info('open testunits in create')
+        self.test_unit_page.click_create_new_testunit()
+
+        self.base_selenium.LOGGER.info('set the type to {}'.format(testunit_type))
+        self.test_unit_page.set_testunit_type(testunit_type=testunit_type)
         self.test_unit_page.sleep_tiny()
-        testunit_row = self.test_unit_page.search(testunit_number)[0]
-        self.test_unit_page.open_edit_page(testunit_row)
-        self.test_unit_page.set_testunit_type(testunit_type)
+        self.base_selenium.LOGGER.info(
+            'set testunit type to {}, fields should be displayed as the following'.format(testunit_type))
+
         if testunit_type == 'Quantitative':
             self.assertTrue(self.test_unit_page.check_for_quantitative_fields())
         elif testunit_type == 'Qualitative':
             self.assertTrue(self.test_unit_page.check_for_qualitative_fields())
-        else:
+        elif testunit_type == 'Quantitative MiBi':
             self.assertTrue(self.test_unit_page.check_for_quantitative_mibi_fields())
 
     def test_028_allow_user_to_change_between_specification_and_quantification(self):
