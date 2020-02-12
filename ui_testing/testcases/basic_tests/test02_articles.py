@@ -30,7 +30,8 @@ class ArticlesTestCases(BaseTest):
         }
 
     def tearDown(self):
-        # if test case of archive configurations we need to restore archived configuration fields before tear down
+        # if test case of archive/restore configurations we need to 
+        #restore archived configuration fields before tear down
         test_case_tag = self._testMethodName
         if test_case_tag in ["test022_user_hide_any_optional_field_is_not_affecting_the_table",
                              "test023_user_hide_any_optional_field_in_create_form_0_edit",
