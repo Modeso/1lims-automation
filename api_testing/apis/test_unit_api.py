@@ -146,7 +146,6 @@ class TestUnitAPI(BaseAPI):
     """
 
     def create_qualitative_testunit(self, **kwargs):
-        
         random_category = self.generate_random_string()
         _payload = {
             'name': self.generate_random_string(),
@@ -187,15 +186,13 @@ class TestUnitAPI(BaseAPI):
                 'value': value
             })
         payload['textValueArray'] = values_arr
-        
-        
+
         api = '{}{}'.format(self.url, self.END_POINTS['test_unit_api']['create_testunit']) 
         self.info('POST : {}'.format(api))
         response = self.session.post(api, json=payload, params='', headers=self.headers, verify=False)
-
         self.info('Status code: {}'.format(response.status_code))
+
         data = response.json()
-        
         if data['status'] == 1:
             return payload
         else:

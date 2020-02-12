@@ -828,7 +828,7 @@ class TestUnitsTestCases(BaseTest):
                                                              unit=unit_with_sub_or_super.replace('sub', '[sub]'))
         else:
             self.test_unit_page.create_quantitative_testunit(name=new_random_name, method=new_random_method,
-                                                             upper_limit='33',lower_limit='22', spec_or_quan='spec',
+                                                             upper_limit='33', lower_limit='22', spec_or_quan='spec',
                                                              unit=unit_with_sub_or_super.replace('super', '{super}'))
         self.test_unit_page.sleep_tiny()
         inserted_unit = self.test_unit_page.get_spec_unit()
@@ -937,12 +937,24 @@ class TestUnitsTestCases(BaseTest):
 
         LIMS-3680
         """
-        self.info('edit random testunit')
-        self.test_unit_page.get_random_test_units()
-        self.base_selenium.get_url()
-        self.info('set the type to {}'.format(testunit_type))
-        self.test_unit_page.set_testunit_type(testunit_type=testunit_type)
+        # if test unit is used in analysis, it can't be edited so, we should create test unit first
+        self.info('create new testunit')
+        new_random_name = self.generate_random_string()
+        new_random_method = self.generate_random_string()
+        if testunit_type == 'Quantitative':
+            self.test_unit_page.create_qualitative_testunit(
+                name=new_random_name, method=new_random_method)
+        else:
+             self.test_unit_page.create_quantitative_testunit(
+                 name=new_random_name, method=new_random_method,
+                 upper_limit='100', lower_limit='5', spec_or_quan='spec')
+
+        testunit_number = self.test_unit_page.get_testunit_number()
+        self.test_unit_page.save()
         self.test_unit_page.sleep_tiny()
+        testunit_row = self.test_unit_page.search(testunit_number)[0]
+        self.test_unit_page.open_edit_page(testunit_row)
+        self.test_unit_page.set_testunit_type(testunit_type)
         if testunit_type == 'Quantitative':
             self.assertTrue(self.test_unit_page.check_for_quantitative_fields())
         elif testunit_type == 'Qualitative':
