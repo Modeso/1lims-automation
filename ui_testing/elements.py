@@ -551,8 +551,13 @@ elements = {
         'first_sub_order_menu': {'method': 'tag_name',
                              'value': 'a',
                              'order': 0},
-         'duplicate_sub_order': {'method': 'id',
+        'duplicate_sub_order': {'method': 'id',
                             'value': 'child_table_duplicate'},
+        'duplicate_pop_up': {'method': 'id',
+                            'value': 'numberOfCopies'},
+
+        'duplicate_save_btn': {'method': 'id',
+                            'value': 'create_copies_id'},
 
         'analysis_tab': {
             'method': 'xpath',

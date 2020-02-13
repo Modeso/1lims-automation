@@ -182,9 +182,11 @@ class Orders(BasePages):
         return main_order
 
 
-    def click_on_duplicate_sub_order(self):
+    def click_on_duplicate_sub_order(self,no_of_copies):
         childtable_arrow = self.base_selenium.find_element_in_element(destination_element='orders:first_sub_order_menu', source_element='orders:first_sub_order_menu_parent')
         childtable_arrow.click()
         self.base_selenium.click(element='orders:duplicate_sub_order')
+        self.base_selenium.set_text(element='orders:duplicate_pop_up', value=no_of_copies)
+        self.save(save_btn='orders:duplicate_save_btn')
         self.sleep_medium()
 

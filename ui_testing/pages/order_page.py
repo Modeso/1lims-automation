@@ -31,6 +31,8 @@ class Order(Orders):
     def get_material_type(self):
         return self.base_selenium.get_text(element='order:material_type').split('\n')[0]
 
+
+
     def get_article(self):
         return self.base_selenium.get_text(element='order:article').split('\n')[0]
 
@@ -541,6 +543,8 @@ class Order(Orders):
     def navigate_to_analysis_active_table(self):
         self.base_selenium.click(element='orders:analysis_tab')
         self.sleep_small()
+
+
 
 
 
