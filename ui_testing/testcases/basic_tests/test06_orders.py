@@ -416,8 +416,7 @@ class OrdersTestCases(BaseTest):
         no_of_copies = randint(2, 5)
         self.base_selenium.LOGGER.info('get last order row that you created')
         selected_row = self.order_page.get_last_order_row()
-        dianaa = self.base_selenium.get_row_cells_dict_related_to_header(row=selected_row)
-        print(dianaa)
+        data_before_duplicate_main_order= self.base_selenium.get_row_cells_dict_related_to_header(row=selected_row)
         self.order_page.open_child_table(source=selected_row)
         rows_with_childtable = self.order_page.result_table(element='general:table_child')
         for row in rows_with_childtable[:-1]:
@@ -427,29 +426,19 @@ class OrdersTestCases(BaseTest):
         self.order_page.click_on_duplicate_sub_order(no_of_copies)
         table_rows = self.order_page.result_table(element='general:table_child')
         selected_row = self.order_page.get_last_order_row()
-        dianab = self.base_selenium.get_row_cells_dict_related_to_header(row=selected_row)
-        print(dianab)
+        data_after_duplicate_main_order = self.base_selenium.get_row_cells_dict_related_to_header(row=selected_row)
         self.base_selenium.LOGGER.info(
-            'Duplicate   {} times  '.format(no_of_copies))
-        #child_table_rows = self.order_page.search(selected_order_data['Order No.'].replace("'", ""))
+            'Duplicate multiple {} times  '.format(no_of_copies))
+
         self.base_selenium.LOGGER.info(
-            'Make sure that created orders has same data of the oringal order')
+            'Make sure that created orders has same data of the original order')
         for index in range(no_of_copies):
             data_after_duplicate = self.base_selenium.get_row_cells_dict_related_to_header(
                 row=table_rows[index], table_element='general:table_child')
+
             self.base_selenium.LOGGER.info(
                 'Check if order created number:  {} with analyis  '.format(index + 1, ))
             self.assertTrue(data_after_duplicate['Analysis No.'])
-            #self.base_selenium.LOGGER.info(
-                #'Check if order created number:  {} has order number = {}   '.format(index + 1,
-                                                                                     #selected_order_data['Order No.']))
-            #self.assertEqual(
-                #selected_order_data['Order No.'], child_table_data['Order No.'])
-            #self.base_selenium.LOGGER.info(
-                #'Check if order created number:  {} has Contact Name = {}   '.format(index + 1, selected_order_data[
-                    #'Contact Name']))
-            #self.assertEqual(
-                #selected_order_data['Contact Name'], child_table_data['Contact Name'])
 
             self.base_selenium.LOGGER.info(
                 'Check if order created number:  {} has Material Type = {}   '.format(index + 1, data_after_duplicate[
@@ -476,23 +465,30 @@ class OrdersTestCases(BaseTest):
                                                                                                                  'Test Date']))
             self.assertEqual(
                 data_before_duplicate['Test Date'], data_after_duplicate['Test Date'])
+
             self.base_selenium.LOGGER.info('Check if order created number:  {} has Test Plan = {}   '.format(index + 1,
                                                                                                              data_after_duplicate[
-                                                                                                                 'Test Plans']))
+                                                                                                             'Test Plans']))
             self.assertEqual(
                 data_before_duplicate['Test Plans'], data_after_duplicate['Test Plans'])
 
+            self.base_selenium.LOGGER.info('Check if order created number:  {} has Test unit = {}   '.format(index + 1,
+                                                                                                             data_after_duplicate[
+                                                                                                                 'Test Units']))
+            self.assertEqual(
+                data_before_duplicate['Test Units'], data_after_duplicate['Test Units'])
 
-            #self.base_selenium.LOGGER.info(
-               # 'Check if order created number:  {} has order number = {}   '.format(index + 1, )
-
-            #self.assertEqual(
-             #dianaa['Order No.'], dianab['Order No.'])
             self.base_selenium.LOGGER.info(
-                'Check if order created number:  {} has Contact Name = {}   '.format(index + 1, dianab[
+             'Check if order created number:  {} has order number = {}   '.format(index + 1,
+                                                                                     data_after_duplicate_main_order['Order No.']))
+            self.assertEqual(
+             data_before_duplicate_main_order['Order No.'], data_after_duplicate_main_order['Order No.'])
+
+            self.base_selenium.LOGGER.info(
+                'Check if order created number:  {} has Contact Name = {}   '.format(index + 1, data_after_duplicate_main_order[
                        'Contact Name']))
             self.assertEqual(
-             dianaa['Contact Name'], dianab['Contact Name'])
+             data_before_duplicate_main_order['Contact Name'], data_after_duplicate_main_order['Contact Name'])
 
     # will continue with us
     # @skip("https://modeso.atlassian.net/browse/LIMS-4782")
