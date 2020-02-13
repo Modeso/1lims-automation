@@ -406,11 +406,13 @@ class OrdersTestCases(BaseTest):
             'Check if export of order has analyis number = {}  '.format(analysis_number))
         self.assertIn(analysis_number, sheet_values)
 
-    # will change that the duplicate many copies will be from the the child table not from the active table
+
     def test012_duplicate_many_orders(self):
         """
-        New: Orders: Duplication from active table Approach: When I duplicate order 5 times, it will create 5 analysis records with the same order number
+        Make sure that the user can duplicate suborder with multiple copies ( record with test units )
+        Make sure that the user can duplicate suborder with multiple copies ( record with test plans )
         LIMS-4285
+        LIMS-6224
         :return:
         """
         no_of_copies = randint(2, 5)
