@@ -1,4 +1,14 @@
 from ui_testing.testcases.base_test import BaseTest
+from ui_testing.pages.article_page import Article
+from ui_testing.pages.contact_page import Contact
+from ui_testing.pages.testplan_page import TstPlan
+from ui_testing.pages.testunit_page import TstUnit
+from ui_testing.pages.base_pages import BasePages
+from ui_testing.pages.order_page import Order
+from ui_testing.pages.contacts_page import Contacts
+from ui_testing.pages.header_page import Header
+from api_testing.apis.orders_api import OrdersAPI
+from api_testing.apis.contacts_api import ContactsAPI
 from parameterized import parameterized
 import re
 import random
@@ -7,6 +17,17 @@ from unittest import skip
 class ContactsTestCases(BaseTest):
     def setUp(self):
         super().setUp()
+        self.contact_page = Contact()
+        self.contacts_page = Contacts()
+        self.contacts_api = ContactsAPI()
+        self.test_plan = TstPlan()
+        self.article_page = Article()
+        self.test_unit_page = TstUnit()
+        self.order_page = Order()
+        self.orders_api = OrdersAPI()
+        self.header_page = Header()
+        self.base_page = BasePages()
+
         self.login_page.login(username=self.base_selenium.username, password=self.base_selenium.password)
         self.base_selenium.wait_until_page_url_has(text='dashboard')
         self.contact_page.get_contacts_page()

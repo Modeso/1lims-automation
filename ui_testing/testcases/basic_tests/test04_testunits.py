@@ -1,5 +1,12 @@
 from ui_testing.testcases.base_test import BaseTest
 from ui_testing.pages.articles_page import Articles
+from ui_testing.pages.testplan_page import TstPlan
+from ui_testing.pages.testunit_page import TstUnit
+from ui_testing.pages.base_pages import BasePages
+from api_testing.apis.test_unit_api import TestUnitAPI
+from api_testing.apis.article_api import ArticleAPI
+from api_testing.apis.test_plan_api import TestPlanAPI
+from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from unittest import skip
 from parameterized import parameterized
 import re, random
@@ -8,7 +15,14 @@ import re, random
 class TestUnitsTestCases(BaseTest):
     def setUp(self):
         super().setUp()
+        self.test_unit_page = TstUnit()
         self.articles_page = Articles()
+        self.test_plan = TstPlan()
+        self.base_page = BasePages()
+        self.article_api = ArticleAPI()
+        self.test_plan_api = TestPlanAPI()
+        self.test_unit_api = TestUnitAPI()
+        self.general_utilities_api = GeneralUtilitiesAPI()
         self.login_page.login(username=self.base_selenium.username, password=self.base_selenium.password)
         self.base_selenium.wait_until_page_url_has(text='dashboard')
         self.test_unit_page.get_test_units_page()
