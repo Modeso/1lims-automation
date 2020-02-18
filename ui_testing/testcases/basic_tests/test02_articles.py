@@ -875,7 +875,8 @@ class ArticlesTestCases(BaseTest):
         LIMS-6201
 
         """
-        articles = self.get_all_articles()
+        articles_response = self.article_api.get_all_articles()
+        articles = articles_response.json()['articles']
         article_name = random.choice(articles)['name']
         search_results = self.article_page.search(article_name)
         self.assertGreater(len(search_results), 1, " * There is no search results for it, Report a bug.")

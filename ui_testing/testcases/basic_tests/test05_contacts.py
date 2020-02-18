@@ -460,7 +460,9 @@ class ContactsTestCases(BaseTest):
         LIMS-6201
 
         """
-        contacts = self.get_all_contacts()
+
+        contacts_response = self.contacts_api.get_all_contacts()
+        contacts = contacts_response.json()['contacts']
         contact_name = random.choice(contacts)['name']
         search_results = self.contact_page.search(contact_name)
         self.assertGreater(len(search_results), 1, " * There is no search results for it, Report a bug.")

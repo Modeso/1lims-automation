@@ -7,6 +7,7 @@ from ui_testing.pages.order_page import Order
 from api_testing.apis.test_plan_api import TestPlanAPI
 from ui_testing.pages.header_page import Header
 from api_testing.apis.users_api import UsersAPI
+from api_testing.apis.article_api import ArticleAPI
 from unittest import skip
 from parameterized import parameterized
 import random
@@ -23,7 +24,7 @@ class TestPlansTestCases(BaseTest):
         self.base_page = BasePages()
         self.test_plan_api = TestPlanAPI()
         self.users_api = UsersAPI()
-
+        self.article_api = ArticleAPI()
 
         self.login_page.login(username=self.base_selenium.username, password=self.base_selenium.password)
         self.base_selenium.wait_until_page_url_has(text='dashboard')
@@ -566,7 +567,7 @@ class TestPlansTestCases(BaseTest):
         testunit_name = self.generate_random_string()
         self.test_unit_page.get_test_units_page()
 
-        active_articles_with_materialtype_dictionary = self.get_active_articles_with_material_type()
+        active_articles_with_materialtype_dictionary = self.article_api.get_active_articles_with_material_type()
         random_materialtype = random.choice(list(active_articles_with_materialtype_dictionary.keys()))
         articles_with_chosen_materialtype = active_articles_with_materialtype_dictionary[random_materialtype]
         random_article = random.choice(articles_with_chosen_materialtype)
@@ -761,7 +762,8 @@ class TestPlansTestCases(BaseTest):
 
         LIMS-6201
         """
-        testplans = self.get_all_test_plans()
+        test_plans_response = self.test_plan_api.get_all_test_plans()
+        testplans = test_plans_response.json()['testPlans']
         testplan_name = random.choice(testplans)['testPlanName']
         search_results = self.test_plan.search(testplan_name)
         self.assertGreater(len(search_results), 1, " * There is no search results for it, Report a bug.")
