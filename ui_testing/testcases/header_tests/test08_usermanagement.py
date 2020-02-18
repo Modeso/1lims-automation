@@ -82,6 +82,7 @@ class HeaderTestCases(BaseTest):
         """
         self.base_selenium.click(element='header:user_management_button')
         self.base_selenium.LOGGER.info(' * Download XSLX sheet')
+        self.header_page.sleep_small()
         self.header_page.download_xslx_sheet()
         rows_data = self.header_page.get_table_rows_data()
         for index in range(len(rows_data)):
