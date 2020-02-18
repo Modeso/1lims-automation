@@ -53,7 +53,6 @@ class BaseTest(TestCase):
         self.article_api = ArticleAPI()
         self.test_plan_api = TestPlanAPI()
         self.test_unit_api = TestUnitAPI()
-        self.test_plan_api = TestPlanAPI()
         self.orders_api = OrdersAPI()
         self.analysis_api = AnalysisAPI()
         self.single_analysis_page = SingleAnalysisPage()

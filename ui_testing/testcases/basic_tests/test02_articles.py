@@ -1,15 +1,22 @@
 from ui_testing.testcases.base_test import BaseTest
+from ui_testing.pages.article_page import Article
+from ui_testing.pages.testplan_page import TstPlan
+from ui_testing.pages.order_page import Order
+from ui_testing.pages.base_pages import BasePages
 from parameterized import parameterized
 import re
 from unittest import skip
 import random
-import inspect
-
 
 
 class ArticlesTestCases(BaseTest):
     def setUp(self):
         super().setUp()
+        self.article_page = Article()
+        self.test_plan = TstPlan()
+        self.order_page = Order()
+        self.base_page = BasePages()
+
         self.login_page.login(
             username=self.base_selenium.username, password=self.base_selenium.password)
         self.base_selenium.wait_until_page_url_has(text='dashboard')
