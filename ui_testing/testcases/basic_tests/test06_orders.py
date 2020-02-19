@@ -616,33 +616,37 @@ class OrdersTestCases(BaseTest):
         order['Order No.'] = self.orders_api.get_auto_generated_order_no()
         order['Contact Name'] = self.contacts_api.get_all_contacts().json()['contacts'][0]
         order['Material Type'] = self.general_utilities_api.list_all_material_types()[0]
-        order['Article Name'] = self.article_api.list_articles_by_materialtype(materialtype_id=order['Material Type']['id'])[0]
-        order['Test Plans'] = self.article_api.list_testplans_by_article_and_materialtype(materialtype_id=order['Material Type']['id'], article_id=order['Article Name']['id'])[0]
+        order['Article Name'] = self.article_api.list_articles_by_materialtype(
+            materialtype_id=order['Material Type']['id'])[0]
+        order['Test Plans'] = self.article_api.list_testplans_by_article_and_materialtype(
+            materialtype_id=order['Material Type']['id'], article_id=order['Article Name']['id'])[0]
         order['Test Date'] = self.test_unit_page.get_current_date_formated()
-        order['Test Units'] = self.test_unit_api.list_testunit_by_name_and_material_type(materialtype_id=order['Material Type']['id'])[0]
+        order['Test Units'] = self.test_unit_api.list_testunit_by_name_and_material_type(
+            materialtype_id=order['Material Type']['id'])[0]
         order['Shipment Date'] = self.test_unit_page.get_current_date_formated()
         order['Current Year'] = self.test_unit_page.get_current_year()[2:]
         
         # create the order using the order data
-        result = self.orders_api.create_new_order(yearOption=1, orderNo=order['Order No.'], year=order['Current Year'],
-                                                  testUnits=[order['Test Units']], testPlans=[order['Test Plans']], article=order['Article Name'],
-                                                  materialType=order['Material Type'], shipmentDate=order['Shipment Date'],
-                                                  testDate=order['Test Date'], contact=[order['Contact Name']])
+        payload, result = self.orders_api.create_new_order(
+            yearOption=1, orderNo=order['Order No.'], year=order['Current Year'], testUnits=[order['Test Units']],
+            testPlans=[order['Test Plans']], article=order['Article Name'], materialType=order['Material Type'],
+            shipmentDate=order['Shipment Date'], testDate=order['Test Date'], contact=[order['Contact Name']])
 
         # add additional order fields and format the dates to match the table format
-        order['id'] = result['mainOrderId']
+        order['id'] = result['order']['mainOrderId']
         order['Order No.'] = '{}-{}'.format(order['Order No.'], order['Current Year'])
         order['Created On'] = today_date
         order['Shipment Date'] = today_date
         order['Test Date'] = today_date
         order['Changed By'] = {'name': config['site']['username']}
         order['Status'] = {'name': 'open'}
-        # add static already existing department since the ocntact selected might not have department
+        # add static already existing department since the selected contact might not have department
         order['Departments'] = 'labx' 
 
         # in case of analysis no., open the edit mode to get the number
         if key == 'Analysis No.':
-            self.base_selenium.get(url='{}/{}'.format(self.order_page.orders_url, order['id']), sleep=self.base_selenium.TIME_MEDIUM)
+            self.base_selenium.get(
+                url='{}/{}'.format(self.order_page.orders_url, order['id']), sleep=self.base_selenium.TIME_MEDIUM)
             order_edit_data = self.order_page.get_suborder_data()
             order['Analysis No.'] = order_edit_data['suborders'][0]['analysis_no']
             self.order_page.get_orders_page()
@@ -661,7 +665,7 @@ class OrdersTestCases(BaseTest):
         order_row_data = {**main_order, **main_order['suborders'][0]}
 
         # make sure that the row have the filter value
-        self.base_selenium.LOGGER.info(' Assert {} value {} '.format(key, order[key]))
+        self.info(' Assert {} value {} '.format(key, order[key]))
         self.assertEqual(filter_value.lower(), order_row_data[key].lower().replace("'", "").replace('"', ''))
 
     # will continue with us 
