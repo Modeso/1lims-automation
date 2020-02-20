@@ -145,8 +145,9 @@ class Order(Orders):
         return self.base_selenium.get_value(element="order:no")
 
     def set_no(self, no):
-        self.base_selenium.LOGGER.info(' set no. {}'.format(no))
+        self.info(' set no. {}'.format(no))
         self.base_selenium.set_text(element="order:no", value=no)
+        self.sleep_tiny()
 
     def set_existing_number(self, no=''):
         if no:
@@ -443,6 +444,7 @@ class Order(Orders):
         return order_id
 
     def navigate_to_analysis_tab(self):
+        self.base_selenium.scroll()
         self.base_selenium.click('order:analysis_tab')
         self.sleep_small()
 
