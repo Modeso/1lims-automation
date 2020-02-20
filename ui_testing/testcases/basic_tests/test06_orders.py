@@ -6,6 +6,7 @@ from ui_testing.pages.order_page import Order
 from ui_testing.pages.contacts_page import Contacts
 from api_testing.apis.orders_api import OrdersAPI
 from ui_testing.pages.analysis_page import SingleAnalysisPage
+from ui_testing.pages.base_pages import BasePages
 from random import randint
 import time
 
@@ -1933,7 +1934,7 @@ class OrdersTestCases(BaseTest):
 
         self.info('generate new order number to use it for update')
         new_order_no = self.orders_api.get_auto_generated_order_no()
-        year_value = self.base_page.get_current_year()[2:]
+        year_value = self.order_page.get_current_year()[2:]
         formated_order_no = new_order_no + '-' + year_value
         self.info('newly generated order number = {}'.format(formated_order_no))
 
