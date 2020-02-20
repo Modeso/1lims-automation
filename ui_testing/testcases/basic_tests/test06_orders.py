@@ -4,6 +4,8 @@ from parameterized import parameterized
 from ui_testing.testcases.base_test import BaseTest
 from ui_testing.pages.order_page import Order
 from ui_testing.pages.contacts_page import Contacts
+from api_testing.apis.orders_api import OrdersAPI
+from ui_testing.pages.analysis_page import SingleAnalysisPage
 from random import randint
 import time
 
@@ -13,6 +15,8 @@ class OrdersTestCases(BaseTest):
         super().setUp()
         self.order_page = Order()
         self.contacts_page = Contacts()
+        self.orders_api = OrdersAPI()
+        self.single_analysis_page = SingleAnalysisPage()
         self.login_page.login(
             username=self.base_selenium.username, password=self.base_selenium.password)
         self.base_selenium.wait_until_page_url_has(text='dashboard')
