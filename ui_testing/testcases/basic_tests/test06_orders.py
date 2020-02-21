@@ -180,7 +180,7 @@ class OrdersTestCases(BaseTest):
 
         record_id = randint(0, len(self.orders_api.get_archived_orders_json()) - 2)
         order_data = self.orders_api.get_archived_orders_json()[record_id]
-        print(order_data)
+
         order_no = order_data['orderNo']
         self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no, field_type='text')
         suborders_data = self.order_page.get_child_table_data(index=0)
