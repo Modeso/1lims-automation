@@ -168,26 +168,27 @@ class OrdersTestCases(BaseTest):
             self.order_page.archive_selected_orders()
             rows = self.order_page.result_table()
             self.assertEqual(len(rows), 1)
-    
-    # will continue with us
+
     def test005_restore_archived_orders(self):
         """
         Restore Order
         I can restore any order successfully
         LIMS-4374
         """
-
         self.order_page.get_archived_items()
-        order_record = self.order_page.get_random_table_row(table_element='orders:orders_table')
-        order_data = self.base_selenium.get_row_cells_dict_related_to_header(row=order_record)
-        order_no = order_data['Order No.']
+        self.orders_api.get_archived_orders_json()
+
+        record_id = randint(0, len(self.orders_api.get_archived_orders_json()) - 2)
+        order_data = self.orders_api.get_archived_orders_json()[record_id]
+        print(order_data)
+        order_no = order_data['orderNo']
         self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no, field_type='text')
         suborders_data = self.order_page.get_child_table_data(index=0)
         self.order_page.restore_table_suborder(index=0)
         self.base_selenium.LOGGER.info('make sure that suborder is restored successfully')
         if len(suborders_data) > 1:
-            suborder_data_after_archive = self.order_page.get_table_data()
-            self.assertNotEqual(suborder_data_after_archive[0], suborders_data[0])
+            suborder_data_after_restore = self.order_page.get_table_data()
+            self.assertNotEqual(suborder_data_after_restore[0], suborders_data[0])
         else:
             table_records_count = len(self.order_page.result_table()) -1
             self.assertEqual(table_records_count, 0)
