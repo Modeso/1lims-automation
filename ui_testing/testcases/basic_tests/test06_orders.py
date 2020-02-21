@@ -1046,9 +1046,12 @@ class OrdersTestCases(BaseTest):
         New: Orders: Table:  Suborder /Archive Approach: : User can archive any suborder successfully 
         LIMS-3739
         """
-        order_record = self.order_page.get_random_table_row(table_element='orders:orders_table')
-        order_data = self.base_selenium.get_row_cells_dict_related_to_header(row=order_record)
-        order_no = order_data['Order No.']
+        self.orders_api.get_all_orders()
+
+        record_id = randint(0, len(self.orders_api.get_all_orders()) - 2)
+        order_data = self.orders_api.get_all_orders()[record_id]
+
+        order_no = order_data['orderNo']
         self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no, field_type='text')
         suborders_data = self.order_page.get_child_table_data(index=0)
         self.order_page.archive_table_suborder(index=0)
