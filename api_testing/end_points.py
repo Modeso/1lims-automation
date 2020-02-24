@@ -35,6 +35,7 @@ end_points = {
     'orders_api': {
         'list_all_orders': '/api/orders',
         'get_order_by_id': '/api/orderInformation/get/orders/byId/',
+        'get_order_by_orderId': '/api/orderInformation/get/orders/byId/',
         'create_new_order': '/api/orders',
         'get_auto_generated_number': '/api/orders/auto/generatedId',
         'archive_main_order': '/api/orderInformation/',
@@ -43,6 +44,7 @@ end_points = {
         'archive_suborder': '/api/orderInformation/',
         'restore_suborder': '/api/orderInformation/',
         'delete_suborder': '/api/orderInformation/',
+
     },
     'analysis_api': {
         'list_all_analysis': '/api/reportSheets',

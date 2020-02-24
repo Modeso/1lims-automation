@@ -98,6 +98,7 @@ class BasePages:
         self.filter_by(filter_element=filter_element, filter_text=filter_text, field_type=field_type)
         self.filter_apply()
 
+
     def filter_reset(self):
         self.base_selenium.LOGGER.info(' Reset Filter')
         self.base_selenium.click(element='general:filter_reset_btn')

@@ -521,6 +521,7 @@ class TestPlansTestCases(BaseTest):
         testplan_data = \
         (self.test_plan_api.get_testplan_with_filter(filter_option='number', filter_text=testplan_number))[0]
 
+
         # get information, material type and article
         testplan_name = testplan_data['testPlanName']
         testplan_materialtype = testplan_data['materialType']
