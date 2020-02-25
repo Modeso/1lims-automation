@@ -1916,12 +1916,12 @@ class OrdersTestCases(BaseTest):
         all those suborders numbers updated according to that 
         and ( this will effect in the analysis records also that mean all order number of those records 
         will updated according to that in the active table )
+
         LIMS-4270
         """
-
         self.info('generate new order number to use it for update')
         new_order_no = self.orders_api.get_auto_generated_order_no()
-        year_value = self.base_page.get_current_year()[2:]
+        year_value = self.order_page.get_current_year()[2:]
         formated_order_no = new_order_no + '-' + year_value
         self.info('newly generated order number = {}'.format(formated_order_no))
 
@@ -1929,17 +1929,17 @@ class OrdersTestCases(BaseTest):
         self.order_page.set_no(no=formated_order_no)
         self.order_page.save(save_btn='order:save_btn')
 
-        self.base_selenium.LOGGER.info('refresh to make sure that data are saved correctly')
+        self.info('refresh to make sure that data are saved correctly')
         self.base_selenium.refresh()
         order_no_after_update = self.order_page.get_no()
 
-        self.base_selenium.LOGGER.info('order no is {}, and it should be {}'.format(order_no_after_update, formated_order_no))
-        self.assertEqual(order_no_after_update, formated_order_no)
-        
-        self.base_selenium.LOGGER.info('navigate to analysis tab to make sure that order no updated correctly')
+        self.info('order no is {}, and it should be {}'.format(order_no_after_update, formated_order_no))
+        self.assertEqual(order_no_after_update.replace("'", ""), formated_order_no)
+
+        self.info('navigate to analysis tab to make sure that order no updated correctly')
         self.order_page.navigate_to_analysis_tab()
         analysis_records = self.single_analysis_page.get_all_analysis_records()
-        
-        self.base_selenium.LOGGER.info('checking order no of each analysis')
+
+        self.info('checking order no of each analysis')
         for record in analysis_records:
             self.assertEqual(record['Order No.'], formated_order_no)
