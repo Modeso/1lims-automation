@@ -1,6 +1,6 @@
 from api_testing.apis.base_api import BaseAPI
 
-class ArticleAPI(BaseAPI):
+class ArticleAPIRequests(BaseAPI):
     def get_all_articles(self, **kwargs):
         api = '{}{}'.format(self.url, self.END_POINTS['article_api']['list_all_articles'])
         _payload = {"sort_value": "number",
@@ -9,22 +9,15 @@ class ArticleAPI(BaseAPI):
                     "sort_order": "DESC",
                     "filter": "{}",
                     "deleted": "0"}
-        payload = self.update_payload(_payload, **kwargs)
-        self.info('GET : {}'.format(api))
-        response = self.session.get(api, params=payload, headers=self.headers, verify=False)
-        self.info('Status code: {}'.format(response.status_code))
-        return response
+        return api, _payload
+
 
     def get_article_form_data(self, id=1):
         api = '{}{}{}'.format(self.url, self.END_POINTS['article_api']['form_data'], str(id))
         self.info('GET : {}'.format(api))
-        response = self.session.get(api, params='', headers=self.headers, verify=False)
-        self.info('Status code: {}'.format(response.status_code))
-        data = response.json()
-        if data['status'] == 1:
-            return data['article']
-        else:
-            return False
+        response_json = self.session.get(api, params='', headers=self.headers, verify=False).json()
+        self.info('Status code: {}'.format(response_json['status']))
+        return response_json
 
     def archive_articles(self, ids=['1']):
         api = '{}{}{}/archive'.format(self.url, self.END_POINTS['article_api']['archive_articles'], ','.join(ids))
@@ -145,3 +138,4 @@ class ArticleAPI(BaseAPI):
         all_articles = response.json()['articles']
         articles = [article for article in all_articles if len(article['testPlanNames']) >= 1]
         return articles
+class ArticleAPI(ArticleAPIRequests):

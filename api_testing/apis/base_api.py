@@ -17,7 +17,6 @@ class BaseAPI:
 
     _instance = None
 
-
     def __new__(class_, *args, **kwargs):
         if not isinstance(class_._instance, class_):
             class_._instance = object.__new__(class_, *args, **kwargs)
@@ -55,6 +54,15 @@ class BaseAPI:
         self.headers['Authorization'] = BaseAPI.AUTHORIZATION
         return BaseAPI.AUTHORIZATION
 
+    def get_api(self, request_method):
+        def wrapper():
+            api, _payload, kwargs = request_method()
+            payload = self.update_payload(_payload, **kwargs)
+            self.info('GET : {}'.format(api))
+            response_json = self.session.get(api, params=payload, headers=self.headers, verify=False).json()
+            self.info('Status code: {}'.format(response_json['status']))
+            return response_json, payload
+        return wrapper
 
     @staticmethod
     def update_payload(payload, **kwargs):
