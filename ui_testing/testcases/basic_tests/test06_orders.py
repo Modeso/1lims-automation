@@ -4,6 +4,10 @@ from parameterized import parameterized
 from ui_testing.testcases.base_test import BaseTest
 from ui_testing.pages.order_page import Order
 from ui_testing.pages.orders_page import Orders
+from ui_testing.pages.analysis_page import SingleAnalysisPage
+from api_testing.apis.article_api import ArticleAPI
+from api_testing.apis.test_unit_api import TestUnitAPI
+from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from random import randint
 import random
 
@@ -13,6 +17,10 @@ class OrdersTestCases(BaseTest):
         super().setUp()
         self.order_page = Order()
         self.orders_page = Orders()
+        self.article_api = ArticleAPI()
+        self.test_unit_api = TestUnitAPI()
+        self.single_analysis_page = SingleAnalysisPage()
+        self.general_utilities_api = GeneralUtilitiesAPI()
         self.login_page.login(
             username=self.base_selenium.username, password=self.base_selenium.password)
         self.base_selenium.wait_until_page_url_has(text='dashboard')
@@ -1813,11 +1821,11 @@ class OrdersTestCases(BaseTest):
 
     def test30_create_new_suborder_with_testunit(self):
         """
-        In case I create new suborder with test unit, make sure one analysis record created according to that 
+        In case I create new suborder with test unit, make sure one
+        analysis record created according to that
+
         LIMS-4255
         """
-
-
         self.info('preparing data needed for creating new suborder')
         materialtype_record = self.general_utilities_api.list_all_material_types()[0]
         materialtype = {
@@ -1830,33 +1838,38 @@ class OrdersTestCases(BaseTest):
         testunits_list = self.test_unit_api.get_all_test_units(filter='{"materialTypes":"all"}').json()['testUnits']
         testunit_record = testunits_list[0]
 
-        self.base_selenium.LOGGER.info('open random record')
+        self.info('open random record')
         self.order_page.get_random_order()
 
-        self.base_selenium.LOGGER.info('getting analysis tab to check out the count of the analysis')
+        self.info('getting analysis tab to check out the count of the analysis')
         self.order_page.navigate_to_analysis_tab()
         analysis_count_before_adding = self.single_analysis_page.get_analysis_count()
 
-        self.base_selenium.LOGGER.info('get back to order tab')
+        self.info('get back to order tab')
         self.single_analysis_page.navigate_to_order_tab()
         order_data_before_adding_new_suborder = self.order_page.get_suborder_data()
-        self.base_selenium.LOGGER.info('create new suborder with materialtype {}, and article {}, and testunit {}'.format(materialtype['text'],random_article_name, testunit_record['name']))
-        self.order_page.create_new_suborder_with_test_units(material_type=materialtype['text'], article_name=random_article_name, test_unit=testunit_record['name'])
+
+        self.info('create new suborder with materialtype {}, and article {}, and testunit {}'.format(
+            materialtype['text'], random_article_name, testunit_record['name']))
+
+        self.order_page.create_new_suborder_with_test_units(
+            material_type=materialtype['text'], article_name=random_article_name, test_unit=testunit_record['name'])
         self.order_page.save(save_btn='order:save_btn')
         self.order_page.sleep_small()
         self.base_selenium.refresh()
         order_data_after_adding_new_suborder = self.order_page.get_suborder_data()
-        self.assertEqual(len(order_data_before_adding_new_suborder['suborders'])+1, len(order_data_after_adding_new_suborder['suborders']))
+        self.assertEqual(len(order_data_before_adding_new_suborder['suborders'])+1,
+                         len(order_data_after_adding_new_suborder['suborders']))
         
-        self.base_selenium.LOGGER.info('navigate to analysis page to make sure that only one analysis is added')
+        self.info('navigate to analysis page to make sure that only one analysis is added')
         self.order_page.navigate_to_analysis_tab()
         analysis_count = self.single_analysis_page.get_analysis_count()
         
-        self.base_selenium.LOGGER.info('check analysis count')
+        self.info('check analysis count')
         self.assertEqual(analysis_count, analysis_count_before_adding+1)
 
         analysis_record = self.single_analysis_page.open_accordion_for_analysis_index(analysis_count-1)
-        testunit_in_analysis=self.single_analysis_page.get_testunits_in_analysis(source=analysis_record)
+        testunit_in_analysis = self.single_analysis_page.get_testunits_in_analysis(source=analysis_record)
         self.assertEqual(len(testunit_in_analysis), 1)
         testunit_name = testunit_in_analysis[0]['']
         self.assertIn(testunit_record['name'], testunit_name)
