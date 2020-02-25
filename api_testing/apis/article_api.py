@@ -70,7 +70,7 @@ class ArticleAPI(BaseAPI):
         else:
             return False
 
-    def create_article(self, number, name, material_type={"id": "", "text": ""}, **kwargs):
+    def create_article(self, number, name, material_type, **kwargs):
         """
         Create an article.
         :param number: article number.
@@ -84,11 +84,10 @@ class ArticleAPI(BaseAPI):
             "No": number,
             "name": name,
             "materialType": material_type,
-            "selectedArticles": [],
-            "selectedArticlesNos": [],
-            "dynamicFieldsValues": [],
-            "selectedMaterialType": [material_type],
-            "materialTypeId": [material_type['id']]
+            "testPlanNames": [],
+            "unit": "",
+            "comment": "",
+            "dynamicFields": []
         }
         payload = self.update_payload(_payload, **kwargs)
         self.info('POST : {}'.format(api))

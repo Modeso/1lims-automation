@@ -5,8 +5,10 @@ from ui_testing.testcases.base_test import BaseTest
 from ui_testing.pages.order_page import Order
 from ui_testing.pages.orders_page import Orders
 from ui_testing.pages.analysis_page import SingleAnalysisPage
+from api_testing.apis.orders_api import OrdersAPI
 from api_testing.apis.article_api import ArticleAPI
 from api_testing.apis.test_unit_api import TestUnitAPI
+from api_testing.apis.contacts_api import ContactsAPI
 from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from ui_testing.pages.contacts_page import Contacts
 from random import randint
@@ -18,8 +20,10 @@ class OrdersTestCases(BaseTest):
         super().setUp()
         self.order_page = Order()
         self.orders_page = Orders()
+        self.orders_api = OrdersAPI()
         self.article_api = ArticleAPI()
         self.test_unit_api = TestUnitAPI()
+        self.contacts_api = ContactsAPI()
         self.single_analysis_page = SingleAnalysisPage()
         self.general_utilities_api = GeneralUtilitiesAPI()
         self.contacts_page = Contacts()
@@ -1839,10 +1843,12 @@ class OrdersTestCases(BaseTest):
         }
         random_article_name = self.generate_random_string()
         random_article_number = self.generate_random_number()
-        self.article_api.create_article(No=random_article_number, name=random_article_name, materialType=materialtype)
+        import ipdb;ipdb.set_trace()
+        self.article_api.create_article(
+            number=random_article_number, name=random_article_name, material_type=materialtype_record['name'])
+
         testunits_list = self.test_unit_api.get_all_test_units(filter='{"materialTypes":"all"}').json()['testUnits']
         testunit_record = testunits_list[0]
-
         self.info('open random record')
         self.order_page.get_random_order()
 
@@ -1860,7 +1866,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.create_new_suborder_with_test_units(
             material_type=materialtype['text'], article_name=random_article_name, test_unit=testunit_record['name'])
         self.order_page.save(save_btn='order:save_btn')
-        self.order_page.sleep_small()
+        self.order_page.sleep_tiny()
         self.base_selenium.refresh()
         order_data_after_adding_new_suborder = self.order_page.get_suborder_data()
         self.assertEqual(len(order_data_before_adding_new_suborder['suborders'])+1,

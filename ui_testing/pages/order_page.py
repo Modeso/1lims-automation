@@ -443,18 +443,19 @@ class Order(Orders):
 
     def create_new_suborder_with_test_units(self, material_type='', article_name='', test_unit='', **kwargs):
         rows_before = self.base_selenium.get_table_rows(element='order:suborder_table')
-        self.base_selenium.LOGGER.info(' Add new suborder.')
+        self.info(' Add new suborder.')
         self.base_selenium.click(element='order:add_new_item')
 
         rows_after = self.base_selenium.get_table_rows(element='order:suborder_table')
-
-        self.base_selenium.LOGGER.info(' Set material type : {}'.format(material_type))
+        self.info(' Set material type : {}'.format(material_type))
         self.set_material_type(material_type=material_type)
         self.sleep_tiny()
-        self.base_selenium.LOGGER.info(' Set article name : {}'.format(article_name))
+        self.info(' Set article name : {}'.format(article_name))
         self.set_article(article=article_name)
-        self.base_selenium.LOGGER.info(' Set Test Unit  : {}'.format(test_unit))
+        self.sleep_tiny()
+        self.info(' Set Test Unit  : {}'.format(test_unit))
         self.set_test_unit(test_unit=test_unit)
+        self.sleep_tiny()
 
     def get_order_id(self):
         current_splited_url = self.base_selenium.get_url().split('/')
