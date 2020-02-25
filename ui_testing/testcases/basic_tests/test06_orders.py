@@ -644,10 +644,12 @@ class OrdersTestCases(BaseTest):
         order['Current Year'] = self.test_unit_page.get_current_year()[2:]
         
         # create the order using the order data
-        payload, result = self.orders_api.create_new_order(
-            yearOption=1, orderNo=order['Order No.'], year=order['Current Year'], testUnits=[order['Test Units']],
-            testPlans=[order['Test Plans']], article=order['Article Name'], materialType=order['Material Type'],
-            shipmentDate=order['Shipment Date'], testDate=order['Test Date'], contact=[order['Contact Name']])
+        payload, result = \
+            self.orders_api.create_new_order(yearOption=1, orderNo=order['Order No.'],
+                                             year=order['Current Year'], testUnits=[order['Test Units']],
+                                             testPlans=[order['Test Plans']], article=order['Article Name'],
+                                             materialType=order['Material Type'], shipmentDate=order['Shipment Date'],
+                                             testDate=order['Test Date'], contact=[order['Contact Name']])
 
         # add additional order fields and format the dates to match the table format
         order['id'] = result['order']['mainOrderId']
