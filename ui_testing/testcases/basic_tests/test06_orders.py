@@ -3,6 +3,8 @@ from unittest import skip
 from parameterized import parameterized
 from testconfig import config
 from ui_testing.testcases.base_test import BaseTest
+from ui_testing.pages.order_page import Order
+from ui_testing.pages.contacts_page import Contacts
 from random import randint
 from datetime import date
 import time
@@ -11,6 +13,8 @@ import time
 class OrdersTestCases(BaseTest):
     def setUp(self):
         super().setUp()
+        self.order_page = Order()
+        self.contacts_page = Contacts()
         self.login_page.login(
             username=self.base_selenium.username, password=self.base_selenium.password)
         self.base_selenium.wait_until_page_url_has(text='dashboard')
