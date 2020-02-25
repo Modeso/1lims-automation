@@ -2,13 +2,17 @@ import re
 from unittest import skip
 from parameterized import parameterized
 from ui_testing.testcases.base_test import BaseTest
+from ui_testing.pages.order_page import Order
+from ui_testing.pages.orders_page import Orders
 from random import randint
-import time
+import random
 
 
 class OrdersTestCases(BaseTest):
     def setUp(self):
         super().setUp()
+        self.order_page = Order()
+        self.orders_page = Orders()
         self.login_page.login(
             username=self.base_selenium.username, password=self.base_selenium.password)
         self.base_selenium.wait_until_page_url_has(text='dashboard')
@@ -1860,17 +1864,17 @@ class OrdersTestCases(BaseTest):
     @parameterized.expand(['save_btn', 'cancel_btn'])
     def test31_update_departments_in_second_suborder(self, action):
         """
-         Orders: department Approach: In case I update the department then press on save button 
-         ( the department updated successfully ) & 
-         when I press on cancel button ( this department not updated ) ( this will apply from the second order)
+         Orders: department Approach: In case I update the department then press on save button
+         (the department updated successfully) & when I press on cancel button (this department
+         not updated) (this will apply from the second order)
+
          LIMS-6523
         """
-        self.base_selenium.LOGGER.info('open random record')
-        random_record = self.order_page.get_random_table_row(table_element='orders:orders_table')
-        random_record_data = self.base_selenium.get_row_cells_dict_related_to_header(row=random_record)
-        order_no = random_record_data['Order No.']
-        self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no, field_type='text')
-        self.order_page.open_edit_page(row=self.order_page.result_table()[0])
+        self.info('open random record')
+        orders = self.orders_api.get_all_orders().json()['orders']
+        order = random.choice(orders)
+        order_id = order['id']
+        self.orders_page.get_order_edit_page_by_id(id=order_id)
 
         random_contact_name = self.generate_random_string()
         random_contact_number = self.generate_random_number()
@@ -1882,31 +1886,27 @@ class OrdersTestCases(BaseTest):
             'id': 'new'
         }
 
-        contact_created = self.contacts_api.create_contact(name=random_contact_name, companyNo=random_contact_number, departments=[department_object])
-        self.info(contact_created)
-        
+        contact_created = self.contacts_api.create_contact(name=random_contact_name, companyNo=random_contact_number,
+                                                           departments=[department_object])
         order_data = self.order_page.get_suborder_data()
 
-        if len(order_data['suborders']) <=1:
+        if len(order_data['suborders']) <= 1:
             self.order_page.duplicate_from_table_view()
             self.order_page.save(save_btn='order:save_btn')
-        
+
         self.order_page.set_contact(contact=random_contact_name)
         self.order_page.save(save_btn='order:save_btn')
         self.base_selenium.refresh()
         selected_suborder_data = self.order_page.get_suborder_data()
-
         self.order_page.update_suborder(sub_order_index=1, departments=random_contact_department)
-        
-        self.order_page.save(save_btn='order:'+action)
+        self.order_page.save(save_btn='order:' + action)
         if action == 'save_btn':
             self.base_selenium.refresh()
             suborder_data_after_update = self.order_page.get_suborder_data()
             self.assertIn(random_contact_department, suborder_data_after_update['suborders'][1]['departments'])
         else:
             self.order_page.confirm_popup()
-            self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no, field_type='text')
-            self.order_page.open_edit_page(row=self.order_page.result_table()[0])
+            self.orders_page.get_order_edit_page_by_id(id=order_id)
             suborder_data_after_cancel = self.order_page.get_suborder_data()
             self.assertEqual(suborder_data_after_cancel['suborders'][1], selected_suborder_data['suborders'][1])
 
