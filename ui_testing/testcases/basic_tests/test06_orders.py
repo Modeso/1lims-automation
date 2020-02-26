@@ -1876,28 +1876,28 @@ class OrdersTestCases(BaseTest):
 
     def test30_create_new_suborder_with_testunit(self):
         """
-        In case I create new suborder with test unit, make sure one
-        analysis record created according to that
+        New: Orders: Create Approach: I can create suborder with test unit successfully,
+        make sure the record created successfully in the analysis section.
 
         LIMS-4255
         """
-        self.info('create article')
         article, article_data = self.article_api.create_article()
+        testunit_record = random.choice(self.test_unit_api.get_all_test_units(
+            filter='{"materialTypes":"all"}').json()['testUnits'])
 
-        self.info('read any test unit record with all material type')
-        testunits_list = self.test_unit_api.get_all_test_units(filter='{"materialTypes":"all"}').json()['testUnits']
-        testunit_record = random.choice(testunits_list)
-
-        self.order_page.get_random_order()
+        order = random.choice(self.orders_api.get_all_orders().json()['orders'])
+        self.orders_page.get_order_edit_page_by_id(id=order['id'])
 
         self.info('getting analysis tab to check out the count of the analysis')
         self.order_page.navigate_to_analysis_tab()
         analysis_count_before_adding = self.single_analysis_page.get_analysis_count()
-        self.info('count of analysis equals:' + str(analysis_count_before_adding))
 
         self.info('get back to order tab')
         self.single_analysis_page.navigate_to_order_tab()
         order_data_before_adding_new_suborder = self.order_page.get_suborder_data()
+        suborder_count_before_adding = len(order_data_before_adding_new_suborder['suborders'])
+        self.info('count of analysis equals: ' + str(analysis_count_before_adding) +
+                  "\t count of suborders equals: " + str(suborder_count_before_adding))
 
         self.info('create new suborder with materialType {}, and article {}, and testUnit {}'.format(
             article_data['materialType']['text'], article['name'], testunit_record['name']))
@@ -1905,12 +1905,12 @@ class OrdersTestCases(BaseTest):
         self.order_page.create_new_suborder_with_test_units(
             material_type=article_data['materialType']['text'],
             article_name=article['name'], test_unit=testunit_record['name'])
-
-        self.order_page.save(save_btn='order:save_btn')
-        self.order_page.sleep_tiny()
+        self.order_page.save(save_btn='order:save_btn', sleep=True)
         self.base_selenium.refresh()
+        self.order_page.sleep_tiny()
+
         order_data_after_adding_new_suborder = self.order_page.get_suborder_data()
-        self.assertEqual(len(order_data_before_adding_new_suborder['suborders']) + 1,
+        self.assertEqual(suborder_count_before_adding + 1,
                          len(order_data_after_adding_new_suborder['suborders']))
 
         self.info('navigate to analysis page to make sure that only one analysis is added')
@@ -1918,9 +1918,9 @@ class OrdersTestCases(BaseTest):
         analysis_count = self.single_analysis_page.get_analysis_count()
 
         self.info('check analysis count\t'+ str (analysis_count) + "\tequals\t"+ str(analysis_count_before_adding + 1))
-        self.assertEqual(analysis_count, analysis_count_before_adding + 1)
+        self.assertGreaterEqual(analysis_count, analysis_count_before_adding+1)
 
-        analysis_record = self.single_analysis_page.open_accordion_for_analysis_index(analysis_count - 1)
+        analysis_record = self.single_analysis_page.open_accordion_for_analysis_index(analysis_count-1)
         testunit_in_analysis = self.single_analysis_page.get_testunits_in_analysis(source=analysis_record)
         self.assertEqual(len(testunit_in_analysis), 1)
         testunit_name = testunit_in_analysis[0]['']
@@ -1936,8 +1936,7 @@ class OrdersTestCases(BaseTest):
          LIMS-6523
         """
         self.info('open random order record')
-        orders = self.orders_api.get_all_orders().json()['orders']
-        order = random.choice(orders)
+        order = random.choice(self.orders_api.get_all_orders().json()['orders'])
         order_id = order['id']
         self.orders_page.get_order_edit_page_by_id(id=order_id)
 
@@ -1968,9 +1967,9 @@ class OrdersTestCases(BaseTest):
     def test32_update_order_no_should_reflect_all_suborders_and_analysis(self):
         """
         In case I update the order number of record that has multiple suborders inside it
-        all those suborders numbers updated according to that 
-        and ( this will effect in the analysis records also that mean all order number of those records 
-        will updated according to that in the active table )
+        all those suborders numbers updated according to that and (this will effect in the
+        analysis records also that mean all order number of those records will updated
+        according to that in the active table )
 
         LIMS-4270
         """
@@ -1980,7 +1979,9 @@ class OrdersTestCases(BaseTest):
         formated_order_no = new_order_no + '-' + year_value
         self.info('newly generated order number = {}'.format(formated_order_no))
 
-        self.order_page.get_random_order()
+        order = random.choice(self.orders_api.get_all_orders().json()['orders'])
+        self.orders_page.get_order_edit_page_by_id(id=order['id'])
+
         self.order_page.set_no(no=formated_order_no)
         self.order_page.save(save_btn='order:save_btn')
 

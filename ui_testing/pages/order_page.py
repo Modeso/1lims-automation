@@ -154,7 +154,7 @@ class Order(Orders):
     def set_no(self, no):
         self.info(' set no. {}'.format(no))
         self.base_selenium.set_text(element="order:no", value=no)
-        self.sleep_tiny()
+        self.sleep_small()
 
     def set_existing_number(self, no=''):
         if no:

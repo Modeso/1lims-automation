@@ -26,7 +26,6 @@ class SingleAnalysisPage(AllAnalysesPage):
 
     def get_analysis_count(self):
         all_accordion_items = self.base_selenium.find_element('analysis_page:all_rows')
-        self.info("all_accordion_items" + str(len(all_accordion_items)-1))
         return len(all_accordion_items)-1
 
     def navigate_to_order_tab(self):
