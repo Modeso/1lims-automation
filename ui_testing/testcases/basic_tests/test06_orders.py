@@ -1888,7 +1888,6 @@ class OrdersTestCases(BaseTest):
         testunits_list = self.test_unit_api.get_all_test_units(filter='{"materialTypes":"all"}').json()['testUnits']
         testunit_record = random.choice(testunits_list)
 
-        self.info('open random order record')
         self.order_page.get_random_order()
 
         self.info('getting analysis tab to check out the count of the analysis')
@@ -1900,7 +1899,7 @@ class OrdersTestCases(BaseTest):
         self.single_analysis_page.navigate_to_order_tab()
         order_data_before_adding_new_suborder = self.order_page.get_suborder_data()
 
-        self.info('create new suborder with materialtype {}, and article {}, and testunit {}'.format(
+        self.info('create new suborder with materialType {}, and article {}, and testUnit {}'.format(
             article_data['materialType']['text'], article['name'], testunit_record['name']))
 
         self.order_page.create_new_suborder_with_test_units(
