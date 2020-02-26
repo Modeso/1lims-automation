@@ -465,7 +465,7 @@ class Order(Orders):
     def navigate_to_analysis_tab(self):
         self.base_selenium.scroll()
         self.base_selenium.click('order:analysis_tab')
-        self.sleep_tiny()
+        self.sleep_small()
 
     def remove_article(self, testplans=''):
         self.base_selenium.LOGGER.info('clear article data')

@@ -1822,10 +1822,10 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.LOGGER.info('get completed testplans with articles based on the suborder materialtype')
         materialtype_list = self.general_utilities_api.list_all_material_types()
         materialtype_object = \
-        list(filter(lambda x: x['name'] == selected_suborder_data['material_type'], materialtype_list))[0]
+            list(filter(lambda x: x['name'] == selected_suborder_data['material_type'], materialtype_list))[0]
 
         testunit_with_materialtype_all = \
-        self.test_unit_api.get_all_test_units(filter='{"materialTypes":"all"}').json()['testUnits'][0]
+            self.test_unit_api.get_all_test_units(filter='{"materialTypes":"all"}').json()['testUnits'][0]
         testunit_form_data = self.test_unit_api.get_testunit_form_data(id=testunit_with_materialtype_all['id'])
         # create random article
         random_article_name = self.order_page.generate_random_text()
@@ -1894,6 +1894,7 @@ class OrdersTestCases(BaseTest):
         self.info('getting analysis tab to check out the count of the analysis')
         self.order_page.navigate_to_analysis_tab()
         analysis_count_before_adding = self.single_analysis_page.get_analysis_count()
+        self.info('count of analysis equals:' + str(analysis_count_before_adding))
 
         self.info('get back to order tab')
         self.single_analysis_page.navigate_to_order_tab()
@@ -1917,7 +1918,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.navigate_to_analysis_tab()
         analysis_count = self.single_analysis_page.get_analysis_count()
 
-        self.info('check analysis count')
+        self.info('check analysis count\t'+ str (analysis_count) + "\tequals\t"+ str(analysis_count_before_adding + 1))
         self.assertEqual(analysis_count, analysis_count_before_adding + 1)
 
         analysis_record = self.single_analysis_page.open_accordion_for_analysis_index(analysis_count - 1)
