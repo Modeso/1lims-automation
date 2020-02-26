@@ -1889,40 +1889,30 @@ class OrdersTestCases(BaseTest):
 
          LIMS-6523
         """
-        self.info('open random record')
+        self.info('open random order record')
         orders = self.orders_api.get_all_orders().json()['orders']
         order = random.choice(orders)
         order_id = order['id']
         self.orders_page.get_order_edit_page_by_id(id=order_id)
 
-        random_contact_name = self.generate_random_string()
-        random_contact_number = self.generate_random_number()
-        random_contact_department = self.generate_random_string()
-        department_object = {
-            'display': random_contact_department,
-            'value': random_contact_department,
-            'text': random_contact_department,
-            'id': 'new'
-        }
-
-        contact_created = self.contacts_api.create_contact(name=random_contact_name, companyNo=random_contact_number,
-                                                           departments=[department_object])
+        self.info('create contact')
+        contact, contact_id = self.contacts_api.create_contact()
         order_data = self.order_page.get_suborder_data()
-
         if len(order_data['suborders']) <= 1:
             self.order_page.duplicate_from_table_view()
             self.order_page.save(save_btn='order:save_btn')
 
-        self.order_page.set_contact(contact=random_contact_name)
+        self.order_page.set_contact(contact=contact['name'])
         self.order_page.save(save_btn='order:save_btn')
         self.base_selenium.refresh()
+
         selected_suborder_data = self.order_page.get_suborder_data()
-        self.order_page.update_suborder(sub_order_index=1, departments=random_contact_department)
+        self.order_page.update_suborder(sub_order_index=1, departments=contact['departments'][0]['text'])
         self.order_page.save(save_btn='order:' + action)
         if action == 'save_btn':
             self.base_selenium.refresh()
             suborder_data_after_update = self.order_page.get_suborder_data()
-            self.assertIn(random_contact_department, suborder_data_after_update['suborders'][1]['departments'])
+            self.assertIn(contact['departments'][0]['text'], suborder_data_after_update['suborders'][1]['departments'])
         else:
             self.order_page.confirm_popup()
             self.orders_page.get_order_edit_page_by_id(id=order_id)
