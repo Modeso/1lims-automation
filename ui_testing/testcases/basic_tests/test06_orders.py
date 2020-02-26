@@ -202,7 +202,6 @@ class OrdersTestCases(BaseTest):
         archived_items = self.orders_api.get_all_orders(limit=20,deleted=1).json()['orders']
         row_id = randint(0, len(archived_items))
         order_number = archived_items[row_id]['orderNo']
-        print(order_number)
 
         rows = self.base_selenium.get_table_rows(element='general:table')
         order_row = rows[row_id]
