@@ -1835,21 +1835,14 @@ class OrdersTestCases(BaseTest):
 
         LIMS-4255
         """
-        self.info('preparing data needed for creating new suborder')
-        materialtype_record = self.general_utilities_api.list_all_material_types()[0]
-        materialtype = {
-            'id': materialtype_record['id'],
-            'text': materialtype_record['name']
-        }
-        random_article_name = self.generate_random_string()
-        random_article_number = self.generate_random_number()
-        import ipdb;ipdb.set_trace()
-        self.article_api.create_article(
-            number=random_article_number, name=random_article_name, material_type=materialtype_record['name'])
+        self.info('create article')
+        article, article_data = self.article_api.create_article()
 
+        self.info('read any test unit record with all material type')
         testunits_list = self.test_unit_api.get_all_test_units(filter='{"materialTypes":"all"}').json()['testUnits']
         testunit_record = testunits_list[0]
-        self.info('open random record')
+
+        self.info('open random order record')
         self.order_page.get_random_order()
 
         self.info('getting analysis tab to check out the count of the analysis')
@@ -1861,10 +1854,12 @@ class OrdersTestCases(BaseTest):
         order_data_before_adding_new_suborder = self.order_page.get_suborder_data()
 
         self.info('create new suborder with materialtype {}, and article {}, and testunit {}'.format(
-            materialtype['text'], random_article_name, testunit_record['name']))
+            article_data['materialType']['text'], article['name'], testunit_record['name']))
 
         self.order_page.create_new_suborder_with_test_units(
-            material_type=materialtype['text'], article_name=random_article_name, test_unit=testunit_record['name'])
+            material_type=article_data['materialType']['text'],
+            article_name=article['name'], test_unit=testunit_record['name'])
+
         self.order_page.save(save_btn='order:save_btn')
         self.order_page.sleep_tiny()
         self.base_selenium.refresh()
