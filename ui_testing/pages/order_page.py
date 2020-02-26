@@ -129,11 +129,21 @@ class Order(Orders):
         self.set_existing_order()
         order_no = self.set_existing_number(no)
         self.set_material_type(material_type=material_type)
+        self.sleep_small()
         self.set_article(article=article)
+        self.sleep_small()
         self.set_contact(contact=contact)
+        self.sleep_small()
+        result = self.get_no()
 
         for test_unit in test_units:
             self.set_test_unit(test_unit)
+
+        self.sleep_small()
+        self.save(save_btn='order:save_btn')
+        self.base_selenium.LOGGER.info(' Order created with no : {} '.format(result))
+        return self.get_suborder_data()
+
 
     def create_existing_order_with_auto_fill(self, no=''):
         self.base_selenium.LOGGER.info(' Create new order.')
@@ -472,6 +482,6 @@ class Order(Orders):
         order_id = current_splited_url[(len(current_splited_url)-1)]
         return order_id
 
-    def navigate_to_analysis_tab(self):
-        self.base_selenium.click('order:analysis_tab')
+    def navigate_to_analysis_active_table(self):
+        self.base_selenium.click(element='orders:analysis_tab')
         self.sleep_small()

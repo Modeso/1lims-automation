@@ -543,7 +543,10 @@ elements = {
         'test_date_filter': {'method': 'id',
                              'value': 'start_testDate'},
         'shipment_date_filter': {'method': 'id',
-                                 'value': 'start_shipmentDate'}
+                                 'value': 'start_shipmentDate'},
+        'analysis_tab': {
+            'method': 'xpath',
+            'value': "//label[@class='btn tab']"},
     },
 
     'audit_trail': {
@@ -647,9 +650,6 @@ elements = {
             'method': 'id',
             'value': 'nofield'
         },
-        'analysis_tab': {'method': 'xpath',
-                         'value': "//span[@class='m-wizard__step-label'][contains(text(),'Analysis')]"
-                         }
     },
 
     'header': {
