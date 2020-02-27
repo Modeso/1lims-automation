@@ -3,6 +3,8 @@ from unittest import skip
 from parameterized import parameterized
 from ui_testing.testcases.base_test import BaseTest
 from api_testing.apis.orders_api import OrdersAPI
+from ui_testing.pages.order_page import Order
+from ui_testing.pages.contacts_page import Contacts
 from random import randint
 import time
 
@@ -11,6 +13,8 @@ class OrdersTestCases(BaseTest):
     def setUp(self):
         super().setUp()
         self.orders_api = OrdersAPI()
+        self.order_page = Order()
+        self.contacts_page = Contacts()
         self.login_page.login(
             username=self.base_selenium.username, password=self.base_selenium.password)
         self.base_selenium.wait_until_page_url_has(text='dashboard')
@@ -421,6 +425,7 @@ class OrdersTestCases(BaseTest):
         self.orders_api.get_all_orders()
         record_id = randint(0, len(self.orders_api.get_all_orders()) - 2)
         data_before_duplicate_main_order= self.orders_api.get_all_orders()[record_id]
+        print(data_before_duplicate_main_order)
 
         order_no = data_before_duplicate_main_order['orderNo']
         self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no,
