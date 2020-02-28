@@ -1,13 +1,23 @@
 from ui_testing.testcases.base_test import BaseTest
+from ui_testing.pages.base_pages import BasePages
+from ui_testing.pages.order_page import Order
+from ui_testing.pages.header_page import Header
+from api_testing.apis.users_api import UsersAPI
+from api_testing.apis.roles_api import RolesAPI
 from parameterized import parameterized
 import re
 from unittest import skip
-import time
+
 
 class HeaderTestCases(BaseTest):
-
     def setUp(self):
         super().setUp()
+        self.order_page = Order()
+        self.header_page = Header()
+        self.base_page = BasePages()
+        self.roles_api = RolesAPI()
+        self.users_api = UsersAPI()
+
         self.login_page.login(username=self.base_selenium.username, password=self.base_selenium.password)
         self.base_selenium.wait_until_page_url_has(text='dashboard')
         self.header_page.click_on_header_button()
@@ -73,15 +83,17 @@ class HeaderTestCases(BaseTest):
                     break
             self.assertEqual(row_data[column], search_data[column])
 
-    @skip('https://modeso.atlassian.net/browse/LIMS-6563')
+    #@skip('https://modeso.atlassian.net/browse/LIMS-6563')
     def test004_download_user_sheet(self):
         """
-        User management: Make sure you can export all the data in the active table & it should display in the same order
+        User management: Make sure you can export all the data in
+        the active table & it should display in the same order
+
         LIMS-6101
-        :return:
         """
         self.base_selenium.click(element='header:user_management_button')
         self.base_selenium.LOGGER.info(' * Download XSLX sheet')
+        self.header_page.sleep_small()
         self.header_page.download_xslx_sheet()
         rows_data = self.header_page.get_table_rows_data()
         for index in range(len(rows_data)):
