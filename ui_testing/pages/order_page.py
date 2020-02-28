@@ -134,16 +134,14 @@ class Order(Orders):
         self.sleep_small()
         self.set_contact(contact=contact)
         self.sleep_small()
-        result = self.get_no()
 
         for test_unit in test_units:
             self.set_test_unit(test_unit)
 
         self.sleep_small()
         self.save(save_btn='order:save_btn')
-        self.base_selenium.LOGGER.info(' Order created with no : {} '.format(result))
-        return self.get_suborder_data()
-
+        self.base_selenium.LOGGER.info(' Order created with no : {} '.format(order_no))
+        return order_no
 
     def create_existing_order_with_auto_fill(self, no=''):
         self.base_selenium.LOGGER.info(' Create new order.')

@@ -6,6 +6,8 @@ from ui_testing.pages.order_page import Order
 from ui_testing.pages.contacts_page import Contacts
 from ui_testing.pages.analysis_page import SingleAnalysisPage
 from ui_testing.pages.analyses_page import AllAnalysesPage
+from api_testing.apis.orders_api import OrdersAPI
+from api_testing.apis.test_unit_api import TestUnitAPI
 from random import randint
 import time
 
@@ -14,9 +16,11 @@ class OrdersTestCases(BaseTest):
     def setUp(self):
         super().setUp()
         self.order_page = Order()
-        self.analysis_page = SingleAnalysisPage
-        self.analyses_page = AllAnalysesPage
+        self.analysis_page = SingleAnalysisPage()
+        self.analyses_page = AllAnalysesPage()
         self.contacts_page = Contacts()
+        self.orders_api = OrdersAPI()
+        self.test_unit_api = TestUnitAPI()
         self.login_page.login(
             username=self.base_selenium.username, password=self.base_selenium.password)
         self.base_selenium.wait_until_page_url_has(text='dashboard')
@@ -897,8 +901,7 @@ class OrdersTestCases(BaseTest):
             testunit_name = row_with_headers['Test Unit']
             self.base_selenium.LOGGER.info(" + Test unit : {}".format(testunit_name))
             self.assertIn(testunit_name, test_units_list)
-            
-    # will continue with us
+
     def test021_create_existing_order_with_test_units(self):
         """
         New: Orders: Create an existing order with test units
@@ -923,18 +926,15 @@ class OrdersTestCases(BaseTest):
         self.order_page.get_orders_page()
         created_order = self.order_page.create_existing_order(no='',material_type='r', article='a', contact='',
                                                               test_units=test_units_list)
-        print(created_order)
-
         self.order_page.get_orders_page()
         self.order_page.navigate_to_analysis_active_table()
         self.base_selenium.LOGGER.info(
             'Assert There is an analysis for this new order.')
-        #order_analysis = self.single_analysis_page.search(created_order['orderNo'].replace("'", ""))
-        orders_analyess = self.analyses_page.search(value=created_order['orderNo'])[0]
+        orders_analyess = self.analyses_page.search(value=created_order)
         latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
             row=orders_analyess[0])
         self.assertEqual(
-            created_order['orderNo'].replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
+            created_order.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
 
         self.analyses_page.open_child_table(source=orders_analyess[0])
         rows_with_childtable = self.analyses_page.result_table(element='general:table_child')
@@ -944,7 +944,7 @@ class OrdersTestCases(BaseTest):
             testunit_name = row_with_headers['Test Unit']
             self.base_selenium.LOGGER.info(" + Test unit : {}".format(testunit_name))
             self.assertIn(testunit_name, test_units_list)
-    
+
     # will continue with us
     def test022_create_existing_order_with_test_units_and_change_material_type(self):
         """
@@ -964,6 +964,7 @@ class OrdersTestCases(BaseTest):
         created_order = self.order_page.create_new_order(material_type='r', article='a', contact='a',
                                                          test_units=test_units_list)
 
+        self.order_page.get_orders_page()
         created_existing_order = self.order_page.create_existing_order_with_auto_fill(no=created_order.replace("'", ""))
         self.order_page.sleep_tiny()
         self.order_page.set_material_type(material_type='Subassembely')
