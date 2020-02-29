@@ -681,11 +681,18 @@ class OrdersTestCases(BaseTest):
 
         # get the main order with its suborder of the first order and suborder
         main_order = self.order_page.get_random_main_order_with_sub_orders_data(True)
-        order_row_data = {**main_order, **main_order['suborders'][0]}
-
-        # make sure that the row have the filter value
         self.info(' Assert {} value {} '.format(key, order[key]))
-        self.assertEqual(filter_value.lower(), order_row_data[key].lower().replace("'", "").replace('"', ''))
+        key_found = False
+        if key in ['Order No.', 'Contact Name', 'Created On']:
+            self.assertIn(filter_value.lower(), main_order[key].lower().replace("'", "").replace('"', ''))
+            key_found = True
+        else: #filter by suborder data, so we need to loop for all suborders
+            for i in range(0, len(main_order['suborders'])):
+                if filter_value.lower() == main_order['suborders'][i][key].lower():
+                    key_found = True
+                    break
+        # make sure that the row have the filter value
+        self.assertEqual(key_found, True)
 
     # will continue with us 
     def test016_validate_order_test_unit_test_plan(self):
