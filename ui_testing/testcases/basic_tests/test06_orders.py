@@ -688,7 +688,7 @@ class OrdersTestCases(BaseTest):
             key_found = True
         else: #filter by suborder data, so we need to loop for all suborders
             for i in range(0, len(main_order['suborders'])):
-                if filter_value.lower().replace("'", "") == main_order['suborders'][i][key].lower():
+                if filter_value.lower().replace("'", "").replace('"', '') == main_order['suborders'][i][key].lower().replace("'", "").replace('"', ''):
                     key_found = True
                     break
         # make sure that the row have the filter value
