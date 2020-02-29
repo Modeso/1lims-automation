@@ -1983,10 +1983,11 @@ class OrdersTestCases(BaseTest):
         self.orders_page.get_order_edit_page_by_id(id=order['id'])
 
         self.order_page.set_no(no=formated_order_no)
-        self.order_page.save(save_btn='order:save_btn')
+        self.order_page.save(save_btn='order:save_btn', sleep=True)
 
         self.info('refresh to make sure that data are saved correctly')
         self.base_selenium.refresh()
+        self.orders_page.sleep_tiny()
         order_no_after_update = self.order_page.get_no()
 
         self.info('order no is {}, and it should be {}'.format(order_no_after_update, formated_order_no))
