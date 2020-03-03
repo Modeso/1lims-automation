@@ -496,7 +496,9 @@ class TstUnit(TstUnits):
         self.use_specification_or_quantification(type_to_use='spec') #to deslect spec
         self.use_specification_or_quantification(type_to_use='quan') #to select quan
         self.set_quan_lower_limit(value=lower_limit)
+        self.sleep_tiny()
         self.set_quan_upper_limit(value=upper_limit)
+        self.sleep_tiny()
         self.save(save_btn='general:save_form', logger_msg='Save testunit')
         self.sleep_tiny()
 
