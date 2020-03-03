@@ -136,7 +136,7 @@ class Order(Orders):
             self.set_test_unit(test_unit)
 
     def create_existing_order_with_auto_fill(self, no=''):
-        self.base_selenium.LOGGER.info(' Create new order.')
+        self.info(' Create new order.')
         self.click_create_order_button()
         self.set_existing_order()
         order_no = self.set_existing_number(no)

@@ -4,6 +4,7 @@ from parameterized import parameterized
 from ui_testing.testcases.base_test import BaseTest
 from ui_testing.pages.order_page import Order
 from ui_testing.pages.contacts_page import Contacts
+from api_testing.apis.orders_api import OrdersAPI
 from random import randint
 import time
 
@@ -13,6 +14,7 @@ class OrdersTestCases(BaseTest):
         super().setUp()
         self.order_page = Order()
         self.contacts_page = Contacts()
+        self.orders_api = OrdersAPI()
         self.login_page.login(
             username=self.base_selenium.username, password=self.base_selenium.password)
         self.base_selenium.wait_until_page_url_has(text='dashboard')
@@ -936,27 +938,28 @@ class OrdersTestCases(BaseTest):
             testunit_name = row_with_headers['Test Unit']
             self.base_selenium.LOGGER.info(" + Test unit : {}".format(testunit_name))
             self.assertIn(testunit_name, test_units_list)
-    
-    # will continue with us
-    def test022_create_existing_order_with_test_units_and_change_material_type(self):
+
+    @parameterized.expand(['material_type', 'article'])
+    def test022_create_existing_order_with_test_units_and_change_material_type(self, edit_feild):
         """
-        New: Orders with test units: Create a new order from an existing order with test units but change the material type
+        New: Orders with test units: Create a new order from an existing order with
+        test units but change the material type or the article
 
         LIMS-3269
         """
-        self.base_selenium.LOGGER.info(
-            'Running test case to create an existing order with test units and change material type')
+        self.info('Running test case to create an existing order with test units and change material type')
         test_units_list = []
         test_unit_dict = self.get_active_tst_unit_with_material_type(search='Qualitative', material_type='All')
         if test_unit_dict:
-            self.base_selenium.LOGGER.info('Retrieved test unit ' + test_unit_dict['Test Unit Name'])
+            self.info('Retrieved test unit ' + test_unit_dict['Test Unit Name'])
             test_units_list.append(test_unit_dict['Test Unit Name'])
 
         self.order_page.get_orders_page()
-        created_order = self.order_page.create_new_order(material_type='r', article='a', contact='a',
-                                                         test_units=test_units_list)
-
-        created_existing_order = self.order_page.create_existing_order_with_auto_fill(no=created_order.replace("'", ""))
+        created_order = self.order_page.create_order_with_test_unit(material_type='r', article='a', contact='a',
+                                                                    test_units=test_units_list)
+        self.order_page.get_orders_page()
+        created_existing_order = \
+            self.order_page.create_existing_order_with_auto_fill(no=created_order['orderNo'].replace("'", ""))
         self.order_page.sleep_tiny()
         self.order_page.set_material_type(material_type='Subassembely')
         self.order_page.sleep_medium()
