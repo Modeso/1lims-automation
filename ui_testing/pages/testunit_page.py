@@ -197,7 +197,7 @@ class TstUnit(TstUnits):
         self.base_selenium.clear_text(element='test_unit:spec_upper_limit')
 
     def set_spec_lower_limit(self, value=''):
-        self.base_selenium.LOGGER.info('Set specification lower limit to be {}'.format(value))
+        self.info('Set specification lower limit to be {}'.format(value))
         self.base_selenium.set_text(element='test_unit:spec_lower_limit', value=value)
 
     def set_spec_unit(self, value=''):
@@ -213,31 +213,31 @@ class TstUnit(TstUnits):
         self.base_selenium.set_text(element='test_unit:quan_lower_limit', value=value)
 
     def set_quan_unit(self, value=''):
-        self.base_selenium.LOGGER.info('Set quantification unit to be {}'.format(value))
+        self.info('Set quantification unit to be {}'.format(value))
         self.base_selenium.set_text(element='test_unit:quan_unit', value=value)
 
     def get_spec_upper_limit(self):
-        self.base_selenium.LOGGER.info('Get testunit specification upper limit')
+        self.info('Get testunit specification upper limit')
         return self.base_selenium.get_value(element='test_unit:spec_upper_limit').split('\n')[0]
 
     def get_spec_lower_limit(self):
-        self.base_selenium.LOGGER.info('Get testunit specification lower limit')
+        self.info('Get testunit specification lower limit')
         return self.base_selenium.get_value(element='test_unit:spec_lower_limit').split('\n')[0]
 
     def get_spec_unit(self):
-        self.base_selenium.LOGGER.info('Get testunit specification unit')
+        self.info('Get testunit specification unit')
         return self.base_selenium.get_value(element='test_unit:spec_unit').split('\n')[0]
 
     def get_spec_unit_preview(self):
-        self.base_selenium.LOGGER.info('Get testunit specification unit preview')
+        self.info('Get testunit specification unit preview')
         return self.base_selenium.get_attribute(element='test_unit:spec_unit_preview',attribute='textContent').split('\n')[0]
 
     def get_quan_upper_limit(self):
-        self.base_selenium.LOGGER.info('Get testunit quantification upper limit')
+        self.info('Get testunit quantification upper limit')
         return self.base_selenium.get_value(element='test_unit:quan_upper_limit').split('\n')[0]
 
     def get_quan_lower_limit(self):
-        self.base_selenium.LOGGER.info('Get testunit quantification lower limit')
+        self.info('Get testunit quantification lower limit')
         return self.base_selenium.get_value(element='test_unit:quan_lower_limit').split('\n')[0]
 
     def get_quan_unit(self):
@@ -492,26 +492,18 @@ class TstUnit(TstUnits):
         elif quantification_checkbox_value:
             return 'quan'
 
-    def switch_from_spec_to_quan(self, lower_limit=0, upper_limit=1):
+    def switch_from_spec_to_quan(self, lower_limit, upper_limit):
         self.use_specification_or_quantification(type_to_use='spec') #to deslect spec
-        self.sleep_tiny()
         self.use_specification_or_quantification(type_to_use='quan') #to select quan
-        self.sleep_tiny()
         self.set_quan_lower_limit(value=lower_limit)
-        self.sleep_tiny()
         self.set_quan_upper_limit(value=upper_limit)
-        self.sleep_tiny()
         self.save(save_btn='general:save_form', logger_msg='Save testunit')
 
-    def switch_from_quan_to_spec(self, lower_limit=0, upper_limit=1):
+    def switch_from_quan_to_spec(self, lower_limit, upper_limit):
         self.use_specification_or_quantification(type_to_use='quan')
-        self.sleep_tiny()
         self.use_specification_or_quantification(type_to_use='spec')
-        self.sleep_tiny()
         self.set_spec_lower_limit(value=lower_limit)
-        self.sleep_tiny()
         self.set_spec_upper_limit(value=upper_limit)
-        self.sleep_tiny()
         self.save(save_btn='general:save_form', logger_msg='Save testunit')
 
     def map_testunit_to_testplan_format(self, testunit, order=0):
