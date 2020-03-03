@@ -501,8 +501,7 @@ class TstUnit(TstUnits):
         self.sleep_tiny()
         self.set_quan_upper_limit(value=upper_limit)
         self.sleep_tiny()
-        self.save(save_btn='general:save_form', logger_msg='Save testunit')
-        self.sleep_tiny()
+        self.save(save_btn='general:save_form', logger_msg='Save testunit', sleep=True)
 
     def switch_from_quan_to_spec(self, lower_limit, upper_limit):
         self.sleep_tiny()
@@ -513,8 +512,7 @@ class TstUnit(TstUnits):
         self.sleep_tiny()
         self.set_spec_upper_limit(value=upper_limit)
         self.sleep_tiny()
-        self.save(save_btn='general:save_form', logger_msg='Save testunit')
-        self.sleep_tiny()
+        self.save(save_btn='general:save_form', logger_msg='Save testunit', sleep=True)
 
     def map_testunit_to_testplan_format(self, testunit, order=0):
         testunit_formated = {}
