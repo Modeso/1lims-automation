@@ -21,6 +21,7 @@ class OrdersTestCases(BaseTest):
         self.contacts_page = Contacts()
         self.orders_api = OrdersAPI()
         self.test_unit_api = TestUnitAPI()
+        self.contacts_page = Contacts()
         self.login_page.login(
             username=self.base_selenium.username, password=self.base_selenium.password)
         self.base_selenium.wait_until_page_url_has(text='dashboard')
