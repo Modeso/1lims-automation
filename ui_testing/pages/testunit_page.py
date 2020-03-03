@@ -494,6 +494,7 @@ class TstUnit(TstUnits):
 
     def switch_from_spec_to_quan(self, lower_limit=0, upper_limit=1):
         self.use_specification_or_quantification(type_to_use='spec') #to deslect spec
+        self.sleep_tiny()
         self.use_specification_or_quantification(type_to_use='quan') #to select quan
         self.sleep_tiny()
         self.set_quan_lower_limit(value=lower_limit)
@@ -501,10 +502,10 @@ class TstUnit(TstUnits):
         self.set_quan_upper_limit(value=upper_limit)
         self.sleep_tiny()
         self.save(save_btn='general:save_form', logger_msg='Save testunit')
-        
 
     def switch_from_quan_to_spec(self, lower_limit=0, upper_limit=1):
         self.use_specification_or_quantification(type_to_use='quan')
+        self.sleep_tiny()
         self.use_specification_or_quantification(type_to_use='spec')
         self.sleep_tiny()
         self.set_spec_lower_limit(value=lower_limit)
