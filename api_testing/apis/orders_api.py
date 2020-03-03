@@ -12,10 +12,9 @@ class OrdersAPI(BaseAPI):
                     "deleted": "0"}
         payload = self.update_payload(_payload, **kwargs)
         self.info('GET : {}'.format(api))
-        response = self.session.get(api, params=payload, headers=self.headers, verify=False).json()
-        #self.info('Status code: {}'.format(response.status_code))
-        self.info('Status code: {}'.format(response['status']))
-        return response, payload
+        response = self.session.get(api, params=payload, headers=self.headers, verify=False)
+        self.info('Status code: {}'.format(response.status_code))
+        return response
 
     def get_order_by_id(self, id=1):
         api = '{}{}{}'.format(self.url, self.END_POINTS['orders_api']['get_order_by_id'], str(id)) 
