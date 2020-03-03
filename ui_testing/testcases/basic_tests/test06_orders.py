@@ -422,10 +422,9 @@ class OrdersTestCases(BaseTest):
         """
         no_of_copies = randint(2, 5)
         self.base_selenium.LOGGER.info('get last order row that you created')
-        all_orders= self.orders_api.get_all_orders()[0]['orders']
+        all_orders= self.orders_api.get_all_orders().json()['orders']
         record_id = randint(0, len(all_orders)-2)
         data_before_duplicate_main_order= all_orders[record_id]
-        print(data_before_duplicate_main_order)
 
         order_no = data_before_duplicate_main_order['orderNo']
         self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no,
@@ -439,7 +438,7 @@ class OrdersTestCases(BaseTest):
 
         self.order_page.click_on_duplicate_sub_order(no_of_copies)
         table_rows = self.order_page.result_table(element='general:table_child')
-        data_after_duplicate_main_order = self.orders_api.get_all_orders()[0]['orders'][record_id]
+        data_after_duplicate_main_order = all_orders[record_id]
         self.base_selenium.LOGGER.info(
             'Duplicate multiple {} times  '.format(no_of_copies))                                                                                             
 
