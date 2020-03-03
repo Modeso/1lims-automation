@@ -501,14 +501,14 @@ class TstUnit(TstUnits):
         self.set_quan_upper_limit(value=upper_limit)
         self.sleep_tiny()
         self.save(save_btn='general:save_form', logger_msg='Save testunit')
-        self.sleep_tiny()
+        
 
     def switch_from_quan_to_spec(self, lower_limit=0, upper_limit=1):
-        
         self.use_specification_or_quantification(type_to_use='quan')
         self.use_specification_or_quantification(type_to_use='spec')
-
+        self.sleep_tiny()
         self.set_spec_lower_limit(value=lower_limit)
+        self.sleep_tiny()
         self.set_spec_upper_limit(value=upper_limit)
         self.sleep_tiny()
         self.save(save_btn='general:save_form', logger_msg='Save testunit')
