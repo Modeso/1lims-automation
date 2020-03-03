@@ -129,6 +129,7 @@ class Order(Orders):
         self.set_existing_order()
         order_no = self.set_existing_number(no)
         self.set_material_type(material_type=material_type)
+
         self.sleep_small()
         self.set_article(article=article)
         self.sleep_small()
