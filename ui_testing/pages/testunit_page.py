@@ -574,3 +574,8 @@ class TstUnit(TstUnits):
             testunit_formated['concentrations'] = testunit['concentrations']
             testunit_formated['textValue'] = ''
             return testunit_formated
+
+    def open_test_unit_edit_page_by_id(self, id):
+        url_str = "{}testUnits/edit/" + str(id)
+        test_units_url = url_str.format(self.base_selenium.url)
+        self.base_selenium.get(url=test_units_url)

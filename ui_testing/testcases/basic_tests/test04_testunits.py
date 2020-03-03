@@ -969,30 +969,8 @@ class TestUnitsTestCases(BaseTest):
 
         LIMS-4160
         """
-        testunits_request = self.test_unit_api.get_all_test_units(filter='{"typeName":2}').json()
-        self.assertEqual(testunits_request['status'], 1)
-        testunits = testunits_request['testUnits']
-        self.assertNotEqual(len(testunits), 0)
-        testunit_name = ''
-        for testunit in testunits:
-            if spec_or_quan == 'spec' and testunit['specifications'] != '' and testunit['quantification'] == '':
-                testunit_name = testunit['name']
-                break
-            elif spec_or_quan == 'quan' and testunit['specifications'] == '' and testunit['quantification'] != '':
-                testunit_name = testunit['name']
-                break
-
-        if testunit_name == '':
-            self.info('there is no testunit with required specs')
-            self.assertTrue(False)
-
-        self.test_unit_page.open_filter_menu()
-        self.info('Filtering by testunit name: {}'.format(testunit_name))
-        self.test_unit_page.filter_by(filter_element='test_units:testunit_name_filter',
-                                      filter_text=testunit_name, field_type='text')
-        self.test_unit_page.filter_apply()
-        testunit_row = self.base_selenium.get_table_rows(element='general:table')[0]
-        self.test_unit_page.open_edit_page(row=testunit_row)
+        test_unit_id = self.test_unit_api.get_test_unit_with_spec_or_quan_only(spec_or_quan)
+        self.test_unit_page.open_test_unit_edit_page_by_id(id=test_unit_id)
 
         self.info('generate random lower/ upper limit')
         random_lower_limit = self.test_unit_page.generate_random_number(lower=0, upper=49)
