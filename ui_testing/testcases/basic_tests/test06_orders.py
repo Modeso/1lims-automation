@@ -1890,3 +1890,111 @@ class OrdersTestCases(BaseTest):
         testunit_name = row_with_headers['Test Unit']
         self.base_selenium.LOGGER.info(" + Test unit : {}".format(testunit_name))
         self.assertIn(testunit_name, testunit_name)
+
+
+    @parameterized.expand(['save_btn', 'cancel'])
+    def test029_update_article(self, save):
+        """
+        New: Orders: Edit Approach: I can update the article successfully and press on ok button
+        then press on cancel button, Nothing updated
+
+        New: Orders: Edit Approach: I can update the article filed successfully with save button
+
+        LIMS-3423
+        LIMS-4297
+        :return:
+        """
+
+        """
+        test case logic
+        i'll filter with raw material material type just to make sure that it has multiple articles
+        and then select and record
+        and then update it's article and try to press save and press cancel
+        """
+
+        self.base_selenium.LOGGER.info('Filter with Raw Material material type, just to make sure that it has multiple articles')
+        rows=self.order_page.search(value='Raw Material')
+
+        self.base_selenium.LOGGER.info('select the required order to update it')
+        row = self.orders_page.get_random_order()
+        order_page_url = self.base_selenium.get_url()
+        self.base_selenium.click(element='order:suborder_table')
+
+        initial_article = self.order_page.get_article()
+        initial_test_plan = self.order_page.get_test_plan()
+        initial_test_unit = self.order_page.get_test_unit()
+
+
+        # Update Article
+        self.order_page.set_article(
+            article='r')
+        new_article = self.order_page.get_article()
+
+        # Update Test Plan
+        if self.order_page.get_test_plan():
+            self.order_page.clear_test_plan()
+            self.order_page.confirm_popup(force=True)
+
+        self.order_page.set_test_plan(test_plan='r')
+        new_test_plan = self.order_page.get_test_plan()
+
+        # Update Test Unit
+        if self.order_page.get_test_unit():
+            self.order_page.clear_test_unit()
+            self.order_page.confirm_popup(force=True)
+
+        self.order_page.set_test_unit(test_unit='r')
+        new_test_unit = self.order_page.get_test_unit()
+
+
+        if 'save_btn' == save:
+            self.order_page.save(save_btn='order:save_btn')
+            self.base_selenium.LOGGER.info('Refresh to make sure that data are saved correctly')
+            self.base_selenium.refresh()
+            self.base_selenium.click(element='order:suborder_table')
+            current_article = self.order_page.get_article()
+            current_test_plan = self.order_page.get_test_plan()
+            current_test_unit = self.order_page.get_test_unit()
+        else:
+            self.order_page.cancel(force=True)
+            self.base_selenium.get(url=order_page_url)
+            self.order_page.sleep_tiny()
+            self.base_selenium.click(element='order:suborder_table')
+            current_article = self.order_page.get_article()
+            current_test_plan = self.order_page.get_test_plan()
+            current_test_unit = self.order_page.get_test_unit()
+            
+
+        if 'save_btn' == save:
+            self.base_selenium.LOGGER.info(
+                ' + Assert {} (current_article) == {} (new_article)'.format(current_article,
+                                                                            new_article))
+            self.assertEqual(new_article, current_article)
+
+            self.base_selenium.LOGGER.info(
+                ' + Assert {} (current_test_plan) == {} (new_test_plan)'.format(current_test_plan,
+                                                                            new_test_plan))
+            self.assertEqual(new_test_plan, current_test_plan)
+
+
+            self.base_selenium.LOGGER.info(
+                ' + Assert {} (current_test_unit) == {} (new_test_unit)'.format(current_test_unit,
+                                                                            new_test_unit))
+            self.assertEqual(new_test_unit, current_test_unit)
+
+        else:
+            self.base_selenium.LOGGER.info(
+                ' + Assert {} (current_article) == {} (initial_article)'.format(current_article,
+                                                                            initial_article))
+            self.assertEqual(initial_article, current_article)
+
+            self.base_selenium.LOGGER.info(
+                ' + Assert {} (current_test_plan) == {} (initial_test_plan)'.format(current_test_plan,
+                                                                            initial_test_plan))
+            self.assertEqual(initial_test_plan, current_test_plan)
+
+
+            self.base_selenium.LOGGER.info(
+                ' + Assert {} (current_test_unit) == {} (initial_test_unit)'.format(current_test_unit,
+                                                                            initial_test_unit))
+            self.assertEqual(initial_test_unit, current_test_unit)
