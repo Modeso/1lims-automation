@@ -182,10 +182,9 @@ class OrdersTestCases(BaseTest):
         LIMS-4374
         """
         self.order_page.get_archived_items()
-        self.orders_api.get_archived_orders_json()
-
-        record_id = randint(0, len(self.orders_api.get_archived_orders_json()) - 2)
-        order_data = self.orders_api.get_archived_orders_json()[record_id]
+        all_orders = self.orders_api.get_archived_orders_json().json()['orders']
+        record_id = randint(0, len(all_orders) - 2)
+        order_data = all_orders[record_id]
 
         order_no = order_data['orderNo']
         self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no, field_type='text')
@@ -1046,10 +1045,10 @@ class OrdersTestCases(BaseTest):
         New: Orders: Table:  Suborder /Archive Approach: : User can archive any suborder successfully 
         LIMS-3739
         """
-        self.orders_api.get_all_orders()
-
-        record_id = randint(0, len(self.orders_api.get_all_orders()) - 2)
-        order_data = self.orders_api.get_all_orders()[record_id]
+        self.base_selenium.LOGGER.info('select random record')
+        all_orders = self.orders_api.get_all_orders().json()['orders']
+        record_id = randint(0, len(all_orders) - 2)
+        order_data = all_orders[record_id]
 
         order_no = order_data['orderNo']
         self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no, field_type='text')
