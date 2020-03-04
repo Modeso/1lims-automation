@@ -433,11 +433,9 @@ class OrdersTestCases(BaseTest):
                                               field_type='text')
 
         self.order_page.get_child_table_data(index=0)
-        rows_with_childtable = self.order_page.result_table(element='general:table_child')
-        for row in rows_with_childtable[:-1]:
-            data_before_duplicate_sub_order = self.base_selenium.get_row_cells_dict_related_to_header(row=row,
+        child_rows=self.order_page.result_table(element='general:table_child')
+        data_before_duplicate_sub_order = self.base_selenium.get_row_cells_dict_related_to_header(row=child_rows[0],
                                                                                             table_element='general:table_child')
-
         self.order_page.click_on_duplicate_sub_order(no_of_copies)
         table_rows = self.order_page.result_table(element='general:table_child')
         data_after_duplicate_main_order = all_orders[record_id]
