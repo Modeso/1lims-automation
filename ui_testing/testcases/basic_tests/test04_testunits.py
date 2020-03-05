@@ -1560,4 +1560,4 @@ class TestUnitsTestCases(BaseTest):
 
         LIMS-6288
         """
-        assert (self.test_unit_page.deselect_all_configurations(), False)
+        self.assertFalse(self.test_unit_page.deselect_all_configurations())
