@@ -315,7 +315,7 @@ class TestPlansTestCases(BaseTest):
         self.info('The duplicated testplan should have the number: {}'.format(duplicated_test_plan_number))
 
         self.info('Choosing a random testplan table row')
-        testPlan = random.choice(self.test_plan_api.get_all_test_plans_json())
+        testPlan = random.choice(self.test_plan_api.get_completed_testplans())
         self.test_plan.click_check_box(source=self.test_plan.search(testPlan['number'])[0])
         self.test_plan.sleep_small()
         self.info('Saving the child data of the main testplan')
@@ -333,7 +333,6 @@ class TestPlansTestCases(BaseTest):
         self.info('Asserting that the data is duplicated correctly')
         self.assertEqual(main_testplan_childtable_data, duplicated_testplan_childtable_data)
         self.assertEqual(testPlan['materialType'], duplicated_testplan_data['Material Type'])
-        self.assertEqual(testPlan['status'], duplicated_testplan_data['Status'].replace(" ",""))
         self.assertEqual(testPlan['article'][0], duplicated_testplan_data['Article Name'])
         self.assertEqual(testPlan['articleNo'][0], duplicated_testplan_data['Article No.'])
 
