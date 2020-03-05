@@ -304,10 +304,11 @@ class TestPlansTestCases(BaseTest):
                     self.assertIn(item, fixed_sheet_row_data)
 
     def test010_test_plan_duplicate(self):
-        '''
-        LIMS-3679
+        """
         Duplicate a test plan
-        '''
+
+        LIMS-3679
+        """
         # get the maximum number given to the latest testplan
         latest_testplan_row_data = self.test_plan.get_the_latest_row_data()
         largest_number = latest_testplan_row_data['Test Plan No.'].replace("'", "")
@@ -318,12 +319,7 @@ class TestPlansTestCases(BaseTest):
         main_testplan_data = self.test_plan.select_random_table_row(element='test_plans:test_plans_table')
         testplan_number = main_testplan_data['Test Plan No.']
         self.info('Testplan number: {} will be duplicated'.format(testplan_number))
-        #self.test_plan.open_filter_menu()
-        #self.test_plan.filter_by_testplan_number(testplan_number)
-        # if test plan in end of table of test plan, then I open filter when
-        # I get child table it reads other table realted to other test plan
-        # I need to adjust page so we don't need to scroll it first
-        # search function don't affect page height like filter
+
         self.base_selenium.scroll()
         self.test_plan.search(testplan_number)
         self.info('Saving the child data of the main testplan')
