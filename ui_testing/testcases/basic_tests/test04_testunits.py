@@ -961,29 +961,23 @@ class TestUnitsTestCases(BaseTest):
         """
         test_unit_id = self.test_unit_api.get_test_unit_with_spec_or_quan_only(spec_or_quan)
         self.test_unit_page.open_test_unit_edit_page_by_id(id=test_unit_id)
-
-        self.info('generate random lower and upper limit')
-        random_lower_limit = self.test_unit_page.generate_random_number(lower=0, upper=49)
-        random_upper_limit = self.test_unit_page.generate_random_number(lower=50, upper=100)
         
         if spec_or_quan == 'spec':
             self.info('switch to quantification')
-            self.test_unit_page.switch_from_spec_to_quan(lower_limit=random_lower_limit,
-                                                         upper_limit=random_upper_limit)
+            self.test_unit_page.switch_from_spec_to_quan(lower_limit=50, upper_limit=100)
             self.info('refresh to make sure that data are updated successfully')
             self.base_selenium.refresh()
             self.assertEqual(self.test_unit_page.get_testunit_specification_type(), 'quan')
-            self.assertEqual(self.test_unit_page.get_quan_upper_limit(), str(random_upper_limit))
-            self.assertEqual(self.test_unit_page.get_quan_lower_limit(), str(random_lower_limit))
+            self.assertEqual(self.test_unit_page.get_quan_upper_limit(), '100')
+            self.assertEqual(self.test_unit_page.get_quan_lower_limit(), '50')
         else:
             self.info('switch to specification')
-            self.test_unit_page.switch_from_quan_to_spec(lower_limit=random_lower_limit,
-                                                         upper_limit=random_upper_limit)
+            self.test_unit_page.switch_from_quan_to_spec(lower_limit=50, upper_limit=100)
             self.info('refresh to make sure that data are updated successfully')
             self.base_selenium.refresh()
             self.assertEqual(self.test_unit_page.get_testunit_specification_type(), 'spec')
-            self.assertEqual(self.test_unit_page.get_spec_upper_limit(), str(random_upper_limit))
-            self.assertEqual(self.test_unit_page.get_spec_lower_limit(), str(random_lower_limit))
+            self.assertEqual(self.test_unit_page.get_spec_upper_limit(), '100')
+            self.assertEqual(self.test_unit_page.get_spec_lower_limit(), '50')
 
     def test030_allow_unit_field_to_be_displayed_in_case_of_mibi(self):
         """
