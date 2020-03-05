@@ -962,9 +962,10 @@ class TestUnitsTestCases(BaseTest):
         test_unit_id = self.test_unit_api.get_test_unit_with_spec_or_quan_only(spec_or_quan)
         self.test_unit_page.open_test_unit_edit_page_by_id(id=test_unit_id)
 
-        self.info('generate random lower/ upper limit')
+        self.info('generate random lower and upper limit')
         random_lower_limit = self.test_unit_page.generate_random_number(lower=0, upper=49)
         random_upper_limit = self.test_unit_page.generate_random_number(lower=50, upper=100)
+        
         if spec_or_quan == 'spec':
             self.info('switch to quantification')
             self.test_unit_page.switch_from_spec_to_quan(lower_limit=random_lower_limit,
