@@ -319,7 +319,7 @@ class TestPlansTestCases(BaseTest):
         self.test_plan.click_check_box(source=self.test_plan.search(testPlan['number'])[0])
         self.test_plan.sleep_small()
         self.info('Saving the child data of the main testplan')
-        main_testplan_childtable_data = self.test_plan.get_child_table_data()
+        main_testplan_childtable_data = self.test_plan.get_child_table_data(index=0)
 
         self.info('Duplicating testplan number: {}'.format(testPlan['number']))
         self.test_plan.duplicate_selected_item()
