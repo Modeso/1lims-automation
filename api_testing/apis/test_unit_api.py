@@ -327,7 +327,5 @@ class TestUnitAPI(BaseAPI):
         for testunit in testunits:
             if spec_or_quan == 'spec' and testunit['specifications'] != '' and testunit['quantification'] == '':
                 return testunit['id']
-                break
             elif spec_or_quan == 'quan' and testunit['specifications'] == '' and testunit['quantification'] != '':
                 return testunit['id']
-                break
