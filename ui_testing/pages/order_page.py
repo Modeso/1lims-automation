@@ -26,6 +26,7 @@ class Order(Orders):
         else:
             self.base_selenium.select_item_from_drop_down(
                 element='order:material_type')
+            self.sleep_tiny()
             return self.get_material_type()
 
     def get_material_type(self):
@@ -142,7 +143,7 @@ class Order(Orders):
         order_no = self.set_existing_number(no)
         self.sleep_tiny()
         self.click_auto_fill()
-        self.base_selenium.LOGGER.info(' Order Auto filled with data from order no : {} '.format(order_no))
+        self.info(' Order Auto filled with data from order no : {} '.format(order_no))
         return order_no
 
     def get_no(self, order_row = None):

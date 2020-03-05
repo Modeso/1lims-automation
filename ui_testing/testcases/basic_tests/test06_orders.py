@@ -3,8 +3,10 @@ from unittest import skip
 from parameterized import parameterized
 from ui_testing.testcases.base_test import BaseTest
 from ui_testing.pages.order_page import Order
+from ui_testing.pages.orders_page import Orders
 from ui_testing.pages.contacts_page import Contacts
 from api_testing.apis.orders_api import OrdersAPI
+from ui_testing.pages.analysis_page import AllAnalysesPage
 from random import randint
 import time
 
@@ -13,6 +15,8 @@ class OrdersTestCases(BaseTest):
     def setUp(self):
         super().setUp()
         self.order_page = Order()
+        self.orders_page = Orders()
+        self.analyses_page = AllAnalysesPage()
         self.contacts_page = Contacts()
         self.orders_api = OrdersAPI()
         self.login_page.login(
@@ -947,46 +951,39 @@ class OrdersTestCases(BaseTest):
 
         LIMS-3269
         """
-        self.info('Running test case to create an existing order with test units and change material type')
-        test_units_list = []
-        test_unit_dict = self.get_active_tst_unit_with_material_type(search='Qualitative', material_type='All')
-        if test_unit_dict:
-            self.info('Retrieved test unit ' + test_unit_dict['Test Unit Name'])
-            test_units_list.append(test_unit_dict['Test Unit Name'])
-
-        self.order_page.get_orders_page()
-        created_order = self.order_page.create_order_with_test_unit(material_type='r', article='a', contact='a',
-                                                                    test_units=test_units_list)
-        self.order_page.get_orders_page()
-        created_existing_order = \
-            self.order_page.create_existing_order_with_auto_fill(no=created_order['orderNo'].replace("'", ""))
+        order_no = self.order_page.create_existing_order_with_auto_fill()
         self.order_page.sleep_tiny()
-        self.order_page.set_material_type(material_type='Subassembely')
-        self.order_page.sleep_medium()
-        self.base_selenium.LOGGER.info('Check If article and test units are empty')
-        article = self.order_page.get_article()
-        self.assertEqual('Search', article)
-        test_unit = self.order_page.get_test_unit()
-        self.assertEqual('Search', article)
-        self.order_page.set_article(article='a')
-        self.order_page.set_test_unit(test_unit=test_unit_dict['Test Unit Name'])
+        if edit_feild == 'material_type':
+            material_type = 'Subassembely'
+            self.order_page.set_material_type(material_type=material_type)
+            self.assertEqual(self.order_page.get_article(), 'Search')
+            self.assertEqual(self.order_page.get_test_unit(), [])
+            article = self.order_page.set_article()
+            test_unit = self.order_page.set_test_unit()
+        else:
+            test_unit = self.order_page.get_test_unit()
+            material_type = self.order_page.get_material_type()
+            article = self.order_page.set_article()
+            self.assertEqual(self.order_page.get_test_unit(), test_unit)
+            self.assertEqual(self.order_page.get_material_type(), material_type)
 
-        article = self.order_page.get_article()
         self.order_page.save(save_btn='order:save_btn')
-        self.base_selenium.LOGGER.info(' + Order created with no : {} '.format(created_existing_order))
-        self.analyses_page.get_analyses_page()
-        self.base_selenium.LOGGER.info(
-            'Assert There is an analysis for this new order.')
-        orders_analyess = self.analyses_page.search(created_order)
-        latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
-            row=orders_analyess[0])
-        self.assertEqual(
-            created_order.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
-        self.assertEqual(
-            article.split(' No:')[0], latest_order_data['Article Name'])
-        self.assertEqual(
-            'Subassembely', latest_order_data['Material Type'])
-        
+        import ipdb;ipdb.set_trace()
+        self.order_page.get_orders_page()
+        self.info('Assert There is an analysis for this new order.')
+        self.analyses_page.filter_by(
+            filter_element='orders:filter_order_no', filter_text= order_no, field_type='drop_down')
+
+        order_analisys = self.orders_page.result_table()[0]
+        latest_order_data = \
+            self.base_selenium.get_row_cells_dict_related_to_header(row=order_analisys [0])
+
+        self.assertEqual(order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
+        self.assertEqual(article.split(' No:')[0], latest_order_data['Article Name'])
+        self.assertEqual(test_unit, latest_order_data['testUnits'])
+        self.assertEqual(material_type,latest_order_data['Material Type'])
+
+
     # will continue with us
     def test023_create_existing_order_with_test_units_and_change_article(self):
         """
