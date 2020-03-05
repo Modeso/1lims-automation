@@ -32,7 +32,6 @@ elements = {
         'confirmation_pop_up': {
             'method': 'id',
             'value': 'swal2-title'},
-
         'confirm_pop': {'method': 'class_name',
                         'value': 'btn-success',
                         'order': 0},
@@ -54,6 +53,9 @@ elements = {
                   'order': 0},
         'menu_filter_view': {'method': 'id',
                              'value': 'custom-accordion-panel'},
+        'filter_button': {'method': 'class_name',
+                             'value': 'filter-btn',
+                             'order': 0},
         'filter': {'method': 'tag_name',
                    'value': 'span',
                    'order': 0},
