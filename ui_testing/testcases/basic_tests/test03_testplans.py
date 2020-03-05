@@ -315,17 +315,13 @@ class TestPlansTestCases(BaseTest):
         self.info('The duplicated testplan should have the number: {}'.format(duplicated_test_plan_number))
 
         self.info('Choosing a random testplan table row')
-        main_testplan_data = self.test_plan.select_random_table_row(element='test_plans:test_plans_table')
-        testplan_number = main_testplan_data['Test Plan No.']
-        self.info('Testplan number: {} will be duplicated'.format(testplan_number))
-
-        self.base_selenium.scroll()
-        self.test_plan.search(testplan_number)
+        testPlan = random.choice(self.test_plan_api.get_all_test_plans_json())
+        self.test_plan.click_check_box(source=self.test_plan.search(testPlan['number'])[0])
         self.test_plan.sleep_small()
         self.info('Saving the child data of the main testplan')
         main_testplan_childtable_data = self.test_plan.get_child_table_data()
 
-        self.info('Duplicating testplan number: {}'.format(testplan_number))
+        self.info('Duplicating testplan number: {}'.format(testPlan['number']))
         self.test_plan.duplicate_selected_item()
         self.test_plan.duplicate_testplan(change=['name'])
         self.test_plan.sleep_tiny()
@@ -334,15 +330,13 @@ class TestPlansTestCases(BaseTest):
             self.test_plan.get_specific_testplan_data_and_childtable_data(
                 filter_by='number', filter_text=duplicated_test_plan_number)
 
-        data_changed = ['Test Plan No.', 'Test Plan Name', 'Version', 'Changed On', 'Changed By', 'Created On']
-        main_testplan_data, duplicated_testplan_data = \
-            self.remove_unduplicated_data(data_changed=data_changed,
-                                          first_element=main_testplan_data,
-                                          second_element=duplicated_testplan_data)
-
         self.info('Asserting that the data is duplicated correctly')
         self.assertEqual(main_testplan_childtable_data, duplicated_testplan_childtable_data)
-        self.assertEqual(main_testplan_data, duplicated_testplan_data)
+        self.assertEqual(testPlan['materialType'], duplicated_testplan_data['Material Type'])
+        self.assertEqual(testPlan['status'], duplicated_testplan_data['Status'].replace(" ",""))
+        self.assertEqual(testPlan['article'][0], duplicated_testplan_data['Article Name'])
+        self.assertEqual(testPlan['articleNo'][0], duplicated_testplan_data['Article No.'])
+
 
     def test011_test_plan_completed_to_inprogress(self):
         '''
