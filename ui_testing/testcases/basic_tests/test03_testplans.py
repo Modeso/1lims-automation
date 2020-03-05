@@ -310,9 +310,8 @@ class TestPlansTestCases(BaseTest):
         LIMS-3679
         """
         # get the maximum number given to the latest testplan
-        latest_testplan_row_data = self.test_plan.get_the_latest_row_data()
-        largest_number = latest_testplan_row_data['Test Plan No.'].replace("'", "")
-        duplicated_test_plan_number = int(largest_number) + 1
+        latest_testplan_number = self.test_plan.get_the_latest_row_data()['Test Plan No.'].replace("'", "")
+        duplicated_test_plan_number = int(latest_testplan_number) + 1
         self.info('The duplicated testplan should have the number: {}'.format(duplicated_test_plan_number))
 
         self.info('Choosing a random testplan table row')
@@ -322,6 +321,7 @@ class TestPlansTestCases(BaseTest):
 
         self.base_selenium.scroll()
         self.test_plan.search(testplan_number)
+        self.test_plan.sleep_small()
         self.info('Saving the child data of the main testplan')
         main_testplan_childtable_data = self.test_plan.get_child_table_data()
 
