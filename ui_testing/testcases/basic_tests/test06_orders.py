@@ -1977,15 +1977,17 @@ class OrdersTestCases(BaseTest):
         LIMS-4270
         """
         self.info('generate new order number to use it for update')
-        new_order_no = self.orders_api.get_auto_generated_order_no()
+        orders = self.orders_api.get_all_orders().json()['orders']
+        new_order_no = int(orders[0]['orderNo'].split('-')[0])+1
         year_value = self.order_page.get_current_year()[2:]
-        formated_order_no = new_order_no + '-' + year_value
+        formated_order_no = str(new_order_no) + '-' + year_value
         self.info('newly generated order number = {}'.format(formated_order_no))
 
-        order = random.choice(self.orders_api.get_all_orders().json()['orders'])
+        order = random.choice(orders)
         self.orders_page.get_order_edit_page_by_id(id=order['id'])
 
         self.order_page.set_no(no=formated_order_no)
+        self.order_page.sleep_small()
         self.order_page.save(save_btn='order:save_btn', sleep=True)
 
         self.info('refresh to make sure that data are saved correctly')
