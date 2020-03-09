@@ -4,6 +4,7 @@ from parameterized import parameterized
 from ui_testing.testcases.base_test import BaseTest
 from ui_testing.pages.order_page import Order
 from ui_testing.pages.orders_page import Orders
+from api_testing.apis.orders_api import OrdersAPI
 from ui_testing.pages.contacts_page import Contacts
 from random import randint
 import time
@@ -14,6 +15,7 @@ class OrdersTestCases(BaseTest):
         super().setUp()
         self.order_page = Order()
         self.orders_page = Orders()
+        self.orders_api = OrdersAPI()
         self.contacts_page = Contacts()
         self.login_page.login(
             username=self.base_selenium.username, password=self.base_selenium.password)
@@ -1914,12 +1916,17 @@ class OrdersTestCases(BaseTest):
         and then update it's article and try to press save and press cancel
         """
 
-        self.base_selenium.LOGGER.info('Filter with Raw Material material type, just to make sure that it has multiple articles')
-        rows=self.order_page.search(value='Raw Material')
+        order_request = self.orders_api.get_all_orders(limit=20).json()
+        self.assertEqual(order_request['status'], 1)
+        orders_records = order_request['orders']
+        self.assertNotEqual(len(orders_records), 0)
+        random_order_index = self.generate_random_number(lower=0, upper=len(orders_records) - 1)
+        selected_order_record = orders_records[random_order_index]
 
-        self.base_selenium.LOGGER.info('select the required order to update it')
-        row = self.orders_page.get_random_order()
         order_page_url = self.base_selenium.get_url()
+        edit_page_url = order_page_url+'/'+str(selected_order_record['id'])
+        self.base_selenium.get(edit_page_url)
+        self.order_page.sleep_tiny()
         self.base_selenium.click(element='order:suborder_table')
 
         initial_article = self.order_page.get_article()
@@ -1928,8 +1935,8 @@ class OrdersTestCases(BaseTest):
 
 
         # Update Article
-        self.order_page.set_article(
-            article='r')
+        self.order_page.set_article(article='r')
+        self.order_page.confirm_popup(force=True)
         new_article = self.order_page.get_article()
 
         # Update Test Plan
@@ -1940,15 +1947,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.set_test_plan(test_plan='r')
         new_test_plan = self.order_page.get_test_plan()
 
-        # Update Test Unit
-        if self.order_page.get_test_unit():
-            self.order_page.clear_test_unit()
-            self.order_page.confirm_popup(force=True)
-
-        self.order_page.set_test_unit(test_unit='r')
-        new_test_unit = self.order_page.get_test_unit()
-
-
+    
         if 'save_btn' == save:
             self.order_page.save(save_btn='order:save_btn')
             self.base_selenium.LOGGER.info('Refresh to make sure that data are saved correctly')
@@ -1965,7 +1964,7 @@ class OrdersTestCases(BaseTest):
             current_article = self.order_page.get_article()
             current_test_plan = self.order_page.get_test_plan()
             current_test_unit = self.order_page.get_test_unit()
-            
+        
 
         if 'save_btn' == save:
             self.base_selenium.LOGGER.info(
@@ -1980,9 +1979,9 @@ class OrdersTestCases(BaseTest):
 
 
             self.base_selenium.LOGGER.info(
-                ' + Assert {} (current_test_unit) == {} (new_test_unit)'.format(current_test_unit,
-                                                                            new_test_unit))
-            self.assertEqual(new_test_unit, current_test_unit)
+                ' + Assert {} (current_test_unit) == {} (initial_test_unit)'.format(current_test_unit,
+                                                                            initial_test_unit))
+            self.assertEqual(initial_test_unit, current_test_unit)
 
         else:
             self.base_selenium.LOGGER.info(
