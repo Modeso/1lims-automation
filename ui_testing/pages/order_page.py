@@ -145,7 +145,7 @@ class Order(Orders):
         self.base_selenium.LOGGER.info(' Order Auto filled with data from order no : {} '.format(order_no))
         return order_no
 
-    def get_no(self, order_row = None):
+    def get_no(self, order_row=None):
         if order_row:
             return order_row['Order No.']
         else:

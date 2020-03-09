@@ -1990,7 +1990,6 @@ class OrdersTestCases(BaseTest):
 
         self.info('refresh to make sure that data are saved correctly')
         self.base_selenium.refresh()
-        self.orders_page.sleep_tiny()
         order_no_after_update = self.order_page.get_no()
 
         self.info('order no is {}, and it should be {}'.format(order_no_after_update, formated_order_no))
