@@ -103,11 +103,12 @@ class TestPlansTestCases(BaseTest):
         self.assertEqual(testplan_row_data_status, 'Completed')
 
     def test003_test_plan_completed_to_completed(self):
-        '''
-        LIMS-3501
+        """
         When the testplan status doesn't change and a new version is created
-        '''
-        self.info('Searching for test plans with Completed status')
+
+        LIMS-3501
+        """
+        self.info('get test plan with Completed status')
         completed_testplan = random.choice(self.test_plan_api.get_completed_testplans(limit=500))
         old_completed_testplan_name = completed_testplan['testPlanName']
         old_completed_testplan_version = completed_testplan['version']
