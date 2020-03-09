@@ -746,3 +746,54 @@ class TestPlansTestCases(BaseTest):
         LIMS-6288
         """
         assert (self.test_unit_page.deselect_all_configurations(), False)
+
+    def test026_update_quantification_limit_new_version_created(self):
+        """
+        New: Test plan: Limits of quantification Approach: In case I update the limits
+        of quantification this will trigger new version in the active table & version table
+
+        LIMS-4426
+        """
+        # select random test plan and get material type
+        testplan = random.choice(self.test_plan_api.get_inprogress_testplans())
+        testplan_name = testplan['testPlanName']
+        material_type = testplan['materialType']
+        old_version = testplan['version']
+        # create quantitative test unit with quantification limit
+        self.test_unit_page.get_test_units_page()
+        new_name = self.generate_random_string()
+        new_method = self.generate_random_string()
+        new_random_limit = self.generate_random_number()
+        self.test_unit_page.create_quantitative_testunit(name=new_name, material_type=material_type, category='',
+                                                         upper_limit=new_random_limit, lower_limit=new_random_limit,
+                                                         spec_or_quan='quan', method=new_method)
+
+        self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
+        # navigate to the chosen test plan edit page
+        self.test_plan.get_test_plans_page()
+        self.test_plan.get_test_plan_edit_page(testplan_name)
+        # navigate to the test units selection tab
+        self.test_plan.set_test_unit(test_unit=new_name)
+        self.test_plan.sleep_tiny()
+        # save the changes
+        self.test_plan.save()
+        # navigate to the chosen test plan edit page
+        self.test_plan.get_test_plans_page()
+        self.test_plan.get_test_plan_edit_page(testplan_name)
+        # navigate to the test units selection tab
+        uper, lower = self.test_plan.get_test_unit_limits()
+        self.test_plan.update_upper_lower_limits_of_testunit(95, 15)
+        # save the changes
+        self.test_plan.save_and_confirm_popup()
+        # go back to the active table
+        self.test_plan.get_test_plans_page()
+        # get the testplan to check its version
+        self.info('Getting the currently changed testplan to check its status and version')
+        new_version, new_status = self.test_plan.get_testplan_version_and_status(search_text=testplan_name)
+        self.test_plan.click_check_box(source=self.base_selenium.get_table_rows(element='general:table')[0])
+        self.assertEqual(old_version + 1, int(new_version))
+        self.test_plan.get_version_items()
+        new_version_childtable_data = self.test_plan.get_child_table_data(index=1)
+        self.info('Asserting that the Quantification limits updated correctly')
+        self.assertEqual(new_version_childtable_data[0]['Quantification Limit'], "20-100")
+        self.info('the Quantification limits updated correctly')

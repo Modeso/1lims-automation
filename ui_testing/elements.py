@@ -98,6 +98,8 @@ elements = {
                     'value': 'Restore'},
         'active': {'method': 'link_text',
                    'value': 'Active'},
+        'versions': {'method': 'link_text',
+                     'value': 'Versions'},
         'delete': {'method': 'link_text',
                    'value': 'Delete'},
         'xslx': {'method': 'link_text',
