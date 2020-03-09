@@ -310,9 +310,9 @@ class TestPlansTestCases(BaseTest):
         LIMS-3679
         """
         # get the maximum number given to the latest testplan
-        latest_testplan_number = self.test_plan.get_the_latest_row_data()['Test Plan No.'].replace("'", "")
-        duplicated_test_plan_number = int(latest_testplan_number) + 1
-        self.info('The duplicated testplan should have the number: {}'.format(duplicated_test_plan_number))
+        #latest_testplan_number = self.test_plan.get_the_latest_row_data()['Test Plan No.'].replace("'", "")
+        #duplicated_test_plan_number = int(latest_testplan_number) + 1
+        #self.info('The duplicated testplan should have the number: {}'.format(duplicated_test_plan_number))
 
         self.info('Choosing a random testplan table row')
         testPlan = random.choice(self.test_plan_api.get_completed_testplans())
@@ -325,8 +325,7 @@ class TestPlansTestCases(BaseTest):
 
         self.info('Duplicating testplan number: {}'.format(testPlan['number']))
         self.test_plan.duplicate_selected_item()
-        self.test_plan.duplicate_testplan(change=['name'])
-        self.test_plan.sleep_tiny()
+        duplicated_test_plan_number = self.test_plan.duplicate_testplan(change=['name'])
 
         duplicated_testplan_data, duplicated_testplan_childtable_data = \
             self.test_plan.get_specific_testplan_data_and_childtable_data(
