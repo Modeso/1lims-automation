@@ -336,7 +336,6 @@ class TestPlansTestCases(BaseTest):
         self.assertEqual(testPlan['article'][0], duplicated_testplan_data['Article Name'])
         self.assertEqual(testPlan['articleNo'][0], duplicated_testplan_data['Article No.'])
 
-
     def test011_test_plan_completed_to_inprogress(self):
         '''
         LIMS-3503

@@ -20,6 +20,10 @@ class TestPlanAPI(BaseAPI):
         testplans_response = self.get_all_test_plans(**kwargs)
         return testplans_response.json()['testPlans']
 
+    def get_max_number_of_test_plans(self):
+        testplans = self.get_all_test_plans_json()
+        return testplans[0]['number']
+
     def get_completed_testplans(self, **kwargs):
         response = self.get_all_test_plans(**kwargs)
         all_test_plans = response.json()['testPlans']
