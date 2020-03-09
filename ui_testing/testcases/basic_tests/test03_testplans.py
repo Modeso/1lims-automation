@@ -72,12 +72,12 @@ class TestPlansTestCases(BaseTest):
         self.assertFalse(deleted_test_unit_found)
 
     def test002_test_plan_inprogress_to_completed(self):
-        '''
-        LIMS-3502
+        """
         When the testplan status is converted from 'In-Progress' to 'Completed', no new version created
-        '''
 
-        self.info('Searching for test plan with In Progress status')
+        LIMS-3502
+        """
+        self.info('get test plan with In Progress status')
         in_progress_testplan = random.choice(self.test_plan_api.get_inprogress_testplans())
         in_progress_testplan_name = in_progress_testplan['testPlanName']
         in_progress_testplan_version = in_progress_testplan['version']
@@ -89,7 +89,7 @@ class TestPlansTestCases(BaseTest):
         self.info('Going to step 2 to add testunit to this test plan')
         self.test_plan.set_test_unit()
         self.info('Saving and completing the testplan')
-        self.test_plan.save(save_btn='test_plan:save_and_complete')
+        self.test_plan.save(save_btn='test_plan:save_and_complete', sleep=True)
 
         # go back to the active table
         self.test_plan.get_test_plans_page()
