@@ -316,13 +316,12 @@ class TestPlansTestCases(BaseTest):
 
         self.info('Choosing a random testplan table row')
         testPlan = random.choice(self.test_plan_api.get_completed_testplans())
+        testunits = self.test_plan_api.get_testunits_in_testplan(id=testPlan['id'])
         self.test_plan.open_filter_menu()
         self.test_plan.filter_by_testplan_number(testPlan['number'])
         self.test_plan.sleep_small()
         self.test_plan.click_check_box(source=self.base_page.result_table()[0])
         self.test_plan.sleep_small()
-        self.info('Saving the child data of the main testplan')
-        main_testplan_childtable_data = self.test_plan.get_child_table_data(index=0)
 
         self.info('Duplicating testplan number: {}'.format(testPlan['number']))
         self.test_plan.duplicate_selected_item()
@@ -332,12 +331,16 @@ class TestPlansTestCases(BaseTest):
         duplicated_testplan_data, duplicated_testplan_childtable_data = \
             self.test_plan.get_specific_testplan_data_and_childtable_data(
                 filter_by='number', filter_text=duplicated_test_plan_number)
+        duplicated_test_units = []
+        for testunit in duplicated_testplan_childtable_data:
+            duplicated_test_units.append(testunit['Test Unit Name'])
 
         self.info('Asserting that the data is duplicated correctly')
-        self.assertEqual(main_testplan_childtable_data, duplicated_testplan_childtable_data)
         self.assertEqual(testPlan['materialType'], duplicated_testplan_data['Material Type'])
         self.assertEqual(testPlan['article'][0], duplicated_testplan_data['Article Name'])
         self.assertEqual(testPlan['articleNo'][0], duplicated_testplan_data['Article No.'])
+        for testunit in testunits:
+            self.assertIn(testunit['name'], duplicated_test_units)
 
     def test011_test_plan_completed_to_inprogress(self):
         '''
