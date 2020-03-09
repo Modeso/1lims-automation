@@ -316,7 +316,10 @@ class TestPlansTestCases(BaseTest):
 
         self.info('Choosing a random testplan table row')
         testPlan = random.choice(self.test_plan_api.get_completed_testplans())
-        self.test_plan.click_check_box(source=self.test_plan.search(testPlan['number'])[0])
+        self.test_plan.open_filter_menu()
+        self.test_plan.filter_by_testplan_number(testPlan['number'])
+        self.test_plan.sleep_small()
+        self.test_plan.click_check_box(source=self.base_page.result_table()[0])
         self.test_plan.sleep_small()
         self.info('Saving the child data of the main testplan')
         main_testplan_childtable_data = self.test_plan.get_child_table_data(index=0)
