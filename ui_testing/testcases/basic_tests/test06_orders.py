@@ -1938,20 +1938,21 @@ class OrdersTestCases(BaseTest):
 
          LIMS-6523
         """
+        self.info('create contact')
+        contact, contact_id = self.contacts_api.create_contact()
+
         self.info('open random order record')
         order = random.choice(self.orders_api.get_all_orders().json()['orders'])
         order_id = order['id']
         self.orders_page.get_order_edit_page_by_id(id=order_id)
-
-        self.info('create contact')
-        contact, contact_id = self.contacts_api.create_contact()
         order_data = self.order_page.get_suborder_data()
         if len(order_data['suborders']) <= 1:
             self.order_page.duplicate_from_table_view()
             self.order_page.save(save_btn='order:save_btn')
 
         self.order_page.set_contact(contact=contact['name'])
-        self.order_page.save(save_btn='order:save_btn')
+        self.order_page.sleep_small()
+        self.order_page.save(save_btn='order:save_btn', sleep=True)
         self.base_selenium.refresh()
 
         selected_suborder_data = self.order_page.get_suborder_data()
