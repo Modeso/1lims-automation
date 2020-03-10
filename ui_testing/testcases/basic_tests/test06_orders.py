@@ -1961,7 +1961,7 @@ class OrdersTestCases(BaseTest):
             current_test_unit = self.order_page.get_test_unit()
         else:
             self.order_page.cancel(force=True)
-            self.base_selenium.get(url=order_page_url)
+            self.base_selenium.get(url=edit_page_url)
             self.order_page.sleep_tiny()
             self.base_selenium.click(element='order:suborder_table')
             current_article = self.order_page.get_article()
