@@ -1895,3 +1895,55 @@ class OrdersTestCases(BaseTest):
         testunit_name = row_with_headers['Test Unit']
         self.base_selenium.LOGGER.info(" + Test unit : {}".format(testunit_name))
         self.assertIn(testunit_name, testunit_name)
+
+    def test029_update_material_type(self):
+        """
+        Apply this on suborder number 5 for example:-
+        -When user update the materiel type from table view once I delete it message will appear
+        (All analysis created with this order and test plan will be deleted )
+        -Once you press on OK button, the material type & article & test pan will delete
+        -You can update it by choose another one and choose corresponding article & test plan 
+
+        LIMS-4264
+
+        """
+        order_request = self.orders_api.get_all_orders(limit=20).json()
+        self.assertEqual(order_request['status'], 1)
+        orders_records = order_request['orders']
+        self.assertNotEqual(len(orders_records), 0)
+        random_order_index = self.generate_random_number(lower=0, upper=len(orders_records) - 1)
+        selected_order_record = orders_records[random_order_index]
+
+        order_page_url = self.base_selenium.get_url()
+        edit_page_url = order_page_url+'/'+str(selected_order_record['id'])
+        self.base_selenium.get(edit_page_url)
+        self.order_page.sleep_tiny()
+        self.base_selenium.click(element='order:suborder_table')
+
+
+
+        # Update material type and confirm popup
+        initial_material_type = self.order_page.get_material_type()
+        self.base_selenium.select_item_from_drop_down(element='order:material_type', avoid_duplicate=True)
+        self.order_page.confirm_popup(force=True)
+        self.order_page.sleep_tiny()
+
+        # Update article
+        self.order_page.set_article(article='r')
+
+        # Update test plan
+        self.order_page.set_test_plan(test_plan='r')
+
+
+        self.order_page.save(save_btn='order:save_btn')
+        self.base_selenium.LOGGER.info('Refresh to make sure that data are saved correctly')
+        self.base_selenium.refresh()
+        self.base_selenium.click(element='order:suborder_table')
+        new_material_type = self.order_page.get_material_type()
+
+        self.base_selenium.LOGGER.info(
+            ' + Assert {} (initial_material_type) != {} (new_material_type)'.format(initial_material_type,
+                                                                        new_material_type))
+        self.assertNotEqual(new_material_type, initial_material_type)
+
+        
