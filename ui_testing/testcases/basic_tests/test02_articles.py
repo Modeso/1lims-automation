@@ -3,6 +3,7 @@ from ui_testing.pages.article_page import Article
 from ui_testing.pages.testplan_page import TstPlan
 from ui_testing.pages.order_page import Order
 from ui_testing.pages.base_pages import BasePages
+from api_testing.apis.article_api import ArticleAPI
 from parameterized import parameterized
 import re
 from unittest import skip
@@ -13,6 +14,7 @@ class ArticlesTestCases(BaseTest):
     def setUp(self):
         super().setUp()
         self.article_page = Article()
+        self.article_api = ArticleAPI()
         self.test_plan = TstPlan()
         self.order_page = Order()
         self.base_page = BasePages()
