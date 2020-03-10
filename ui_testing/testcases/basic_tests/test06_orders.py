@@ -956,8 +956,8 @@ class OrdersTestCases(BaseTest):
         if edit_feild == 'material_type':
             material_type = 'Subassembely'
             self.order_page.set_material_type(material_type=material_type)
-            self.assertEqual(self.order_page.get_article(), 'Search')
-            self.assertEqual(self.order_page.get_test_unit(), [])
+            self.assertEqual(self.base_selenium.get_value(element='order:article'), None)
+            self.assertEqual(self.base_selenium.get_value(element='order:test_unit'), None)
             article = self.order_page.set_article()
             test_unit = self.order_page.set_test_unit()
         else:
@@ -968,21 +968,18 @@ class OrdersTestCases(BaseTest):
             self.assertEqual(self.order_page.get_material_type(), material_type)
 
         self.order_page.save(save_btn='order:save_btn')
-        import ipdb;ipdb.set_trace()
         self.order_page.get_orders_page()
+        self.order_page.navigate_to_analysis_tab()
         self.info('Assert There is an analysis for this new order.')
-        self.analyses_page.filter_by(
-            filter_element='orders:filter_order_no', filter_text= order_no, field_type='drop_down')
-
-        order_analisys = self.orders_page.result_table()[0]
+        self.analyses_page.apply_filter_scenario(
+            filter_element='orders:filter_order_no', filter_text=order_no, field_type='drop_down')
         latest_order_data = \
-            self.base_selenium.get_row_cells_dict_related_to_header(row=order_analisys [0])
+            self.base_selenium.get_row_cells_dict_related_to_header(row=self.analyses_page.result_table()[0])
 
         self.assertEqual(order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
         self.assertEqual(article.split(' No:')[0], latest_order_data['Article Name'])
-        self.assertEqual(test_unit, latest_order_data['testUnits'])
-        self.assertEqual(material_type,latest_order_data['Material Type'])
-
+        self.assertEqual(test_unit, self.analyses_page.get_child_table_data()[0]['Test Unit'])
+        self.assertEqual(material_type, latest_order_data['Material Type'])
 
     # will continue with us
     def test023_create_existing_order_with_test_units_and_change_article(self):

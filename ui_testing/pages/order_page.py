@@ -93,7 +93,7 @@ class Order(Orders):
     def get_test_unit(self):
         test_units = self.base_selenium.get_text(element='order:test_unit')
         if "×" in test_units:
-            return test_units.replace("× ", "").split('\n')
+            return test_units.replace("×", "").split(' No')[0]
         else:
             return []
 
@@ -474,5 +474,6 @@ class Order(Orders):
         return order_id
 
     def navigate_to_analysis_tab(self):
+        self.base_selenium.wait_until_element_clickable('order:analysis_tab')
         self.base_selenium.click('order:analysis_tab')
         self.sleep_small()
