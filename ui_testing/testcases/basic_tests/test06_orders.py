@@ -1885,10 +1885,10 @@ class OrdersTestCases(BaseTest):
         LIMS-4255
         """
         article, article_data = self.article_api.create_article()
-        testunit_record = random.choice(self.test_unit_api.get_all_test_units(
-            filter='{"materialTypes":"all"}').json()['testUnits'])
+        testunit_record = random.choice\
+            (self.test_unit_api.get_all_test_units(filter='{"materialTypes":"all"}').json()['testUnits'])
 
-        order = random.choice(self.orders_api.get_all_orders().json()['orders'])
+        order = random.choice(self.orders_api.get_all_orders(limit=50).json()['orders'])
         self.orders_page.get_order_edit_page_by_id(id=order['id'])
 
         self.info('getting analysis tab to check out the count of the analysis')
@@ -1942,7 +1942,7 @@ class OrdersTestCases(BaseTest):
         contact, contact_id = self.contacts_api.create_contact()
 
         self.info('open random order record')
-        order = random.choice(self.orders_api.get_all_orders().json()['orders'])
+        order = random.choice(self.orders_api.get_all_orders(limit=50).json()['orders'])
         order_id = order['id']
         self.orders_page.get_order_edit_page_by_id(id=order_id)
         order_data = self.order_page.get_suborder_data()
