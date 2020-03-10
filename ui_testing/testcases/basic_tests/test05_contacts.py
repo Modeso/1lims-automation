@@ -169,9 +169,14 @@ class ContactsTestCases(BaseTest):
         LIMS-6386
         """
         contact_data = self.contact_page.create_update_contact()
+
         self.info('filter by contact no.: {} to get the record'.format(contact_data['Contact No']))
-        contact_record = self.contact_page.search(value=contact_data['Contact No'])[0]
-        self.contacts_page.info('open the record in edit to compare the data')
+        self.order_page.apply_filter_scenario(
+            filter_element='contact:contact_no_filter', filter_text=contact_data['Contact No'], field_type='text')
+        self.contact_page.sleep_small()
+        contact_record = self.contact_page.result_table()[0]
+
+        self.info('open the record in edit to compare the data')
         self.contact_page.open_edit_page_by_css_selector(row=contact_record)
         contact_data_after_create = self.contact_page.get_full_contact_data()
         self.assertTrue(self.contact_page.compare_contact_main_data(data_after_save=contact_data_after_create,
