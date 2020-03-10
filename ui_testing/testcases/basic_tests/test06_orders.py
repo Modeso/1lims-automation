@@ -631,7 +631,6 @@ class OrdersTestCases(BaseTest):
         self.info('Create new order')
         order = {}
         today_date = date.today().strftime("%d.%m.%Y")
-
         # prepare order data
         order['Order No.'] = self.orders_api.get_auto_generated_order_no()
         order['Contact Name'] = self.contacts_api.get_all_contacts().json()['contacts'][0]
@@ -645,14 +644,14 @@ class OrdersTestCases(BaseTest):
             materialtype_id=order['Material Type']['id'])[0]
         order['Shipment Date'] = self.test_unit_page.get_current_date_formated()
         order['Current Year'] = self.test_unit_page.get_current_year()[2:]
-        
+        contact = [order['Contact Name']]
         # create the order using the order data
         payload, result = \
             self.orders_api.create_new_order(yearOption=1, orderNo=order['Order No.'],
                                              year=order['Current Year'], testUnits=[order['Test Units']],
                                              testPlans=[order['Test Plans']], article=order['Article Name'],
                                              materialType=order['Material Type'], shipmentDate=order['Shipment Date'],
-                                             testDate=order['Test Date'], contact=[order['Contact Name']])
+                                             testDate=order['Test Date'], contact=contact)
 
         # add additional order fields and format the dates to match the table format
         order['id'] = result['order']['mainOrderId']
