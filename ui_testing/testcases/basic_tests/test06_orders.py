@@ -1982,8 +1982,7 @@ class OrdersTestCases(BaseTest):
         year_value = self.order_page.get_current_year()[2:]
         formated_order_no = new_order_no + '-' + year_value
         self.info('newly generated order number = {}'.format(formated_order_no))
-
-        order = random.choice(self.orders_api.get_all_orders().json()['orders'])
+        order = self.orders_api.get_all_orders(limit= 50).json()['orders'][1]
         self.orders_page.get_order_edit_page_by_id(id=order['id'])
         self.order_page.set_no(no=formated_order_no)
         self.order_page.sleep_small()
