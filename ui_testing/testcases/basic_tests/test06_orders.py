@@ -963,6 +963,7 @@ class OrdersTestCases(BaseTest):
         else:
             test_unit = self.order_page.get_test_unit()
             material_type = self.order_page.get_material_type()
+            self.order_page.sleep_tiny()
             article = self.order_page.set_article()
             self.assertEqual(self.order_page.get_test_unit(), test_unit)
             self.assertEqual(self.order_page.get_material_type(), material_type)
