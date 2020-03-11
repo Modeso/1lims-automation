@@ -1905,8 +1905,13 @@ class OrdersTestCases(BaseTest):
         -You can update it by choose another one and choose corresponding article & test plan 
 
         LIMS-4264
-
+        
         """
+        # Get test plan
+        test_plan_dict = self.get_active_article_with_tst_plan(
+            test_plan_status='complete')
+        
+        # Get random order
         order_request = self.orders_api.get_all_orders(limit=20).json()
         self.assertEqual(order_request['status'], 1)
         orders_records = order_request['orders']
@@ -1914,6 +1919,7 @@ class OrdersTestCases(BaseTest):
         random_order_index = self.generate_random_number(lower=0, upper=len(orders_records) - 1)
         selected_order_record = orders_records[random_order_index]
 
+        self.order_page.get_orders_page()
         order_page_url = self.base_selenium.get_url()
         edit_page_url = order_page_url+'/'+str(selected_order_record['id'])
         self.base_selenium.get(edit_page_url)
@@ -1924,15 +1930,16 @@ class OrdersTestCases(BaseTest):
 
         # Update material type and confirm popup
         initial_material_type = self.order_page.get_material_type()
-        self.base_selenium.select_item_from_drop_down(element='order:material_type', avoid_duplicate=True)
+        
+        self.order_page.set_material_type(test_plan_dict['Material Type'])
         self.order_page.confirm_popup(force=True)
         self.order_page.sleep_tiny()
 
         # Update article
-        self.order_page.set_article(article='r')
+        self.order_page.set_article(test_plan_dict['Article No.'])
 
         # Update test plan
-        self.order_page.set_test_plan(test_plan='r')
+        self.order_page.set_test_plan(test_plan_dict['Test Plan Name'])
 
 
         self.order_page.save(save_btn='order:save_btn')
@@ -1945,5 +1952,3 @@ class OrdersTestCases(BaseTest):
             ' + Assert {} (initial_material_type) != {} (new_material_type)'.format(initial_material_type,
                                                                         new_material_type))
         self.assertNotEqual(new_material_type, initial_material_type)
-
-        
