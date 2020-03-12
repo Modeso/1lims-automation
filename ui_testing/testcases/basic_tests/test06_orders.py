@@ -335,7 +335,8 @@ class OrdersTestCases(BaseTest):
         User can add suborder from the main order
         '''
 
-        test_plan = random.choice(self.test_plan_api.get_completed_testplans(limit=1000))
+        test_plan = self.get_active_article_with_tst_plan(test_plan_status='complete')
+        self.order_page.get_orders_page()
         order_row = self.order_page.get_random_order_row()
         order_data = self.base_selenium.get_row_cells_dict_related_to_header(row=order_row)
         order_number = order_data['Order No.']
@@ -346,9 +347,9 @@ class OrdersTestCases(BaseTest):
         order_url = self.base_selenium.get_url()
         self.base_selenium.LOGGER.info('Order url: {}'.format(order_url))
 
-        self.order_page.create_new_suborder(material_type=test_plan['materialType'],
-                                            article_name=test_plan['article'][0],
-                                            test_plan=test_plan['testPlanName'], add_new_suborder_btn='order:add_another_suborder')
+        self.order_page.create_new_suborder(material_type=test_plan['Material Type'],
+                                            article_name=test_plan['Article No.'],
+                                            test_plan=test_plan['Test Plan Name'], add_new_suborder_btn='order:add_another_suborder')
         self.order_page.save(save_btn='order:save_btn')
 
         self.order_page.get_orders_page()
