@@ -191,4 +191,19 @@ class Orders(BasePages):
     def navigate_to_analysis_active_table(self):
         self.base_selenium.click(element='orders:analysis_tab')
         self.sleep_small()
-        
+
+    def search_by_analysis_number(self,analysis_number):
+        self.base_selenium.click(element='general:filter_button')
+        self.base_selenium.set_text(element='orders:analysis_filter',value=analysis_number)
+        self.base_selenium.click(element='general:filter_btn')
+        time.sleep(self.base_selenium.TIME_MEDIUM)
+
+    def is_order_in_table(self,value):
+        results=self.base_selenium.get_table_rows(element='general:table')
+        if len(results) == 0:
+            return False
+        else:
+            if value in results[0].text:
+                return True
+            else:
+                return False 
