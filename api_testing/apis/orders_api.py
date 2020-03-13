@@ -283,7 +283,7 @@ class OrdersAPI(BaseAPI):
         return request_body
 
     def archive_main_order(self, mainorder_id):
-        api = '{}{}{}/archive/mainOrder'.format(self.url, self.END_POINTS['orders_api']['archive_testunits'], str(mainorder_id)) 
+        api = '{}{}{}/archive/mainOrder'.format(self.url, self.END_POINTS['orders_api']['archive_main_order'], str(mainorder_id)) 
         self.info('PUT : {}'.format(api))
         response = self.session.put(api, params='', headers=self.headers, verify=False)
         self.info('Status code: {}'.format(response.status_code))

@@ -126,22 +126,19 @@ class OrdersTestCases(BaseTest):
         LIMS-6516
         User can archive a main order
         '''
-        order_row = self.order_page.get_random_order_row()
-        self.order_page.click_check_box(source=order_row)
-        order_data = self.base_selenium.get_row_cells_dict_related_to_header(row=order_row)
-        suborder_data_before_archiving, _ = self.order_page.get_orders_and_suborders_data(order_data['Order No.'])
-        
-        self.base_selenium.LOGGER.info('Trying to archive order with number: {}'.format(order_data['Order No.']))
-        order_deleted = self.order_page.archive_selected_orders(check_pop_up=True)
-        self.base_selenium.LOGGER.info(' + {} '.format(order_deleted))
-        
-        self.base_selenium.refresh()
-        self.base_page.get_archived_items()
+        # Get random order
+        order_request = self.orders_api.get_all_orders(limit=20).json()
+        self.assertEqual(order_request['status'], 1)
+        orders_records = order_request['orders']
+        self.assertNotEqual(len(orders_records), 0)
+        random_order_index = self.generate_random_number(lower=0, upper=len(orders_records) - 1)
+        order_data = orders_records[random_order_index]
+        order_id = order_data['id']
 
-        suborder_data_after_archiving, _ = self.order_page.get_orders_and_suborders_data(order_data['Order No.'])
 
-        self.base_selenium.LOGGER.info('Asserting the suborders were correctly archived')
-        self.assertEqual(suborder_data_before_archiving, suborder_data_after_archiving)
+        # Arcihve main order
+        archived_order = self.orders_api.archive_main_order(order_id)
+        self.assertTrue(archived_order)
     
     # will continue with us
     def test005_restore_archived_orders(self):
