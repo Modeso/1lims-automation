@@ -345,19 +345,26 @@ class OrdersTestCases(BaseTest):
         LIMS-3817
         User can add suborder from the main order
         '''
-
+        # Get active suborder data to use
         test_plan = self.get_active_article_with_tst_plan(test_plan_status='complete')
-        self.order_page.get_orders_page()
-        order_row = self.order_page.get_random_order_row()
-        order_data = self.base_selenium.get_row_cells_dict_related_to_header(row=order_row)
-        order_number = order_data['Order No.']
-        orders_duplicate_data_before, orders = self.order_page.get_orders_duplicate_data(order_no=order_number)
 
+        # Get random order
+        order_request = self.orders_api.get_all_orders(limit=20).json()
+        self.assertEqual(order_request['status'], 1)
+        orders_records = order_request['orders']
+        self.assertNotEqual(len(orders_records), 0)
+        random_order_index = self.generate_random_number(lower=0, upper=len(orders_records) - 1)
+        order_data = orders_records[random_order_index]
+        order_number = order_data['orderNo']
+
+        self.order_page.get_orders_page()
+        orders_duplicate_data_before, orders = self.order_page.get_orders_duplicate_data(order_no=order_number)
         self.base_selenium.LOGGER.info('Select random order with number: {}'.format(order_number))
+
+        
         self.order_page.open_edit_page(row=orders[0])
         order_url = self.base_selenium.get_url()
         self.base_selenium.LOGGER.info('Order url: {}'.format(order_url))
-
         self.order_page.create_new_suborder(material_type=test_plan['Material Type'],
                                             article_name=test_plan['Article No.'],
                                             test_plan=test_plan['Test Plan Name'], add_new_suborder_btn='order:add_another_suborder')
