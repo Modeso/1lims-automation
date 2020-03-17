@@ -664,15 +664,24 @@ class OrdersTestCases(BaseTest):
         """
         self.base_selenium.LOGGER.info(' Running test case to check that at least test unit or test plan is mandatory in order')
 
-        # validate in edit mode, go to order over view
-        self.order_page.get_orders_page()
-        self.order_page.get_random_order()
-        order_url = self.base_selenium.get_url()
-        self.base_selenium.LOGGER.info(' + order_url : {}'.format(order_url))
+        # Get random order
+        order_request = self.orders_api.get_all_orders(limit=20).json()
+        self.assertEqual(order_request['status'], 1)
+        orders_records = order_request['orders']
+        self.assertNotEqual(len(orders_records), 0)
+        random_order_index = self.generate_random_number(lower=0, upper=len(orders_records) - 1)
+        selected_order_record = orders_records[random_order_index]
 
-        self.base_selenium.LOGGER.info(' Remove all selected test plans and test units')
+        # Open random order edit page
+        order_page_url = self.base_selenium.get_url()
+        edit_page_url = order_page_url+'/'+str(selected_order_record['id'])
+        self.base_selenium.LOGGER.info(' + order_url : {}'.format(edit_page_url))
+        self.base_selenium.get(edit_page_url)
+        self.order_page.sleep_tiny()
 
+        
         # edit suborder
+        self.base_selenium.LOGGER.info(' Remove all selected test plans and test units')
         suborder_row = self.base_selenium.get_table_rows(element='order:suborder_table')[0]
         suborder_row.click()
 
