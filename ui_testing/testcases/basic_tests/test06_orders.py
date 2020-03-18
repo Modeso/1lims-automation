@@ -687,7 +687,7 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.LOGGER.info(' + order_url : {}'.format(edit_page_url))
         self.base_selenium.get(edit_page_url)
         self.order_page.sleep_tiny()
-
+        self.base_selenium.click(element='order:suborder_table')
         
         # edit suborder
         self.base_selenium.LOGGER.info(' Remove all selected test plans and test units')
@@ -695,6 +695,13 @@ class OrdersTestCases(BaseTest):
         suborder_row.click()
 
         # delete test plan and test unit
+        if self.order_page.get_test_unit():
+            self.order_page.clear_test_unit()
+            self.order_page.confirm_popup(force=True)
+            self.order_page.save(save_btn='order:save_btn')
+            test_unit_class_name = self.base_selenium.get_attribute(element="order:test_unit", attribute='class')
+            self.assertIn('has-error', test_unit_class_name)
+
         if self.order_page.get_test_plan():
             self.order_page.clear_test_plan()
             self.order_page.confirm_popup(force=True)
@@ -702,12 +709,6 @@ class OrdersTestCases(BaseTest):
             test_plan_class_name = self.base_selenium.get_attribute(element="order:test_plan", attribute='class')
             self.assertIn('has-error', test_plan_class_name)
 
-        if self.order_page.get_test_unit():
-            self.order_page.clear_test_unit()
-            self.order_page.confirm_popup(force=True)
-            self.order_page.save(save_btn='order:save_btn')
-            test_unit_class_name = self.base_selenium.get_attribute(element="order:test_unit", attribute='class')
-            self.assertIn('has-error', test_unit_class_name)
 
     @parameterized.expand(['save_btn', 'cancel'])
     def test032_update_test_date(self, save):
