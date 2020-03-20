@@ -781,7 +781,6 @@ class TestPlansTestCases(BaseTest):
         self.test_plan.get_test_plans_page()
         self.test_plan.get_test_plan_edit_page(testplan_name)
         # navigate to the test units selection tab
-        uper, lower = self.test_plan.get_test_unit_limits()
         self.test_plan.update_upper_lower_limits_of_testunit(95, 15)
         # save the changes
         self.test_plan.save_and_confirm_popup()
