@@ -5,6 +5,7 @@ from ui_testing.pages.testunit_page import TstUnit
 from ui_testing.pages.base_pages import BasePages
 from ui_testing.pages.order_page import Order
 from api_testing.apis.test_plan_api import TestPlanAPI
+from api_testing.apis.test_unit_api import TestUnitAPI
 from ui_testing.pages.header_page import Header
 from api_testing.apis.users_api import UsersAPI
 from api_testing.apis.article_api import ArticleAPI
@@ -747,7 +748,6 @@ class TestPlansTestCases(BaseTest):
         LIMS-6288
         """
         assert (self.test_unit_page.deselect_all_configurations(), False)
-
     def test026_update_quantification_limit_new_version_created(self):
         """
         New: Test plan: Limits of quantification Approach: In case I update the limits
@@ -758,29 +758,24 @@ class TestPlansTestCases(BaseTest):
         # select random test plan and get material type
         testplan = random.choice(self.test_plan_api.get_inprogress_testplans())
         testplan_name = testplan['testPlanName']
-        material_type = testplan['materialType']
         old_version = testplan['version']
+        MaterialTypes = [{
+            'id': self.get_material_type_id(material_type=testplan['materialType']),
+            'text': testplan['materialType']
+        }]
         # create quantitative test unit with quantification limit
-        self.test_unit_page.get_test_units_page()
-        new_name = self.generate_random_string()
-        new_method = self.generate_random_string()
-        new_random_limit = self.generate_random_number()
-        self.test_unit_page.create_quantitative_testunit(name=new_name, material_type=material_type, category='',
-                                                         upper_limit=new_random_limit, lower_limit=new_random_limit,
-                                                         spec_or_quan='quan', method=new_method)
-
-        self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
+        self.test_unit_api = TestUnitAPI()
+        test_unit = self.test_unit_api.create_quantitative_testunit(selectedMaterialTypes=MaterialTypes)
         # navigate to the chosen test plan edit page
-        self.test_plan.get_test_plans_page()
-        self.test_plan.get_test_plan_edit_page(testplan_name)
+        self.test_plan.get_test_plan_edit_page(testplan['id'])
         # navigate to the test units selection tab
-        self.test_plan.set_test_unit(test_unit=new_name)
+        self.test_plan.set_test_unit(test_unit=test_unit['name'])
         self.test_plan.sleep_tiny()
         # save the changes
         self.test_plan.save()
         # navigate to the chosen test plan edit page
         self.test_plan.get_test_plans_page()
-        self.test_plan.get_test_plan_edit_page(testplan_name)
+        self.test_plan.get_test_plan_edit_page(id=testplan['id'])
         # navigate to the test units selection tab
         self.test_plan.update_upper_lower_limits_of_testunit(95, 15)
         # save the changes
