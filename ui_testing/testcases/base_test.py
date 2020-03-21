@@ -6,6 +6,7 @@ from ui_testing.pages.article_page import Article
 from ui_testing.pages.login_page import Login
 from ui_testing.pages.testplan_page import TstPlan
 from ui_testing.pages.testunit_page import TstUnit
+from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 import datetime, re
 
 
@@ -120,3 +121,10 @@ class BaseTest(TestCase):
 
     def info(self, message):
         self.base_selenium.LOGGER.info(message)
+        
+    def get_material_type_id(self, material_type):
+        self.general_utilities_api = GeneralUtilitiesAPI()
+        materialtypes = self.general_utilities_api.list_all_material_types()
+        for material in materialtypes:
+            if material_type == material['name']:
+                return material['id']
