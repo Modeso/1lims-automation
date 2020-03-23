@@ -38,17 +38,13 @@ class ArticleAPIFactory(BaseAPI):
         _payload = {}
         return api, _payload, kwargs
 
-<<<<<<< HEAD
-=======
     @api_factory('post')
->>>>>>> ArticleAPI updates with decoration
     def create_article(self, **kwargs):
         """
         Create an article.
         """
         api = '{}{}'.format(self.url, self.END_POINTS['article_api']['create_article'])
         _payload = {
-<<<<<<< HEAD
             "selectedArticles": [],
             "selectedArticlesNos": [],
             "No": self.generate_random_number(),
@@ -56,13 +52,6 @@ class ArticleAPIFactory(BaseAPI):
             "materialType": {
                     "id": 1,
                     "text": "Raw Material"
-=======
-            "No": self.generate_random_number(),
-            "name": self.generate_random_string(),
-            "materialType": {
-                "id": 1,
-                "text": "Raw Material"
->>>>>>> ArticleAPI updates with decoration
             },
             "selectedMaterialType": [
                 {
@@ -73,6 +62,13 @@ class ArticleAPIFactory(BaseAPI):
             "materialTypeId": 1,
             "dynamicFieldsValues": []
         }
+        return api, _payload, kwargs
+
+    @api_factory('get')
+    def list_testplans_by_article_and_materialtype(self, materialtype_id=1, article_id=1, **kwargs):
+        api = '{}{}{}/{}'.format(self.url, self.END_POINTS['article_api']['list_testplans_by_article_and_materialtype'],
+                                 article_id, materialtype_id)
+        _payload = {}
         return api, _payload, kwargs
 
     @api_factory('get')
@@ -105,17 +101,6 @@ class ArticleAPI(ArticleAPIFactory):
                 data[material_type] = []
             data[material_type].append(article['name'])
         return data
-
-    def list_testplans_by_article_and_materialtype(self, materialtype_id=1, article_id=1):
-        api = '{}{}{}/{}'.format(self.url, self.END_POINTS['article_api']['list_testplans_by_article_and_materialtype'],
-                                 article_id, materialtype_id)
-        self.info('GET : {}'.format(api))
-        response = self.session.get(api, params='', headers=self.headers, verify=False)
-        self.info('Status code: {}'.format(response.status_code))
-        data = response.json()
-        if data['status'] == 1:
-            return data['testPlans']
-        return []
 
     def get_articles_with_no_testplans(self,**kwargs):
         response = self.get_all_articles(**kwargs)
