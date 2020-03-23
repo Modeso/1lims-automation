@@ -10,7 +10,6 @@ from unittest import skip
 import random, re
 
 
-
 class ArticlesTestCases(BaseTest):
     def setUp(self):
         super().setUp()

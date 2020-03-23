@@ -113,3 +113,4 @@ class ArticleAPI(ArticleAPIFactory):
         all_articles = response.json()['articles']
         articles = [article for article in all_articles if len(article['testPlanNames']) >= 1]
         return articles
+
