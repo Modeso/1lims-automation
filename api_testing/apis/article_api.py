@@ -17,7 +17,7 @@ class ArticleAPI(BaseAPI):
         return response
 
     def get_article_form_data(self, id=1):
-        api = '{}{}{}'.format(self.url, self.END_POINTS['article_api']['form_data'], str(id)) 
+        api = '{}{}{}'.format(self.url, self.END_POINTS['article_api']['form_data'], str(id))
         self.info('GET : {}'.format(api))
         response = self.session.get(api, params='', headers=self.headers, verify=False)
         self.info('Status code: {}'.format(response.status_code))
@@ -26,9 +26,9 @@ class ArticleAPI(BaseAPI):
             return data['article']
         else:
             return False
-    
+
     def archive_articles(self, ids=['1']):
-        api = '{}{}{}/archive'.format(self.url, self.END_POINTS['article_api']['archive_articles'], ','.join(ids)) 
+        api = '{}{}{}/archive'.format(self.url, self.END_POINTS['article_api']['archive_articles'], ','.join(ids))
         self.info('PUT : {}'.format(api))
         response = self.session.put(api, params='', headers=self.headers, verify=False)
         self.info('Status code: {}'.format(response.status_code))
@@ -37,25 +37,25 @@ class ArticleAPI(BaseAPI):
             return True
         else:
             return False
-    
+
     def restore_articles(self, ids=['1']):
-        api = '{}{}{}/restore'.format(self.url, self.END_POINTS['article_api']['restore_articles'], ','.join(ids)) 
+        api = '{}{}{}/restore'.format(self.url, self.END_POINTS['article_api']['restore_articles'], ','.join(ids))
         self.info('PUT : {}'.format(api))
         response = self.session.put(api, params='', headers=self.headers, verify=False)
         self.info('Status code: {}'.format(response.status_code))
         data = response.json()
-        if data['status'] == 1 and data['message']=='restore_success':
+        if data['status'] == 1 and data['message'] == 'restore_success':
             return True
         else:
             return False
-    
+
     def delete_archived_article(self, id=1):
-        api = '{}{}{}'.format(self.url, self.END_POINTS['article_api']['delete_article'], str(id)) 
+        api = '{}{}{}'.format(self.url, self.END_POINTS['article_api']['delete_article'], str(id))
         self.info('DELETE : {}'.format(api))
         response = self.session.delete(api, params='', headers=self.headers, verify=False)
         self.info('Status code: {}'.format(response.status_code))
         data = response.json()
-        if data['status'] == 1 and data['message']=='hard_delete_success':
+        if data['status'] == 1 and data['message'] == 'hard_delete_success':
             return True
         else:
             return False
@@ -71,27 +71,41 @@ class ArticleAPI(BaseAPI):
             return False
 
     def create_article(self, **kwargs):
-        request_body = {}
-        request_body['selectedArticles'] = []
-        request_body['selectedArticlesNos'] = []
-        request_body['dynamicFieldsValues'] = []
-        for key in kwargs:
-            request_body[key] = kwargs[key]
+        """
+        Create an article.
+        """
+        api = '{}{}'.format(self.url, self.END_POINTS['article_api']['create_article'])
+        _payload = {
+            "selectedArticles": [],
+            "selectedArticlesNos": [],
+            "No": self.generate_random_number(),
+            "name": self.generate_random_string(),
+            "materialType": {
+                    "id": 1,
+                    "text": "Raw Material"
+            },
+            "selectedMaterialType": [
+                {
+                    "id": 1,
+                    "text": "Raw Material"
+                }
+            ],
+            "materialTypeId": 1,
+            "dynamicFieldsValues": []
+        }
 
-        api = '{}{}'.format(self.url, self.END_POINTS['article_api']['create_article']) 
+        payload = self.update_payload(_payload, **kwargs)
         self.info('POST : {}'.format(api))
-        response = self.session.post(api, json=request_body, params='', headers=self.headers, verify=False)
-
-        self.info('Status code: {}'.format(response.status_code))
-        data = response.json()
-        
-        if data['status'] == 1:
-            return data['article']
+        response = self.session.post(api, json=payload, params='', headers=self.headers, verify=False).json()
+        self.info('Status code: {}'.format(response['status']))
+        if response['status'] == 1:
+            return response['article'], payload
         else:
-            return data['message']
+            return response['message']
 
     def list_articles_by_materialtype(self, materialtype_id=1, name='', is_archived=0):
-        api = '{}{}{}/{}?name={}'.format(self.url, self.END_POINTS['article_api']['list_articles_by_materialtype'], materialtype_id, is_archived, name) 
+        api = '{}{}{}/{}?name={}'.format(self.url, self.END_POINTS['article_api']['list_articles_by_materialtype'],
+                                         materialtype_id, is_archived, name)
         self.info('GET : {}'.format(api))
         response = self.session.get(api, params='', headers=self.headers, verify=False)
         self.info('Status code: {}'.format(response.status_code))
@@ -99,9 +113,20 @@ class ArticleAPI(BaseAPI):
         if data['status'] == 1:
             return data['articles']
         return []
-    
+
+    def get_active_articles_with_material_type(self):
+        data = {}
+        articles = self.get_all_articles().json()['articles']
+        for article in articles:
+            material_type = article['materialType']
+            if material_type not in data.keys():
+                data[material_type] = []
+            data[material_type].append(article['name'])
+        return data
+
     def list_testplans_by_article_and_materialtype(self, materialtype_id=1, article_id=1):
-        api = '{}{}{}/{}'.format(self.url, self.END_POINTS['article_api']['list_testplans_by_article_and_materialtype'], article_id, materialtype_id) 
+        api = '{}{}{}/{}'.format(self.url, self.END_POINTS['article_api']['list_testplans_by_article_and_materialtype'],
+                                 article_id, materialtype_id)
         self.info('GET : {}'.format(api))
         response = self.session.get(api, params='', headers=self.headers, verify=False)
         self.info('Status code: {}'.format(response.status_code))

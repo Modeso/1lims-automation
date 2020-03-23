@@ -52,13 +52,15 @@ class BasePages:
         time.sleep(self.base_selenium.TIME_LARGE)
 
     def save(self, sleep=True, save_btn='general:save', logger_msg='save the changes'):
-        self.base_selenium.LOGGER.info(logger_msg)
+        self.info(logger_msg)
         if self.base_selenium.check_element_is_exist(element=save_btn):
+            if sleep:
+                self.sleep_tiny()
             self.base_selenium.click(element=save_btn)
         else:            
             self.base_selenium.click(element='my_profile:save_button')
         if sleep:
-            time.sleep(self.base_selenium.TIME_MEDIUM)
+            self.sleep_tiny()
 
     def cancel(self, force=True):
         if self.base_selenium.check_element_is_exist(element='general:cancel'):
@@ -110,8 +112,9 @@ class BasePages:
         rows = self.base_selenium.get_table_rows(element=element)
         no_of_rows = randint(min(1, len(rows)-1), min(5, len(rows)-1))
         count = 0
-        self.base_selenium.LOGGER.info(' No. of selected rows {} '.format(no_of_rows))
+        self.info(' No. of selected rows {} '.format(no_of_rows))
         while count < no_of_rows:
+            self.base_selenium.scroll()
             row = rows[randint(0, len(rows) - 1)]
             row_text = row.text
             if not row_text:
@@ -551,3 +554,6 @@ class BasePages:
         current_year = datetime.datetime.now()
         return str(current_year.year)
 
+    def get_the_latest_row_data(self):
+        latest_row = (self.result_table()[0])
+        return self.base_selenium.get_row_cells_dict_related_to_header(latest_row)
