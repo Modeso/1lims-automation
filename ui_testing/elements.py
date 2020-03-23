@@ -151,7 +151,14 @@ elements = {
         'remove_file': {'method': 'class_name', 'value': 'dz-remove', 'order': 0},
         'uploaded_file_name': {'method': 'xpath', 'value': '//span[@data-dz-name="" and last()]'},
         'pagination_button': {'method': 'xpath', 'value': '//button[@class="btn dropdown-toggle btn-default"]'},
-        'pagination_menu': {'method': 'xpath', 'value': '//ul[@class="dropdown-menu inner"]'}
+        'pagination_menu': {'method': 'xpath', 'value': '//ul[@class="dropdown-menu inner"]'},
+        'form_popup_warning_window': {'method': 'class_name', 'value':'swal2-header', 'order':0},
+        'confirmation_button': {'method': 'xpath',
+                                'value': '//button[@class="swal2-confirm btn btn-success m-btn m-btn--custom"]'},
+        'clear_single_dropdown': {'method': 'class_name', 'value': 'ng-clear-wrapper', 'order': 0},
+        'td': {'method': 'tag_name', 'value': 'td', 'order': 0},
+        'th': {'method': 'tag_name', 'value': 'th', 'order': 0},
+        'div': {'method': 'tag_name', 'value': 'div', 'order': 0}
 
     },
     'login': {
@@ -312,7 +319,9 @@ elements = {
         'new_testunit': {'method': 'link_text',
                          'value': 'New Test Unit'},
         'qualitative_value': {'method': 'id',
-                              'value': 'textValueArrayfield'}
+                              'value': 'textValueArrayfield'},
+        'testunit_name_filter': {'method': 'id',
+                        'value': 'namefield'}
     },
 
     'test_plan': {
@@ -607,7 +616,7 @@ elements = {
         'order_number_add_form': {'method': 'id',
                                   'value': 'selectedOrderNofield'},
         'shipment_date': {'method': 'id',
-                          'value': 'date_shipmentDate'},
+                          'value': 'date_shipmentDate_0'},
         'test_date': {'method': 'id',
                       'value': 'date_testDate'},
         'save': {'method': 'class_name',
@@ -621,15 +630,16 @@ elements = {
                         'value': 'icon-views',
                         'order': 0
                         },
-
         'suborder_list': {'method': 'class_name',
                           'value': 'flaticon-signs',
                           'order': 0},
         'suborder_table': {'method': 'id',
                            'value': 'table-with-add'},
-        'add_new_item': {'method': 'class_name',
+        'add_new_item11': {'method': 'class_name',
                          'value': 'addNewItem',
                          'order': 0},
+        'add_new_item': {'method': 'link_text',
+                         'value': 'Add another item'},
         'order_no_error_message': {'method': 'xpath',
                                    'value': '//*[@id="field"]/div[3]/div/span'},
         'confirm_pop': {'method': 'class_name',
@@ -649,7 +659,8 @@ elements = {
         },
         'analysis_tab': {'method': 'xpath',
                          'value': "//span[@class='m-wizard__step-label'][contains(text(),'Analysis')]"
-                         }
+                         },
+        'orders_tab': {'method': 'xpath', 'value': "//span[@class='m-wizard__step-label'][contains(text(),'Orders')]"}
     },
 
     'header': {
@@ -1014,6 +1025,8 @@ elements = {
             'method': 'id',
             'value': 'table-with-add'
         },
+        'analysis_page_table': {'method': 'class_name', 'value': 'm_accordion_7', 'order': 0},
+        'headers': {'method': 'id', 'value': 'headers'}
     },
 
     'company_profile': {
