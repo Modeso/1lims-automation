@@ -947,33 +947,57 @@ class OrdersTestCases(BaseTest):
             self.base_selenium.LOGGER.info(" + Test unit : {}".format(testunit_name))
             self.assertIn(testunit_name, test_units_list)
 
-    @parameterized.expand(['material_type', 'article'])
-    def test022_create_existing_order_with_test_units_and_change_material_type(self, edit_feild):
+    def test022_create_existing_order_with_test_units_and_change_material_type(self):
         """
         New: Orders with test units: Create a new order from an existing order with
-        test units but change the material type or the article
+        test units but change the material type
 
-        LIMS-3269
+        LIMS-3269-case 1
         """
         order_no = self.order_page.create_existing_order_with_auto_fill()
         self.order_page.sleep_tiny()
-        if edit_feild == 'material_type':
-            material_type = 'Subassembely'
-            self.order_page.set_material_type(material_type=material_type)
-            self.assertEqual(self.base_selenium.get_value(element='order:article'), None)
-            self.assertEqual(self.base_selenium.get_value(element='order:test_unit'), None)
-            article = self.order_page.set_article()
+
+        self.order_page.set_material_type(material_type='Subassembely')
+        self.assertEqual(self.base_selenium.get_value(element='order:article'), None)
+        self.assertEqual(self.base_selenium.get_value(element='order:test_unit'), None)
+
+        article = self.order_page.set_article()
+        test_unit = self.order_page.set_test_unit()
+        self.order_page.save(save_btn='order:save_btn', sleep=True)
+
+        self.order_page.get_orders_page()
+        self.order_page.navigate_to_analysis_tab()
+
+        self.info('Assert There is an analysis for this new order.')
+        self.analyses_page.apply_filter_scenario(
+            filter_element='orders:filter_order_no', filter_text=order_no, field_type='drop_down')
+        latest_order_data = \
+            self.base_selenium.get_row_cells_dict_related_to_header(row=self.analyses_page.result_table()[0])
+        self.assertEqual(order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
+        self.assertEqual(article.split(' No:')[0], latest_order_data['Article Name'])
+        self.assertEqual(test_unit, self.analyses_page.get_child_table_data()[0]['Test Unit'])
+        self.assertEqual('Subassembely', latest_order_data['Material Type'])
+
+    @skip"https://modeso.atlassian.net/browse/LIMSA-116"
+    def test023_create_existing_order_with_test_units_and_change_article(self):
+        """
+        New: Orders with test units: Create a new order from an existing order with
+        test units but change the article
+
+        LIMS-3269- case 2
+        """
+        order_no = self.order_page.create_existing_order_with_auto_fill()
+        self.order_page.sleep_tiny()
+
+        test_unit = self.order_page.get_test_unit()
+        material_type = self.order_page.get_material_type()
+        article = self.order_page.set_article()
+        # until bug in https://modeso.atlassian.net/browse/LIMSA-116 solved
+        if self.order_page.get_test_unit() == [] and self.order_page.get_test_plan() == []:
             test_unit = self.order_page.set_test_unit()
-        else:
-            test_unit = self.order_page.get_test_unit()
-            material_type = self.order_page.get_material_type()
-            article = self.order_page.set_article()
-            # until bug in https://modeso.atlassian.net/browse/LIMSA-116 solved
-            if self.order_page.get_test_unit() == [] and self.order_page.get_test_plan() == []:
-                test_unit = self.order_page.set_test_unit()
-            self.order_page.sleep_small()
-            self.assertEqual(self.order_page.get_test_unit(), test_unit)
-            self.assertEqual(self.order_page.get_material_type(), material_type)
+        self.order_page.sleep_small()
+        self.assertEqual(self.order_page.get_test_unit(), test_unit)
+        self.assertEqual(self.order_page.get_material_type(), material_type)
 
         self.order_page.save(save_btn='order:save_btn')
         self.order_page.get_orders_page()
