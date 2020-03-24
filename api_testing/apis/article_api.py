@@ -12,31 +12,31 @@ class ArticleAPIFactory(BaseAPI):
                     "sort_order": "DESC",
                     "filter": "{}",
                     "deleted": "0"}
-        return api, _payload, kwargs
+        return api, _payload
 
     @api_factory('get')
     def get_article_form_data(self, id=1, **kwargs):
         api = '{}{}{}'.format(self.url, self.END_POINTS['article_api']['form_data'], str(id))
         _payload = {}
-        return api, _payload, kwargs
+        return api, _payload
 
     @api_factory('put')
     def archive_articles(self, ids=['1'], **kwargs):
         api = '{}{}{}/archive'.format(self.url, self.END_POINTS['article_api']['archive_articles'], ','.join(ids))
         _payload = {}
-        return api, _payload, kwargs
+        return api, _payload
 
     @api_factory('put')
     def restore_articles(self, ids=['1'], **kwargs):
         api = '{}{}{}/restore'.format(self.url, self.END_POINTS['article_api']['restore_articles'], ','.join(ids))
         _payload = {}
-        return api, _payload, kwargs
+        return api, _payload
 
     @api_factory('delete')
     def delete_archived_article(self, id=1, **kwargs):
         api = '{}{}{}'.format(self.url, self.END_POINTS['article_api']['delete_article'], str(id))
         _payload = {}
-        return api, _payload, kwargs
+        return api, _payload
 
     @api_factory('post')
     def create_article(self, **kwargs):
@@ -62,21 +62,21 @@ class ArticleAPIFactory(BaseAPI):
             "materialTypeId": 1,
             "dynamicFieldsValues": []
         }
-        return api, _payload, kwargs
+        return api, _payload
 
     @api_factory('get')
     def list_testplans_by_article_and_materialtype(self, materialtype_id=1, article_id=1, **kwargs):
         api = '{}{}{}/{}'.format(self.url, self.END_POINTS['article_api']['list_testplans_by_article_and_materialtype'],
                                  article_id, materialtype_id)
         _payload = {}
-        return api, _payload, kwargs
+        return api, _payload
 
     @api_factory('get')
     def list_articles_by_materialtype(self, materialtype_id=1, name='', is_archived=0, **kwargs):
         api = '{}{}{}/{}?name={}'.format(self.url, self.END_POINTS['article_api']['list_articles_by_materialtype'],
                                          materialtype_id, is_archived, name)
         _payload = {}
-        return api, _payload, kwargs
+        return api, _payload
 
 
 class ArticleAPI(ArticleAPIFactory):
@@ -104,7 +104,7 @@ class ArticleAPI(ArticleAPIFactory):
 
     def get_articles_with_no_testplans(self,**kwargs):
         response = self.get_all_articles(**kwargs)
-        all_articles = response.json()['articles']
+        all_articles = response[0]['articles']
         articles = [article for article in all_articles if len(article['testPlanNames']) < 1]
         return articles
 
