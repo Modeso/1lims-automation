@@ -21,7 +21,7 @@ class TestPlans(BasePages):
         self.sleep_small()
 
     def get_test_plan_edit_page(self, id):
-        url_str = "{}testPlans/" + str(id)
+        url_str = "{}testPlans/edit/" + str(id)
         url = url_str.format(self.base_selenium.url)
         self.base_selenium.get(url=url, sleep=5)
 
