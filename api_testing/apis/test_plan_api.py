@@ -12,6 +12,7 @@ class TestPlanAPI(BaseAPI):
                     "deleted": "0"}
         payload = self.update_payload(_payload, **kwargs)
         self.info('GET : {}'.format(api))
+        self.info(api)
         response = self.session.get(api, params=payload, headers=self.headers, verify=False)
         self.info('Status code: {}'.format(response.status_code))
         return response
@@ -31,6 +32,11 @@ class TestPlanAPI(BaseAPI):
         all_test_plans = response.json()['testPlans']
         inprogress_test_plans = [test_plan for test_plan in all_test_plans if test_plan['status'] == 'InProgress']
         return inprogress_test_plans
+
+    def get_testplans_with_status(self, status):
+        all_test_plans = self.get_all_test_plans_json()
+        test_plans = [test_plan for test_plan in all_test_plans if test_plan['status'] == status]
+        return test_plans
 
     def get_testunits_in_testplan(self, id):
         api = '{}{}{}'.format(self.url, self.END_POINTS['test_plan_api']['get_testunits_in_testplan'], id)

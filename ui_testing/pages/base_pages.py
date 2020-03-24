@@ -52,7 +52,7 @@ class BasePages:
         time.sleep(self.base_selenium.TIME_LARGE)
 
     def save(self, sleep=True, save_btn='general:save', logger_msg='save the changes'):
-        self.base_selenium.LOGGER.info(logger_msg)
+        self.info(logger_msg)
         if self.base_selenium.check_element_is_exist(element=save_btn):
             if sleep:
                 self.sleep_tiny()
@@ -248,8 +248,9 @@ class BasePages:
         headers = self.base_selenium.get_table_head_elements(element='general:table_child')
 
         child_table_data = []
-        for subrecord in range(0,len(rows_with_childtable)):
-            rows_with_headers=self.base_selenium.get_row_cells_dict_related_to_header(row=rows_with_childtable[subrecord], table_element='general:table_child')
+        for subrecord in range(0, len(rows_with_childtable)):
+            rows_with_headers = self.base_selenium.get_row_cells_dict_related_to_header(
+                row=rows_with_childtable[subrecord], table_element='general:table_child')
             if rows_with_headers != {}:
                 child_table_data.append(rows_with_headers)
 

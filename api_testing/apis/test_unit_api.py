@@ -6,12 +6,13 @@ class TestUnitAPI(BaseAPI):
         _payload = {"sort_value": "number",
                     "limit": 1000,
                     "start": 0,
-                    "sort_order": "DESC",
-                    "filter": "{}",
+                "sort_order": "DESC",
+                "filter": "{}",
                     "deleted": "0"}
         payload = self.update_payload(_payload, **kwargs)
         self.info('GET : {}'.format(api))
         response = self.session.get(api, params=payload, headers=self.headers, verify=False)
+        self.info(response)
         self.info('Status code: {}'.format(response.status_code))
         return response
 
@@ -321,3 +322,11 @@ class TestUnitAPI(BaseAPI):
             if testunit['specifications'] == '':
                 testunits_name.append(testunit['name'])
         return testunits_name
+
+    def get_test_unit_with_spec_or_quan_only(self, spec_or_quan):
+        testunits = self.get_all_test_units(filter='{"typeName":2}').json()['testUnits']
+        for testunit in testunits:
+            if spec_or_quan == 'spec' and testunit['specifications'] != '' and testunit['quantification'] == '':
+                return testunit['id']
+            elif spec_or_quan == 'quan' and testunit['specifications'] == '' and testunit['quantification'] != '':
+                return testunit['id']
