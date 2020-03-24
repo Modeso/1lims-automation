@@ -20,7 +20,13 @@ class TestPlans(BasePages):
         self.base_selenium.click(element='test_plans:new_test_plan')
         self.sleep_small()
 
-    def get_test_plan_edit_page(self, id):
+    def get_test_plan_edit_page(self, name):
+        self.info('Navigating to testplan {} edit page'.format(name))
+        test_plan = self.search(value=name)[0]
+        self.open_edit_page_by_css_selector(row=test_plan, css_selector='')
+        self.sleep_small()
+
+    def get_test_plan_edit_page_by_id(self, id):
         url_str = "{}testPlans/edit/" + str(id)
         url = url_str.format(self.base_selenium.url)
         self.base_selenium.get(url=url, sleep=5)
