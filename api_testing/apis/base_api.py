@@ -89,7 +89,6 @@ def api_factory(method):
         base_api = BaseAPI()
 
         def wrapper(*args, **kwargs):
-            import ipdb; ipdb.set_trace()
             api, _payload = func(*args, **kwargs)
             payload = base_api.update_payload(_payload, **kwargs)
             base_api.info('GET : {}'.format(api))
