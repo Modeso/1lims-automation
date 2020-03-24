@@ -739,7 +739,7 @@ class TestPlansTestCases(BaseTest):
         self.test_unit_api = TestUnitAPI()
         test_unit = self.test_unit_api.create_quantitative_testunit(selectedMaterialTypes=MaterialTypes)
         # navigate to the chosen test plan edit page
-        self.test_plan.get_test_plan_edit_page(testplan['id'])
+        self.test_plan.get_test_plan_edit_page_by_id(testplan['id'])
         # navigate to the test units selection tab
         self.test_plan.set_test_unit(test_unit=test_unit['name'])
         self.test_plan.sleep_tiny()
