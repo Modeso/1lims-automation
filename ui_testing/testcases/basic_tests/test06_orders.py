@@ -975,10 +975,10 @@ class OrdersTestCases(BaseTest):
             self.base_selenium.get_row_cells_dict_related_to_header(row=self.analyses_page.result_table()[0])
         self.assertEqual(order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
         self.assertEqual(article.split(' No:')[0], latest_order_data['Article Name'])
-        self.assertEqual(test_unit, self.analyses_page.get_child_table_data()[0]['Test Unit'])
+        self.assertEqual(test_unit.split(' Type:')[0], self.analyses_page.get_child_table_data()[0]['Test Unit'])
         self.assertEqual('Subassembely', latest_order_data['Material Type'])
 
-    @skip"https://modeso.atlassian.net/browse/LIMSA-116"
+    @skip("https://modeso.atlassian.net/browse/LIMSA-116")
     def test023_create_existing_order_with_test_units_and_change_article(self):
         """
         New: Orders with test units: Create a new order from an existing order with
