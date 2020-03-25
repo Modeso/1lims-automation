@@ -19,13 +19,16 @@ class Order(Orders):
         self.base_selenium.select_item_from_drop_down(
             element='order:order', item_text='Existing Order')
 
+    def open_suborder_edit(self):
+        self.base_selenium.click(element='order:suborder_table')
+
     def set_material_type(self, material_type=''):
         if material_type:
             self.base_selenium.select_item_from_drop_down(
                 element='order:material_type', item_text=material_type)
         else:
             self.base_selenium.select_item_from_drop_down(
-                element='order:material_type')
+                element='order:material_type', avoid_duplicate=True)
             return self.get_material_type()
 
     def get_material_type(self):

@@ -2016,3 +2016,45 @@ class OrdersTestCases(BaseTest):
         self.info('checking order no of each analysis')
         for record in analysis_records:
             self.assertEqual(record['Order No.'], formated_order_no)
+
+    def test033_Duplicate_main_order_and_cahange_materiel_type(self):
+        """
+        duplicate the main order then change the materiel type
+
+        LIMS-6219
+        """
+        # get the random main order data
+        main_order = self.order_page.get_random_main_order_with_sub_orders_data()
+        # select the order
+        self.order_page.click_check_box(main_order['row_element'])
+        # duplicate the main order
+        self.order_page.duplicate_main_order_from_table_overview()
+        # get the new order data
+        after_duplicate_order = self.order_page.get_suborder_data()
+        # make sure that its the duplication page
+        self.assertTrue('duplicateMainOrder' in self.base_selenium.get_url())
+        # make sure that the new order has different order No
+        self.assertNotEqual(main_order['orderNo'], after_duplicate_order['orderNo'])
+        # change material type
+        self.order_page.open_suborder_edit()
+        self.order_page.set_material_type()
+        self.order_page.sleep_small()
+        self.info('Make sure that article and test units are empty')
+        self.assertEqual(self.base_selenium.get_value(element='order:article'), None)
+        self.assertEqual(self.base_selenium.get_value(element='order:test_unit'), None)
+        article = self.order_page.set_article()
+        test_unit = self.order_page.set_test_unit()
+        order_no = self.order_page.get_order_number()
+        # save the duplicated order after edit
+        self.order_page.save(save_btn='order:save_btn', sleep=True)
+        # go back to the table view
+        self.order_page.get_orders_page()
+        # search for the created order no
+        self.order_page.search(order_no)
+        # get the search result text
+        child_data = self.order_page.get_child_table_data()[0]
+        # check that it exists
+        import ipdb;ipdb.set_trace()
+        self.assertEqual(after_edit_order['suborders'][0]['Material Type'], child_data['Material Type'])
+        self.assertIn(child_data['Article Name'], article)
+        self.assertIn(child_data['Test Units'],test_unit)
