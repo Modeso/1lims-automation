@@ -52,7 +52,7 @@ class BasePages:
         time.sleep(self.base_selenium.TIME_LARGE)
 
     def save(self, sleep=True, save_btn='general:save', logger_msg='save the changes'):
-        self.base_selenium.LOGGER.info(logger_msg)
+        self.info(logger_msg)
         if self.base_selenium.check_element_is_exist(element=save_btn):
             if sleep:
                 self.sleep_tiny()
@@ -85,10 +85,10 @@ class BasePages:
         filter.click()
 
     def filter_by(self, filter_element, filter_text, field_type='drop_down'):
-        if field_type=='drop_down':
+        if field_type =='drop_down':
             self.base_selenium.select_item_from_drop_down(element=filter_element, item_text=filter_text)
         else:
-            self.base_selenium.set_text(element=filter_element, value = filter_text )
+            self.base_selenium.set_text(element=filter_element, value=filter_text)
 
     def filter_apply(self):
         self.base_selenium.click(element='general:filter_btn')
@@ -99,6 +99,7 @@ class BasePages:
         self.base_selenium.wait_element(element=filter_element)
         self.filter_by(filter_element=filter_element, filter_text=filter_text, field_type=field_type)
         self.filter_apply()
+        self.sleep_tiny()
 
     def filter_reset(self):
         self.base_selenium.LOGGER.info(' Reset Filter')
@@ -247,8 +248,9 @@ class BasePages:
         headers = self.base_selenium.get_table_head_elements(element='general:table_child')
 
         child_table_data = []
-        for subrecord in range(0,len(rows_with_childtable)):
-            rows_with_headers=self.base_selenium.get_row_cells_dict_related_to_header(row=rows_with_childtable[subrecord], table_element='general:table_child')
+        for subrecord in range(0, len(rows_with_childtable)):
+            rows_with_headers = self.base_selenium.get_row_cells_dict_related_to_header(
+                row=rows_with_childtable[subrecord], table_element='general:table_child')
             if rows_with_headers != {}:
                 child_table_data.append(rows_with_headers)
 
