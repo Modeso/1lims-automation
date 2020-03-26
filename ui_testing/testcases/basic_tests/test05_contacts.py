@@ -4,6 +4,7 @@ from ui_testing.pages.contact_page import Contact
 from ui_testing.pages.testplan_page import TstPlan
 from ui_testing.pages.testunit_page import TstUnit
 from ui_testing.pages.base_pages import BasePages
+from ui_testing.pages.my_profile_page import MyProfile
 from ui_testing.pages.order_page import Order
 from ui_testing.pages.contacts_page import Contacts
 from ui_testing.pages.header_page import Header
@@ -28,7 +29,7 @@ class ContactsTestCases(BaseTest):
         self.orders_api = OrdersAPI()
         self.header_page = Header()
         self.base_page = BasePages()
-
+        self.my_profile_page = MyProfile()
         self.login_page.login(username=self.base_selenium.username, password=self.base_selenium.password)
         self.base_selenium.wait_until_page_url_has(text='dashboard')
         self.contact_page.get_contacts_page()
