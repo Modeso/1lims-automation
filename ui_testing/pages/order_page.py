@@ -8,7 +8,7 @@ class Order(Orders):
         return self.base_selenium.get_text(element='order:order').split('\n')[0]
 
     def get_order_number(self):
-        return self.base_selenium.get_text(element='order:order_number_add_form').split('\n')[0]
+        return self.base_selenium.get_text(element='order:no').split('\n')[0]
 
     def set_new_order(self):
         self.base_selenium.LOGGER.info('Set new order.')
