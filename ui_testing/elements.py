@@ -593,7 +593,7 @@ elements = {
         'suborder_table': {'method': 'xpath',
                            'value': "//table[@id='table-with-add']//tbody//tr"},
         'material_type': {'method': 'xpath',
-                          'value': '//td//*[@id="materialType"]'},
+                          'value': "//ng-select[@id='materialType']"},
         'article': {'method': 'xpath',
                     'value': '//td//*[@id="article"]'},
         'departments': {'method': 'xpath',
