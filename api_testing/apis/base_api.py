@@ -1,7 +1,10 @@
 from testconfig import config
 from api_testing.end_points import end_points
+from uuid import uuid4
+from random import randint
 import requests
 from loguru import logger
+from datetime import datetime
 
 
 class BaseAPI:
@@ -27,7 +30,8 @@ class BaseAPI:
         self.password = config['site']['password']
 
         self.session = requests.Session()
-        self.headers = {'Content-Type': "application/json", 'Authorization': BaseAPI.AUTHORIZATION, 'Connection': "keep-alive",
+        self.headers = {'Content-Type': "application/json", 'Authorization': BaseAPI.AUTHORIZATION,
+                        'Connection': "keep-alive",
                         'cache-control': "no-cache"}
         self._get_authorized_session()
 
@@ -51,7 +55,6 @@ class BaseAPI:
         self.headers['Authorization'] = BaseAPI.AUTHORIZATION
         return BaseAPI.AUTHORIZATION
 
-
     @staticmethod
     def update_payload(payload, **kwargs):
         for key in kwargs:
@@ -64,3 +67,36 @@ class BaseAPI:
     @staticmethod
     def info(message):
         BaseAPI.LOGGER.info(message)
+
+    @staticmethod
+    def generate_random_string():
+        return str(uuid4()).replace("-", "")[:10]
+
+    @staticmethod
+    def generate_random_number(lower=1, upper=100000):
+        return randint(lower, upper)
+
+    @staticmethod
+    def get_current_date():
+        return datetime.today().strftime('%Y-%m-%d')
+
+
+def api_factory(method):
+    if method not in ['get', 'post', 'put', 'delete']:
+        raise Exception("{} should be in ['get', 'post', 'put', 'delete']".format(method))
+
+    def api_request(func):
+        base_api = BaseAPI()
+
+        def wrapper(*args, **kwargs):
+            api, _payload = func(*args, **kwargs)
+            payload = base_api.update_payload(_payload, **kwargs)
+            base_api.info('GET : {}'.format(api))
+            response_json = base_api.session.__getattribute__(method)(api, params=payload, headers=base_api.headers,
+                                                                      verify=False).json()
+            base_api.info('Status code: {}'.format(response_json['status']))
+            return response_json, payload
+
+        return wrapper
+
+    return api_request
