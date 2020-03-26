@@ -142,13 +142,13 @@ class Order(Orders):
             self.set_test_unit(test_unit)
 
     def create_existing_order_with_auto_fill(self, no=''):
-        self.base_selenium.LOGGER.info(' Create new order.')
+        self.info(' Create new order.')
         self.click_create_order_button()
         self.set_existing_order()
         order_no = self.set_existing_number(no)
         self.sleep_tiny()
         self.click_auto_fill()
-        self.base_selenium.LOGGER.info(' Order Auto filled with data from order no : {} '.format(order_no))
+        self.info(' Order Auto filled with data from order no : {} '.format(order_no))
         return order_no
 
     def get_no(self, order_row=None):
@@ -482,7 +482,7 @@ class Order(Orders):
 
     def navigate_to_analysis_tab(self):
         self.base_selenium.scroll()
-        self.base_selenium.click('order:analysis_tab')
+        self.base_selenium.click('orders:analysis_order_tab')
         self.sleep_small()
 
     def set_material_type_of_first_suborder(self, material_type='', sub_order_index=0):
