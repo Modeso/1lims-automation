@@ -35,13 +35,14 @@ class Order(Orders):
         return self.base_selenium.get_text(element='order:material_type').split('\n')[0]
 
     def get_article(self):
-        return self.base_selenium.get_text(element='order:article').split('\n')[0]
+        return self.base_selenium.get_text(element='order:article').split(' No')[0]
 
     def set_article(self, article=''):
         if article:
             self.base_selenium.select_item_from_drop_down(element='order:article', item_text=article)
         else:
             self.base_selenium.select_item_from_drop_down(element='order:article')
+            self.sleep_tiny()
             return self.get_article()
 
     def is_article_existing(self, article):
@@ -95,7 +96,9 @@ class Order(Orders):
     def get_test_unit(self):
         test_units = self.base_selenium.get_text(element='order:test_unit')
         if "×" in test_units:
-            return test_units.replace("× ", "").split('\n')
+            return test_units.replace("×", "").split(' Type')[0]
+        elif "× " in test_units:
+            return test_units.replace("× ", "").split(' Type')[0]
         else:
             return []
 

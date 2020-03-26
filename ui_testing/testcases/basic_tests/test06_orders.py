@@ -940,7 +940,7 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(
             created_order.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
         self.assertEqual(
-            article.split(' No:')[0], latest_order_data['Article Name'])
+            article, latest_order_data['Article Name'])
         self.assertEqual(
             'Subassembely', latest_order_data['Material Type'])
 
@@ -969,7 +969,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.sleep_medium()
         self.base_selenium.LOGGER.info('Check test units are still the same')
         test_unit = self.order_page.get_test_unit()
-        self.assertEqual(test_unit[0].split(' No:')[0], test_unit_dict['Test Unit Name'])
+        self.assertEqual(test_unit[0], test_unit_dict['Test Unit Name'])
         self.order_page.set_article(article='r')
 
         article = self.order_page.get_article()
@@ -983,8 +983,7 @@ class OrdersTestCases(BaseTest):
             row=orders_analyess[0])
         self.assertEqual(
             created_order.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
-        self.assertEqual(
-            article.split(' No:')[0], latest_order_data['Article Name'])
+        self.assertEqual(article, latest_order_data['Article Name'])
 
         self.analyses_page.open_child_table(source=orders_analyess[0])
         rows_with_childtable = self.analyses_page.result_table(element='general:table_child')
@@ -2037,24 +2036,27 @@ class OrdersTestCases(BaseTest):
         self.assertNotEqual(main_order['orderNo'], after_duplicate_order['orderNo'])
         # change material type
         self.order_page.open_suborder_edit()
-        self.order_page.set_material_type()
+        material_type = self.order_page.set_material_type()
         self.order_page.sleep_small()
         self.info('Make sure that article and test units are empty')
         self.assertEqual(self.base_selenium.get_value(element='order:article'), None)
         self.assertEqual(self.base_selenium.get_value(element='order:test_unit'), None)
         article = self.order_page.set_article()
         test_unit = self.order_page.set_test_unit()
-        order_no = self.order_page.get_order_number()
         # save the duplicated order after edit
         self.order_page.save(save_btn='order:save_btn', sleep=True)
         # go back to the table view
         self.order_page.get_orders_page()
         # search for the created order no
-        self.order_page.search(order_no)
+        self.order_page.search(after_duplicate_order['orderNo'])
         # get the search result text
-        child_data = self.order_page.get_child_table_data()[0]
+        child_data = self.order_page.get_child_table_data()
+        if len(child_data) > 1:
+            suborder_data = child_data[-1]
+        else:
+            suborder_data = child_data[0]
+
         # check that it exists
-        import ipdb;ipdb.set_trace()
-        self.assertEqual(after_edit_order['suborders'][0]['Material Type'], child_data['Material Type'])
-        self.assertIn(child_data['Article Name'], article)
-        self.assertIn(child_data['Test Units'],test_unit)
+        self.assertEqual(material_type, suborder_data['Material Type'])
+        self.assertEqual(suborder_data['Article Name'], article)
+        self.assertEqual(suborder_data['Test Units'], test_unit)
