@@ -2117,12 +2117,11 @@ class OrdersTestCases(BaseTest):
         self.order_page.click_check_box(main_order['row_element'])
         # duplicate the main order
         self.order_page.duplicate_main_order_from_table_overview()
-        # get the new order data
-        after_duplicate_order = self.order_page.get_suborder_data()
-        # make sure that its the duplication page
+         # make sure that its the duplication page
         self.assertTrue('duplicateMainOrder' in self.base_selenium.get_url())
         # make sure that the new order has different order No
-        self.assertNotEqual(main_order['orderNo'], after_duplicate_order['orderNo'])
+        duplicated_order_number = self.order_page.get_order_number()
+        self.assertNotEqual(main_order['orderNo'], duplicated_order_number)
         # change material type
         self.order_page.open_suborder_edit()
         material_type = self.order_page.set_material_type()
@@ -2137,7 +2136,7 @@ class OrdersTestCases(BaseTest):
         # go back to the table view
         self.order_page.get_orders_page()
         # search for the created order no
-        self.order_page.search(after_duplicate_order['orderNo'])
+        self.order_page.search(duplicated_order_number)
         # get the search result text
         child_data = self.order_page.get_child_table_data()
         if len(child_data) > 1:
