@@ -2123,10 +2123,10 @@ class OrdersTestCases(BaseTest):
         # make sure that the new order has different order No
         duplicated_order_number = self.order_page.get_order_number()
         self.assertNotEqual(main_order['orderNo'], duplicated_order_number)
-        # change material type
+        # change material type to 'Subassembely' to make sure that there're articles and test units in drop down
         self.order_page.open_suborder_edit()
         self.order_page.sleep_small()
-        material_type = self.order_page.set_material_type()
+        self.order_page.set_material_type(material_type='Subassembely')
         self.info('Make sure that article and test units are empty')
         self.assertEqual(self.base_selenium.get_value(element='order:article'), None)
         self.assertEqual(self.base_selenium.get_value(element='order:test_unit'), None)
@@ -2146,6 +2146,6 @@ class OrdersTestCases(BaseTest):
             suborder_data = child_data[0]
 
         # check that it exists
-        self.assertEqual(suborder_data['Material Type'], material_type)
+        self.assertEqual(suborder_data['Material Type'], 'Subassembely')
         self.assertEqual(suborder_data['Article Name'], article)
         self.assertEqual(suborder_data['Test Units'], test_unit)
