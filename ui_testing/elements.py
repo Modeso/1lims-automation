@@ -435,9 +435,25 @@ elements = {
             'method': 'id',
             'value': 'numberfield'
         },
+        'testunit_number_filter': {
+            'method': 'id',
+            'value': 'numberfield'
+        },
         'category': {
             'method': 'id',
             'value': 'category'
+        },
+        'category_filter': {
+            'method': 'id',
+            'value': 'categoryNamefield'
+        },
+        'name_filter': {
+            'method': 'id',
+            'value': 'namefield'
+        },
+        'method_filter': {
+            'method': 'id',
+            'value': 'methodfield'
         },
         'type': {
             'method': 'id',
@@ -456,6 +472,8 @@ elements = {
         'spec_lower_limit': {'method': 'id',
                              'value': 'lowerLimitfield'},
         'spec_unit': {'method': 'id',
+                      'value': 'unitfield'},
+        'spec_unit_filter': {'method': 'id',
                       'value': 'unitfield'},
         'spec_unit_preview': {'method': 'css_selector',
                               'value': '[class="form-control field-with-scrips"]'},
@@ -509,8 +527,12 @@ elements = {
                                           'value': 'method',
                                           'order': 0},
         'configuration_testunit_comment': {'method': 'class_name',
-                                           'value': 'comment',
-                                           'order': 0},
+                              'value': 'comment',
+                              'order': 0},
+        'filter_created_at': {'method': 'id', 'value': 'start_createdAt'},
+        'filter_material_type': {'method': 'id', 'value': 'materialTypesfield'},
+        'filter_type': {'method': 'id', 'value': 'typeNamefield'},
+        'filter_changed_by': {'method': 'id', 'value': 'lastModifiedUserfield'},
     },
     'orders': {
         'orders_table': {'method': 'id',
