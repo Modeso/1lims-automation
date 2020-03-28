@@ -346,16 +346,16 @@ elements = {
         'category-label': {'method': 'css_selector',
                            'value': '[class="category-label"]'},
         'test_units': {'method': 'id',
-                       'value': 'selectedTestUnitsfield'},
-        'add': {'method': 'id',
-                'value': 'new_testunit_add_button'},
+                       'value': 'selectedTestUnits'},
+        'add': {'method': 'xpath',
+                'value': '//i[@class="la la-check"]'},
         'save_btn': {'method': 'id',
                      'value': 'save_btn'},
         'save_and_complete': {'method': 'id',
                               'value': 'save_and_complete_btn'},
-        'add_test_units': {'method': 'id',
-                           'value': 'add_new_testunit_form_view'},
-        'testunit_upper_limit': {'method': 'class_name',
+        'add_test_units': {'method': 'xpath',
+                           'value': '//div[@class="add-another"]//span'},
+        'testunit_upper_limit': {'method': 'xpath',
                                  'value': '//*[@id="88"]/div[2]/div/div[3]/input'},
         'testunit_lower_limit': {'method': 'xpath',
                                  'value': '//*[@id="88"]/div[2]/div/div[4]/input'},
@@ -400,11 +400,11 @@ elements = {
                           'value': 'testunit_unit'},
         'testunit_quantification_upper_limit': {
             'method': 'id',
-            'value': 'quantification_upper_limit'
+            'value': 'lowerLimit'
         },
         'testunit_quantification_lower_limit': {
             'method': 'id',
-            'value': 'quantification_lower_limit'
+            'value':'lowerLimit'
         },
         'add_testunit_error_msg': {
             'method': 'xpath',

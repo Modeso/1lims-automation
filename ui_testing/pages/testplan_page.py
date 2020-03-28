@@ -67,15 +67,17 @@ class TstPlan(TestPlans):
         self.base_selenium.select_item_from_drop_down(element='test_plan:test_units', item_text=test_unit)
         self.base_selenium.click('test_plan:add')
         if 'upper' in kwargs:
-            self.base_selenium.LOGGER.info(' set upper : {}'.format(kwargs['upper']))
-            elems = self.base_selenium.find_elements('general:col_6')
-            upper = self.base_selenium.find_element_in_element(source=elems[4], destination_element='general:input')
+            self.info(' set upper : {}'.format(kwargs['upper']))
+            #elems = self.base_selenium.find_elements('general:col_6')
+            #upper = self.base_selenium.find_element_in_element(source=elems[4], destination_element='general:input')
+            upper = self.base_selenium.find_element('test_plan:testunit_upper_limit')
             upper.clear()
             upper.send_keys(kwargs['upper'])
         if 'lower' in kwargs:
-            self.base_selenium.LOGGER.info(' set lower : {}'.format(kwargs['lower']))
-            elems = self.base_selenium.find_elements('general:col_6')
-            lower = self.base_selenium.find_element_in_element(source=elems[5], destination_element='general:input')
+            self.info(' set lower : {}'.format(kwargs['lower']))
+            #elems = self.base_selenium.find_elements('general:col_6')
+            #lower = self.base_selenium.find_element_in_element(source=elems[5], destination_element='general:input')
+            lower = self.base_selenium.find_element('test_plan:testunit_lower_limit')
             lower.clear()
             lower.send_keys(kwargs['lower'])
 
@@ -236,6 +238,7 @@ class TstPlan(TestPlans):
         return old_testunits_searchable_from_testplans
 
     def update_upper_lower_limits_of_testunit(self, old_upper, old_lower):
+        import ipdb;ipdb.set_trace()
         self.base_selenium.set_text('test_plan:testunit_quantification_upper_limit', str(old_upper + 5))
         self.base_selenium.set_text('test_plan:testunit_quantification_lower_limit', str(old_lower + 5))
         self.sleep_small()
