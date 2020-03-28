@@ -762,12 +762,12 @@ class TestUnitsTestCases(BaseTest):
         largest_number = str(largest_number).replace("'", '')
         duplicated_test_unit_number = int(largest_number) + 1
         self.info('The duplicated testunit should have the number: {}'.format(duplicated_test_unit_number))
-
         self.info('Choosing a random testunit table row')
         random_test_unit = self.test_unit_page.select_random_table_row()
         test_unit_name = random_test_unit['Test Unit Name']
         self.info('test unit name : {}'.format(test_unit_name))
         self.test_unit_page.duplicate_test_unit()
+        self.test_unit_page.sleep_small()
         self.test_unit_page.apply_filter_scenario(
             filter_element='test_unit:testunit_name', filter_text=test_unit_name, field_type='text')
 
