@@ -2125,8 +2125,9 @@ class OrdersTestCases(BaseTest):
         self.order_page.info(main_order['orderNo'])
         self.assertNotEqual(main_order['orderNo'], duplicated_order_number)
         # change material type
-        self.order_page.open_suborder_edit()
         self.order_page.sleep_small()
+        self.order_page.open_suborder_edit()
+        self.order_page.sleep_medium()
         material_type = self.order_page.set_material_type()
         self.info('Make sure that article and test units are empty')
         self.assertEqual(self.base_selenium.get_value(element='order:article'), None)
