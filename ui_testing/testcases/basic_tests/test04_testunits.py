@@ -768,7 +768,7 @@ class TestUnitsTestCases(BaseTest):
         test_unit_name = random_test_unit['Test Unit Name']
         self.info('test unit name : {}'.format(test_unit_name))
         self.test_unit_page.duplicate_test_unit()
-        self.test_unit_page.sleep_tiny()
+        self.test_unit_page.sleep_small()
         found_testunit = self.test_unit_page.search(test_unit_name)[0]
         found_testunit_data = self.base_selenium.get_row_cells_dict_related_to_header(row=found_testunit)
         data_changed = ['Test Unit No.', 'Changed On', 'Created On', 'Version']
