@@ -198,7 +198,7 @@ class OrdersAPI(BaseAPI):
         data = response.json()
 
         if data['status'] == 1:
-            return payload, data
+            return data
         else:
             return data['message']
 

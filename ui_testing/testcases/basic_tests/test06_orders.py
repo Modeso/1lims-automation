@@ -630,7 +630,7 @@ class OrdersTestCases(BaseTest):
         order['Current Year'] = self.test_unit_page.get_current_year()[2:]
         contact = [order['Contact Name']]
         # create the order using the order data
-        payload, result = \
+        result = \
             self.orders_api.create_new_order(yearOption=1, orderNo=order['Order No.'],
                                              year=order['Current Year'], testUnits=[order['Test Units']],
                                              testPlans=[order['Test Plans']], article=order['Article Name'],
@@ -651,7 +651,7 @@ class OrdersTestCases(BaseTest):
         # in case of analysis no., open the edit mode to get the number
         if key == 'Analysis No.':
             self.base_selenium.get(
-                url='{}/{}'.format(self.order_page.orders_url, order['id']), sleep=self.base_selenium.TIME_MEDIUM)
+                url='{}/{}'.format(self.order_page.orders_url, order['id']), sleep=self.order_page.sleep_small)
             order_edit_data = self.order_page.get_suborder_data()
             order['Analysis No.'] = order_edit_data['suborders'][0]['analysis_no']
             self.order_page.get_orders_page()
