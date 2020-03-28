@@ -2118,7 +2118,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.click_check_box(main_order['row_element'])
         # duplicate the main order
         self.order_page.duplicate_main_order_from_table_overview()
-         # make sure that its the duplication page
+        # make sure that its the duplication page
         self.assertTrue('duplicateMainOrder' in self.base_selenium.get_url())
         # make sure that the new order has different order No
         duplicated_order_number = self.order_page.get_order_number()
@@ -2137,7 +2137,8 @@ class OrdersTestCases(BaseTest):
         # go back to the table view
         self.order_page.get_orders_page()
         # search for the created order no
-        self.order_page.search(duplicated_order_number)
+        self.order_page.apply_filter_scenario(
+            filter_element='orders:filter_order_no', filter_text=duplicated_order_number, field_type='text')
         # get the search result text
         child_data = self.order_page.get_child_table_data()
         if len(child_data) > 1:
