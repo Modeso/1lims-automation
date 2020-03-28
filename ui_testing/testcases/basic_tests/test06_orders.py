@@ -2126,7 +2126,7 @@ class OrdersTestCases(BaseTest):
         # change material type
         self.order_page.open_suborder_edit()
         self.order_page.sleep_small()
-        material_type = self.order_page.set_material_type()
+        self.order_page.set_material_type(material_type='Subassembely')
         self.info('Make sure that article and test units are empty')
         self.assertEqual(self.base_selenium.get_value(element='order:article'), None)
         self.assertEqual(self.base_selenium.get_value(element='order:test_unit'), None)
@@ -2146,6 +2146,6 @@ class OrdersTestCases(BaseTest):
             suborder_data = child_data[0]
 
         # check that it exists
-        self.assertEqual(material_type, suborder_data['Material Type'])
+        self.assertEqual(suborder_data['Material Type'], 'Subassembely')
         self.assertEqual(suborder_data['Article Name'], article)
         self.assertEqual(suborder_data['Test Units'], test_unit)
