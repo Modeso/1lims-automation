@@ -4,7 +4,7 @@ elements = {
                               'value': 'm-datatable__toggle-subtable',
                               'order': 0},
         'table_child': {'method': 'class_name', 'value': 'dataTable', 'order': 1},
-
+        'table_menu_options': {'method': 'class_name', 'value': 'dropdown', 'order': 0},
         'span': {'method': 'tag_name',
                  'value': 'span',
                  'order': 0},
@@ -19,10 +19,6 @@ elements = {
                    'value': 'generalSearch'},
         'table': {'method': 'id',
                   'value': 'table'},
-        'table_child': {"method": "class_name",
-                        "value": "dataTable",
-                        "order": 1
-                        },
         'save': {'method': 'class_name',
                  'value': 'btn-primary',
                  'order': 0},
@@ -554,7 +550,8 @@ elements = {
         'test_date_filter': {'method': 'id',
                              'value': 'start_testDate'},
         'shipment_date_filter': {'method': 'id',
-                                 'value': 'start_shipmentDate'}
+                                 'value': 'start_shipmentDate'},
+        'mainorder_duplicate': {'method': 'id', 'value': 'main_table_duplicate'}
     },
 
     'audit_trail': {

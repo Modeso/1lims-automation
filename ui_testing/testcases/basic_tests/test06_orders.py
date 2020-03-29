@@ -2113,11 +2113,11 @@ class OrdersTestCases(BaseTest):
         LIMS-6219
         """
         # get the random main order data
-        main_order = self.order_page.get_random_main_order_with_sub_orders_data()
+        main_order = random.choice(self.orders_api.get_all_orders(limit=50).json()['orders'])
         # select the order
-        self.order_page.click_check_box(main_order['row_element'])
+        order_row = self.order_page.search(main_order['orderNo'])
         # duplicate the main order
-        self.order_page.duplicate_main_order_from_table_overview()
+        self.order_page.duplicate_main_order_from_order_option()
         # make sure that its the duplication page
         self.assertTrue('duplicateMainOrder' in self.base_selenium.get_url())
         # make sure that the new order has different order No

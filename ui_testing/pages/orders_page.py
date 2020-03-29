@@ -69,6 +69,13 @@ class Orders(BasePages):
         self.base_selenium.click(element='orders:duplicate')
         self.sleep_medium()
 
+    def duplicate_main_order_from_order_option(self, index=0):
+        self.info('duplicate suborder from the order\'s active table')
+        table_records = self.result_table(element='general:table')
+        self.open_row_options(row=table_records[index])
+        self.base_selenium.click(element='orders:mainorder_duplicate')
+        self.sleep_medium()
+
     def get_random_order(self):
         self.base_selenium.LOGGER.info(' + Get random order.')
         row = self.get_random_order_row()
