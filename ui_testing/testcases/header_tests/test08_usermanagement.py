@@ -116,7 +116,8 @@ class HeaderTestCases(BaseTest):
         random_user_name = self.generate_random_string()
         random_user_email = self.base_page.generate_random_email()
         random_user_password = self.generate_random_string()
-        created_user = self.users_api.create_new_user(random_user_name, random_user_email, random_user_password)
+        created_user = self.users_api.create_new_user(username=random_user_name, email=random_user_email,
+                                       password=random_user_password)[0]['user']
 
         result = self.header_page.search(value=random_user_name)
         self.assertTrue(result, created_user)

@@ -19,7 +19,7 @@ class MyProfileTestCases(BaseTest):
 
         # create new user
         self.info('Create User {}'.format(self.username))
-        user = self.users_api.create_new_user(self.username, self.email, self.current_password)
+        self.users_api.create_new_user(username=self.username, emai=self.email, password=self.current_password)
 
         # uncomment with the tearDown
         # self.userId = user['userId'] 

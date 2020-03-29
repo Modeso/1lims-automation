@@ -632,7 +632,8 @@ class TestPlansTestCases(BaseTest):
         random_user_email = self.header_page.generate_random_email()
         random_user_password = self.generate_random_string()
         self.info('Calling the users api to create a new user with username: {}'.format(random_user_name))
-        self.users_api.create_new_user(random_user_name, random_user_email, random_user_password)
+        self.users_api.create_new_user(username=random_user_name, email=random_user_email,
+                                       password=random_user_password)
 
         self.header_page.click_on_header_button()
         self.base_selenium.click('header:logout')

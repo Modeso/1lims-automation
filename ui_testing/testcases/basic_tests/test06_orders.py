@@ -219,7 +219,7 @@ class OrdersTestCases(BaseTest):
         LIMS-3257
         """
         self.order_page.get_archived_items()
-        archived_items = self.orders_api.get_all_orders(limit=20,deleted=1).json()['orders']
+        archived_items = self.orders_api.get_all_orders(limit=20,deleted=1)['orders']
         row_id = randint(0, len(archived_items))
         order_number = archived_items[row_id]['orderNo']
 
@@ -1837,7 +1837,7 @@ class OrdersTestCases(BaseTest):
         selected_suborder_data = order_data['suborders'][random_index_to_edit]
 
         self.base_selenium.LOGGER.info('get completed testplans with articles based on the suborder materialtype')
-        materialtype_list = self.general_utilities_api.list_all_material_types()
+        materialtype_list = self.general_utilities_api.list_all_material_types()['materialTypes']
         materialtype_object = \
             list(filter(lambda x: x['name'] == selected_suborder_data['material_type'], materialtype_list))[0]
 
@@ -1902,7 +1902,7 @@ class OrdersTestCases(BaseTest):
         testunit_record = random.choice\
             (self.test_unit_api.get_all_test_units(filter='{"materialTypes":"all"}').json()['testUnits'])
 
-        order = random.choice(self.orders_api.get_all_orders(limit=50).json()['orders'])
+        order = random.choice(self.orders_api.get_all_orders(limit=50)['orders'])
         self.orders_page.get_order_edit_page_by_id(id=order['id'])
 
         self.info('getting analysis tab to check out the count of the analysis')
@@ -1953,10 +1953,11 @@ class OrdersTestCases(BaseTest):
          LIMS-6523
         """
         self.info('create contact')
-        contact, contact_id = self.contacts_api.create_contact()
+        response, payload = self.contacts_api.create_contact()
+        contact, contact_id = payload, response['company']['companyId']
 
         self.info('open random order record')
-        order = random.choice(self.orders_api.get_all_orders(limit=50).json()['orders'])
+        order = random.choice(self.orders_api.get_all_orders(limit=50)['orders'])
         order_id = order['id']
         self.orders_page.get_order_edit_page_by_id(id=order_id)
         order_data = self.order_page.get_suborder_data()
@@ -1996,7 +1997,7 @@ class OrdersTestCases(BaseTest):
         year_value = self.order_page.get_current_year()[2:]
         formated_order_no = new_order_no + '-' + year_value
         self.info('newly generated order number = {}'.format(formated_order_no))
-        order = self.orders_api.get_all_orders(limit= 50).json()['orders'][1]
+        order = self.orders_api.get_all_orders(limit= 50)['orders'][1]
         self.orders_page.get_order_edit_page_by_id(id=order['id'])
         self.order_page.set_no(no=formated_order_no)
         self.order_page.sleep_small()

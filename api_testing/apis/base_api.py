@@ -80,6 +80,10 @@ class BaseAPI:
     def get_current_date():
         return datetime.today().strftime('%Y-%m-%d')
 
+    @staticmethod
+    def get_current_year():
+        return str(datetime.now().year)
+
 
 def api_factory(method):
     if method not in ['get', 'post', 'put', 'delete']:

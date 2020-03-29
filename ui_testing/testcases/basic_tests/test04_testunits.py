@@ -1041,7 +1041,7 @@ class TestUnitsTestCases(BaseTest):
             'text': 'All'
         }]
         self.base_selenium.LOGGER.info('Create new testunit with qualitative and random generated data')
-        testunit_id = self.test_unit_api.create_qualitative_testunit(name=new_random_name, number=new_random_number,
+        testunit_id, _ = self.test_unit_api.create_qualitative_testunit(name=new_random_name, number=new_random_number,
                                                                      method=new_random_method, category=category,
                                                                      selectedMaterialTypes=material_type,
                                                                      textValue=new_random_qualtitative_value)[
@@ -1053,7 +1053,7 @@ class TestUnitsTestCases(BaseTest):
         active_article_request = self.article_api.get_all_articles()[0]['articles']
         active_article = active_article_request[0]
 
-        all_materialtypes = self.general_utilities_api.list_all_material_types()
+        all_materialtypes = self.general_utilities_api.list_all_material_types()['materialTypes']
 
         article_materialtype = list(filter(lambda x: x['name'] == active_article['materialType'], all_materialtypes))[0]
         article_object = [{
