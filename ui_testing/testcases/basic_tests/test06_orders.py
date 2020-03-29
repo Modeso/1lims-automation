@@ -2112,7 +2112,8 @@ class OrdersTestCases(BaseTest):
     def test033_Duplicate_sub_order_and_cahange_materiel_type(self):
         """
         duplicate sub-order of any order then change the materiel type
-        LIMS-6219
+
+        LIMS-6277
         """
         # get the random main order data
         main_order = random.choice(self.orders_api.get_all_orders(limit=20).json()['orders'])
