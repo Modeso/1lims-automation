@@ -566,7 +566,7 @@ elements = {
         'order': {'method': 'id',
                   'value': 'orderTypefield'},
         'suborder_table': {'method': 'xpath',
-                           'value': "//table[@id='table-with-add']//tbody//tr"},
+                           'value': "//table[@id='table-with-add']"},
         'material_type': {'method': 'xpath',
                           'value': "//td//*[@id='materialType']"},
         'article': {'method': 'xpath',
