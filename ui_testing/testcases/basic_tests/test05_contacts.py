@@ -29,8 +29,7 @@ class ContactsTestCases(BaseTest):
         self.header_page = Header()
         self.base_page = BasePages()
 
-        self.login_page.login(username=self.base_selenium.username, password=self.base_selenium.password)
-        self.base_selenium.wait_until_page_url_has(text='dashboard')
+        self.set_authorization(auth=self.contacts_api.AUTHORIZATION_RESPONSE)
         self.contact_page.get_contacts_page()
         table_fields = self.contacts_api.get_table_fields(component_id=3)[0]['fields']
 

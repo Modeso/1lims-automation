@@ -29,9 +29,7 @@ class OrdersTestCases(BaseTest):
         self.contacts_page = Contacts()
         self.orders_api = OrdersAPI()
         self.orders_page = Orders()
-        self.login_page.login(
-            username=self.base_selenium.username, password=self.base_selenium.password)
-        self.base_selenium.wait_until_page_url_has(text='dashboard')
+        self.set_authorization(auth=self.contacts_api.AUTHORIZATION_RESPONSE)
         self.order_page.get_orders_page()
 
     # will continue with us    

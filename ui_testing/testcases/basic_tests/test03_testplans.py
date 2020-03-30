@@ -26,8 +26,7 @@ class TestPlansTestCases(BaseTest):
         self.users_api = UsersAPI()
         self.article_api = ArticleAPI()
 
-        self.login_page.login(username=self.base_selenium.username, password=self.base_selenium.password)
-        self.base_selenium.wait_until_page_url_has(text='dashboard')
+        self.set_authorization(auth=self.article_api.AUTHORIZATION_RESPONSE)
         self.test_plan.get_test_plans_page()
 
     def test001_test_plan_delete_testunit(self):

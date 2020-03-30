@@ -23,8 +23,7 @@ class TestUnitsTestCases(BaseTest):
         self.test_plan_api = TestPlanAPI()
         self.test_unit_api = TestUnitAPI()
         self.general_utilities_api = GeneralUtilitiesAPI()
-        self.login_page.login(username=self.base_selenium.username, password=self.base_selenium.password)
-        self.base_selenium.wait_until_page_url_has(text='dashboard')
+        self.set_authorization(auth=self.article_api.AUTHORIZATION_RESPONSE)
         self.test_unit_page.get_test_units_page()
 
     # @skip('https://modeso.atlassian.net/browse/LIMS-5237')
