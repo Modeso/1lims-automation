@@ -2143,7 +2143,10 @@ class OrdersTestCases(BaseTest):
         self.order_page.search(duplicated_order_number)
         # get the search result text
         child_data = self.order_page.get_child_table_data()
-        suborder_data = child_data[0]
+        if len(child_data) > 1:
+            suborder_data = child_data[-1]
+        else:
+            suborder_data = child_data[0]
         # check that it exists
         self.assertEqual(suborder_data['Material Type'], material_type)
         self.assertEqual(suborder_data['Article Name'], article)
