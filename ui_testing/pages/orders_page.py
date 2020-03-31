@@ -178,5 +178,5 @@ class Orders(BasePages):
         main_order = self.construct_main_order_from_table_view(main_order)
         # attach the row element
         main_order['row_element'] = all_orders[row_id]
-        # return the main order
+        # return the main order.
         return main_order

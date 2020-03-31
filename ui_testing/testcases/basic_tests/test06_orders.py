@@ -220,6 +220,45 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.LOGGER.info(' + {} '.format(has_active_analysis))
         self.assertFalse(has_active_analysis)
 
+    @parameterized.expand(['True', 'False'])
+    def test000_order_search(self, small_letters):
+        """
+        New: Orders: Search Approach: User can search by any field & each field should display with yellow color
+        LIMS-3492
+        LIMS-3061
+        :return:
+        """
+        orders = self.orders_api.get_all_orders(limit=1).json()['orders'][0]
+        rows = self.order_page.search(orders['orderNo'])
+        row_data = self.base_selenium.get_row_cells_dict_related_to_header(
+            row=rows[0])
+        for column in row_data:
+            search_by = row_data[column].split(',')[0]
+            if re.findall(r'\d{1,}.\d{1,}.\d{4}', row_data[column]) or row_data[
+                column] == '' or column == 'Time Difference' or row_data[column] == '-':
+                continue
+            elif column == 'Analysis Results':
+                search_by = row_data[column].split(' (')[0]
+
+            row_data[column] = row_data[column].split(',')[0]
+            self.base_selenium.LOGGER.info(
+                ' + search for {} : {}'.format(column, row_data[column]))
+            if small_letters == 'True':
+                search_results = self.order_page.search(search_by)
+            else:
+                search_results = self.order_page.search(search_by.upper())
+
+            self.assertGreater(
+                len(search_results), 1, " * There is no search results for it, Report a bug.")
+            for search_result in search_results:
+                search_data = self.base_selenium.get_row_cells_dict_related_to_header(
+                    search_result)
+                if search_data[column].replace("'", '').split(',')[0] == row_data[column].replace("'", '').split(',')[
+                    0]:
+                    break
+            self.assertEqual(row_data[column].replace("'", '').split(',')[0],
+                             search_data[column].replace("'", '').split(',')[0])
+
     # will continue with us    
     @parameterized.expand(['True', 'False'])
     def test007_order_search(self, small_letters):
@@ -266,22 +305,38 @@ class OrdersTestCases(BaseTest):
         LIMS-3270
         :return:
         """
-        # get the random main order data
-        main_order = self.order_page.get_random_main_order_with_sub_orders_data()
-        # select the order
-        self.order_page.click_check_box(main_order['row_element'])
+        # get random order
+        all_orders = self.orders_api.get_all_orders().json()['orders']
+        record_id = randint(0, len(all_orders) - 2)
+        data_before_duplicate_main_order = all_orders[record_id]
+        data_before_duplicate_sub_order = self.order_page.get_suborder_data(sub_order_index=0)
+
+
+        order_no = data_before_duplicate_main_order['orderNo']
+        self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no,
+                                              field_type='text')
+
+        data_before_duplicate_sub_order = self.order_page.get_suborder_data(sub_order_index=0)
+
+        #sub_orders = self.order_page.get_child_table_data()
+        #child_rows = self.order_page.result_table(element='general:table_child')
+        #print(child_rows)
+        #data_before_duplicate_sub_order = self.base_selenium.get_row_cells_dict_related_to_header(row=child_rows,
+                                                                                                  #table_element='general:table_child')
+        #print(data_before_duplicate_sub_order)
+        row = self.order_page.get_last_order_row()
+        self.order_page.click_check_box(source=row)
         # duplicate the main order
         self.order_page.duplicate_main_order_from_table_overview()
         # get the new order data
         after_duplicate_order = self.order_page.get_suborder_data()
-
         # ignore contact no since the table view doesn't have contact No.
         for contact in after_duplicate_order['contacts']:
             contact['no'] = None
 
-        for index in range(len(main_order['suborders'])):
+        for index in range(len(data_before_duplicate_sub_order['suborders'])):
             # ignore analysis no. since it won't be created in the form until saving
-            main_order['suborders'][index]['analysis_no'] = ''
+            data_before_duplicate_sub_order['suborders'][index]['analysis_no'] = ''
             # ignore testunit numbers since the table view only got the name
             for testunit in after_duplicate_order['suborders'][index]['testunits']:
                 testunit['no'] = None
@@ -289,11 +344,11 @@ class OrdersTestCases(BaseTest):
         # make sure that its the duplication page
         self.assertTrue('duplicateMainOrder' in self.base_selenium.get_url())
         # make sure that the new order has different order No
-        self.assertNotEqual(main_order['orderNo'], after_duplicate_order['orderNo'])
+        self.assertNotEqual(data_before_duplicate_main_order['orderNo'], after_duplicate_order['orderNo'])
         # compare the contacts 
-        self.assertCountEqual(main_order['contacts'], after_duplicate_order['contacts'])
+        self.assertCountEqual(data_before_duplicate_main_order['company'], after_duplicate_order['contacts'])
         # compare the data of suborders data in both orders
-        self.assertCountEqual(main_order['suborders'], after_duplicate_order['suborders'])
+        self.assertCountEqual(data_before_duplicate_sub_order['suborders'], after_duplicate_order['suborders'])
 
         # save the duplicated order
         self.order_page.save(save_btn='orders:save_order')
@@ -563,6 +618,13 @@ class OrdersTestCases(BaseTest):
         LIMS-4282
         :return:
         """
+        orders = self.orders_api.get_all_orders(limit=1).json()['orders'][0]
+        print(orders)
+        rows = self.order_page.search(orders['orderNo'])
+        print(rows)
+        row_data = self.base_selenium.get_row_cells_dict_related_to_header(
+        row = rows[0])
+        print(row_data)
         test_plan_dict = self.get_active_article_with_tst_plan(
             test_plan_status='complete')
 
@@ -1211,13 +1273,13 @@ class OrdersTestCases(BaseTest):
         self.order_page.get_orders_page()
         
     # will continue with us & then put the test case number for it 
-    def test026_update_suborder_article(self):
-        self.base_selenium.LOGGER.info('Order created with 4 suborders with the following data')
+    #def test026_update_suborder_article(self):
+        #self.base_selenium.LOGGER.info('Order created with 4 suborders with the following data')
         #self.base_selenium.LOGGER.info('Material type: {}, Article name: {}, Test plans: {}, Test Units: {}'.format(
             #suborder_data['material_types'], suborder_data['article'], suborder_data['test_plan'],
             #suborder_data['test_unit']))
 
-        self.base_selenium.LOGGER.info(
+        #self.base_selenium.LOGGER.info(
             #'Change Material type from {}, to {}, and press cancel'.format(suborder_data['material_types'],
                                                                            #new_material_type))
         #self.order_page.update_suborder(sub_order_index=3, material_type=new_material_type, form_view=False)
@@ -1231,7 +1293,7 @@ class OrdersTestCases(BaseTest):
         
         #self.base_selenium.LOGGER.info('Comparing order data after pressing cancel')
 
-        self.base_selenium.LOGGER.info(
+        #self.base_selenium.LOGGER.info(
             #'+Assert Compare Material type, old: {}, new: {}'.format(suborder_data['material_types'],
                                                                      #suborder_data_after_pressing_cancel[
                                                                          #'material_types']))
@@ -1252,33 +1314,33 @@ class OrdersTestCases(BaseTest):
                                                                                                #  'test_unit']))
         #self.assertEqual(suborder_data['test_unit'], suborder_data_after_pressing_cancel['test_unit'])
 
-        self.base_selenium.LOGGER.info(
+        #self.base_selenium.LOGGER.info(
            # 'Change article from {}, to {}, and press confirm'.format(suborder_data['article'], new_article))
         #self.order_page.update_suborder(sub_order_index=3, material_type=new_material_type, form_view=False)
         #self.base_selenium.LOGGER.info('Change article from {}, to {}, and press confirm'.format(suborder_data['article'], new_article))
         #self.order_page.update_suborder(sub_order_index=3, articles=new_article, form_view=False)
         #self.base_selenium.click(element='order:confirm_pop')
 
-        self.base_selenium.LOGGER.info(
+        #self.base_selenium.LOGGER.info(
            # 'Get suborder data to make sure that all the data are removed after pressing confirm')
 
         #suborder_data_after_pressing_confirm = self.order_page.get_suborder_data(sub_order_index=3)
 
         #self.base_selenium.LOGGER.info('Comparing order data after pressing confirm')
 
-        self.base_selenium.LOGGER.info(
+        #self.base_selenium.LOGGER.info(
           #  'Empty fields will have the word "Search" as a placeholder, so the results from the table will carry the value "Search" which denotes that the field is empty')
         #self.base_selenium.LOGGER.info('+Assert Compare Material type, old: {}, new: {}'.format(new_material_type,
                                                                                                 #suborder_data_after_pressing_confirm[
                                                                                                     #'material_types']))
         #self.assertEqual(new_material_type, suborder_data_after_pressing_confirm['material_types'])
 
-        self.base_selenium.LOGGER.info('+Assert Compare Article, old: {}, new: {}'.format('Search',
+        #self.base_selenium.LOGGER.info('+Assert Compare Article, old: {}, new: {}'.format('Search',
                                                                                           #suborder_data_after_pressing_confirm[
                                                                                               #'article']))
         #self.assertEqual('Search', suborder_data_after_pressing_confirm['article'])
 
-        self.base_selenium.LOGGER.info('+Assert Compare Test Plans, old: {}, new: {}'.format('Search',
+        #self.base_selenium.LOGGER.info('+Assert Compare Test Plans, old: {}, new: {}'.format('Search',
                                                                                             # suborder_data_after_pressing_confirm[
                                                                                                  #'test_plan']))
         #self.assertEqual('earch', suborder_data_after_pressing_confirm['test_plan'])
@@ -1316,10 +1378,10 @@ class OrdersTestCases(BaseTest):
         #self.base_selenium.LOGGER.info('Update Test plans and press save to make sure that it is updated')
 
         #self.order_page.update_suborder(sub_order_index=3, test_plans=[new_testplan], form_view=False)
-        suborder_data_after_changing_testplans = #self.order_page.get_suborder_data(sub_order_index=3)
+        #suborder_data_after_changing_testplans = #self.order_page.get_suborder_data(sub_order_index=3)
 
         #self.base_selenium.LOGGER.info('Update test plans from {}, to {}'.format(suborder_data['test_plan'], suborder_data_after_changing_testplans['test_plan']))
-        self.order_page.save(save_btn="order:save_btn")
+        #self.order_page.save(save_btn="order:save_btn")
         
     ### SYNTAX ERROR ###
     # will continue with us
@@ -1447,7 +1509,7 @@ class OrdersTestCases(BaseTest):
     ### SYNTAX ERROR ###
 
     # will continue with us apply it from the second suborder & need test case number for it to apply from the second suborder
-    @parameterized.expand(['save_btn', 'cancel'])
+    #@parameterized.expand(['save_btn', 'cancel'])
     def test025_update_contact_departments(self, save):
         """
         Orders: department Approach: In case I update the department then press on save button
