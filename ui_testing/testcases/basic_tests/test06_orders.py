@@ -2121,8 +2121,10 @@ class OrdersTestCases(BaseTest):
         # make sure that its the duplication page
         self.assertTrue('duplicateMainOrder' in self.base_selenium.get_url())
         # make sure that the new order has different order No
+        self.order_page.sleep_tiny()
         duplicated_order_number = self.order_page.get_order_number()
-        self.order_page.info('order to be duplicated'+ str(main_order['orderNo']))
+        self.order_page.info('order to be duplicated is {}, new order no is {}'.
+                             format(main_order['orderNo'], duplicated_order_number))
         self.assertNotEqual(main_order['orderNo'], duplicated_order_number)
         # change material type
         self.order_page.sleep_small()
@@ -2134,20 +2136,20 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(self.base_selenium.get_value(element='order:test_unit'), None)
         article = self.order_page.set_article()
         test_unit = self.order_page.set_test_unit()
-        self.info('duplicated order material is {}, article {}, and test_unit {}'.format(material_type, article, test_unit))
+        self.info('duplicated order material is {}, article {}, and test_unit {}'.
+                  format(material_type, article, test_unit))
         # save the duplicated order after edit
         self.order_page.save(save_btn='order:save_btn', sleep=True)
         # go back to the table view
         self.order_page.get_orders_page()
         # search for the created order no
-        self.order_page.apply_filter_scenario(
-            filter_element='orders:filter_order_no', filter_text=duplicated_order_number, field_type='text')
+        self.order_page.search(duplicated_order_number)
         # get the search result text
         child_data = self.order_page.get_child_table_data()
-        if len(child_data) > 1:
-            suborder_data = child_data[-1]
-        else:
-            suborder_data = child_data[0]
+        #if len(child_data) > 1:
+        #    suborder_data = child_data[-1]
+        #else:
+        suborder_data = child_data[0]
 
         # check that it exists
         self.assertEqual(suborder_data['Material Type'], material_type)
