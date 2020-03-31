@@ -2114,7 +2114,8 @@ class OrdersTestCases(BaseTest):
         LIMS-6277
         """
         # get the random main order data
-        main_order = random.choice(self.orders_api.get_all_orders(limit=20).json()['orders'])
+        orders, payload = self.orders_api.get_all_orders(limit=50)
+        main_order = random.choice(orders['orders'])
         self.order_page.search(main_order['orderNo'])
         self.order_page.get_child_table_data()
         # duplicate the sub order of main order
