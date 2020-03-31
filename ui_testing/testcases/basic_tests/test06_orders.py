@@ -2111,9 +2111,9 @@ class OrdersTestCases(BaseTest):
         LIMS-6219
         """
         # get the random main order data
-        main_order = random.choice(self.orders_api.get_all_orders(limit=50).json()['orders'])
-        # select the order
-        order_row = self.order_page.search(main_order['orderNo'])
+        orders, payload = self.orders_api.get_all_orders(limit=50)
+        main_order = random.choice(orders['orders'])
+        self.order_page.search(main_order['orderNo'])
         # duplicate the main order
         self.order_page.duplicate_main_order_from_order_option()
         # make sure that its the duplication page
@@ -2125,7 +2125,6 @@ class OrdersTestCases(BaseTest):
                              format(main_order['orderNo'], duplicated_order_number))
         self.assertNotEqual(main_order['orderNo'], duplicated_order_number)
         # change material type
-        self.order_page.sleep_small()
         self.order_page.open_suborder_edit()
         self.order_page.sleep_medium()
         material_type = self.order_page.set_material_type()
@@ -2144,11 +2143,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.search(duplicated_order_number)
         # get the search result text
         child_data = self.order_page.get_child_table_data()
-        #if len(child_data) > 1:
-        #    suborder_data = child_data[-1]
-        #else:
         suborder_data = child_data[0]
-
         # check that it exists
         self.assertEqual(suborder_data['Material Type'], material_type)
         self.assertEqual(suborder_data['Article Name'], article)
