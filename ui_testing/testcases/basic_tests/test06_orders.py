@@ -1,26 +1,19 @@
 import re
 from unittest import skip
 from parameterized import parameterized
-from testconfig import config
 from ui_testing.testcases.base_test import BaseTest
 from ui_testing.pages.order_page import Order
 from ui_testing.pages.orders_page import Orders
-
-from ui_testing.pages.contacts_page import Contacts
-from ui_testing.pages.testunit_page import TstUnit
-from api_testing.apis.article_api import ArticleAPI
 from api_testing.apis.orders_api import OrdersAPI
 from ui_testing.pages.analysis_page import SingleAnalysisPage
 from ui_testing.pages.analysis_page import AllAnalysesPage
+from api_testing.apis.article_api import ArticleAPI
 from api_testing.apis.test_unit_api import TestUnitAPI
 from api_testing.apis.contacts_api import ContactsAPI
 from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
-from api_testing.apis.contacts_api import ContactsAPI
-from api_testing.apis.test_unit_api import TestUnitAPI
+from ui_testing.pages.contacts_page import Contacts
 from random import randint
-from datetime import date
 import random
-
 
 
 class OrdersTestCases(BaseTest):
@@ -37,11 +30,6 @@ class OrdersTestCases(BaseTest):
         self.general_utilities_api = GeneralUtilitiesAPI()
         self.contacts_page = Contacts()
         self.orders_api = OrdersAPI()
-        self.contacts_api = ContactsAPI()
-        self.general_utilities_api = GeneralUtilitiesAPI()
-        self.article_api = ArticleAPI()
-        self.test_unit_page = TstUnit()
-        self.test_unit_api = TestUnitAPI()
         self.orders_page = Orders()
         self.set_authorization(auth=self.contacts_api.AUTHORIZATION_RESPONSE)
         self.order_page.get_orders_page()
@@ -414,41 +402,38 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(
             orders_duplicate_data_after[0]['Analysis No.'], latest_order_data['Analysis No.'])
 
-    def test011_analysis_number_should_appear_in_the_child_table(self):
+    # will change to dispaly it in the child table & in the export     
+    def test011_analysis_number_filter_and_export(self):
         """
         New: Orders: Analysis number should appear in the table view column
-        this it will change to display the analysis number in the order child table ( suborder )
-
         LIMS-2622
         :return:
         """
-        # prepare order data
-        self.info('Create new order')
-        order_no = self.orders_api.get_auto_generated_order_no()
-        material_type = self.general_utilities_api.list_all_material_types()[0]
-        article = self.article_api.list_articles_by_materialtype(materialtype_id=material_type['id'])[0]
-        testunits = self.test_unit_api.list_testunit_by_name_and_material_type(materialtype_id=material_type['id'])[0]
-        test_date = self.test_unit_page.get_current_date_formated()
-        shipment_date = self.test_unit_page.get_current_date_formated()
-        current_year = self.test_unit_page.get_current_year()[2:]
-        contacts = self.contacts_api.get_all_contacts().json()['contacts'][0]
-
-        # create the order using the order data
-        self.orders_api.create_new_order(yearOption=1, orderNo=order_no, year=current_year,
-                                         testUnits=[testunits], testPlans=[], article=article,
-                                         materialType=material_type, shipmentDate=shipment_date,
-                                         testDate=test_date, contact=[contacts])
-        order_no_with_year = '{}-{}'.format(order_no, current_year)
-        self.info('Order {} created successfully'.format(order_no_with_year))
-
-        # search for the created order
-        self.info('Search for order {}'.format(order_no_with_year))
-        self.order_page.search(order_no_with_year)
-        # get the first suborder date form the table
-        suborder = self.order_page.get_child_table_data()[0]
-        # make sure that there is analysis No.
-        self.info('Make sure that the Analysis No. exist')
-        self.assertTrue(suborder['Analysis No.'])
+        self.base_selenium.LOGGER.info(' Select Random Order')
+        order_row = self.order_page.get_random_order_row()
+        order_data = self.base_selenium.get_row_cells_dict_related_to_header(
+            row=order_row)
+        analysis_number = order_data['Analysis No.'].split(',')[0]
+        analysis_filter_field = self.order_page.order_filters_element(
+            'Analysis No.')
+        self.order_page.open_filter_menu()
+        self.order_page.filter('Analysis No.', analysis_filter_field['element'], analysis_number,
+                               analysis_filter_field['type'])
+        last_rows = self.order_page.get_last_order_row()
+        order_data_after_filter = self.base_selenium.get_row_cells_dict_related_to_header(
+            row=last_rows)
+        analysis_number_filter = order_data_after_filter['Analysis No.'].split(',')[
+            0]
+        self.base_selenium.LOGGER.info(
+            ' * Compare search result if last row has  analysis number = {}  '.format(analysis_number))
+        self.assertEqual(analysis_number_filter, analysis_number)
+        self.order_page.click_check_box(source=last_rows)
+        self.base_selenium.LOGGER.info(' * Download XSLX sheet')
+        self.order_page.download_xslx_sheet()
+        sheet_values = self.order_page.sheet.iloc[0].values
+        self.base_selenium.LOGGER.info(
+            'Check if export of order has analyis number = {}  '.format(analysis_number))
+        self.assertIn(analysis_number, sheet_values)
 
     # will change that the duplicate many copies will be from the the child table not from the active table     
     def test012_duplicate_many_orders(self):
@@ -600,85 +585,32 @@ class OrdersTestCases(BaseTest):
                                                                                           order_material_type))
             self.assertEqual(current_material_type, order_material_type)
 
-    @parameterized.expand(['Order No.', 'Contact Name', 'Material Type', 'Test Plans', 
-                           'Test Date', 'Article Name', 'Created On', 'Changed By',
-                           'Shipment Date', 'Status', 'Analysis No.', 'Departments'])
-    def test015_filter_by_any_fields(self, key):
+    # wiill continue with us
+    def test015_filter_by_any_fields(self):
         """
         New: Orders: Filter Approach: I can filter by any field in the table view
-
         LIMS-3495
         """
-        self.info('Create new order')
-        order = {}
-        today_date = date.today().strftime("%d.%m.%Y")
-        # prepare order data
-        order['Order No.'] = self.orders_api.get_auto_generated_order_no()
-        order['Contact Name'] = self.contacts_api.get_all_contacts().json()['contacts'][0]
-        order['Material Type'] = self.general_utilities_api.list_all_material_types()[0]
-        order['Article Name'] = self.article_api.list_articles_by_materialtype(
-            materialtype_id=order['Material Type']['id'])[0]
-        order['Test Plans'] = self.article_api.list_testplans_by_article_and_materialtype(
-            materialtype_id=order['Material Type']['id'], article_id=order['Article Name']['id'])[0]
-        order['Test Date'] = self.test_unit_page.get_current_date_formated()
-        order['Test Units'] = self.test_unit_api.list_testunit_by_name_and_material_type(
-            materialtype_id=order['Material Type']['id'])[0]
-        order['Shipment Date'] = self.test_unit_page.get_current_date_formated()
-        order['Current Year'] = self.test_unit_page.get_current_year()[2:]
-        contact = [order['Contact Name']]
-        # create the order using the order data
-        result = \
-            self.orders_api.create_new_order(yearOption=1, orderNo=order['Order No.'],
-                                             year=order['Current Year'], testUnits=[order['Test Units']],
-                                             testPlans=[order['Test Plans']], article=order['Article Name'],
-                                             materialType=order['Material Type'], shipmentDate=order['Shipment Date'],
-                                             testDate=order['Test Date'], contact=contact)
-
-        # add additional order fields and format the dates to match the table format
-        order['id'] = result['order']['mainOrderId']
-        order['Order No.'] = '{}-{}'.format(order['Order No.'], order['Current Year'])
-        order['Created On'] = today_date
-        order['Shipment Date'] = today_date
-        order['Test Date'] = today_date
-        order['Changed By'] = {'name': config['site']['username']}
-        order['Status'] = {'name': 'open'}
-        # add static already existing department since the selected contact might not have department
-        order['Departments'] = 'labx' 
-
-        # in case of analysis no., open the edit mode to get the number
-        if key == 'Analysis No.':
-            self.base_selenium.get(
-                url='{}/{}'.format(self.order_page.orders_url, order['id']), sleep=self.order_page.sleep_small)
-            order_edit_data = self.order_page.get_suborder_data()
-            order['Analysis No.'] = order_edit_data['suborders'][0]['analysis_no']
-            self.order_page.get_orders_page()
-
-        # get the filter element
-        filter_field = self.order_page.order_filters_element(key=key)
-        # open the filter menu
+        order_row = self.order_page.get_random_order_row()
+        order_data = self.base_selenium.get_row_cells_dict_related_to_header(
+            row=order_row)
+        filter_fields_dict = self.order_page.order_filters_element()
         self.order_page.open_filter_menu()
-        # set the filter value
-        filter_value = order[key]['name'] if filter_field['type'] == 'drop_down' else order[key]
-        # filter by selected key
-        self.order_page.filter(key, filter_field['element'], filter_value, filter_field['type'])
+        for key in filter_fields_dict:
+            field = filter_fields_dict[key]
+            self.order_page.filter(
+                key, field['element'], order_data[key], field['type'])
+            filtered_rows = self.order_page.result_table()
+            for index in range(len(filtered_rows) - 1):
+                row_data = self.base_selenium.get_row_cells_dict_related_to_header(
+                    row=filtered_rows[index])
+                self.base_selenium.LOGGER.info(
+                    ' Assert {} in  (table row: {}) == {} '.format(key, index + 1, order_data[key]))
+                self.assertEqual(order_data[key].replace(
+                    "'", ""), row_data[key].replace("'", ""))
+            self.order_page.filter_reset()
 
-        # get the main order with its suborder of the first order and suborder
-        main_order = self.order_page.get_random_main_order_with_sub_orders_data(True)
-        self.info(' Assert {} value {} '.format(key, order[key]))
-        key_found = False
-        if key in ['Order No.', 'Contact Name', 'Created On']:
-            self.assertIn(filter_value.lower(), main_order[key].lower().replace("'", "").replace('"', ''))
-            key_found = True
-        else: #filter by suborder data, so we need to loop for all suborders
-            for i in range(0, len(main_order['suborders'])):
-                if filter_value.lower().replace("'", "").replace('"', '') == \
-                        main_order['suborders'][i][key].lower().replace("'", "").replace('"', ''):
-                    key_found = True
-                    break
-        # make sure that the row have the filter value
-        self.assertEqual(key_found, True)
-
-    # will continue with us 
+    # will continue with us
     def test016_validate_order_test_unit_test_plan(self):
         """
         New: orders Test plan /test unit validation
@@ -2171,3 +2103,51 @@ class OrdersTestCases(BaseTest):
         self.info('checking order no of each analysis')
         for record in analysis_records:
             self.assertEqual(record['Order No.'], formated_order_no)
+
+    def test033_Duplicate_main_order_and_cahange_materiel_type(self):
+        """
+        duplicate the main order then change the materiel type
+
+        LIMS-6219
+        """
+        # get the random main order data
+        orders, payload = self.orders_api.get_all_orders(limit=50)
+        main_order = random.choice(orders['orders'])
+        self.order_page.search(main_order['orderNo'])
+        # duplicate the main order
+        self.order_page.duplicate_main_order_from_order_option()
+        # make sure that its the duplication page
+        self.assertTrue('duplicateMainOrder' in self.base_selenium.get_url())
+        # make sure that the new order has different order No
+        self.order_page.sleep_tiny()
+        duplicated_order_number = self.order_page.get_order_number()
+        self.order_page.info('order to be duplicated is {}, new order no is {}'.
+                             format(main_order['orderNo'], duplicated_order_number))
+        self.assertNotEqual(main_order['orderNo'], duplicated_order_number)
+        # change material type
+        self.order_page.open_suborder_edit()
+        self.order_page.sleep_medium()
+        material_type = self.order_page.set_material_type()
+        self.info('Make sure that article and test units are empty')
+        self.assertEqual(self.base_selenium.get_value(element='order:article'), None)
+        self.assertEqual(self.base_selenium.get_value(element='order:test_unit'), None)
+        article = self.order_page.set_article()
+        test_unit = self.order_page.set_test_unit()
+        self.info('duplicated order material is {}, article {}, and test_unit {}'.
+                  format(material_type, article, test_unit))
+        # save the duplicated order after edit
+        self.order_page.save(save_btn='order:save_btn', sleep=True)
+        # go back to the table view
+        self.order_page.get_orders_page()
+        # search for the created order no
+        self.order_page.search(duplicated_order_number)
+        # get the search result text
+        child_data = self.order_page.get_child_table_data()
+        if len(child_data) > 1:
+            suborder_data = child_data[-1]
+        else:
+            suborder_data = child_data[0]
+        # check that it exists
+        self.assertEqual(suborder_data['Material Type'], material_type)
+        self.assertEqual(suborder_data['Article Name'], article)
+        self.assertEqual(suborder_data['Test Units'], test_unit)
