@@ -111,7 +111,7 @@ class BasePages:
         selected_rows_data = []
         selected_rows = []
         rows = self.base_selenium.get_table_rows(element=element)
-        no_of_rows = randint(min(1, len(rows)-1), min(5, len(rows)-1))
+        no_of_rows = randint(min(2, len(rows)-1), min(5, len(rows)-1))
         count = 0
         self.info(' No. of selected rows {} '.format(no_of_rows))
         while count < no_of_rows:
@@ -557,15 +557,6 @@ class BasePages:
         date_parameters = date_in_days.split('-')
         date_parameters.reverse()
         return '.'.join(date_parameters)
-        
-    def get_current_date_formated(self):
-        current_time = datetime.datetime.now()
-        date = str(current_time.year)+'-'+str(current_time.month)+'-'+str(current_time.day)
-        return date
-
-    def get_current_year(self):
-        current_year = datetime.datetime.now()
-        return str(current_year.year)
 
     def get_the_latest_row_data(self):
         latest_row = (self.result_table()[0])
