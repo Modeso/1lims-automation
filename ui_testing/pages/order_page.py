@@ -21,6 +21,7 @@ class Order(Orders):
 
     def open_suborder_edit(self):
         self.base_selenium.click(element='order:suborder_table')
+        self.info("suborder table can be editted")
 
     def set_material_type(self, material_type=''):
         if material_type:

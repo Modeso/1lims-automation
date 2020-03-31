@@ -634,8 +634,6 @@ elements = {
         'suborder_list': {'method': 'class_name',
                           'value': 'flaticon-signs',
                           'order': 0},
-        'suborder_table': {'method': 'id',
-                           'value': 'table-with-add'},
         'add_new_item11': {'method': 'class_name',
                            'value': 'addNewItem',
                            'order': 0},
