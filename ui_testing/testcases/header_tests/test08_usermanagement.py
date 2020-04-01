@@ -18,8 +18,7 @@ class HeaderTestCases(BaseTest):
         self.roles_api = RolesAPI()
         self.users_api = UsersAPI()
 
-        self.login_page.login(username=self.base_selenium.username, password=self.base_selenium.password)
-        self.base_selenium.wait_until_page_url_has(text='dashboard')
+        self.set_authorization(auth=self.roles_api.AUTHORIZATION_RESPONSE)
         self.header_page.click_on_header_button()
 
     def test001_archive_user_management(self):
@@ -60,20 +59,21 @@ class HeaderTestCases(BaseTest):
         for user_name in user_names:
             self.assertTrue(self.header_page.is_user_in_table(value=user_name))
 
-    @skip('https://modeso.atlassian.net/browse/LIMS-6384')
     def test003_user_search(self):
         """
-        Header:  User management:  Search Approach: Make sure that you can search by any field in the active table successfully
+        Header:  User management:  Search Approach: Make sure that you can search by
+        any field in the active table successfully
+
         LIMS-6082
-        :return:
         """
         self.base_selenium.click(element='header:user_management_button')
-        row = self.header_page.getsearch_random_user_row()
+        row = self.header_page.get_random_user_row()
         row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=row)
         for column in row_data:
-            if re.findall(r'\d{1,}.\d{1,}.\d{4}', row_data[column]) or row_data[column] == '':
+            if re.findall(r'\d{1,}.\d{1,}.\d{4}', row_data[column]) \
+                    or row_data[column] == '' or row_data[column] == '-':
                 continue
-            self.base_selenium.LOGGER.info(' + search for {} : {}'.format(column, row_data[column]))
+            self.info(' + search for {} : {}'.format(column, row_data[column]))
             search_results = self.header_page.search(row_data[column])
             self.assertGreater(len(search_results), 1, " * There is no search results for it, Report a bug.")
             for search_result in search_results:
@@ -115,7 +115,8 @@ class HeaderTestCases(BaseTest):
         random_user_name = self.generate_random_string()
         random_user_email = self.base_page.generate_random_email()
         random_user_password = self.generate_random_string()
-        created_user = self.users_api.create_new_user(random_user_name, random_user_email, random_user_password)
+        created_user = self.users_api.create_new_user(username=random_user_name, email=random_user_email,
+                                       password=random_user_password)[0]['user']
 
         result = self.header_page.search(value=random_user_name)
         self.assertTrue(result, created_user)
