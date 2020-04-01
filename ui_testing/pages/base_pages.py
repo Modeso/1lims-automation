@@ -236,8 +236,16 @@ class BasePages:
         self._copy(value=value)
         self._paste(element=element)
 
+    def open_row_options(self, row):
+        self.info('open record options menu')
+        row_options = self.base_selenium.find_element_in_element(
+            destination_element='general:table_menu_options', source=row)
+        row_options.click()
+        self.sleep_tiny()
+
     def open_child_table(self, source):
-        childtable_arrow = self.base_selenium.find_element_in_element(destination_element='general:child_table_arrow', source=source)
+        childtable_arrow = self.base_selenium.find_element_in_element(
+            destination_element='general:child_table_arrow', source=source)
         childtable_arrow.click()
         self.sleep_medium()
     

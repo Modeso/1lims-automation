@@ -3,8 +3,10 @@ elements = {
         'child_table_arrow': {'method': 'class_name',
                               'value': 'm-datatable__toggle-subtable',
                               'order': 0},
-        'table_child': {'method': 'id', 'value': 'child-data-table'},
-
+        'table_child': {'method': 'class_name',
+                        'value': 'dataTable',
+                        'order': 1},
+        'table_menu_options': {'method': 'class_name', 'value': 'dropdown', 'order': 0},
         'span': {'method': 'tag_name',
                  'value': 'span',
                  'order': 0},
@@ -14,9 +16,8 @@ elements = {
         'tag': {'method': 'tag_name',
                 'value': 'tag',
                 'order': 0},
-
-        'search': {'method': 'id',
-                   'value': 'generalSearch'},
+        'search': {'method': 'xpath',
+                   'value': '//input[@id="generalSearch"]'},
         'table': {'method': 'id',
                   'value': 'table'},
         'save': {'method': 'class_name',
@@ -71,9 +72,6 @@ elements = {
         'checkbox': {'method': 'class_name',
                      'value': 'm-checkbox',
                      'order': 0},
-        'child_table_arrow': {'method': 'class_name',
-                              'value': 'm-datatable__toggle-subtable',
-                              'order': 0},
         'label': {'method': 'tag_name',
                   'value': 'label',
                   'order': 0},
@@ -579,6 +577,7 @@ elements = {
         'suborder_related_orders': {'method': 'id', 'value': 'child_table_related_orders'},
         'suborder_archive': {'method': 'id', 'value': 'child_table_archive'},
         'suborder_restore': {'method': 'id', 'value': 'child_table_restore'},
+        'suborder_duplicate': {'method': 'id', 'value': 'child_table_duplicate'}
     },
 
     'audit_trail': {
