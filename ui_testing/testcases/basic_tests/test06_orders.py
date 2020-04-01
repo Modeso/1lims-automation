@@ -7,6 +7,7 @@ from ui_testing.pages.contacts_page import Contacts
 from random import randint
 from api_testing.apis.orders_api import OrdersAPI
 import time
+import random
 
 
 class OrdersTestCases(BaseTest):
