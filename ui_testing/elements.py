@@ -149,10 +149,7 @@ elements = {
         'pagination_button': {'method': 'xpath', 'value': '//button[@class="btn dropdown-toggle btn-default"]'},
         'pagination_menu': {'method': 'xpath', 'value': '//ul[@class="dropdown-menu inner"]'},
         'table_menu_options': {'method': 'class_name', 'value': 'dropdown', 'order': 0},
-        'filter_button': {'method': 'class_name', 'value': 'filter-btn', 'order': 0}
         'form_popup_warning_window': {'method': 'class_name', 'value': 'swal2-header', 'order': 0},
-        'confirmation_button': {'method': 'xpath',
-                                'value': '//button[@class="swal2-confirm btn btn-success m-btn m-btn--custom"]'},
         'clear_single_dropdown': {'method': 'class_name', 'value': 'ng-clear-wrapper', 'order': 0},
         'td': {'method': 'tag_name', 'value': 'td', 'order': 0},
         'th': {'method': 'tag_name', 'value': 'th', 'order': 0},
