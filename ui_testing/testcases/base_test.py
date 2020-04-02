@@ -19,7 +19,7 @@ class BaseTest(TestCase):
         print('\t')
         self.info('Test case : {}'.format(self._testMethodName))
         self.base_selenium.get_driver()
-        self.login_page = Login()
+        self.base_selenium.get(url=self.base_selenium.url)
 
     def tearDown(self):
         self.base_selenium.quit_driver()
@@ -105,6 +105,11 @@ class BaseTest(TestCase):
             if test_unit_dict['Type'] == search and material_type in test_unit_dict['Material Type']:
                 return test_unit_dict
         return {}
+
+    0
+
+
+
     '''
     Removes the data that was changed in the duplication process in order to compare
     between the objects to make sure that the duplication was done correcly.
@@ -121,3 +126,9 @@ class BaseTest(TestCase):
 
     def info(self, message):
         self.base_selenium.LOGGER.info(message)
+
+    def set_authorization(self, auth):
+        if "Admin" in auth['role']:
+            del auth['role']
+            auth['roles'] = ["Admin"]
+        self.base_selenium.set_local_storage('modeso-auth-token', auth)
