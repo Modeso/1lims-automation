@@ -401,40 +401,7 @@ class OrdersTestCases(BaseTest):
             row=orders_analyess[0])
         self.assertEqual(
             orders_duplicate_data_after[0]['Analysis No.'], latest_order_data['Analysis No.'])
-
-    # will change to dispaly it in the child table & in the export     
-    def test011_analysis_number_filter_and_export(self):
-        """
-        New: Orders: Analysis number should appear in the table view column
-        LIMS-2622
-        :return:
-        """
-        self.base_selenium.LOGGER.info(' Select Random Order')
-        order_row = self.order_page.get_random_order_row()
-        order_data = self.base_selenium.get_row_cells_dict_related_to_header(
-            row=order_row)
-        analysis_number = order_data['Analysis No.'].split(',')[0]
-        analysis_filter_field = self.order_page.order_filters_element(
-            'Analysis No.')
-        self.order_page.open_filter_menu()
-        self.order_page.filter('Analysis No.', analysis_filter_field['element'], analysis_number,
-                               analysis_filter_field['type'])
-        last_rows = self.order_page.get_last_order_row()
-        order_data_after_filter = self.base_selenium.get_row_cells_dict_related_to_header(
-            row=last_rows)
-        analysis_number_filter = order_data_after_filter['Analysis No.'].split(',')[
-            0]
-        self.base_selenium.LOGGER.info(
-            ' * Compare search result if last row has  analysis number = {}  '.format(analysis_number))
-        self.assertEqual(analysis_number_filter, analysis_number)
-        self.order_page.click_check_box(source=last_rows)
-        self.base_selenium.LOGGER.info(' * Download XSLX sheet')
-        self.order_page.download_xslx_sheet()
-        sheet_values = self.order_page.sheet.iloc[0].values
-        self.base_selenium.LOGGER.info(
-            'Check if export of order has analyis number = {}  '.format(analysis_number))
-        self.assertIn(analysis_number, sheet_values)
-
+        
     # will change that the duplicate many copies will be from the the child table not from the active table     
     def test012_duplicate_many_orders(self):
         """
@@ -2119,7 +2086,7 @@ class OrdersTestCases(BaseTest):
         # make sure that its the duplication page
         self.assertTrue('duplicateMainOrder' in self.base_selenium.get_url())
         # make sure that the new order has different order No
-        self.order_page.sleep_tiny()
+        self.order_page.sleep_small()
         duplicated_order_number = self.order_page.get_order_number()
         self.order_page.info('order to be duplicated is {}, new order no is {}'.
                              format(main_order['orderNo'], duplicated_order_number))
