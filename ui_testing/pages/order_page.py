@@ -27,7 +27,9 @@ class Order(Orders):
         if material_type:
             self.base_selenium.select_item_from_drop_down(element='order:material_type', item_text=material_type)
         else:
-            self.base_selenium.select_item_from_drop_down(element='order:material_type', avoid_duplicate=True)
+            self.base_selenium.select_item_from_drop_down(
+                element='order:material_type', avoid_duplicate=True)
+
             self.sleep_tiny()
             return self.get_material_type()
 

@@ -14,9 +14,8 @@ elements = {
         'tag': {'method': 'tag_name',
                 'value': 'tag',
                 'order': 0},
-
-        'search': {'method': 'id',
-                   'value': 'generalSearch'},
+        'search': {'method': 'xpath',
+                   'value': '//input[@id="generalSearch"]'},
         'table': {'method': 'id',
                   'value': 'table'},
         'save': {'method': 'class_name',
@@ -71,9 +70,6 @@ elements = {
         'checkbox': {'method': 'class_name',
                      'value': 'm-checkbox',
                      'order': 0},
-        'child_table_arrow': {'method': 'class_name',
-                              'value': 'm-datatable__toggle-subtable',
-                              'order': 0},
         'label': {'method': 'tag_name',
                   'value': 'label',
                   'order': 0},
@@ -551,7 +547,10 @@ elements = {
                              'value': 'start_testDate'},
         'shipment_date_filter': {'method': 'id',
                                  'value': 'start_shipmentDate'},
-        'mainorder_duplicate': {'method': 'id', 'value': 'main_table_duplicate'}
+        'mainorder_duplicate': {'method': 'id', 
+                                'value': 'main_table_duplicate'},
+        'suborder_duplicate': {'method': 'id', 
+                               'value': 'child_table_duplicate'}
     },
 
     'audit_trail': {
