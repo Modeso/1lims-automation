@@ -48,7 +48,7 @@ class Article(Articles):
                 "comment": self.article_comment,
                 "created_at": self.article_create_date,
                 "changed_at": self.article_create_date,
-                "changed_by": self.article_create_user,            
+                "changed_by": self.article_create_user,
                 "test_plan": None,
             }
 
@@ -126,15 +126,17 @@ class Article(Articles):
         for item in input_items:
             label = self.base_selenium.find_element_in_element(source=item, destination_element='general:label')
             if 'select' in label:
-                drop_down = self.base_selenium.find_element_in_element(source=item, destination_element='general:drop_down')
+                drop_down = self.base_selenium.find_element_in_element(source=item,
+                                                                       destination_element='general:drop_down')
                 self.base_selenium.select_item_from_drop_down(element_source=drop_down)
             if 'text' in label:
-                input_item = self.base_selenium.find_element_in_element(source=item, destination_element='general:input')
+                input_item = self.base_selenium.find_element_in_element(source=item,
+                                                                        destination_element='general:input')
                 # send text
-    
+
     def toggle_default_filters(self, element1, element2=None):
         self.open_filter_menu()
-        self.base_selenium.click(element='general:filter_configuration') # open filter configuration
+        self.base_selenium.click(element='general:filter_configuration')  # open filter configuration
         self.sleep_small()
         self.base_selenium.click(element=element1)
         if element2:
@@ -145,11 +147,27 @@ class Article(Articles):
         self.sleep_medium()
 
     def archive_restore_optional_fields(self, restore=False):
-        self.sleep_small()
         self.info('+ Open article configuration')
         self.open_configuration()
+        self.sleep_tiny()
         if restore:
-            self.base_selenium.click(element='general:configurations_archived') # open the archived tab
+            self.base_selenium.click(element='general:configurations_archived')  # open the archived tab
+            self.sleep_small()
+
         self.toggle_archive_field(field_name='unit', restore=restore)
         self.toggle_archive_field(field_name='comment', restore=restore)
         self.toggle_archive_field(field_name='related_article', restore=restore)
+
+    def restore_ui(self, restore=True):
+        self.info('Open article configuration')
+        self.open_configuration()
+        self.base_selenium.click(element='general:configurations_archived')  # open the archived tab
+
+        if self.base_selenium.check_element_is_exist('articles:unit_field_options'):
+            self.toggle_archive_field(field_name='unit', restore=restore)
+
+        if self.base_selenium.check_element_is_exist('articles:comment_field_options'):
+            self.toggle_archive_field(field_name='comment', restore=restore)
+
+        if self.base_selenium.check_element_is_exist('articles:related_article_field_options'):
+            self.toggle_archive_field(field_name='related_article', restore=restore)
