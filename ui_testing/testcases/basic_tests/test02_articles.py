@@ -67,16 +67,16 @@ class ArticlesTestCases(BaseTest):
 
             # if test case of archive/restore configurations we need to
             # restore archived configuration fields before tear down
-            test_case_tag = self._testMethodName
-            if test_case_tag in ["test022_user_hide_any_optional_field_is_not_affecting_the_table",
-                                 "test023_user_hide_any_optional_field_in_create_form_0_edit",
-                                 "test023_user_hide_any_optional_field_in_create_form_1_create",
-                                 "test024_user_restore_any_optional_field_is_not_affecting_the_table",
-                                 "test025_user_restore_any_optional_field_in_create_form_0_edit",
-                                 "test025_user_restore_any_optional_field_in_create_form_1_create"]:
-                self.article_page.info("check if any configuration field still archived before tear down")
-                self.article_page.get_articles_page()
-                self.article_page.restore_ui()
+        test_case_tag = self._testMethodName
+        if test_case_tag in ["test022_user_hide_any_optional_field_is_not_affecting_the_table",
+                             "test023_user_hide_any_optional_field_in_create_form_0_edit",
+                             "test023_user_hide_any_optional_field_in_create_form_1_create",
+                             "test024_user_restore_any_optional_field_is_not_affecting_the_table",
+                             "test025_user_restore_any_optional_field_in_create_form_0_edit",
+                             "test025_user_restore_any_optional_field_in_create_form_1_create"]:
+            self.article_page.info("check if any configuration field still archived before tear down")
+            self.article_page.get_articles_page()
+            self.article_page.restore_ui()
 
         super().tearDown()
 
