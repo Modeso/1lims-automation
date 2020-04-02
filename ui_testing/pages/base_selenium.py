@@ -8,7 +8,7 @@ from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 from ui_testing.elements import elements
-import random, time, os
+import random, time, os, json
 import pandas as pd
 from loguru import logger
 
@@ -399,7 +399,10 @@ class BaseSelenium:
 
         items = self.find_elements(element=options_element)
         if not item_text: #random selection
-            if len(items) <= 1:
+            if len(items) == 1 and items[0].text:  # if only one item in list
+                items[0].click()
+                return True
+            elif len(items) <= 1:
                 self.LOGGER.info(' There is no drop-down options')
                 return False
             if avoid_duplicate:
@@ -686,3 +689,7 @@ class BaseSelenium:
 
     def find_element_by_xpath(self, xpath=''):
         return self.driver.find_element_by_xpath(xpath)
+
+    def set_local_storage(self, key, value):
+        self.driver.execute_script("window.localStorage.setItem(arguments[0], arguments[1]);", key,
+                                   json.dumps(value))

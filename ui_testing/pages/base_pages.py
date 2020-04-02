@@ -111,7 +111,7 @@ class BasePages:
         selected_rows_data = []
         selected_rows = []
         rows = self.base_selenium.get_table_rows(element=element)
-        no_of_rows = randint(min(1, len(rows)-1), min(5, len(rows)-1))
+        no_of_rows = randint(min(2, len(rows)-1), min(5, len(rows)-1))
         count = 0
         self.info(' No. of selected rows {} '.format(no_of_rows))
         while count < no_of_rows:
@@ -242,16 +242,27 @@ class BasePages:
         self._copy(value=value)
         self._paste(element=element)
 
+    def open_row_options(self, row):
+        self.info('open record options menu')
+        row_options = self.base_selenium.find_element_in_element(
+            destination_element='general:table_menu_options', source=row)
+        row_options.click()
+        self.sleep_tiny()
+
     def open_child_table(self, source):
-        childtable_arrow = self.base_selenium.find_element_in_element(destination_element='general:child_table_arrow', source=source)
+        childtable_arrow = self.base_selenium.find_element_in_element(
+            destination_element='general:child_table_arrow', source=source)
         childtable_arrow.click()
         self.sleep_medium()
 
     def get_child_table_data(self, index=0):
         rows = self.result_table()
         self.open_child_table(source=rows[index])
-        rows_with_childtable = self.result_table(element='general:table_child')
-        headers = self.base_selenium.get_table_head_elements(element='general:table_child')
+        return self.get_table_data()
+
+    def get_table_data(self, table_element='general:table_child'):
+        rows_with_childtable = self.result_table(element=table_element)
+        headers = self.base_selenium.get_table_head_elements(element=table_element)
 
         child_table_data = []
         for subrecord in range(0, len(rows_with_childtable)):
@@ -552,15 +563,6 @@ class BasePages:
         date_parameters = date_in_days.split('-')
         date_parameters.reverse()
         return '.'.join(date_parameters)
-        
-    def get_current_date_formated(self):
-        current_time = datetime.datetime.now()
-        date = str(current_time.year)+'-'+str(current_time.month)+'-'+str(current_time.day)
-        return date
-
-    def get_current_year(self):
-        current_year = datetime.datetime.now()
-        return str(current_year.year)
 
     def get_the_latest_row_data(self):
         latest_row = (self.result_table()[0])
