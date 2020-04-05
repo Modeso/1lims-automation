@@ -2095,3 +2095,52 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(suborder_data['Material Type'], material_type)
         self.assertEqual(suborder_data['Article Name'], article)
         self.assertEqual(suborder_data['Test Units'], test_unit)
+
+    def test034_duplicate_sub_order_table_with_add(self):
+        """
+        Orders: User can duplicate any suborder from the order form ( table with add )
+        LIMS-3738
+        :return:
+        """
+        # get random order
+        self.base_selenium.LOGGER.info('select random record')
+        orders, payload = self.orders_api.get_all_orders()
+        data_before_duplicate_main_order = random.choice(orders['orders'])
+
+        #filter by this random order
+        order_no = data_before_duplicate_main_order['orderNo']
+        self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no,
+                                              field_type='text')
+        #get order data before duplicate
+        row = self.order_page.get_last_order_row()
+        self.orders_page.open_edit_page(row)
+        data_before_duplicate = self.order_page.get_suborder_data()
+
+        self.orders_page.get_orders_page()
+
+        self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no,
+                                              field_type='text')
+
+        # get order data after duplicate
+        row = self.order_page.get_last_order_row()
+        self.orders_page.open_edit_page(row)
+        self.order_page.duplicate_sub_order_table_with_add(index_to_duplicate_from=0)
+        after_duplicate_order = self.order_page.get_suborder_data()
+
+        # make sure that the new order has same order No
+        self.assertEqual(data_before_duplicate['orderNo'].replace("'", ""), after_duplicate_order['orderNo'].replace("'", ""))
+        # compare the contacts between two records
+        self.assertCountEqual(data_before_duplicate['contacts'], after_duplicate_order['contacts'])
+        # compare the data of suborders data in both orders
+        self.assertNotEqual(data_before_duplicate['suborders'], after_duplicate_order['suborders'])
+
+        # save the duplicated order
+        self.order_page.save(save_btn='orders:save_order')
+        # go back to the table view
+        self.order_page.get_orders_page()
+        # search for the created order no
+        self.order_page.search(after_duplicate_order['orderNo'])
+        results = self.order_page.result_table()[0].text
+        # check that it exists
+        self.assertIn(after_duplicate_order['orderNo'].replace("'", ""), results)
+
