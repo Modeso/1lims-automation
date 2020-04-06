@@ -10,6 +10,7 @@ elements = {
                               'value': 'm-datatable__toggle-subtable',
                               'order': 0},
         'table_child': {'method': 'class_name', 'value': 'dataTable', 'order': 1},
+
         'table_menu_options': {'method': 'class_name', 'value': 'dropdown', 'order': 0},
         'span': {'method': 'tag_name',
                  'value': 'span',
@@ -555,14 +556,12 @@ elements = {
                                  'value': 'start_shipmentDate'},
         'mainorder_duplicate': {'method': 'id',
                                 'value': 'main_table_duplicate'},
-        'suborder_duplicate': {'method': 'id',
-                               'value': 'child_table_duplicate'},
+        'suborder_duplicate': {'method': 'id', 'value': 'child_table_duplicate'},
         'suborder_coa': {'method': 'id', 'value': 'child_table_pdf'},
         'suborder_mail': {'method': 'id', 'value': 'child_table_mail'},
         'suborder_related_orders': {'method': 'id', 'value': 'child_table_related_orders'},
         'suborder_archive': {'method': 'id', 'value': 'child_table_archive'},
         'suborder_restore': {'method': 'id', 'value': 'child_table_restore'},
-
     },
 
     'audit_trail': {
