@@ -2143,4 +2143,3 @@ class OrdersTestCases(BaseTest):
         results = self.order_page.result_table()[0].text
         # check that it exists
         self.assertIn(after_duplicate_order['orderNo'].replace("'", ""), results)
-
