@@ -284,7 +284,7 @@ class OrdersTestCases(BaseTest):
         """
         # get random order
         self.base_selenium.LOGGER.info('select random record')
-        orders, payload = self.orders_api.get_all_orders()
+        orders, payload = self.orders_api.get_all_orders(limit=20)
         data_before_duplicate_main_order = random.choice(orders['orders'])
 
         order_no = data_before_duplicate_main_order['orderNo']
@@ -2097,10 +2097,6 @@ class OrdersTestCases(BaseTest):
         """
         duplicate the main order then change the materiel type
         LIMS-6219
-<<<<<<< HEAD
-
-=======
->>>>>>> 37602079b4474b3260e80da6a18f4f64960bc490
         """
         # get the random main order data
         orders, payload = self.orders_api.get_all_orders(limit=50)
