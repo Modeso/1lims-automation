@@ -2104,7 +2104,7 @@ class OrdersTestCases(BaseTest):
         """
         # get random order
         self.base_selenium.LOGGER.info('select random record')
-        orders, payload = self.orders_api.get_all_orders()
+        orders, payload = self.orders_api.get_all_orders(limit=20)
         data_before_duplicate_main_order = random.choice(orders['orders'])
 
         #filter by this random order
@@ -2142,4 +2142,4 @@ class OrdersTestCases(BaseTest):
         self.order_page.search(after_duplicate_order['orderNo'])
         results = self.order_page.result_table()[0].text
         # check that it exists
-        self.assertIn(after_duplicate_order['orderNo'].replace("'", ""), results)
+        self.assertIn(after_duplicate_order['orderNo'].replace("'", ""), results.replace("'", ""))
