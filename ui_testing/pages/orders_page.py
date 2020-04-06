@@ -10,7 +10,7 @@ class Orders(BasePages):
 
     def get_orders_page(self):
         self.base_selenium.get(url=self.orders_url)
-        self.sleep_small()
+        self.wait_until_page_is_loaded()
 
     def get_order_edit_page_by_id(self, id):
         url_text = "{}sample/orders/" + str(id)
@@ -67,6 +67,21 @@ class Orders(BasePages):
         self.base_selenium.click(element='general:right_menu')
         self.sleep_tiny()
         self.base_selenium.click(element='orders:duplicate')
+        self.sleep_medium()
+
+    def duplicate_main_order_from_order_option(self, index=0):
+        self.info('duplicate suborder from the order\'s active table')
+        table_records = self.result_table(element='general:table')
+        self.open_row_options(row=table_records[index])
+        self.base_selenium.click(element='orders:mainorder_duplicate')
+
+    def duplicate_sub_order_from_table_overview(self, index=0, number_of_copies=1):
+        self.info('duplicate suborder from the order\'s active table')
+        child_table_records = self.result_table(element='general:table_child')
+        self.open_row_options(row=child_table_records[index])
+        self.base_selenium.click(element='orders:suborder_duplicate')
+        self.base_selenium.set_text(element='orders:number_of_copies', value=number_of_copies)
+        self.base_selenium.click(element='orders:create_copies')
         self.sleep_medium()
 
     def get_random_order(self):

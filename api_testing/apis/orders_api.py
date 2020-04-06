@@ -211,11 +211,8 @@ class OrdersAPI(BaseAPI):
         elif payload['yearOption'] == 2:
             payload['orderNoWithYear'] = payload['year'] + '-' + payload['orderNo']
 
-        request_body['materialTypeId'] = kwargs['materialType']['id']
+        payload['materialTypeId'] = payload['materialType']['id']
         return payload
-
-
-
    
     
     
