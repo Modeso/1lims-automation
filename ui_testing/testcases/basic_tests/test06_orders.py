@@ -440,8 +440,6 @@ class OrdersTestCases(BaseTest):
         self.info('Make sure that the Analysis No. exist')
         self.assertTrue(suborder['Analysis No.'])
 
-    # will change that the duplicate many copies will be from the the child table not from the active table     
-
     def test012_duplicate_many_orders(self):
         """
         New: Orders: Duplication from active table Approach: When I duplicate order 5 times, it will create 5 analysis records with the same order number
@@ -2098,9 +2096,11 @@ class OrdersTestCases(BaseTest):
     def test033_Duplicate_main_order_and_cahange_materiel_type(self):
         """
         duplicate the main order then change the materiel type
-
         LIMS-6219
+<<<<<<< HEAD
 
+=======
+>>>>>>> 37602079b4474b3260e80da6a18f4f64960bc490
         """
         # get the random main order data
         orders, payload = self.orders_api.get_all_orders(limit=50)
@@ -2143,3 +2143,4 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(suborder_data['Material Type'], material_type)
         self.assertEqual(suborder_data['Article Name'], article)
         self.assertEqual(suborder_data['Test Units'], test_unit)
+
