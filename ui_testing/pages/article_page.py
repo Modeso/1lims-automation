@@ -164,8 +164,8 @@ class Article(Articles):
         self._archive_field(field_name='related_article')
 
     def _restore_field(self, field_name):
+        self.info(' restore field {}'.format(field_name))
         self.base_selenium.click(element='articles:{}_field_options'.format(field_name))
-        self.info(' Restore field {}'.format(field_name))
         self.base_selenium.click(element='articles:{}_field_restore'.format(field_name))
         self.confirm_popup()
 

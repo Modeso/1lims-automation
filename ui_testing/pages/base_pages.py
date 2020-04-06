@@ -268,6 +268,9 @@ class BasePages:
         return child_table_data
 
     def info(self, message):
+        if message[0] != " ":
+            message = " {}".format(message)
+        message = message.lower()
         self.base_selenium.LOGGER.info(message)
 
     def generate_random_email(self):
