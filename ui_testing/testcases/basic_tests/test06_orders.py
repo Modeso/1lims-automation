@@ -2118,3 +2118,33 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(suborder_data['Material Type'], material_type)
         self.assertEqual(suborder_data['Article Name'], article)
         self.assertEqual(suborder_data['Test Units'], test_unit)
+
+    def test033_delete_suborder(self):
+        """
+         Delete sub order Approach: In case I have main order with multiple sub orders ,
+         make sure you can delete one of them
+
+        'LIMS-6853'
+        """
+        # get the random main order data
+        order = self.orders_api.get_orders_with_multiple_sub_orders()
+        self.order_page.search(order['orderNo'])
+        # archive first suborder
+        suborder_data = self.order_page.get_child_table_data()[0]
+        self.order_page.archive_sub_order_from_active_table()
+        # delete it
+        self.order_page.get_archived_items()
+        row = self.order_page.search(order['orderNo'])
+        self.order_page.click_check_box(row[0])
+        self.order_page.delete_selected_item()
+        validation_result = self.base_selenium.get_text(element='orders:confirm_delete')
+        self.assertIn('Please note that the reports of this order will be deleted', validation_result)
+        self.order_page.confirm_popup()
+        # go to analysis page to make sure that analysis reated to that suborder is deleted
+        self.info('Navigate to analysis page to make sure that analysis related to that suborder is deleted')
+        self.order_page.get_orders_page()
+        self.order_page.navigate_to_analysis_tab()
+        self.analyses_page.apply_filter_scenario(filter_element='analysis_page:analysis_no_filter',
+                                                 filter_text=suborder_data['Analysis No.'], field_type='text')
+        self.assertEqual(len(self.order_page.result_table()), 1)
+

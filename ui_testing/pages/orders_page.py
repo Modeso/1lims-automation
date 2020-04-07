@@ -84,6 +84,13 @@ class Orders(BasePages):
         self.base_selenium.click(element='orders:create_copies')
         self.sleep_medium()
 
+    def archive_sub_order_from_active_table(self, index=0):
+        self.info('archive suborder from the order\'s active table')
+        child_table_records = self.result_table(element='general:table_child')
+        self.open_row_options(row=child_table_records[index])
+        self.base_selenium.click(element='orders:suborder_archive')
+        self.confirm_popup()
+
     def get_random_order(self):
         self.base_selenium.LOGGER.info(' + Get random order.')
         row = self.get_random_order_row()
