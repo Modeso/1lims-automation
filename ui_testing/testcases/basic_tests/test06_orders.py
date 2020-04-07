@@ -2144,6 +2144,7 @@ class OrdersTestCases(BaseTest):
         self.info('Navigate to analysis page to make sure that analysis related to that suborder is deleted')
         self.order_page.get_orders_page()
         self.order_page.navigate_to_analysis_tab()
+        self.order_page.sleep_small()
         self.analyses_page.apply_filter_scenario(filter_element='analysis_page:analysis_no_filter',
                                                  filter_text=suborder_data['Analysis No.'], field_type='text')
         self.assertEqual(len(self.order_page.result_table()), 1)
