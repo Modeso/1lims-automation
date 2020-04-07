@@ -197,6 +197,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.get_archived_items()
         orders, payload = self.orders_api.get_all_orders(deleted=1)
         order_data = random.choice(orders['orders'])
+        print(order_data)
 
         order_no = order_data['orderNo']
         self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no, field_type='text')
@@ -209,6 +210,12 @@ class OrdersTestCases(BaseTest):
         else:
             table_records_count = len(self.order_page.result_table()) -1
             self.assertEqual(table_records_count, 0)
+
+        self.base_selenium.click(element='orders:right_menu')
+        self.base_selenium.click(element='orders:active')
+        self.order_page.search(order_no)
+        results = self.order_page.result_table()[0].text
+        self.assertIn(order_no.replace("'", ""), results.replace("'", ""))
       
     # will continue with us 
     def test006_deleted_archived_order(self):
@@ -991,6 +998,11 @@ class OrdersTestCases(BaseTest):
             table_records_count = len(self.order_page.result_table()) -1
             self.assertEqual(table_records_count, 0)
 
+        self.base_selenium.click(element='orders:right_menu')
+        self.base_selenium.click(element='orders:archived')
+        self.order_page.search(order_no)
+        results = self.order_page.result_table()[0].text
+        self.assertIn(order_no.replace("'", ""), results.replace("'", ""))
 
     # will continue with us 
     @skip('https://modeso.atlassian.net/browse/LIMS-4914')

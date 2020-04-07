@@ -523,6 +523,10 @@ elements = {
                        'value': '//*[@id="custom-accordion-panel"]/div/a/i'},
         'archive': {'method': 'link_text',
                     'value': 'Archive'},
+        'active': {'method': 'link_text',
+                    'value': 'Active'},
+        'archived': {'method': 'link_text',
+                    'value': 'Archived'},
         'analysis-confirmation': {
             'method': 'class_name',
             'value': 'swal2-header'},
