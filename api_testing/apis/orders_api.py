@@ -215,7 +215,7 @@ class OrdersAPIFactory(BaseAPI):
         return payload
 
 class  OrdersAPI(OrdersAPIFactory):
-    def get_orders_with_multiple_sub_orders(self):
+    def get_order_with_multiple_sub_orders(self):
         api, payload = self.get_all_orders()
         all_orders = api['orders']
         for order in all_orders:

@@ -91,6 +91,19 @@ class Orders(BasePages):
         self.base_selenium.click(element='orders:suborder_archive')
         self.confirm_popup()
 
+    def delete_sub_order(self, order_no, index=0, confirm_popup=True):
+        self.info('delete suborder of order No {}'.format(order_no))
+        import ipdb;ipdb.set_trace()
+        self.get_archived_items()
+        row = self.search(order_no)
+        self.click_check_box(row[0])
+        self.delete_selected_item()
+        if confirm_popup:
+            self.base_selenium.confirm_popup()
+        else:
+            self.info('Cancel the popup')
+            self.base_selenium.cancel()
+
     def get_random_order(self):
         self.base_selenium.LOGGER.info(' + Get random order.')
         row = self.get_random_order_row()

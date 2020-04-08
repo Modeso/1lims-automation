@@ -401,7 +401,7 @@ class OrdersTestCases(BaseTest):
             row=orders_analyess[0])
         self.assertEqual(
             orders_duplicate_data_after[0]['Analysis No.'], latest_order_data['Analysis No.'])
-        
+
     # will change that the duplicate many copies will be from the the child table not from the active table     
     def test012_duplicate_many_orders(self):
         """
@@ -732,13 +732,14 @@ class OrdersTestCases(BaseTest):
         # check if the shipment date changed or not
         if 'cancel' == save:
             self.base_selenium.LOGGER.info(
-                ' + Assert {} (current_shipment_date) != {} (new_shipment_date)'.format(new_shipment_date, saved_shipment_date))
+                ' + Assert {} (current_shipment_date) != {} (new_shipment_date)'.format(new_shipment_date,
+                                                                                        saved_shipment_date))
             self.assertNotEqual(saved_shipment_date, new_shipment_date)
         else:
             self.base_selenium.LOGGER.info(
-                ' + Assert {} (current_shipment_date) == {} (new_shipment_date)'.format(new_shipment_date, saved_shipment_date))
+                ' + Assert {} (current_shipment_date) == {} (new_shipment_date)'.format(new_shipment_date,
+                                                                                        saved_shipment_date))
             self.assertEqual(saved_shipment_date, new_shipment_date)
-
 
     # will continue with us
     def test018_validate_order_no_exists(self):
@@ -902,7 +903,7 @@ class OrdersTestCases(BaseTest):
             testunit_name = row_with_headers['Test Unit']
             self.base_selenium.LOGGER.info(" + Test unit : {}".format(testunit_name))
             self.assertIn(testunit_name, test_units_list)
-            
+
     def test022_create_existing_order_with_test_units_and_change_material_type(self):
         """
         New: Orders with test units: Create a new order from an existing order with
@@ -916,7 +917,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.set_material_type(material_type='Subassembely')
         self.assertEqual(self.base_selenium.get_value(element='order:article'), None)
         self.assertEqual(self.base_selenium.get_value(element='order:test_unit'), None)
-        
+
         article = self.order_page.set_article()
         test_unit = self.order_page.set_test_unit()
         self.order_page.save(save_btn='order:save_btn', sleep=True)
@@ -1952,7 +1953,7 @@ class OrdersTestCases(BaseTest):
         LIMS-4255
         """
         article, article_data = self.article_api.create_article()
-        testunit_record = random.choice\
+        testunit_record = random.choice \
             (self.test_unit_api.get_all_test_units(filter='{"materialTypes":"all"}').json()['testUnits'])
 
         order = random.choice(self.orders_api.get_all_orders(limit=50)['orders'])
@@ -1987,10 +1988,10 @@ class OrdersTestCases(BaseTest):
         self.order_page.navigate_to_analysis_tab()
         analysis_count = self.single_analysis_page.get_analysis_count()
 
-        self.info('check analysis count\t'+ str (analysis_count) + "\tequals\t"+ str(analysis_count_before_adding + 1))
-        self.assertGreaterEqual(analysis_count, analysis_count_before_adding+1)
+        self.info('check analysis count\t' + str(analysis_count) + "\tequals\t" + str(analysis_count_before_adding + 1))
+        self.assertGreaterEqual(analysis_count, analysis_count_before_adding + 1)
 
-        analysis_record = self.single_analysis_page.open_accordion_for_analysis_index(analysis_count-1)
+        analysis_record = self.single_analysis_page.open_accordion_for_analysis_index(analysis_count - 1)
         testunit_in_analysis = self.single_analysis_page.get_testunits_in_analysis(source=analysis_record)
         self.assertEqual(len(testunit_in_analysis), 1)
         testunit_name = testunit_in_analysis[0]['']
@@ -2050,7 +2051,7 @@ class OrdersTestCases(BaseTest):
         year_value = self.order_page.get_current_year()[2:]
         formated_order_no = new_order_no + '-' + year_value
         self.info('newly generated order number = {}'.format(formated_order_no))
-        order = self.orders_api.get_all_orders(limit= 50)['orders'][1]
+        order = self.orders_api.get_all_orders(limit=50)['orders'][1]
         self.orders_page.get_order_edit_page_by_id(id=order['id'])
         self.order_page.set_no(no=formated_order_no)
         self.order_page.sleep_small()
@@ -2124,28 +2125,24 @@ class OrdersTestCases(BaseTest):
          Delete sub order Approach: In case I have main order with multiple sub orders ,
          make sure you can delete one of them
 
-        'LIMS-6853'
+         LIMS-6853
         """
-        # get the random main order data
-        order = self.orders_api.get_orders_with_multiple_sub_orders()
+        self.info('get random order with multiple suborders')
+        order = self.orders_api.get_order_with_multiple_sub_orders()
         self.order_page.search(order['orderNo'])
-        # archive first suborder
+        self.info('archive first suborder')
         suborder_data = self.order_page.get_child_table_data()[0]
         self.order_page.archive_sub_order_from_active_table()
-        # delete it
+        self.info('navigate to archived order table')
         self.order_page.get_archived_items()
-        row = self.order_page.search(order['orderNo'])
-        self.order_page.click_check_box(row[0])
-        self.order_page.delete_selected_item()
-        validation_result = self.base_selenium.get_text(element='orders:confirm_delete')
-        self.assertIn('Please note that the reports of this order will be deleted', validation_result)
-        self.order_page.confirm_popup()
-        # go to analysis page to make sure that analysis reated to that suborder is deleted
+        self.orders_page.delete_sub_order(order_no=order['orderNo'])
         self.info('Navigate to analysis page to make sure that analysis related to that suborder is deleted')
         self.order_page.get_orders_page()
+        self.order_page.search(order['orderNo'])
+        suborders_after_delete = self.order_page.get_child_table_data()
+        self.assertNotIn(suborder_data['Analysis No.'], suborders_after_delete)
         self.order_page.navigate_to_analysis_tab()
         self.order_page.sleep_small()
         self.analyses_page.apply_filter_scenario(filter_element='analysis_page:analysis_no_filter',
                                                  filter_text=suborder_data['Analysis No.'], field_type='text')
         self.assertEqual(len(self.order_page.result_table()), 1)
-
