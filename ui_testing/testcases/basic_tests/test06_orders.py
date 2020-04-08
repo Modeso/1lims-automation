@@ -2077,38 +2077,35 @@ class OrdersTestCases(BaseTest):
 
         LIMS-6219
         """
-        # get the random main order data
+        self.info('get random order ')
         orders, payload = self.orders_api.get_all_orders(limit=50)
         main_order = random.choice(orders['orders'])
         self.order_page.search(main_order['orderNo'])
-        # duplicate the main order
+        self.info('duplicate the main order')
         self.order_page.duplicate_main_order_from_order_option()
-        # make sure that its the duplication page
-        self.assertTrue('duplicateMainOrder' in self.base_selenium.get_url())
-        # make sure that the new order has different order No
-        self.order_page.sleep_small()
+
         duplicated_order_number = self.order_page.get_order_number()
-        self.order_page.info('order to be duplicated is {}, new order no is {}'.
-                             format(main_order['orderNo'], duplicated_order_number))
+        self.info('order to be duplicated is {}, new order no is {}'.
+                  format(main_order['orderNo'], duplicated_order_number))
         self.assertNotEqual(main_order['orderNo'], duplicated_order_number)
-        # change material type
-        self.order_page.open_suborder_edit()
-        self.order_page.sleep_medium()
-        material_type = self.order_page.set_material_type()
+
+        self.info('change material type of first suborder')
+        material_type = self.order_page.set_material_type_of_first_suborder()
+
         self.info('Make sure that article and test units are empty')
         self.assertEqual(self.base_selenium.get_value(element='order:article'), None)
         self.assertEqual(self.base_selenium.get_value(element='order:test_unit'), None)
+        self.assertEqual(self.base_selenium.get_value(element='order:test_plan'), None)
+
+        self.info('select random article, test unit and test plan')
         article = self.order_page.set_article()
         test_unit = self.order_page.set_test_unit()
         self.info('duplicated order material is {}, article {}, and test_unit {}'.
                   format(material_type, article, test_unit))
-        # save the duplicated order after edit
         self.order_page.save(save_btn='order:save_btn', sleep=True)
-        # go back to the table view
+        self.info("navigate to orders' page to make sure that order duplicated correctly with selected data")
         self.order_page.get_orders_page()
-        # search for the created order no
         self.order_page.search(duplicated_order_number)
-        # get the search result text
         child_data = self.order_page.get_child_table_data()
         if len(child_data) > 1:
             suborder_data = child_data[-1]
@@ -2116,5 +2113,5 @@ class OrdersTestCases(BaseTest):
             suborder_data = child_data[0]
         # check that it exists
         self.assertEqual(suborder_data['Material Type'], material_type)
-        self.assertEqual(suborder_data['Article Name'], article)
+        self.assertEqual(suborder_data['Article Name'].replce("'",""), article)
         self.assertEqual(suborder_data['Test Units'], test_unit)
