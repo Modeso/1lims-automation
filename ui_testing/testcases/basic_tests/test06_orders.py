@@ -2123,7 +2123,7 @@ class OrdersTestCases(BaseTest):
         """
         duplicate sub-order of any order then change the materiel type
 
-        LIMS-6277
+        LIMS-6227
         """
         self.info('get random main order data')
         orders, payload = self.orders_api.get_all_orders(limit=50)
