@@ -488,7 +488,7 @@ class Order(Orders):
     def navigate_to_analysis_tab(self):
         self.base_selenium.scroll()
         self.base_selenium.click('orders:analysis_order_tab')
-        self.sleep_small()
+        self.wait_until_page_is_loaded()
 
     def set_material_type_of_first_suborder(self, material_type='', sub_order_index=0):
         suborder_table_rows = self.base_selenium.get_table_rows(

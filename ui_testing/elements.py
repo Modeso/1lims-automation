@@ -559,6 +559,8 @@ elements = {
                                'value': 'child_table_duplicate'},
         'suborder_archive': {'method': 'id',
                              'value': 'child_table_archive'},
+        'suborder_delete': {'method': 'id',
+                             'value': 'child_table_delete'},
         'confirm_delete': {'method':'xpath',
                            'value': '//h2[@id="swal2-title"]'}
     },
