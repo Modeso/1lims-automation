@@ -2113,5 +2113,5 @@ class OrdersTestCases(BaseTest):
             suborder_data = child_data[0]
         # check that it exists
         self.assertEqual(suborder_data['Material Type'], material_type)
-        self.assertEqual(suborder_data['Article Name'].replce("'",""), article)
+        self.assertEqual(suborder_data['Article Name'].replace("'",""), article)
         self.assertEqual(suborder_data['Test Units'], test_unit)
