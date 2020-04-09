@@ -5,7 +5,6 @@ from ui_testing.testcases.base_test import BaseTest
 from ui_testing.pages.order_page import Order
 from ui_testing.pages.orders_page import Orders
 from api_testing.apis.orders_api import OrdersAPI
-from ui_testing.pages.analysis_page import SingleAnalysisPage
 from ui_testing.pages.analysis_page import AllAnalysesPage
 from api_testing.apis.article_api import ArticleAPI
 from api_testing.apis.test_unit_api import TestUnitAPI
@@ -29,7 +28,6 @@ class OrdersTestCases(BaseTest):
         self.test_unit_api = TestUnitAPI()
         self.test_plan_api = TestPlanAPI()
         self.contacts_api = ContactsAPI()
-        self.single_analysis_page = SingleAnalysisPage()
         self.general_utilities_api = GeneralUtilitiesAPI()
         self.contacts_page = Contacts()
         self.set_authorization(auth=self.contacts_api.AUTHORIZATION_RESPONSE)
