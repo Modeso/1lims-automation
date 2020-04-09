@@ -210,8 +210,7 @@ class OrdersTestCases(BaseTest):
             table_records_count = len(self.order_page.result_table()) -1
             self.assertEqual(table_records_count, 0)
 
-        self.base_selenium.click(element='orders:right_menu')
-        self.base_selenium.click(element='orders:active')
+        self.order_page.get_active_items()
         self.order_page.search(order_no)
         results = self.order_page.result_table()[0].text
         self.assertIn(order_no.replace("'", ""), results.replace("'", ""))
@@ -997,8 +996,7 @@ class OrdersTestCases(BaseTest):
             table_records_count = len(self.order_page.result_table()) -1
             self.assertEqual(table_records_count, 0)
 
-        self.base_selenium.click(element='orders:right_menu')
-        self.base_selenium.click(element='orders:archived')
+        self.order_page.get_archived_items()
         self.order_page.search(order_no)
         results = self.order_page.result_table()[0].text
         self.assertIn(order_no.replace("'", ""), results.replace("'", ""))
