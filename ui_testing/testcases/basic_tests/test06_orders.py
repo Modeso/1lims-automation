@@ -197,7 +197,6 @@ class OrdersTestCases(BaseTest):
         self.order_page.get_archived_items()
         orders, payload = self.orders_api.get_all_orders(deleted=1)
         order_data = random.choice(orders['orders'])
-        print(order_data)
 
         order_no = order_data['orderNo']
         self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no, field_type='text')
@@ -983,7 +982,7 @@ class OrdersTestCases(BaseTest):
         LIMS-6518
         """
         self.base_selenium.LOGGER.info('select random record')
-        orders, payload = self.orders_api.get_all_orders()
+        orders, payload = self.orders_api.get_all_orders(limit=20)
         order_data = random.choice(orders['orders'])
 
         order_no = order_data['orderNo']
