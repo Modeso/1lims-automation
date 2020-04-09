@@ -1,5 +1,8 @@
 elements = {
     'general': {
+        'fields_panel': {'method': 'class_name',
+                         'value': 'fieldsPanel',
+                         'order': 0},
         'configuration_body': {'method': 'id',
                                'value': 'body',
                                'order': 0},
@@ -257,8 +260,7 @@ elements = {
                   'value': 'field'},
         'field_items': {'method': 'class_name',
                         'value': 'padding',
-                        'order': -1}
-
+                        'order': -1},
     },
     'test_plans': {
         'test_plans_table': {'method': 'id',
@@ -516,7 +518,7 @@ elements = {
                                'value': 'a',
                                'order': 4},
         'analysis_order_tab': {'method': 'xpath',
-                         'value': "//label[@class='btn tab']"},
+                               'value': "//label[@class='btn tab']"},
         'new_order': {'method': 'link_text',
                       'value': 'New Order'},
         'right_menu': {'method': 'xpath',
@@ -566,6 +568,7 @@ elements = {
         'suborder_related_orders': {'method': 'id', 'value': 'child_table_related_orders'},
         'suborder_archive': {'method': 'id', 'value': 'child_table_archive'},
         'suborder_restore': {'method': 'id', 'value': 'child_table_restore'},
+   
     },
 
     'audit_trail': {
