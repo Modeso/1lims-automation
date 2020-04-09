@@ -289,7 +289,7 @@ class Order(Orders):
         
         return self.get_suborder_data()
 
-    def duplicate_sub_order_table_with_add(self, number_of_duplicates=1, index_to_duplicate_from=0):
+    def duplicate_from_table_view(self, number_of_duplicates=1, index_to_duplicate_from=0):
         suborders = self.base_selenium.get_table_rows(element='order:suborder_table')
         suborders_elements = self.base_selenium.get_row_cells_elements_related_to_header(
             row=suborders[index_to_duplicate_from],

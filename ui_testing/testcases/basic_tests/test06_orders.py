@@ -2103,7 +2103,7 @@ class OrdersTestCases(BaseTest):
         :return:
         """
         # get random order
-        self.base_selenium.LOGGER.info('select random record')
+        self.info('select random record')
         orders, payload = self.orders_api.get_all_orders(limit=20)
         data_before_duplicate_main_order = random.choice(orders['orders'])
 
@@ -2124,7 +2124,7 @@ class OrdersTestCases(BaseTest):
         # get order data after duplicate
         row = self.order_page.get_last_order_row()
         self.orders_page.open_edit_page(row)
-        self.order_page.duplicate_sub_order_table_with_add(index_to_duplicate_from=0)
+        self.order_page.duplicate_from_table_view(index_to_duplicate_from=0)
         after_duplicate_order = self.order_page.get_suborder_data()
 
         # make sure that the new order has same order No
@@ -2140,6 +2140,12 @@ class OrdersTestCases(BaseTest):
         self.order_page.get_orders_page()
         # search for the created order no
         self.order_page.search(after_duplicate_order['orderNo'])
-        results = self.order_page.result_table()[0].text
+        suborder_data = self.order_page.get_child_table_data()[0]
+        order_result = self.order_page.result_table()[0].text
         # check that it exists
-        self.assertIn(after_duplicate_order['orderNo'].replace("'", ""), results.replace("'", ""))
+        self.assertIn(after_duplicate_order['orderNo'].replace("'", ""), order_result.replace("'", ""))
+        self.order_page.navigate_to_analysis_tab()
+        self.order_page.search(suborder_data['Analysis No.'])
+        analysis_result = self.order_page.result_table()[0].text
+        self.assertIn(suborder_data['Analysis No.'].replace("'", ""), analysis_result.replace("'", ""))
+
