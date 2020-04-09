@@ -344,7 +344,6 @@ class HeaderTestCases(BaseTest):
                                         filter_text=user_data['number'])
 
         users_result = self.header_page.result_table()
-        print(users_result)
         self.assertIn(str(user_data['number'].replace("'", "")), (users_result[0].text).replace("'", ""))
 
         self.base_selenium.LOGGER.info('filter results displayed with the user no')
