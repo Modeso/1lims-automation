@@ -9,6 +9,7 @@ from ui_testing.pages.analysis_page import SingleAnalysisPage
 from ui_testing.pages.analysis_page import AllAnalysesPage
 from api_testing.apis.article_api import ArticleAPI
 from api_testing.apis.test_unit_api import TestUnitAPI
+from api_testing.apis.test_plan_api import TestPlanAPI
 from api_testing.apis.contacts_api import ContactsAPI
 from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from ui_testing.pages.contacts_page import Contacts
@@ -2071,7 +2072,7 @@ class OrdersTestCases(BaseTest):
         for record in analysis_records:
             self.assertEqual(record['Order No.'], formated_order_no)
 
-    def test033_Duplicate_main_order_and_cahange_materiel_type(self):
+        def test033_Duplicate_main_order_and_cahange_materiel_type(self):
         """
         duplicate the main order then change the materiel type
 
@@ -2083,25 +2084,32 @@ class OrdersTestCases(BaseTest):
         self.order_page.search(main_order['orderNo'])
         self.info('duplicate the main order')
         self.order_page.duplicate_main_order_from_order_option()
-
         duplicated_order_number = self.order_page.get_order_number()
         self.info('order to be duplicated is {}, new order no is {}'.
                   format(main_order['orderNo'], duplicated_order_number))
         self.assertNotEqual(main_order['orderNo'], duplicated_order_number)
 
         self.info('change material type of first suborder')
-        material_type = self.order_page.set_material_type_of_first_suborder()
 
-        self.info('Make sure that article and test units are empty')
+        self.test_plan_api = TestPlanAPI()
+        completed_test_plans = self.test_plan_api.get_completed_testplans()
+        old_material_type = self.order_page.get_material_type_of_first_suborder()
+        for test_plan in completed_test_plans:
+            if test_plan['materialType'] != old_material_type:
+                selected_test_plan = test_plan
+                break
+
+        self.order_page.set_material_type_of_first_suborder(material_type=selected_test_plan['materialType'])
+        self.info('Make sure that article, test unit, and test plan are empty')
         self.assertEqual(self.base_selenium.get_value(element='order:article'), None)
         self.assertEqual(self.base_selenium.get_value(element='order:test_unit'), None)
         self.assertEqual(self.base_selenium.get_value(element='order:test_plan'), None)
-
         self.info('select random article, test unit and test plan')
-        article = self.order_page.set_article()
+        article = self.order_page.set_article(article=selected_test_plan['article'][0])
         test_unit = self.order_page.set_test_unit()
-        self.info('duplicated order material is {}, article {}, and test_unit {}'.
-                  format(material_type, article, test_unit))
+        test_plan = self.order_page.set_test_plan(test_plan=selected_test_plan['testPlanName'])
+        self.info('duplicated order material is {}, article {}, test_unit {} and test_plan {}'.
+                  format(material_type, article, test_unit, test_plan))
         self.order_page.save(save_btn='order:save_btn', sleep=True)
         self.info("navigate to orders' page to make sure that order duplicated correctly with selected data")
         self.order_page.get_orders_page()
@@ -2111,7 +2119,9 @@ class OrdersTestCases(BaseTest):
             suborder_data = child_data[-1]
         else:
             suborder_data = child_data[0]
-        # check that it exists
-        self.assertEqual(suborder_data['Material Type'], material_type)
-        self.assertEqual(suborder_data['Article Name'].replace("'",""), article)
+        
+        self.info('Make sure that suborder data is correct')
+        self.assertEqual(suborder_data['Material Type'], selected_test_plan['materialType'])
+        self.assertEqual(suborder_data['Article Name'].replace("'", ""), article)
         self.assertEqual(suborder_data['Test Units'], test_unit)
+        self.assertEqual(suborder_data['Test Plans'], test_plan)
