@@ -167,14 +167,14 @@ class TestPlanAPI(TestPlanAPIFactory):
         return testplans_response.json()['testPlans']
 
     def get_completed_testplans(self, **kwargs):
-        response = self.get_all_test_plans(**kwargs)
+        response, payload = self.get_all_test_plans(**kwargs)
         all_test_plans = response['testPlans']
         completed_test_plans = [test_plan for test_plan in all_test_plans if test_plan['status'] == 'Completed']
         return completed_test_plans
 
     def get_inprogress_testplans(self, **kwargs):
-        response = self.get_all_test_plans(**kwargs)
-        all_test_plans = response.json()['testPlans']
+        response, payload = self.get_all_test_plans(**kwargs)
+        all_test_plans = response['testPlans']
         inprogress_test_plans = [test_plan for test_plan in all_test_plans if test_plan['status'] == 'InProgress']
         return inprogress_test_plans
 
