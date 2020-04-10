@@ -3,6 +3,7 @@ from selenium.webdriver.common.keys import Keys
 from selenium import webdriver
 from random import randint
 
+
 class Order(Orders):
     def get_order(self):
         return self.base_selenium.get_text(element='order:order').split('\n')[0]
@@ -19,13 +20,17 @@ class Order(Orders):
         self.base_selenium.select_item_from_drop_down(
             element='order:order', item_text='Existing Order')
 
+    def open_suborder_edit(self):
+        self.base_selenium.click(element='order:suborder_table')
+        self.info("suborder table can be editted")
+
     def set_material_type(self, material_type=''):
         if material_type:
-            self.base_selenium.select_item_from_drop_down(
-                element='order:material_type', item_text=material_type)
+            self.base_selenium.select_item_from_drop_down(element='order:material_type', item_text=material_type)
         else:
             self.base_selenium.select_item_from_drop_down(
                 element='order:material_type', avoid_duplicate=True)
+
             self.sleep_tiny()
             return self.get_material_type()
 
@@ -40,6 +45,7 @@ class Order(Orders):
             self.base_selenium.select_item_from_drop_down(element='order:article', item_text=article)
         else:
             self.base_selenium.select_item_from_drop_down(element='order:article')
+            self.sleep_tiny()
             return self.get_article()
 
     def is_article_existing(self, article):

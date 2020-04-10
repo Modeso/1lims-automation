@@ -1,11 +1,18 @@
 elements = {
     'general': {
+        'fields_panel': {'method': 'class_name',
+                         'value': 'fieldsPanel',
+                         'order': 0},
+        'configuration_body': {'method': 'id',
+                               'value': 'body',
+                               'order': 0},
+        'loading': {'method': 'class_name',
+                    'value': 'm-blockui',
+                    'order': 0},
         'child_table_arrow': {'method': 'class_name',
                               'value': 'm-datatable__toggle-subtable',
                               'order': 0},
-        'table_child': {'method': 'class_name',
-                        'value': 'dataTable',
-                        'order': 1},
+        'table_child': {'method': 'class_name', 'value': 'dataTable', 'order': 1},
         'table_menu_options': {'method': 'class_name', 'value': 'dropdown', 'order': 0},
         'span': {'method': 'tag_name',
                  'value': 'span',
@@ -252,8 +259,7 @@ elements = {
                   'value': 'field'},
         'field_items': {'method': 'class_name',
                         'value': 'padding',
-                        'order': -1}
-
+                        'order': -1},
     },
     'test_plans': {
         'test_plans_table': {'method': 'id',
@@ -427,25 +433,9 @@ elements = {
             'method': 'id',
             'value': 'numberfield'
         },
-        'testunit_number_filter': {
-            'method': 'id',
-            'value': 'numberfield'
-        },
         'category': {
             'method': 'id',
             'value': 'category'
-        },
-        'category_filter': {
-            'method': 'id',
-            'value': 'categoryNamefield'
-        },
-        'name_filter': {
-            'method': 'id',
-            'value': 'namefield'
-        },
-        'method_filter': {
-            'method': 'id',
-            'value': 'methodfield'
         },
         'type': {
             'method': 'id',
@@ -464,8 +454,6 @@ elements = {
         'spec_lower_limit': {'method': 'id',
                              'value': 'lowerLimitfield'},
         'spec_unit': {'method': 'id',
-                      'value': 'unitfield'},
-        'spec_unit_filter': {'method': 'id',
                       'value': 'unitfield'},
         'spec_unit_preview': {'method': 'css_selector',
                               'value': '[class="form-control field-with-scrips"]'},
@@ -519,12 +507,8 @@ elements = {
                                           'value': 'method',
                                           'order': 0},
         'configuration_testunit_comment': {'method': 'class_name',
-                              'value': 'comment',
-                              'order': 0},
-        'filter_created_at': {'method': 'id', 'value': 'start_createdAt'},
-        'filter_material_type': {'method': 'id', 'value': 'materialTypesfield'},
-        'filter_type': {'method': 'id', 'value': 'typeNamefield'},
-        'filter_changed_by': {'method': 'id', 'value': 'lastModifiedUserfield'},
+                                           'value': 'comment',
+                                           'order': 0},
     },
     'orders': {
         'orders_table': {'method': 'id',
@@ -533,7 +517,7 @@ elements = {
                                'value': 'a',
                                'order': 4},
         'analysis_order_tab': {'method': 'xpath',
-                         'value': "//label[@class='btn tab']"},
+                               'value': "//label[@class='btn tab']"},
         'new_order': {'method': 'link_text',
                       'value': 'New Order'},
         'right_menu': {'method': 'xpath',
@@ -574,8 +558,10 @@ elements = {
         'analysis_tab': {
             'method': 'xpath',
             'value': "//label[@class='btn tab']"},
-        'suborder_duplicate': {'method': 'id', 'value': 'child_table_duplicate'}
-
+        'mainorder_duplicate': {'method': 'id',
+                                'value': 'main_table_duplicate'},
+        'suborder_duplicate': {'method': 'id',
+                               'value': 'child_table_duplicate'}
     },
 
     'audit_trail': {
@@ -589,8 +575,10 @@ elements = {
     'order': {
         'order': {'method': 'id',
                   'value': 'orderTypefield'},
+        'suborder_table': {'method': 'xpath',
+                           'value': "//table[@id='table-with-add']"},
         'material_type': {'method': 'xpath',
-                          'value': '//td//*[@id="materialType"]'},
+                          'value': "//td//*[@id='materialType']"},
         'article': {'method': 'xpath',
                     'value': '//td//*[@id="article"]'},
         'departments': {'method': 'xpath',
@@ -656,8 +644,6 @@ elements = {
         'suborder_list': {'method': 'class_name',
                           'value': 'flaticon-signs',
                           'order': 0},
-        'suborder_table': {'method': 'id',
-                           'value': 'table-with-add'},
         'add_new_item11': {'method': 'class_name',
                            'value': 'addNewItem',
                            'order': 0},
@@ -680,8 +666,7 @@ elements = {
             'method': 'id',
             'value': 'nofield'
         }
-  },
-
+    },
 
     'header': {
         'header_button': {'method': 'xpath',
