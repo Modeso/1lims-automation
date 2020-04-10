@@ -2109,7 +2109,8 @@ class OrdersTestCases(BaseTest):
         test_unit = self.order_page.set_test_unit()
         self.order_page.set_test_plan(test_plan=selected_test_plan['testPlanName'])
         self.info('duplicated order material is {}, article {}, test_unit {} and test_plan {}'.
-                  format(selected_test_plan['materialType'], article, test_unit, test_plan))
+                  format(selected_test_plan['materialType'], selected_test_plan['article'][0],
+                         test_unit, selected_test_plan['testPlanName']))
         self.order_page.save(save_btn='order:save_btn', sleep=True)
         self.info("navigate to orders' page to make sure that order duplicated correctly with selected data")
         self.order_page.get_orders_page()
