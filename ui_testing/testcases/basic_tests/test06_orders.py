@@ -901,7 +901,6 @@ class OrdersTestCases(BaseTest):
         """
 
         self.base_selenium.LOGGER.info('Running test case to create a new order with test units')
-        diana = self.test_unit_api.get_all_test_units()
         test_units_list = []
         test_unit_dict = self.get_active_tst_unit_with_material_type(search='Qualitative', material_type='All')
         if test_unit_dict:
@@ -916,7 +915,7 @@ class OrdersTestCases(BaseTest):
             self.base_selenium.LOGGER.info('Retrieved test unit ' + test_unit_dict['Test Unit Name'])
             test_units_list.append(test_unit_dict['Test Unit Name'])
         self.order_page.get_orders_page()
-        created_order = self.order_page.create_existing_order(no='',material_type='r', article='a', contact='',
+        created_order = self.order_page.create_existing_order(no='',material_type='s', article='a', contact='',
                                                               test_units=test_units_list)
         self.order_page.get_orders_page()
         self.order_page.navigate_to_analysis_active_table()
