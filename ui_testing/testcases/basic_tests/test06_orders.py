@@ -2105,9 +2105,9 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(self.base_selenium.get_value(element='order:test_unit'), None)
         self.assertEqual(self.base_selenium.get_value(element='order:test_plan'), None)
         self.info('select random article, test unit and test plan')
-        article = self.order_page.set_article(article=selected_test_plan['article'][0])
+        self.order_page.set_article(article=selected_test_plan['article'][0])
         test_unit = self.order_page.set_test_unit()
-        test_plan = self.order_page.set_test_plan(test_plan=selected_test_plan['testPlanName'])
+        self.order_page.set_test_plan(test_plan=selected_test_plan['testPlanName'])
         self.info('duplicated order material is {}, article {}, test_unit {} and test_plan {}'.
                   format(selected_test_plan['materialType'], article, test_unit, test_plan))
         self.order_page.save(save_btn='order:save_btn', sleep=True)
@@ -2122,6 +2122,6 @@ class OrdersTestCases(BaseTest):
         
         self.info('Make sure that suborder data is correct')
         self.assertEqual(suborder_data['Material Type'], selected_test_plan['materialType'])
-        self.assertEqual(suborder_data['Article Name'].replace("'", ""), article)
+        self.assertEqual(suborder_data['Article Name'].replace("'", ""), selected_test_plan['article'][0])
         self.assertEqual(suborder_data['Test Units'], test_unit)
-        self.assertEqual(suborder_data['Test Plans'], test_plan)
+        self.assertEqual(suborder_data['Test Plans'], selected_test_plan['testPlanName'])
