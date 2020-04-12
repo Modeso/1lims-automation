@@ -865,9 +865,12 @@ class OrdersTestCases(BaseTest):
 
         LIMS-3268
         """
-        #random_testunit =  self.test_unit_api.get_all_test_units(filter='{"materialTypes":"All"}')
+        diana = self.test_unit_api.list_testunit_by_name_and_material_type(materialtype_id=0, searchableValue=all)
+        print(diana)
         random_testunit = self.test_unit_api.get_all_test_units(limit=20)
-        diana = random.choice(random_testunit['testUnits'])
+
+
+
         self.order_page.get_orders_page()
         created_order = self.order_page.create_existing_order(no='',material_type='s', article='a', contact='',
                                                               test_units=random_testunit['name'])
