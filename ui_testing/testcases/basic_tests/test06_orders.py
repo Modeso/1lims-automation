@@ -2084,6 +2084,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.search(main_order['orderNo'])
         self.info('duplicate the main order')
         self.order_page.duplicate_main_order_from_order_option()
+        self.order_page.wait_until_page_is_loaded()
         duplicated_order_number = self.order_page.get_order_number()
         self.info('order to be duplicated is {}, new order no is {}'.
                   format(main_order['orderNo'], duplicated_order_number))
@@ -2091,7 +2092,7 @@ class OrdersTestCases(BaseTest):
         
         self.info('get material type of first suborder')
         old_material_type = self.order_page.get_material_type_of_first_suborder()
-        self.info('get completed test plan with differnt material type')
+        self.info('get completed test plan with different material type')
         self.test_plan_api = TestPlanAPI()
         completed_test_plans = self.test_plan_api.get_completed_testplans()
         for test_plan in completed_test_plans:
