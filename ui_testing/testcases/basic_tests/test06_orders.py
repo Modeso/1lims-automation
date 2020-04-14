@@ -865,15 +865,16 @@ class OrdersTestCases(BaseTest):
 
         LIMS-3268
         """
-        diana = self.test_unit_api.list_testunit_by_name_and_material_type(materialtype_id=0, searchableValue=all)
+        #diana = self.test_unit_api.list_testunit_by_name_and_material_type(materialtype_id=0, searchableValue=all)
+        #print(diana)
+        random_testunit, payload = self.test_unit_api.get_all_test_units(filter='{"materialTypes":"all"}')
+        print(random_testunit)
+
+        diana = random.choice(random_testunit['testUnits'])
         print(diana)
-        random_testunit = self.test_unit_api.get_all_test_units(limit=20)
-
-
-
         self.order_page.get_orders_page()
         created_order = self.order_page.create_existing_order(no='',material_type='s', article='a', contact='',
-                                                              test_units=random_testunit['name'])
+                                                              test_units=diana['name'])
         self.order_page.get_orders_page()
         self.order_page.navigate_to_analysis_active_table()
         self.base_selenium.LOGGER.info(
