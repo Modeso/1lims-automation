@@ -2107,23 +2107,9 @@ class OrdersTestCases(BaseTest):
         orders, payload = self.orders_api.get_all_orders(limit=20)
         data_before_duplicate_main_order = random.choice(orders['orders'])
 
-        #filter by this random order
-        order_no = data_before_duplicate_main_order['orderNo']
-        self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no,
-                                              field_type='text')
-        #get order data before duplicate
-        row = self.order_page.get_last_order_row()
-        self.orders_page.open_edit_page(row)
+        self.orders_page.get_order_edit_page_by_id(id=data_before_duplicate_main_order['id'])
         data_before_duplicate = self.order_page.get_suborder_data()
 
-        self.orders_page.get_orders_page()
-
-        self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no,
-                                              field_type='text')
-
-        # get order data after duplicate
-        row = self.order_page.get_last_order_row()
-        self.orders_page.open_edit_page(row)
         self.order_page.duplicate_from_table_view(index_to_duplicate_from=0)
         after_duplicate_order = self.order_page.get_suborder_data()
 
