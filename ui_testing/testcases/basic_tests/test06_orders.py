@@ -13,7 +13,6 @@ from api_testing.apis.contacts_api import ContactsAPI
 from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from ui_testing.pages.contacts_page import Contacts
 from random import randint
-import time
 import random
 
 
@@ -283,18 +282,14 @@ class OrdersTestCases(BaseTest):
         :return:
         """
         # get random order
-        self.base_selenium.LOGGER.info('select random record')
+        self.info('select random record')
         orders, payload = self.orders_api.get_all_orders(limit=20)
         data_before_duplicate_main_order = random.choice(orders['orders'])
 
-        order_no = data_before_duplicate_main_order['orderNo']
-        self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no,
-                                              field_type='text')
-
-        row = self.order_page.get_last_order_row()
-        self.orders_page.open_edit_page(row)
+        self.orders_page.get_order_edit_page_by_id(id=data_before_duplicate_main_order['id'])
         data_before_duplicate = self.order_page.get_suborder_data()
         self.orders_page.get_orders_page()
+        order_no = data_before_duplicate_main_order['orderNo']
         self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no,
                                               field_type='text')
 
@@ -1185,128 +1180,126 @@ class OrdersTestCases(BaseTest):
     # will continue with us & then put the test case number for it
     def test026_update_suborder_article(self):
         self.base_selenium.LOGGER.info('Order created with 4 suborders with the following data')
+        self.base_selenium.LOGGER.info('Material type: {}, Article name: {}, Test plans: {}, Test Units: {}'.format(
+            suborder_data['material_types'], suborder_data['article'], suborder_data['test_plan'],
+            suborder_data['test_unit']))
 
-    # self.base_selenium.LOGGER.info('Material type: {}, Article name: {}, Test plans: {}, Test Units: {}'.format(
-    # suborder_data['material_types'], suborder_data['article'], suborder_data['test_plan'],
-    # suborder_data['test_unit']))
+        self.base_selenium.LOGGER.info(
+            'Change Material type from {}, to {}, and press cancel'.format(suborder_data['material_types'],
+                                                                           new_material_type))
+        self.order_page.update_suborder(sub_order_index=3, material_type=new_material_type, form_view=False)
+        self.base_selenium.LOGGER.info(
+            'Change article from {}, to {}, and press cancel'.format(suborder_data['article'], new_article))
+        self.order_page.update_suborder(sub_order_index=3, articles=new_article, form_view=False)
+        self.base_selenium.click(element='order:confirm_cancel')
 
-    # self.base_selenium.LOGGER.info(
-    # 'Change Material type from {}, to {}, and press cancel'.format(suborder_data['material_types'],
-    #                                                              new_material_type))
-    # self.order_page.update_suborder(sub_order_index=3, material_type=new_material_type, form_view=False)
-    # self.base_selenium.LOGGER.info(
-    # 'Change article from {}, to {}, and press cancel'.format(suborder_data['article'], new_article))
-    # self.order_page.update_suborder(sub_order_index=3, articles=new_article, form_view=False)
-    # self.base_selenium.click(element='order:confirm_cancel')
+        self.base_selenium.LOGGER.info('Getting data after pressing cancel to make sure that it did not change')
 
-    # self.base_selenium.LOGGER.info('Getting data after pressing cancel to make sure that it did not change')
+        suborder_data_after_pressing_cancel = self.order_page.get_suborder_data(sub_order_index=3)
 
-    # suborder_data_after_pressing_cancel = self.order_page.get_suborder_data(sub_order_index=3)
+        self.base_selenium.LOGGER.info('Comparing order data after pressing cancel')
 
-    # self.base_selenium.LOGGER.info('Comparing order data after pressing cancel')
+        self.base_selenium.LOGGER.info(
+            '+Assert Compare Material type, old: {}, new: {}'.format(suborder_data['material_types'],
+                                                                     suborder_data_after_pressing_cancel[
+                                                                         'material_types']))
+        self.assertEqual(suborder_data['material_types'], suborder_data_after_pressing_cancel['material_types'])
 
-    # self.base_selenium.LOGGER.info(
-    # '+Assert Compare Material type, old: {}, new: {}'.format(suborder_data['material_types'],
-    # suborder_data_after_pressing_cancel[
-    # 'material_types']))
-    # self.assertEqual(suborder_data['material_types'], suborder_data_after_pressing_cancel['material_types'])
+        self.base_selenium.LOGGER.info('+Assert Compare Article, old: {}, new: {}'.format(suborder_data['article'],
+                                                                                          suborder_data_after_pressing_cancel[
+                                                                                              'article']))
+        self.assertEqual(suborder_data['article'], suborder_data_after_pressing_cancel['article'])
 
-    # self.base_selenium.LOGGER.info('+Assert Compare Article, old: {}, new: {}'.format(suborder_data['article'],
-    # suborder_data_after_pressing_cancel[
-    #     'article']))
-    # self.assertEqual(suborder_data['article'], suborder_data_after_pressing_cancel['article'])
+        self.base_selenium.LOGGER.info('+Assert Compare Test Plans, old: {}, new: {}'.format(suborder_data['test_plan'],
+                                                                                             suborder_data_after_pressing_cancel[
+                                                                                                 'test_plan']))
+        self.assertEqual(suborder_data['test_plan'], suborder_data_after_pressing_cancel['test_plan'])
 
-    # self.base_selenium.LOGGER.info('+Assert Compare Test Plans, old: {}, new: {}'.format(suborder_data['test_plan'],
-    # suborder_data_after_pressing_cancel[
-    # 'test_plan']))
-    # self.assertEqual(suborder_data['test_plan'], suborder_data_after_pressing_cancel['test_plan'])
+        self.base_selenium.LOGGER.info('+Assert Compare Test units, old: {}, new: {}'.format(suborder_data['test_unit'],
+                                                                                             suborder_data_after_pressing_cancel[
+                                                                                                 'test_unit']))
+        self.assertEqual(suborder_data['test_unit'], suborder_data_after_pressing_cancel['test_unit'])
 
-    # self.base_selenium.LOGGER.info('+Assert Compare Test units, old: {}, new: {}'.format(suborder_data['test_unit'],
-    # suborder_data_after_pressing_cancel[
-    # 'test_unit']))
-    # self.assertEqual(suborder_data['test_unit'], suborder_data_after_pressing_cancel['test_unit'])
+        self.base_selenium.LOGGER.info(
+            'Change article from {}, to {}, and press confirm'.format(suborder_data['article'], new_article))
+        self.order_page.update_suborder(sub_order_index=3, material_type=new_material_type, form_view=False)
+        self.base_selenium.LOGGER.info(
+            'Change article from {}, to {}, and press confirm'.format(suborder_data['article'], new_article))
+        self.order_page.update_suborder(sub_order_index=3, articles=new_article, form_view=False)
+        self.base_selenium.click(element='order:confirm_pop')
 
-    # self.base_selenium.LOGGER.info(
-    #   'Change article from {}, to {}, and press confirm'.format(suborder_data['article'], new_article))
-    # self.order_page.update_suborder(sub_order_index=3, material_type=new_material_type, form_view=False)
-    # self.base_selenium.LOGGER.info(
-    #   'Change article from {}, to {}, and press confirm'.format(suborder_data['article'], new_article))
-    # self.order_page.update_suborder(sub_order_index=3, articles=new_article, form_view=False)
-    # self.base_selenium.click(element='order:confirm_pop')
+        self.base_selenium.LOGGER.info(
+            'Get suborder data to make sure that all the data are removed after pressing confirm')
 
-    # self.base_selenium.LOGGER.info(
-    # 'Get suborder data to make sure that all the data are removed after pressing confirm')
+        suborder_data_after_pressing_confirm = self.order_page.get_suborder_data(sub_order_index=3)
 
-    # suborder_data_after_pressing_confirm = self.order_page.get_suborder_data(sub_order_index=3)
+        self.base_selenium.LOGGER.info('Comparing order data after pressing confirm')
 
-    # self.base_selenium.LOGGER.info('Comparing order data after pressing confirm')
+        self.base_selenium.LOGGER.info(
+            'Empty fields will have the word "Search" as a placeholder, so the results from the table will carry the value "Search" which denotes that the field is empty')
+        self.base_selenium.LOGGER.info('+Assert Compare Material type, old: {}, new: {}'.format(new_material_type,
+                                                                                                suborder_data_after_pressing_confirm[
+                                                                                                    'material_types']))
+        self.assertEqual(new_material_type, suborder_data_after_pressing_confirm['material_types'])
 
-    # self.base_selenium.LOGGER.info(
-    #   'Empty fields will have the word "Search" as a placeholder, so the results from the table will carry the value "Search" which denotes that the field is empty')
-    # self.base_selenium.LOGGER.info('+Assert Compare Material type, old: {}, new: {}'.format(new_material_type,
-    # suborder_data_after_pressing_confirm[
-    # 'material_types']))
-    # self.assertEqual(new_material_type, suborder_data_after_pressing_confirm['material_types'])
+        self.base_selenium.LOGGER.info('+Assert Compare Article, old: {}, new: {}'.format('Search',
+                                                                                          suborder_data_after_pressing_confirm[
+                                                                                              'article']))
+        self.assertEqual('Search', suborder_data_after_pressing_confirm['article'])
 
-    # self.base_selenium.LOGGER.info('+Assert Compare Article, old: {}, new: {}'.format('Search',
-    # suborder_data_after_pressing_confirm[
-    # 'article']))
-    # self.assertEqual('Search', suborder_data_after_pressing_confirm['article'])
+        self.base_selenium.LOGGER.info('+Assert Compare Test Plans, old: {}, new: {}'.format('Search',
+                                                                                             suborder_data_after_pressing_confirm[
+                                                                                                 'test_plan']))
+        self.assertEqual('earch', suborder_data_after_pressing_confirm['test_plan'])
 
-    # self.base_selenium.LOGGER.info('+Assert Compare Test Plans, old: {}, new: {}'.format('Search',
-    # suborder_data_after_pressing_confirm[
-    # 'test_plan']))
-    # self.assertEqual('earch', suborder_data_after_pressing_confirm['test_plan'])
+        self.base_selenium.LOGGER.info('+Assert Compare Test units, old: {}, new: {}'.format('Search',
+                                                                                             suborder_data_after_pressing_confirm[
+                                                                                                 'test_unit']))
+        self.assertEqual('earch', suborder_data_after_pressing_confirm['test_unit'])
 
-    # self.base_selenium.LOGGER.info('+Assert Compare Test units, old: {}, new: {}'.format('Search',
-    # suborder_data_after_pressing_confirm[
-    # 'test_unit']))
-    # self.assertEqual('earch', suborder_data_after_pressing_confirm['test_unit'])
+        self.base_selenium.LOGGER.info('Update data and press save to make sure that it is updated')
 
-    # self.base_selenium.LOGGER.info('Update data and press save to make sure that it is updated')
+        self.order_page.update_suborder(sub_order_index=3, test_plans=[new_testplan_name],
+                                        material_type=new_material_type, articles=new_article, test_units=[''],
+                                        form_view=False)
+        suborder_data_after_changing_data = self.order_page.get_suborder_data(sub_order_index=3)
 
-    # self.order_page.update_suborder(sub_order_index=3, test_plans=[new_testplan_name],
-    # material_type=new_material_type, articles=new_article, test_units=[''],
-    # form_view=False)
-    # suborder_data_after_changing_data = self.order_page.get_suborder_data(sub_order_index=3)
+        self.base_selenium.LOGGER.info('Update test plans from {}, to {}'.format(suborder_data['test_plan'],
+                                                                                 suborder_data_after_changing_data[
+                                                                                     'test_plan']))
 
-    # self.base_selenium.LOGGER.info('Update test plans from {}, to {}'.format(suborder_data['test_plan'],
-    # suborder_data_after_changing_data[
-    # 'test_plan']))
+        self.base_selenium.LOGGER.info(
+            '+Assert Compare Material type, old: {}, new: {}'.format(suborder_data['material_types'],
+                                                                     suborder_data_after_pressing_confirm[
+                                                                         'material_types']))
+        self.assertEqual(suborder_data['material_types'], suborder_data_after_pressing_confirm['material_types'])
 
-    # self.base_selenium.LOGGER.info(
-    # '+Assert Compare Material type, old: {}, new: {}'.format(suborder_data['material_types'],
-    # suborder_data_after_pressing_confirm[
-    # 'material_types']))
-    # self.assertEqual(suborder_data['material_types'], suborder_data_after_pressing_confirm['material_types'])
+        self.base_selenium.LOGGER.info('+Assert Compare Article, old: {}, new: {}'.format(new_article,
+                                                                                          suborder_data_after_pressing_confirm[
+                                                                                              'article']))
+        self.assertEqual(new_article, suborder_data_after_pressing_confirm['article'])
 
-    # self.base_selenium.LOGGER.info('+Assert Compare Article, old: {}, new: {}'.format(new_article,
-    # suborder_data_after_pressing_confirm[
-    # 'article']))
-    # self.assertEqual(new_article, suborder_data_after_pressing_confirm['article'])
+        # written as earch because the function that retrieves the data removes the first char in case of test unit/ test plan to remove the 'x'
+        # so in case no test unit or no test plan, it removes the first char in the placeholder word which is search, so i match with earch
+        self.base_selenium.LOGGER.info('+Assert Compare Test Plans, old: {}, new: {}'.format('Search',
+                                                                                             suborder_data_after_pressing_confirm[
+                                                                                                 'test_plan']))
+        self.assertEqual('earch', suborder_data_after_pressing_confirm['test_plan'])
 
-    # written as earch because the function that retrieves the data removes the first char in case of test unit/ test plan to remove the 'x'
-    # so in case no test unit or no test plan, it removes the first char in the placeholder word which is search, so i match with earch
-    # self.base_selenium.LOGGER.info('+Assert Compare Test Plans, old: {}, new: {}'.format('Search',
-    # suborder_data_after_pressing_confirm[
-    # 'test_plan']))
-    # self.assertEqual('earch', suborder_data_after_pressing_confirm['test_plan'])
+        self.base_selenium.LOGGER.info('+Assert Compare Test units, old: {}, new: {}'.format(suborder_data['test_unit'],
+                                                                                             suborder_data_after_pressing_confirm[
+                                                                                                 'test_unit']))
+        self.assertEqual(suborder_data['test_unit'], suborder_data_after_pressing_confirm['test_unit'])
 
-    # self.base_selenium.LOGGER.info('+Assert Compare Test units, old: {}, new: {}'.format(suborder_data['test_unit'],
-    # suborder_data_after_pressing_confirm[
-    # 'test_unit']))
-    # self.assertEqual(suborder_data['test_unit'], suborder_data_after_pressing_confirm['test_unit'])
+        self.base_selenium.LOGGER.info('Update Test plans and press save to make sure that it is updated')
 
-    # self.base_selenium.LOGGER.info('Update Test plans and press save to make sure that it is updated')
+        self.order_page.update_suborder(sub_order_index=3, test_plans=[new_testplan], form_view=False)
+        suborder_data_after_changing_testplans = self.order_page.get_suborder_data(sub_order_index=3)
 
-    # self.order_page.update_suborder(sub_order_index=3, test_plans=[new_testplan], form_view=False)
-    # suborder_data_after_changing_testplans = self.order_page.get_suborder_data(sub_order_index=3)
-
-    # self.base_selenium.LOGGER.info('Update test plans from {}, to {}'.format(suborder_data['test_plan'],
-    #                                                                        suborder_data_after_changing_testplans[
-    #                                                                           'test_plan']))
-    # self.order_page.save(save_btn="order:save_btn")
-
+        self.base_selenium.LOGGER.info('Update test plans from {}, to {}'.format(suborder_data['test_plan'],
+                                                                                 suborder_data_after_changing_testplans[
+                                                                                     'test_plan']))
+        self.order_page.save(save_btn="order:save_btn")
     ### SYNTAX ERROR ###
     # will continue with us
     # this bug will only affect the delete case, but the adding case is working fine
@@ -1537,84 +1530,83 @@ class OrdersTestCases(BaseTest):
             contacta_after_pressing_cancel = self.order_page.get_contact()
             departmentsa_after_pressing_cancel = self.order_page.get_departments()
 
-    # will continue with us
-    @skip('https://modeso.atlassian.net/browse/LIMS-5070')
-    def test031_user_can_add_suborder_with_test_units(self):
-        """
-        New: Orders: Create Approach: I can create suborder with test unit successfully,
-        make sure the record created successfully in the analysis section.
-        ( create with any type of test unit )
-        LIMS-4255
-        LIMS-4255
-        :return:
-        """
+        # will continue with us
+        @skip('https://modeso.atlassian.net/browse/LIMS-5070')
+        def test031_user_can_add_suborder_with_test_units(self):
+            """
+            New: Orders: Create Approach: I can create suborder with test unit successfully,
+            make sure the record created successfully in the analysis section.
+            ( create with any type of test unit )
+            LIMS-4255
+            LIMS-4255
+            :return:
+            """
 
-        # Go to the order page
-        self.order_page.get_orders_page()
-        order_row = self.order_page.get_random_order_row()
-        order_data = self.base_selenium.get_row_cells_dict_related_to_header(
-            row=order_row)
-        orders_duplicate_data_before, orders = self.order_page.get_orders_duplicate_data(
-            order_no=order_data['Order No.'])
-        orders_records_before = self.order_page.get_table_records()
+            # Go to the order page
+            self.order_page.get_orders_page()
+            order_row = self.order_page.get_random_order_row()
+            order_data = self.base_selenium.get_row_cells_dict_related_to_header(
+                row=order_row)
+            orders_duplicate_data_before, orders = self.order_page.get_orders_duplicate_data(
+                order_no=order_data['Order No.'])
+            orders_records_before = self.order_page.get_table_records()
 
-        self.base_selenium.LOGGER.info(
-            ' + Select random order with {} no.'.format(order_data['Order No.']))
-        self.order_page.get_random_x(orders[0])
-        order_url = self.base_selenium.get_url()
-        self.base_selenium.LOGGER.info(' + Order url : {}'.format(order_url))
-        # create order with random data
-        self.order_page.create_new_suborder_with_test_units(material_type='Raw Material', article_name='a',
-                                                            test_unit='')
-        self.order_page.save(save_btn='order:save_btn')
+            self.base_selenium.LOGGER.info(
+                ' + Select random order with {} no.'.format(order_data['Order No.']))
+            self.order_page.get_random_x(orders[0])
+            order_url = self.base_selenium.get_url()
+            self.base_selenium.LOGGER.info(' + Order url : {}'.format(order_url))
+            # create order with random data
+            self.order_page.create_new_suborder_with_test_units(material_type='Raw Material', article_name='a',
+                                                                test_unit='')
+            self.order_page.save(save_btn='order:save_btn')
 
-        # filter one more time to make sure new record added to the active table
-        self.order_page.get_orders_page()
-        orders_duplicate_data_after, _ = self.order_page.get_orders_duplicate_data(
-            order_no=order_data['Order No.'])
-        orders_records_after = self.order_page.get_table_records()
+            # filter one more time to make sure new record added to the active table
+            self.order_page.get_orders_page()
+            orders_duplicate_data_after, _ = self.order_page.get_orders_duplicate_data(
+                order_no=order_data['Order No.'])
+            orders_records_after = self.order_page.get_table_records()
 
-        self.base_selenium.LOGGER.info(
-            ' + Assert there is a new suborder with the same order no.')
-        self.assertEqual(orders_records_after, orders_records_before + 1)
+            self.base_selenium.LOGGER.info(
+                ' + Assert there is a new suborder with the same order no.')
+            self.assertEqual(orders_records_after, orders_records_before + 1)
 
-        # go to the analysis section to make sure new analysis record created successfully
-        self.analyses_page.get_analyses_page()
-        self.base_selenium.LOGGER.info('Filter by order no to make sure that the analysis was not deleted')
+            # go to the analysis section to make sure new analysis record created successfully
+            self.analyses_page.get_analyses_page()
+            self.base_selenium.LOGGER.info('Filter by order no to make sure that the analysis was not deleted')
 
-        # analysis_records = self.analyses_page.search(value=order_no)
-        # analysis_count = len(analysis_records) - 1
+            analysis_records = self.analyses_page.search(value=order_no)
+            analysis_count = len(analysis_records) - 1
 
-        # self.base_selenium.LOGGER.info(
-        # '+ Assert count of analysis is: {}, and it should be {}'.format(analysis_count, 2))
-        # self.assertEqual(2, analysis_count)
+            self.base_selenium.LOGGER.info(
+                '+ Assert count of analysis is: {}, and it should be {}'.format(analysis_count, 2))
+            self.assertEqual(2, analysis_count)
 
-        # making sure that the new test unit is added to the order's analysis no with the same analysis no not new number
-        # selected_analysis_data = self.base_selenium.get_row_cells_dict_related_to_header(row=analysis_records[0])
-        # analysis_no_from_analysis_table_after_update = selected_analysis_data['Analysis No.']
-        # self.base_selenium.LOGGER.info('Making sure that when test plan is deleted, analysis number did not change')
-        # self.base_selenium.LOGGER.info(
-        # '+ Assert analysis no before update is: {}, and analysis number after update is: {}'.format(
-        # analysis_no_from_analysis_table_after_update, analysis_no))
-        # self.assertEqual(analysis_no_from_analysis_table_after_update, analysis_no)
+            # making sure that the new test unit is added to the order's analysis no with the same analysis no not new number
+            selected_analysis_data = self.base_selenium.get_row_cells_dict_related_to_header(row=analysis_records[0])
+            analysis_no_from_analysis_table_after_update = selected_analysis_data['Analysis No.']
+            self.base_selenium.LOGGER.info('Making sure that when test plan is deleted, analysis number did not change')
+            self.base_selenium.LOGGER.info(
+                '+ Assert analysis no before update is: {}, and analysis number after update is: {}'.format(
+                    analysis_no_from_analysis_table_after_update, analysis_no))
+            self.assertEqual(analysis_no_from_analysis_table_after_update, analysis_no)
 
-        # making sure that the status remained open after adding new test unit
-        self.base_selenium.LOGGER.info('Getting analysis status after removing test plan to make sure that it is Open')
+            # making sure that the status remained open after adding new test unit
+            self.base_selenium.LOGGER.info(
+                'Getting analysis status after removing test plan to make sure that it is Open')
+            analysis_status_after_update = selected_analysis_data['Status']
 
-    # analysis_status_after_update = selected_analysis_data['Status']
+            self.base_selenium.LOGGER.info(
+                '+ Assert analysis status is {}, and it should be {}'.format(analysis_status_after_update, 'Open'))
+            self.assertEqual(analysis_status_after_update, 'Open')
 
-    # self.base_selenium.LOGGER.info(
-    # '+ Assert analysis status is {}, and it should be {}'.format(analysis_status_after_update, 'Open'))
-    # self.assertEqual(analysis_status_after_update, 'Open')
-
-    # getting tezt plan value to make sure that it is equal to the one form order's
-    # analysis_test_plan_after_update = selected_analysis_data['Test Plans']
-    # self.base_selenium.LOGGER.info('Getting test plan from analysis to make sure test plans have been removed')
-    # self.base_selenium.LOGGER.info(
-    # '+ Assert test plan is: {}, and it should be {}'.format(analysis_test_plan_after_update,
-    # suborder_testplans[1]))
-    # self.assertEqual(analysis_test_plan_after_update, suborder_testplans[1])
-
+            # getting tezt plan value to make sure that it is equal to the one form order's
+            analysis_test_plan_after_update = selected_analysis_data['Test Plans']
+            self.base_selenium.LOGGER.info('Getting test plan from analysis to make sure test plans have been removed')
+            self.base_selenium.LOGGER.info(
+                '+ Assert test plan is: {}, and it should be {}'.format(analysis_test_plan_after_update,
+                                                                        suborder_testplans[1]))
+            self.assertEqual(analysis_test_plan_after_update, suborder_testplans[1])
     ### SYNTAX ERROR ###
     # will continue with us ( apply it from the second order & need diff test case number for it
     # @parameterized.expand(['save_btn', 'cancel'])
