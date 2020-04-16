@@ -2213,7 +2213,8 @@ class OrdersTestCases(BaseTest):
         LIMS-6852
         """
         self.info('create order data multiple testplans and test units')
-        api, payload = self.orders_api.create_new_order()
-        self.info(api)
+        response, payload = self.orders_api.create_new_order()
+        import ipdb; ipdb.set_trace()
+        self.info(response)
 
 

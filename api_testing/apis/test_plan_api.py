@@ -8,7 +8,7 @@ class TestPlanAPIFactory(BaseAPI):
         api = '{}{}'.format(self.url, self.END_POINTS['test_plan_api']['list_all_test_plans'])
         _payload = {"sort_value": "number",
                     "limit": 100,
-                    "start": 1,
+                    "start": 0,
                     "sort_order": "DESC",
                     "filter": "{}",
                     "deleted": "0"}
@@ -34,7 +34,7 @@ class TestPlanAPIFactory(BaseAPI):
         api = '{}{}'.format(self.url, self.END_POINTS['test_plan_api']['list_testplan_testunits'])
         _payload = {"sort_value": "id",
                     "limit": 100,
-                    "start": 1,
+                    "start": 0,
                     "sort_order": "DESC",
                     "filter": '{"id": ' + str(id) + '}'
                     }
