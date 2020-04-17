@@ -865,16 +865,12 @@ class OrdersTestCases(BaseTest):
 
         LIMS-3268
         """
-        #diana = self.test_unit_api.list_testunit_by_name_and_material_type(materialtype_id=0, searchableValue=all)
-        #print(diana)
         random_testunit, payload = self.test_unit_api.get_all_test_units(filter='{"materialTypes":"all"}')
-        print(random_testunit)
+        random_name = random.choice(random_testunit['testUnits'])
 
-        diana = random.choice(random_testunit['testUnits'])
-        print(diana)
         self.order_page.get_orders_page()
         created_order = self.order_page.create_existing_order(no='',material_type='s', article='a', contact='',
-                                                              test_units=diana['name'])
+                                                              test_units=[random_name['name']])
         self.order_page.get_orders_page()
         self.order_page.navigate_to_analysis_active_table()
         self.base_selenium.LOGGER.info(
@@ -892,7 +888,7 @@ class OrdersTestCases(BaseTest):
                                                                                        table_element='general:table_child')
             testunit_name = row_with_headers['Test Unit']
             self.base_selenium.LOGGER.info(" + Test unit : {}".format(testunit_name))
-            self.assertIn(testunit_name, test_units_list)
+            self.assertIn(testunit_name, random_name['name'])
   
     def test022_create_existing_order_with_test_units_and_change_material_type(self):
         """
