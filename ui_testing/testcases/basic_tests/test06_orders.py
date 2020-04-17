@@ -13,7 +13,6 @@ from api_testing.apis.contacts_api import ContactsAPI
 from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from ui_testing.pages.contacts_page import Contacts
 from random import randint
-import time
 import random
 
 
@@ -199,21 +198,16 @@ class OrdersTestCases(BaseTest):
         order_data = random.choice(orders['orders'])
 
         order_no = order_data['orderNo']
-        self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no, field_type='text')
-        suborders_data = self.order_page.get_child_table_data(index=0)
+        self.order_page.search(order_no)
+        suborders_data = self.order_page.get_child_table_data()[0]
         self.order_page.restore_table_suborder(index=0)
         self.base_selenium.LOGGER.info('make sure that suborder is restored successfully')
-        if len(suborders_data) > 1:
-            suborder_data_after_restore = self.order_page.get_table_data()
-            self.assertNotEqual(suborder_data_after_restore[0], suborders_data[0])
-        else:
-            table_records_count = len(self.order_page.result_table()) -1
-            self.assertEqual(table_records_count, 0)
 
         self.order_page.get_active_items()
-        self.order_page.search(order_no)
-        results = self.order_page.result_table()[0].text
-        self.assertIn(order_no.replace("'", ""), results.replace("'", ""))
+        row = self.order_page.search(suborders_data['Analysis No.'])[0]
+        result = self.base_selenium.get_row_cells_dict_related_to_header(
+            row=row, table_element='general:table_child')
+        self.assertTrue(row, result)
       
     # will continue with us 
     def test006_deleted_archived_order(self):
@@ -985,21 +979,16 @@ class OrdersTestCases(BaseTest):
         order_data = random.choice(orders['orders'])
 
         order_no = order_data['orderNo']
-        self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no, field_type='text')
-        suborders_data = self.order_page.get_child_table_data(index=0)
+        self.order_page.search(order_no)
+        suborders_data = self.order_page.get_child_table_data()[0]
         self.order_page.archive_table_suborder(index=0)
         self.base_selenium.LOGGER.info('make sure that suborder is archived successfully')
-        if len(suborders_data) > 1:
-            suborder_data_after_archive = self.order_page.get_table_data()
-            self.assertNotEqual(suborder_data_after_archive[0], suborders_data[0])
-        else:
-            table_records_count = len(self.order_page.result_table()) -1
-            self.assertEqual(table_records_count, 0)
 
         self.order_page.get_archived_items()
-        self.order_page.search(order_no)
-        results = self.order_page.result_table()[0].text
-        self.assertIn(order_no.replace("'", ""), results.replace("'", ""))
+        row = self.order_page.search(suborders_data['Analysis No.'])[0]
+        result= self.base_selenium.get_row_cells_dict_related_to_header(
+            row=row, table_element='general:table_child')
+        self.assertTrue(row, result)
 
     # will continue with us 
     @skip('https://modeso.atlassian.net/browse/LIMS-4914')
@@ -1333,7 +1322,7 @@ class OrdersTestCases(BaseTest):
     ### SYNTAX ERROR ###
 
     # will continue with us apply it from the second suborder & need test case number for it to apply from the second suborder
-   # @parameterized.expand(['save_btn', 'cancel'])
+    @parameterized.expand(['save_btn', 'cancel'])
     def test025_update_contact_departments(self, save):
         """
         Orders: department Approach: In case I update the department then press on save button
