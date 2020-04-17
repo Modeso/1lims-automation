@@ -283,7 +283,8 @@ class OrdersTestCases(BaseTest):
         """
         # get random order
         self.info('select random record')
-        orders, payload = self.orders_api.get_all_orders(limit=20)
+        orders, payload = self.orders_api.get_all_suborders()
+        print(orders)
         data_before_duplicate_main_order = random.choice(orders['orders'])
 
         self.orders_page.get_order_edit_page_by_id(id=data_before_duplicate_main_order['id'])
@@ -1425,7 +1426,7 @@ class OrdersTestCases(BaseTest):
     ### SYNTAX ERROR ###
 
     # will continue with us apply it from the second suborder & need test case number for it to apply from the second suborder
-    # @parameterized.expand(['save_btn', 'cancel'])
+    @parameterized.expand(['save_btn', 'cancel'])
     def test025_update_contact_departments(self, save):
         """
         Orders: department Approach: In case I update the department then press on save button
