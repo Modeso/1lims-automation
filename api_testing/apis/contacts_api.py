@@ -1,8 +1,9 @@
 from api_testing.apis.base_api import BaseAPI
-import json
+from api_testing.apis.base_api import api_factory
 
 
-class ContactsAPI(BaseAPI):
+class ContactsAPIFactory(BaseAPI):
+    @api_factory('get')
     def get_all_contacts(self, **kwargs):
         api = '{}{}'.format(self.url, self.END_POINTS['contacts_api']['list_all_contacts'])
         _payload = {"sort_value": "companyNo",
@@ -11,143 +12,128 @@ class ContactsAPI(BaseAPI):
                     "sort_order": "DESC",
                     "filter": "{}",
                     "deleted": "0"}
-        payload = self.update_payload(_payload, **kwargs)
-        self.info('GET : {}'.format(api))
-        response = self.session.get(api, params=payload, headers=self.headers, verify=False)
-        self.info('Status code: {}'.format(response.status_code))
-        return response
+        return api, _payload
 
+    @api_factory('get')
+    def get_table_fields(self, component_id):
+        api = '{}{}{}/'.format(self.url, self.END_POINTS['contacts_api']['get_table_fields'], component_id)
+        return api, {}
+
+    @api_factory('get')
+    def get_contact_form_data(self, id=1):
+        api = '{}{}{}'.format(self.url, self.END_POINTS['contacts_api']['form_data'], str(id)) 
+        return api, {}
+
+    @api_factory('put')
+    def archive_contacts(self, ids=['1']):
+        """
+        if success, response['message'] == 'delete_success'
+        :param ids:
+        :return:
+        """
+        api = '{}{}{}'.format(self.url, self.END_POINTS['contacts_api']['archive_contacts'], ','.join(ids)) 
+        return api, {}
+
+    @api_factory('put')
+    def restore_contacts(self, ids=['1']):
+        """
+        if success, response['message']=='restore_success'
+        :param ids:
+        :return:
+        """
+        api = '{}{}{}'.format(self.url, self.END_POINTS['contacts_api']['restore_contacts'], ','.join(ids)) 
+        return api, {}
+
+    @api_factory('delete')
+    def delete_archived_contact(self, id=1):
+        """
+        if success, response['message']=='hard_delete_success'
+        :param id:
+        :return:
+        """
+        api = '{}{}{}'.format(self.url, self.END_POINTS['contacts_api']['delete_contact'], str(id)) 
+        return api, {}
+
+    @api_factory('post')
+    def create_contact(self, **kwargs):
+        """
+        minimum require parameters:
+            Param: companyNo: denoted company no
+            Param: name: denotes contact name
+
+        Param: departments: array denotes the contact's departments and each element consist of 
+        {
+            "display": department displayed name,
+            "value": department saved value,
+            "id": in case of update put department id, in case of create put 'new',
+            "text": text of the department display,
+        }
+        Param: address: denotes contact address
+        Param: postalCode: denotes contact postal code
+        Param: location: denotes contact location
+        Param: selectedCountry: denotes contact selected country and it is object 
+        {
+            "id": country id,
+            "text": country displayed text,
+            "code": country code
+        }
+        Param: email: denotes contact email
+        Param: phone: denotes contact phone
+        Param: skype: denotes contact skype
+        Param: website: denotes contact website
+        Param: isLaboratory: True/False
+        Param: isSupplier: True/False
+        Param: isClient: True/False
+        Param: country: text of the selected country
+        
+        contact persons parameters
+        Param: persons: array and each element consist of the following
+            Param: "name": contact person name
+            Param: "position": contact person position 
+            Param: "email": contact person email 
+            Param: "phone": contact person phone 
+            Param: "skype": contact person skype 
+            Param: "moreInfo": contact person information field
+        """
+        random_contact_departments = self.generate_random_string()
+        _payload = {
+            "departments": [
+                {
+                    "display": random_contact_departments,
+                    "value": random_contact_departments,
+                    "id": "new",
+                    "text": random_contact_departments
+                }
+            ],
+            "departmentArray": [],
+            "persons": [],
+            "companyNo": self.generate_random_number(),
+            "name": self.generate_random_string(),
+            "isSupplier": "true",
+            "country": "",
+            "dynamicFieldsValues": []
+            }
+
+        api = '{}{}'.format(self.url, self.END_POINTS['contacts_api']['create_contact'])
+        return api, {}
+
+
+class ContactsAPI(ContactsAPIFactory):
     def get_first_record_with_data_in_attribute(self, attribute):
-        contacts_request = self.get_all_contacts().json()
+        contacts_request, _ = self.get_all_contacts()
         if (contacts_request['status'] != 1) or (contacts_request['count'] == 0):
             return False
         contacts_records = contacts_request['contacts']
         for contact in contacts_records:
             if contact[attribute] != '':
                 return contact[attribute]
-    
-    def get_table_fields(self, component_id):
-        api = '{}{}{}/'.format(self.url, self.END_POINTS['contacts_api']['get_table_fields'], component_id)
-        self.info('GET : {}'.format(api))
-        response = self.session.get(api, headers=self.headers, verify=False)
-        self.info('Status code: {}'.format(response.status_code))
-        parsed_response = response.json()
-        if parsed_response['status'] == 1:
-            return parsed_response['fields']
-        else:
-            return []
-
-    def get_contact_form_data(self, id=1):
-        api = '{}{}{}'.format(self.url, self.END_POINTS['contacts_api']['form_data'], str(id)) 
-        self.info('GET : {}'.format(api))
-        response = self.session.get(api, params='', headers=self.headers, verify=False)
-        self.info('Status code: {}'.format(response.status_code))
-        data = response.json()
-        if data['status'] == 1:
-            return data['contact']
-        else:
-            return False
-    
-    def archive_contacts(self, ids=['1']):
-        api = '{}{}{}'.format(self.url, self.END_POINTS['contacts_api']['archive_contacts'], ','.join(ids)) 
-        self.info('PUT : {}'.format(api))
-        response = self.session.put(api, params='', headers=self.headers, verify=False)
-        self.info('Status code: {}'.format(response.status_code))
-        data = response.json()
-        if data['status'] == 1 and data['message'] == 'delete_success':
-            return True
-        else:
-            return False
-    
-    def restore_contacts(self, ids=['1']):
-        api = '{}{}{}'.format(self.url, self.END_POINTS['contacts_api']['restore_contacts'], ','.join(ids)) 
-        self.info('PUT : {}'.format(api))
-        response = self.session.put(api, params='', headers=self.headers, verify=False)
-        self.info('Status code: {}'.format(response.status_code))
-        data = response.json()
-        if data['status'] == 1 and data['message']=='restore_success':
-            return True
-        else:
-            return False
-    
-    def delete_archived_contact(self, id=1):
-        api = '{}{}{}'.format(self.url, self.END_POINTS['contacts_api']['delete_contact'], str(id)) 
-        self.info('DELETE : {}'.format(api))
-        response = self.session.delete(api, params='', headers=self.headers, verify=False)
-        self.info('Status code: {}'.format(response.status_code))
-        data = response.json()
-        if data['status'] == 1 and data['message']=='hard_delete_success':
-            return True
-        else:
-            return False
 
     def delete_active_contact(self, id=1):
-        if self.archive_contacts(ids=[str(id)]):
-            if self.delete_archived_contact(id=id):
+        if self.archive_contacts(ids=[str(id)])[0]['message'] == 'delete_success':
+            if self.delete_archived_contact(id=id)[0]['message']=='hard_delete_success':
                 return True
             else:
                 self.restore_contacts(ids=[str(id)])
                 return False
         else:
             return False
-
-    # kwargs are the arguments used in the request body
-    # departments: array denotes the contact's departments and each element consist of 
-    # {
-    # "display": department displayed name
-    # "value": department saved value
-    # "id": in case of update put department id, in case of create put 'new'
-    # "text": text of the department display
-    # }
-    # companyNo: denoted company no
-    # name: denotes contact name
-    # address: denotes contact address
-    # postalCode: denotes contact postal code
-    # location: denotes contact location
-    # selectedCountry: denotes contact selected country and it is object 
-    # {
-    # "id": country id,
-    # "text": country displayed text,
-    # "code": country code
-    # }
-    # email: denotes contact email
-    # phone: denotes contact phone
-    # skype: denotes contact skype
-    # website: denotes contact website
-    # isLaboratory: True/False
-    # isSupplier: True/False
-    # isClient: True/False
-    # country: text of the selected country
-    # persons: array and each element consist of the following
-    # {
-    # "name": contact person name
-    # "position": contact person position 
-    # "email": contact person email 
-    # "phone": contact person phone 
-    # "skype": contact person skype 
-    # "moreInfo": contact person information field
-    # }
-    def create_contact(self, **kwargs):
-        request_body = {}
-        request_body['departments'] = []
-        request_body['departmentArray'] = []
-        request_body['persons'] = []
-        request_body['country'] = ''
-        request_body['dynamicFieldsValues'] = []
-        for key in kwargs:
-            request_body[key] = kwargs[key]
-
-        
-        api = '{}{}'.format(self.url, self.END_POINTS['contacts_api']['create_contact']) 
-        self.info('POST : {}'.format(api))
-        response = self.session.post(api, json=request_body, params='', headers=self.headers, verify=False)
-
-        self.info('Status code: {}'.format(response.status_code))
-        data = response.json()
-        
-        if data['status'] == 1:
-            return data['company']
-        else:
-            return data['message']
-
-            
