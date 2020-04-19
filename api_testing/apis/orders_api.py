@@ -238,34 +238,3 @@ class OrdersAPI(OrdersAPIFactory):
             if len(suborder) > 1:
                 return order
 
-    def create_order_with_double_test_plans(self):
-        testplan = random.choice(TestPlanAPI().get_completed_testplans())
-        material_type = testplan['materialType']
-        material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
-        article = testplan['article'][0]
-        article_api = ArticleAPI()
-        if article == "all":
-            res, _ = article_api.get_all_articles(limit=20)
-        else:
-            res, _ = article_api.quick_search_article(name=article)
-        article_id = res['articles'][0]['id']
-        testunit = random.choice(TestUnitAPI().list_testunit_by_name_and_material_type(
-            materialtype_id=material_type_id)[0]['testUnits'])
-
-        testplan2 = random.choice(TestPlanAPI().get_completed_testplans_with_material_and_same_article(
-            material_type=material_type, article=article))
-        testplan_list = [testplan, testplan2]
-
-        testunit2 = random.choice(TestUnitAPI().list_testunit_by_name_and_material_type(
-            materialtype_id=material_type_id)[0]['testUnits'])
-        testunit_list = [testunit, testunit2]
-
-        payload = {
-            'testPlans': testplan_list,
-            'testUnits': testunit_list,
-            'materialType': {"id": material_type_id, "text": material_type},
-            'materialTypeId': material_type_id,
-            'article': {'id': article_id, 'text': article},
-            'articleId': article_id
-        }
-        return self.create_new_order(payload)

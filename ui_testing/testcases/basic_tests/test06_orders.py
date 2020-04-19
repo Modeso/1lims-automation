@@ -2206,15 +2206,6 @@ class OrdersTestCases(BaseTest):
                                                  filter_text=suborder_data['Analysis No.'], field_type='text')
         self.assertEqual(len(self.order_page.result_table()), 1)
 
-    def test036_Duplicate_sub_order_with_multiple_testplans_and_testunits_delet_approach(self):
-        """
-        Duplicate suborder Approach: Duplicate any sub order then delete the units & test plans
 
-        LIMS-6852
-        """
-        self.info('create order data multiple testplans and test units')
-        response, payload = self.orders_api.create_new_order()
-        import ipdb; ipdb.set_trace()
-        self.info(response)
 
 
