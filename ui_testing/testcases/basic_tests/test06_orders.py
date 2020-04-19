@@ -276,6 +276,7 @@ class OrdersTestCases(BaseTest):
             self.assertEqual(row_data[column].replace("'", '').split(',')[0],
                              search_data[column].replace("'", '').split(',')[0])
 
+# we have an issue that we need an data after duplicate tkon bl order number algded wl analysis algeda after saving process wba2y al assert
     def test008_duplicate_main_order(self):
         """
         New: Orders with test units: Duplicate an order with test unit 1 copy
@@ -289,7 +290,10 @@ class OrdersTestCases(BaseTest):
         print(data_before_duplicate_main_order)
 
         self.orders_page.get_order_edit_page_by_id(id=data_before_duplicate_main_order['id'])
-        data_before_duplicate = self.orders_api.get_suborder_by_order_id(id=data_before_duplicate_main_order['id'])
+
+        before_duplicate_data, payload = self.orders_api.get_suborder_by_order_id(id=data_before_duplicate_main_order['id'])[0]['orders']
+
+        print(before_duplicate_data)
         self.orders_page.get_orders_page()
         order_no = data_before_duplicate_main_order['orderNo']
         self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no,
@@ -297,28 +301,22 @@ class OrdersTestCases(BaseTest):
 
         row = self.order_page.get_last_order_row()
         self.order_page.click_check_box(source=row)
-
         # duplicate the main order
         self.order_page.duplicate_main_order_from_table_overview()
-        # get the new order data
         #after_duplicate_order = self.order_page.get_suborder_data()
-        after_duplicate_order = self.orders_api.get_suborder_by_order_id(id=data_before_duplicate_main_order['id'])
+        # get the data after the duplication
+        after_duplicate_order, payload = self.orders_api.get_suborder_by_order_id(id=data_before_duplicate_main_order['id'])[0]['orders']
+        print(after_duplicate_order)
 
-        #for index in range(len(data_before_duplicate['suborders'])):
-            # ignore analysis no. since it won't be created in the form until saving
-            #data_before_duplicate['suborders'][index]['analysis_no'] = ''
-            # ignore testunit numbers since the table view only got the name
-            #for testunit in after_duplicate_order['suborders'][index]['testunits']:
-               # testunit['no'] = None
 
         # make sure that its the duplication page
         self.assertTrue('duplicateMainOrder' in self.base_selenium.get_url())
         # make sure that the new order has different order No
-        self.assertNotEqual(data_before_duplicate_main_order['orderNo'], after_duplicate_order)
-        # compare the contacts
-        self.assertCountEqual(data_before_duplicate['contacts'], after_duplicate_order['contacts'])
+        self.assertNotEqual(data_before_duplicate_main_order['orderNo'], after_duplicate_order['orderNo'][0])
         # compare the data of suborders data in both orders
-        self.assertCountEqual(data_before_duplicate['suborders'], after_duplicate_order['suborders'])
+        self.assertEqual(before_duplicate_data['article'], after_duplicate_order['article'])
+        self.assertEqual(before_duplicate_data['articleNo'], after_duplicate_order['articleNo'])
+        self.assertEqual(before_duplicate_data['materialType'], after_duplicate_order['materialType'])
 
         # save the duplicated order
         self.order_page.save(save_btn='orders:save_order')
