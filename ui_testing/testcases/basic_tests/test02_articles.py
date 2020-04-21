@@ -342,6 +342,7 @@ class ArticlesTestCases(BaseTest):
         self.article_page.filter_article_by(filter_element='article:filter_test_plan',
                                             filter_text=self.test_plan.test_plan_name, field_type="drop_down")
         article = self.article_page.result_table()[0]
+        print(article)
         self.article_page.info('Assert user could filter with test plan.')
         self.assertIn(self.test_plan.test_plan_name, article.text)
 

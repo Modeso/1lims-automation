@@ -193,22 +193,29 @@ class OrdersTestCases(BaseTest):
         I can restore any order successfully
         LIMS-4374
         """
-        self.order_page.get_archived_items()
-        orders, payload = self.orders_api.get_all_orders(deleted=1)
-        order_data = random.choice(orders['orders'])
+        self.orders_page.get_archived_items()
+        orders, payload = self.orders_api.get_all_orders(deleted=1, limit=20)
+        order = random.choice(orders['orders'])
 
-        order_no = order_data['orderNo']
-        self.order_page.search(order_no)
-        suborders_data = self.order_page.get_child_table_data()[0]
+        order_no = order['orderNo']
+        self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no,
+                                              field_type='text')
+        suborders_data = self.order_page.get_child_table_data(index=0)
         self.order_page.restore_table_suborder(index=0)
-        self.base_selenium.LOGGER.info('make sure that suborder is restored successfully')
+        self.info('make sure that suborder is restored successfully')
+        if len(suborders_data) > 1:
+            suborder_data_after_restore = self.order_page.get_table_data()
+            self.assertNotEqual(suborder_data_after_restore[0], suborders_data[0])
+        else:
+            table_records_count = len(self.order_page.result_table()) - 1
+            self.assertEqual(table_records_count, 0)
 
-        self.order_page.get_active_items()
-        row = self.order_page.search(suborders_data['Analysis No.'])[0]
-        result = self.base_selenium.get_row_cells_dict_related_to_header(
-            row=row, table_element='general:table_child')
-        self.assertTrue(row, result)
-      
+        self.orders_page.get_orders_page()
+        analysis_no = self.order_page.search(suborders_data[0]['Analysis No.'])
+        self.single_analysis_page.open_child_table(source=analysis_no[0])
+        results = self.order_page.result_table(element='general:table_child')[0].text
+        self.assertIn(suborders_data[0]['Analysis No.'].replace("'", ""), results.replace("'", ""))
+
     # will continue with us 
     def test006_deleted_archived_order(self):
         """
@@ -970,25 +977,33 @@ class OrdersTestCases(BaseTest):
 
     def test024_archive_sub_order(self):
         """
-        New: Orders: Table:  Suborder /Archive Approach: : User can archive any suborder successfully 
+        New: Orders: Table:  Suborder /Archive Approach: : User can archive any suborder successfully
         LIMS-3739
         LIMS-6518
         """
-        self.base_selenium.LOGGER.info('select random record')
-        orders, payload = self.orders_api.get_all_orders(limit=20)
-        order_data = random.choice(orders['orders'])
+        orders, payload = self.orders_api.get_all_orders(limit =20)
+        order = random.choice(orders['orders'])
 
-        order_no = order_data['orderNo']
-        self.order_page.search(order_no)
-        suborders_data = self.order_page.get_child_table_data()[0]
+        order_no = order['orderNo']
+        self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no,
+                                              field_type='text')
+        suborders_data = self.order_page.get_child_table_data(index=0)
         self.order_page.archive_table_suborder(index=0)
-        self.base_selenium.LOGGER.info('make sure that suborder is archived successfully')
+        self.info('make sure that suborder is archived successfully')
+        if len(suborders_data) > 1:
+            suborder_data_after_restore = self.order_page.get_table_data()
+            self.assertNotEqual(suborder_data_after_restore[0], suborders_data[0])
+        else:
+            table_records_count = len(self.order_page.result_table()) - 1
+            self.assertEqual(table_records_count, 0)
 
-        self.order_page.get_archived_items()
-        row = self.order_page.search(suborders_data['Analysis No.'])[0]
-        result= self.base_selenium.get_row_cells_dict_related_to_header(
-            row=row, table_element='general:table_child')
-        self.assertTrue(row, result)
+        self.base_selenium.refresh()
+        self.orders_page.get_archived_items()
+        analysis_no = self.order_page.search(suborders_data[0]['Analysis No.'])
+        self.orders_page.open_child_table(source=analysis_no[0])
+        results = self.order_page.result_table(element='general:table_child')[0].text
+        self.assertIn(suborders_data[0]['Analysis No.'].replace("'", ""), results.replace("'", ""))
+
 
     # will continue with us 
     @skip('https://modeso.atlassian.net/browse/LIMS-4914')
