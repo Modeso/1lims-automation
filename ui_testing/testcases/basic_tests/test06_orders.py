@@ -2196,6 +2196,8 @@ class OrdersTestCases(BaseTest):
 
          LIMS-6853
         """
+        self.orders_page.get_orders_page()
+        self.order_page.create_new_order(contact='a', material_type='r', article='a', test_units=['q'])
         self.info('get random order with multiple suborders')
         order = self.orders_api.get_order_with_multiple_sub_orders()
         self.order_page.search(order['orderNo'])
