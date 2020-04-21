@@ -2216,5 +2216,13 @@ class OrdersTestCases(BaseTest):
         response, payload = self.orders_api.create_order_with_double_test_plans()
         import ipdb; ipdb.set_trace()
         self.info(response)
+        main_order = response['orders']
+        self.orders_page.filter_by_order_no(main_order['orderNo'])
+        self.orders_page.get_child_table_data()
+        self.info("duplicate the sub order of order {} from suborder's options".format(main_order['orderNo']))
+        self.orders_page.duplicate_sub_order_from_table_overview()
+
+
+
 
 

@@ -516,7 +516,6 @@ class TstUnit(TstUnits):
 
     def map_testunit_to_testplan_format(self, testunit, order=0):
         testunit_formated = {}
-        import ipdb;ipdb.set_trace()
         testunit_formated['id'] = testunit['id']
         testunit_formated['comment'] = testunit['comment']
         testunit_formated['testUnitTypeId'] = testunit['type']['id']
@@ -574,7 +573,7 @@ class TstUnit(TstUnits):
             testunit_formated['mibiValue'] = testunit['upperLimit']
             testunit_formated['quantificationUpperLimit'] = ''
             testunit_formated['quantificationLowerLimit'] = ''
-            testunit_formated['concentrations'] = testunit['concentrations']
+            testunit_formated['concentrations'] = testunit['concentrationsNames']
             testunit_formated['textValue'] = ''
             return testunit_formated
 

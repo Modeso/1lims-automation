@@ -50,21 +50,20 @@ class OrdersAPIFactory(BaseAPI):
         :param kwargs:
         :return: response, payload
         """
-
         order_no = self.get_auto_generated_order_no()[0]['id']
-        if 'testplan' not in kwargs.keys():
-            testplan = random.choice(TestPlanAPI().get_completed_testplans())
-            material_type = testplan['materialType']
-            material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
-            article = testplan['article'][0]
-            article_api = ArticleAPI()
-            if article == "all":
-                res, _ = article_api.get_all_articles(limit=20)
-            else:
-                res, _ = article_api.quick_search_article(name=article)
-            article_id = res['articles'][0]['id']
-            testunit = random.choice(TestUnitAPI().list_testunit_by_name_and_material_type(
-                materialtype_id=material_type_id)[0]['testUnits'])
+
+        testplan = random.choice(TestPlanAPI().get_completed_testplans())
+        material_type = testplan['materialType']
+        material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
+        article = testplan['article'][0]
+        article_api = ArticleAPI()
+        if article == "all":
+            res, _ = article_api.get_all_articles(limit=20)
+        else:
+            res, _ = article_api.quick_search_article(name=article)
+        article_id = res['articles'][0]['id']
+        testunit = random.choice(TestUnitAPI().list_testunit_by_name_and_material_type(
+            materialtype_id=material_type_id)[0]['testUnits'])
 
         test_date = self.get_current_date()
         shipment_date = self.get_current_date()
@@ -103,6 +102,7 @@ class OrdersAPIFactory(BaseAPI):
                 'year': current_year,
                 'yearOption': 1
             }]
+        import ipdb; ipdb.set_trace()
         payload = self.update_payload(_payload, **kwargs)
         payload = self._format_payload(payload)
         api = '{}{}'.format(self.url, self.END_POINTS['orders_api']['create_new_order'])
@@ -249,19 +249,25 @@ class OrdersAPI(OrdersAPIFactory):
             res, _ = article_api.get_all_articles(limit=20)
         else:
             res, _ = article_api.quick_search_article(name=article)
+
         article_id = res['articles'][0]['id']
-        testunit = random.choice(TestUnitAPI().list_testunit_by_name_and_material_type(materialtype_id=material_type_id)[0]['testUnits'])
-        # testplan2 = random.choice(TestPlanAPI().get_completed_testplans_with_material_and_same_article(
-        #     material_type=material_type, article=article))
-        import ipdb; ipdb.set_trace()
+
+        testunit = random.choice(TestUnitAPI().list_testunit_by_name_and_material_type(
+            materialtype_id=material_type_id)[0]['testUnits'])
         testunit_data = TestUnitAPI().get_testunit_form_data(id=testunit['id'])[0]['testUnit']
         formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
-        formatted_article = {'id': article_id, 'text': article}
-        formatted_material = {'id': material_type_id, 'text': material_type}
-        testplan2 = TestPlanAPI().create_testplan(
-            testunits=[formated_testunit], selectedArticles=[formatted_article], materialType=formatted_material)
 
-        testplan_list = [testplan, testplan2]
+        formatted_article = {'id': article_id, 'text': article}
+
+        formatted_material = {'id': material_type_id, 'text': material_type}
+
+        testplan2, _ = TestPlanAPI().create_testplan(
+            testUnits=[formated_testunit], selectedArticles=[formatted_article], materialType=formatted_material)
+
+
+        testplan_id = testplan2['testPlanDetails']['id']
+        second_testPlan = TestPlanAPI()._get_testplan_form_data(id=testplan_id)
+        testplan_list = [testplan, second_testPlan[0]['testPlan']]
 
         testunit2 = random.choice(TestUnitAPI().list_testunit_by_name_and_material_type(
             materialtype_id=material_type_id)[0]['testUnits'])
@@ -275,4 +281,4 @@ class OrdersAPI(OrdersAPIFactory):
             'article': {'id': article_id, 'text': article},
             'articleId': article_id
         }
-        return self.create_new_order(payload)
+        return self.create_new_order(**payload)
