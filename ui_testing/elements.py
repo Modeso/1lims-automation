@@ -568,7 +568,10 @@ elements = {
         'suborder_related_orders': {'method': 'id', 'value': 'child_table_related_orders'},
         'suborder_archive': {'method': 'id', 'value': 'child_table_archive'},
         'suborder_restore': {'method': 'id', 'value': 'child_table_restore'},
-   
+        'suborder_delete': {'method': 'id',
+                             'value': 'child_table_delete'},
+        'confirm_delete': {'method':'xpath',
+                           'value': '//h2[@id="swal2-title"]'}
     },
 
     'audit_trail': {
@@ -1037,7 +1040,8 @@ elements = {
             'value': 'table-with-add'
         },
         'analysis_page_table': {'method': 'class_name', 'value': 'm_accordion_7', 'order': 0},
-        'headers': {'method': 'id', 'value': 'headers'}
+        'headers': {'method': 'id', 'value': 'headers'},
+        'analysis_no_filter': {'method': 'id', 'value': 'nofield'}
     },
 
     'company_profile': {
