@@ -4,6 +4,7 @@ from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from api_testing.apis.test_plan_api import TestPlanAPI
 from api_testing.apis.test_unit_api import TestUnitAPI
 from api_testing.apis.article_api import ArticleAPI
+from ui_testing.pages.testunit_page import TstUnit
 from api_testing.apis.base_api import api_factory
 import random
 
@@ -249,11 +250,17 @@ class OrdersAPI(OrdersAPIFactory):
         else:
             res, _ = article_api.quick_search_article(name=article)
         article_id = res['articles'][0]['id']
-        testunit = random.choice(TestUnitAPI().list_testunit_by_name_and_material_type(
-            materialtype_id=material_type_id)[0]['testUnits'])
+        testunit = random.choice(TestUnitAPI().list_testunit_by_name_and_material_type(materialtype_id=material_type_id)[0]['testUnits'])
+        # testplan2 = random.choice(TestPlanAPI().get_completed_testplans_with_material_and_same_article(
+        #     material_type=material_type, article=article))
+        import ipdb; ipdb.set_trace()
+        testunit_data = TestUnitAPI().get_testunit_form_data(id=testunit['id'])[0]['testUnit']
+        formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
+        formatted_article = {'id': article_id, 'text': article}
+        formatted_material = {'id': material_type_id, 'text': material_type}
+        testplan2 = TestPlanAPI().create_testplan(
+            testunits=[formated_testunit], selectedArticles=[formatted_article], materialType=formatted_material)
 
-        testplan2 = random.choice(TestPlanAPI().get_completed_testplans_with_material_and_same_article(
-            material_type=material_type, article=article))
         testplan_list = [testplan, testplan2]
 
         testunit2 = random.choice(TestUnitAPI().list_testunit_by_name_and_material_type(

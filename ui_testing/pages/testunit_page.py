@@ -516,6 +516,7 @@ class TstUnit(TstUnits):
 
     def map_testunit_to_testplan_format(self, testunit, order=0):
         testunit_formated = {}
+        import ipdb;ipdb.set_trace()
         testunit_formated['id'] = testunit['id']
         testunit_formated['comment'] = testunit['comment']
         testunit_formated['testUnitTypeId'] = testunit['type']['id']
