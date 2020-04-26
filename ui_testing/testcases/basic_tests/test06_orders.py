@@ -212,6 +212,7 @@ class OrdersTestCases(BaseTest):
             self.assertTrue(self.order_page.is_order_exist(
                 value=selected_order_data['Analysis No.']))
 
+    # will continue with us
     def test006_delete_main_order(self):
         """
         New: Order without/with article: Deleting of orders
