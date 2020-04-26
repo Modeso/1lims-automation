@@ -50,6 +50,7 @@ class OrdersAPIFactory(BaseAPI):
         :param kwargs:
         :return: response, payload
         """
+
         order_no = self.get_auto_generated_order_no()[0]['id']
 
         testplan = random.choice(TestPlanAPI().get_completed_testplans())
@@ -227,7 +228,6 @@ class OrdersAPIFactory(BaseAPI):
             payload['orderNoWithYear'] = "{}-{}".format(payload['year'], payload['orderNo'])
 
         return [payload]
-
 
 class OrdersAPI(OrdersAPIFactory):
     def get_order_with_multiple_sub_orders(self):
