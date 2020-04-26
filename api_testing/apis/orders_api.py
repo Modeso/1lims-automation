@@ -102,7 +102,6 @@ class OrdersAPIFactory(BaseAPI):
                 'year': current_year,
                 'yearOption': 1
             }]
-        import ipdb; ipdb.set_trace()
         payload = self.update_payload(_payload, **kwargs)
         payload = self._format_payload(payload)
         api = '{}{}'.format(self.url, self.END_POINTS['orders_api']['create_new_order'])
@@ -264,10 +263,14 @@ class OrdersAPI(OrdersAPIFactory):
         testplan2, _ = TestPlanAPI().create_testplan(
             testUnits=[formated_testunit], selectedArticles=[formatted_article], materialType=formatted_material)
 
+        second_testPlan_data = TestPlanAPI()._get_testplan_form_data(id=testplan2['testPlanDetails']['id'])
 
-        testplan_id = testplan2['testPlanDetails']['id']
-        second_testPlan = TestPlanAPI()._get_testplan_form_data(id=testplan_id)
-        testplan_list = [testplan, second_testPlan[0]['testPlan']]
+        testPlan2 = {
+            'id': int(second_testPlan_data[0]['testPlan']['id']),
+            'testPlanName': second_testPlan_data[0]['testPlan']['testPlanEntity']['name'],
+            'version': 1
+        }
+        testplan_list = [testplan, testPlan2]
 
         testunit2 = random.choice(TestUnitAPI().list_testunit_by_name_and_material_type(
             materialtype_id=material_type_id)[0]['testUnits'])

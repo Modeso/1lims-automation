@@ -521,24 +521,3 @@ class Order(Orders):
             self.sleep_tiny()
             self.base_selenium.click(element='general:confirmation_button')
         self.sleep_small()
-
-    def remove_feilds_from_suborder(self, sub_order_index=0, testplan=False, testunit=False):
-        suborder_table_rows = \
-            self.base_selenium.get_table_rows(element='order:suborder_table')
-        suborder_row = suborder_table_rows[sub_order_index]
-        suborder_elements_dict = \
-            self.base_selenium.get_row_cells_id_dict_related_to_header(row=suborder_row,
-                                                                       table_element='order:suborder_table')
-        suborder_row.click()
-
-        if testplan:
-            self.base_selenium.clear_single_select_drop_down(element='order:test_plan')
-            self.base_selenium.wait_element(element='general:form_popup_warning_window')
-            self.base_selenium.click(element='general:confirmation_button')
-
-        if testunit:
-            self.base_selenium.clear_single_select_drop_down(element='order:test_unit')
-            self.base_selenium.wait_element(element='general:form_popup_warning_window')
-            self.base_selenium.click(element='general:confirmation_button')
-
-        self.save()
