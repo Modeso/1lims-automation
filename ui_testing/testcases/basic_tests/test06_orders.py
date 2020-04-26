@@ -35,14 +35,13 @@ class OrdersTestCases(BaseTest):
         self.set_authorization(auth=self.contacts_api.AUTHORIZATION_RESPONSE)
         self.order_page.get_orders_page()
 
-    # will continue with us    
+    # will continue with us
     @parameterized.expand(['save_btn', 'cancel'])
-    #@skip('https://modeso.atlassian.net/browse//LIMS-4768')
-    def test001_update_number_with_save_cancel_btn(self, save):
+    @skip('https://modeso.atlassian.net/browse//LIMS-4768')
+    def test001_cancel_button_edit_no(self, save):
         """
         New: Orders: Save/Cancel button: After I edit no field then press on cancel button,
         a pop up will appear that the data will be
-
         LIMS-5241
         :return:
         """
@@ -70,7 +69,6 @@ class OrdersTestCases(BaseTest):
                 ' + Assert {} (current_no) == {} (order_no)'.format(current_no, order_no))
             self.assertEqual(current_no, order_no)
 
-    # will continue with us
     @parameterized.expand(['save_btn', 'cancel'])
     def test002_update_contact_with_save_cancel_btn(self, save):
         """
@@ -214,8 +212,7 @@ class OrdersTestCases(BaseTest):
             self.assertTrue(self.order_page.is_order_exist(
                 value=selected_order_data['Analysis No.']))
 
-    # will continue with us
-    def test006_deleted_archived_order(self):
+    def test006_delete_main_order(self):
         """
         New: Order without/with article: Deleting of orders
         The user can hard delete any archived order
@@ -236,6 +233,9 @@ class OrdersTestCases(BaseTest):
             ' + Delete order has number = {}'.format(order_data['Order No.']))
         self.order_page.delete_selected_item()
         self.assertFalse(self.order_page.confirm_popup())
+        deleted_order = self.orders_page.search(order_number)[0]
+        self.assertTrue(deleted_order.get_attribute("textContent"), 'No records found')
+        self.order_page.navigate_to_analysis_tab()
         deleted_order = self.orders_page.search(order_number)[0]
         self.assertTrue(deleted_order.get_attribute("textContent"), 'No records found')
 
