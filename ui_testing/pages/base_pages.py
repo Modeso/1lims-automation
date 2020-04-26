@@ -248,12 +248,6 @@ class BasePages:
             destination_element='general:child_table_arrow', source=source)
         childtable_arrow.click()
         self.sleep_medium()
-    
-    def open_row_options(self, row):
-        self.info('open record options menu')
-        row_options = self.base_selenium.find_element_in_element(destination_element='general:table_menu_options', source=row)
-        row_options.click()
-        self.sleep_tiny()
 
     def get_child_table_data(self, index=0):
         rows = self.result_table()

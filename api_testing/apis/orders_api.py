@@ -160,8 +160,6 @@ class OrdersAPIFactory(BaseAPI):
         api = '{}{}{}'.format(self.url, self.END_POINTS['orders_api']['delete_suborder'], str(suborder_id))
         return api, {}
 
-
-
     @staticmethod
     def _format_payload(payload):
         if payload['testPlans']:
