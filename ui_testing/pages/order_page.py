@@ -494,9 +494,6 @@ class Order(Orders):
         order_id = current_splited_url[(len(current_splited_url)-1)]
         return order_id
 
-    def navigate_to_analysis_active_table(self):
-        self.base_selenium.click(element='orders:analysis_tab')
-        
     def navigate_to_analysis_tab(self):
         self.base_selenium.scroll()
         self.base_selenium.click('orders:analysis_order_tab')

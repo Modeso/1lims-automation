@@ -6,16 +6,15 @@ from ui_testing.pages.order_page import Order
 from ui_testing.pages.orders_page import Orders
 from api_testing.apis.orders_api import OrdersAPI
 from ui_testing.pages.analysis_page import AllAnalysesPage
-from ui_testing.pages.analysis_page import SingleAnalysisPage
 from api_testing.apis.article_api import ArticleAPI
 from api_testing.apis.test_unit_api import TestUnitAPI
+from ui_testing.pages.analysis_page import SingleAnalysisPage
 from api_testing.apis.test_plan_api import TestPlanAPI
 from api_testing.apis.contacts_api import ContactsAPI
 from api_testing.apis.test_plan_api import TestPlanAPI
 from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from ui_testing.pages.contacts_page import Contacts
 from random import randint
-import time
 import random
 
 
@@ -28,9 +27,9 @@ class OrdersTestCases(BaseTest):
         self.analyses_page = AllAnalysesPage()
         self.article_api = ArticleAPI()
         self.test_unit_api = TestUnitAPI()
+        self.single_analysis_page = SingleAnalysisPage()
         self.test_plan_api = TestPlanAPI()
         self.contacts_api = ContactsAPI()
-        self.single_analysis_page = SingleAnalysisPage()
         self.general_utilities_api = GeneralUtilitiesAPI()
         self.contacts_page = Contacts()
         self.set_authorization(auth=self.contacts_api.AUTHORIZATION_RESPONSE)
@@ -875,7 +874,7 @@ class OrdersTestCases(BaseTest):
         created_order = self.order_page.create_existing_order(no='',material_type='s', article='a', contact='',
                                                               test_units=[random_name['name']])
         self.order_page.get_orders_page()
-        self.order_page.navigate_to_analysis_active_table()
+        self.order_page.navigate_to_analysis_tab()
         self.base_selenium.LOGGER.info(
             'Assert There is an analysis for this new order.')
         orders_analyess = self.analyses_page.search(value=created_order)
