@@ -184,9 +184,9 @@ class TstPlan(TestPlans):
         self.base_selenium.click(element='test_plan:table_card_switcher')
 
     def save_and_confirm_popup(self):
-        self.save(save_btn='test_plan:save_btn')
+        self.save(save_btn='test_plan:save_btn', sleep=True)
         # press 'Ok' on the popup
-        self.base_selenium.LOGGER.info('Accepting the changes made')
+        self.info('Accepting the changes made')
         self.base_selenium.click(element='test_plan:ok')
         self.sleep_small()
 
@@ -208,8 +208,11 @@ class TstPlan(TestPlans):
             if c == 'name':
                 duplicated_test_plan_name = self.generate_random_text()
                 self.set_test_plan(name=duplicated_test_plan_name)
-        self.save()
-        
+
+        no = self.get_no()
+        self.save(sleep=True)
+        return no
+
     def get_testunit_category_and_iterations(self, testplan_name):
         self.get_test_plan_edit_page(testplan_name)
         self.navigate_to_testunits_selection_page()
