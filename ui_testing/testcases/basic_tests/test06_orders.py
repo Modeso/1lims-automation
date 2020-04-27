@@ -5,12 +5,13 @@ from ui_testing.testcases.base_test import BaseTest
 from ui_testing.pages.order_page import Order
 from ui_testing.pages.orders_page import Orders
 from api_testing.apis.orders_api import OrdersAPI
-from ui_testing.pages.analysis_page import SingleAnalysisPage
 from ui_testing.pages.analysis_page import AllAnalysesPage
 from api_testing.apis.article_api import ArticleAPI
 from api_testing.apis.test_unit_api import TestUnitAPI
+from ui_testing.pages.analysis_page import SingleAnalysisPage
 from api_testing.apis.test_plan_api import TestPlanAPI
 from api_testing.apis.contacts_api import ContactsAPI
+from api_testing.apis.test_plan_api import TestPlanAPI
 from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from ui_testing.pages.contacts_page import Contacts
 from random import randint
@@ -21,17 +22,16 @@ class OrdersTestCases(BaseTest):
     def setUp(self):
         super().setUp()
         self.order_page = Order()
+        self.orders_api = OrdersAPI()
         self.orders_page = Orders()
         self.analyses_page = AllAnalysesPage()
-        self.orders_api = OrdersAPI()
         self.article_api = ArticleAPI()
         self.test_unit_api = TestUnitAPI()
-        self.contacts_api = ContactsAPI()
         self.single_analysis_page = SingleAnalysisPage()
+        self.test_plan_api = TestPlanAPI()
+        self.contacts_api = ContactsAPI()
         self.general_utilities_api = GeneralUtilitiesAPI()
         self.contacts_page = Contacts()
-        self.orders_api = OrdersAPI()
-        self.orders_page = Orders()
         self.set_authorization(auth=self.contacts_api.AUTHORIZATION_RESPONSE)
         self.order_page.get_orders_page()
 
@@ -74,7 +74,6 @@ class OrdersTestCases(BaseTest):
         """
         Orders: In case I update the contact then press on cancel button, a pop up should display with ( ok & cancel )
         buttons and when I press on cancel button, this update shouldn't submit
-
         LIMS-4764
         LIMS-4764
         :return:
@@ -111,7 +110,6 @@ class OrdersTestCases(BaseTest):
         """
         Orders: department Approach: In case I update the department then press on save button ( the department updated successfully) &
         when I press on cancel button ( this department not updated )
-
         LIMS-4765
         LIMS-4765
         :return:
@@ -141,13 +139,12 @@ class OrdersTestCases(BaseTest):
                                                                                       order_departments))
             self.assertEqual(current_departments, order_departments)
 
-    # will change totally and implement the new behavior 
+    # will change totally and implement the new behavior
     def test004_archive_order(self):
         """
             New: Orders: Archive
             The user cannot archive an order unless all corresponding analysis are archived
             LIMS-3425
-
             New: Archive order has active analysis
             The user cannot archive an order unless all corresponding analysis are archived
             LIMS-4329
@@ -240,12 +237,11 @@ class OrdersTestCases(BaseTest):
         deleted_order = self.orders_page.search(order_number)[0]
         self.assertTrue(deleted_order.get_attribute("textContent"), 'No records found')
 
-    # will continue with us    
+    # will continue with us
     @parameterized.expand(['True', 'False'])
     def test007_order_search(self, small_letters):
         """
         New: Orders: Search Approach: User can search by any field & each field should display with yellow color
-
         LIMS-3492
         LIMS-3061
         :return:
@@ -284,7 +280,6 @@ class OrdersTestCases(BaseTest):
     def test008_duplicate_main_order(self):
         """
         New: Orders with test units: Duplicate an order with test unit 1 copy
-
         LIMS-3270
         :return:
         """
@@ -312,7 +307,7 @@ class OrdersTestCases(BaseTest):
         self.assertTrue('duplicateMainOrder' in self.base_selenium.get_url())
         # make sure that the new order has different order No
         self.assertNotEqual(main_order['orderNo'], after_duplicate_order['orderNo'])
-        # compare the contacts 
+        # compare the contacts
         self.assertCountEqual(main_order['contacts'], after_duplicate_order['contacts'])
         # compare the data of suborders data in both orders
         self.assertCountEqual(main_order['suborders'], after_duplicate_order['suborders'])
@@ -348,11 +343,10 @@ class OrdersTestCases(BaseTest):
             for item in fixed_row_data:
                 self.assertIn(item, fixed_sheet_row_data)
 
-    # will continue with us             
+    # will continue with us
     def test010_user_can_add_suborder(self):
         """
         New: Orders: Table view: Suborder Approach: User can add suborder from the main order
-
         LIMS-3817
         LIMS-4279
         Only "Apply this from add new item in the order table view"
@@ -503,7 +497,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.save(save_btn='order:save_btn')
         self.base_selenium.LOGGER.info(
             ' + order_updated_with_number : {}'.format(new_order_no))
-
+    
     @parameterized.expand(['save_btn', 'cancel'])
     def test014_update_first_order_material_type(self, save):
         """
@@ -579,7 +573,6 @@ class OrdersTestCases(BaseTest):
     def test016_validate_order_test_unit_test_plan(self):
         """
         New: orders Test plan /test unit validation
-
         LIMS-4349
         """
         self.base_selenium.LOGGER.info(
@@ -613,7 +606,6 @@ class OrdersTestCases(BaseTest):
     def test017_validate_order_test_unit_test_plan_edit_mode(self):
         """
         New: orders Test plan /test unit validation in edit mode
-
         LIMS-4826
         """
         self.base_selenium.LOGGER.info(
@@ -647,7 +639,7 @@ class OrdersTestCases(BaseTest):
     def test032_update_test_date(self, save):
         """
         New: Orders: Test Date: I can update test date successfully with cancel/save buttons
-        
+
         LIMS-4780
         :return:
         """
@@ -743,7 +735,6 @@ class OrdersTestCases(BaseTest):
     def test018_validate_order_no_exists(self):
         """
         New: Orders: Create new order and change the autogenerated number
-
         LIMS-3406
         """
         self.base_selenium.LOGGER.info('Running test case to check that order number should be unique')
@@ -762,7 +753,6 @@ class OrdersTestCases(BaseTest):
     def test019_validate_order_no_archived_exists(self):
         """
         New: Orders: Create new order and change the autogenerated number
-
         LIMS-3406
         """
         self.base_selenium.LOGGER.info(
@@ -814,11 +804,10 @@ class OrdersTestCases(BaseTest):
             element="order:order_no_error_message")
         self.assertIn('No. already exists in archived, you can go to Archive table and restore it', order_error_message)
 
-    # will continue with us      
+    # will continue with us
     def test020_create_new_order_with_test_units(self):
         """
         New: Orders: Create a new order with test units
-
         LIMS-3267
         """
         self.base_selenium.LOGGER.info('Running test case to create a new order with test units')
@@ -858,36 +847,22 @@ class OrdersTestCases(BaseTest):
             self.base_selenium.LOGGER.info(" + Test unit : {}".format(testunit_name))
             self.assertIn(testunit_name, test_units_list)
 
-    # will continue with us
     def test021_create_existing_order_with_test_units(self):
         """
         New: Orders: Create an existing order with test units
-
         LIMS-3268
         """
-        self.base_selenium.LOGGER.info('Running test case to create an existing order with test units')
-        test_units_list = []
-        test_unit_dict = self.get_active_tst_unit_with_material_type(search='Qualitative', material_type='All')
-        if test_unit_dict:
-            self.base_selenium.LOGGER.info('Retrieved test unit ' + test_unit_dict['Test Unit Name'])
-            test_units_list.append(test_unit_dict['Test Unit Name'])
-        test_unit_dict = self.get_active_tst_unit_with_material_type(search='Quantitative')
-        if test_unit_dict:
-            self.base_selenium.LOGGER.info('Retrieved test unit ' + test_unit_dict['Test Unit Name'])
-            test_units_list.append(test_unit_dict['Test Unit Name'])
-        test_unit_dict = self.get_active_tst_unit_with_material_type(search='Quantitative Mibi')
-        if test_unit_dict:
-            self.base_selenium.LOGGER.info('Retrieved test unit ' + test_unit_dict['Test Unit Name'])
-            test_units_list.append(test_unit_dict['Test Unit Name'])
+        random_testunit, payload = self.test_unit_api.get_all_test_units(filter='{"materialTypes":"all"}')
+        random_name = random.choice(random_testunit['testUnits'])
 
         self.order_page.get_orders_page()
-        created_order = self.order_page.create_existing_order(no='', material_type='r', article='a', contact='a',
-                                                              test_units=test_units_list)
-
-        self.analyses_page.get_analyses_page()
+        created_order = self.order_page.create_existing_order(no='',material_type='s', article='a', contact='',
+                                                              test_units=[random_name['name']])
+        self.order_page.get_orders_page()
+        self.order_page.navigate_to_analysis_tab()
         self.base_selenium.LOGGER.info(
             'Assert There is an analysis for this new order.')
-        orders_analyess = self.analyses_page.search(created_order)
+        orders_analyess = self.analyses_page.search(value=created_order)
         latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
             row=orders_analyess[0])
         self.assertEqual(
@@ -900,15 +875,14 @@ class OrdersTestCases(BaseTest):
                                                                                        table_element='general:table_child')
             testunit_name = row_with_headers['Test Unit']
             self.base_selenium.LOGGER.info(" + Test unit : {}".format(testunit_name))
-            self.assertIn(testunit_name, test_units_list)
-
+            self.assertIn(testunit_name, random_name['name'])
+            
     def test022_create_existing_order_with_test_units_and_change_material_type(self):
         """
         New: Orders with test units: Create a new order from an existing order with
         test units but change the material type
-
         LIMS-3269-case 1
-        """
+        """   
         order_no = self.order_page.create_existing_order_with_auto_fill()
         self.order_page.sleep_tiny()
 
@@ -938,7 +912,6 @@ class OrdersTestCases(BaseTest):
         """
         New: Orders with test units: Create a new order from an existing order with
         test units but change the article
-
         LIMS-3269- case 2
         """
         order_no = self.order_page.create_existing_order_with_auto_fill()
@@ -972,7 +945,7 @@ class OrdersTestCases(BaseTest):
     # will continue with us
     def test024_archive_sub_order(self):
         """
-        New: Orders: Table:  Suborder /Archive Approach: : User can archive any suborder successfully 
+        New: Orders: Table:  Suborder /Archive Approach: : User can archive any suborder successfully
         LIMS-3739
         """
 
@@ -981,7 +954,7 @@ class OrdersTestCases(BaseTest):
         order_no_created = self.order_page.create_new_order(multiple_suborders=2, material_type='Raw Material',
                                                             test_units=[''])
 
-        # filter by order no to get the orders data 
+        # filter by order no to get the orders data
         self.base_selenium.LOGGER.info(' Filter by order No: {}'.format(order_no_created))
         self.orders_page.filter_by_order_no(filter_text=order_no_created)
 
@@ -1073,7 +1046,7 @@ class OrdersTestCases(BaseTest):
 
         self.assertEqual(len(rows_count) - 1, 1)
 
-    # will continue with us 
+    # will continue with us
     @skip('https://modeso.atlassian.net/browse/LIMS-4914')
     def test027_update_material_type(self):
         """
@@ -1081,10 +1054,8 @@ class OrdersTestCases(BaseTest):
         -When user update the materiel type from table view once I delete it message will appear
         (All analysis created with this order and test plan will be deleted )
         -Once you press on OK button, the material type & article & test pan will delete
-        -You can update it by choose another one and choose corresponding article & test plan 
-
+        -You can update it by choose another one and choose corresponding article & test plan
         LIMS-4264
-
         """
 
         # new random order data
@@ -1156,7 +1127,7 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.LOGGER.info('Get order data to remove a test plan from the order')
         self.order_page.get_orders_page()
 
-    # will continue with us & then put the test case number for it 
+    # will continue with us & then put the test case number for it
     def test026_update_suborder_article(self):
         self.base_selenium.LOGGER.info('Order created with 4 suborders with the following data')
         self.base_selenium.LOGGER.info('Material type: {}, Article name: {}, Test plans: {}, Test Units: {}'.format(
@@ -1258,7 +1229,7 @@ class OrdersTestCases(BaseTest):
                                                                                               'article']))
         self.assertEqual(new_article, suborder_data_after_pressing_confirm['article'])
 
-        # written as earch because the function that retrieves the data removes the first char in case of test unit/ test plan to remove the 'x' 
+        # written as earch because the function that retrieves the data removes the first char in case of test unit/ test plan to remove the 'x'
         # so in case no test unit or no test plan, it removes the first char in the placeholder word which is search, so i match with earch
         self.base_selenium.LOGGER.info('+Assert Compare Test Plans, old: {}, new: {}'.format('Search',
                                                                                              suborder_data_after_pressing_confirm[
@@ -1289,7 +1260,7 @@ class OrdersTestCases(BaseTest):
     # def test021_update_suborder_testunits(self, save):
     #     """
     #     Try this on suborder number 5 for example:-
-    #     -When I delete test unit to update it message will appear 
+    #     -When I delete test unit to update it message will appear
     #     ( This Test Unit will be removed from the corresponding analysis )
     #     -Make sure the corresponding analysis records created according to this update in test unit.
 
@@ -1412,7 +1383,7 @@ class OrdersTestCases(BaseTest):
         ( the department updated successfully )
         &
         when I press on cancel button ( this department not updated )
-        
+
         LIMS-4765
         """
         self.base_selenium.LOGGER.info(
@@ -1517,7 +1488,6 @@ class OrdersTestCases(BaseTest):
         New: Orders: Create Approach: I can create suborder with test unit successfully,
         make sure the record created successfully in the analysis section.
         ( create with any type of test unit )
-
         LIMS-4255
         LIMS-4255
         :return:
@@ -1587,9 +1557,9 @@ class OrdersTestCases(BaseTest):
             '+ Assert test plan is: {}, and it should be {}'.format(analysis_test_plan_after_update,
                                                                     suborder_testplans[1]))
         self.assertEqual(analysis_test_plan_after_update, suborder_testplans[1])
-
+      
     ### SYNTAX ERROR ###
-    # will continue with us ( apply it from the second order & need diff test case number for it 
+    # will continue with us ( apply it from the second order & need diff test case number for it
     # @parameterized.expand(['save_btn', 'cancel'])
     # def test025_update_article(self, save):
     #     """
@@ -1720,7 +1690,7 @@ class OrdersTestCases(BaseTest):
 
     # def test_test(self):
     #     import ipdb; ipdb.set_trace()	        import ipdb; ipdb.set_trace()
-    #     suborder_data = self.order_page.get_suborder_data(sub_order_index=3)	        suborder_data = self.order_page.get_suborder_data(sub_order_index=3) 
+    #     suborder_data = self.order_page.get_suborder_data(sub_order_index=3)	        suborder_data = self.order_page.get_suborder_data(sub_order_index=3)
     # discard no need form the form
     ### SYNTAX ERROR ###
 
@@ -1793,7 +1763,7 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.LOGGER.info(" + Test unit : {}".format(testunit_name))
         self.assertIn(testunit_name, testunit_name)
 
-    # discarded no need for the form         
+    # discarded no need for the form
     def test028_update_test_unit_with_delete_in_form(self):
         """
         New: Orders: Form: Update test unit: update test unit by replace it by another one ( remove it ) &
@@ -1872,11 +1842,10 @@ class OrdersTestCases(BaseTest):
         """
         Apply this on the suborder number 5 for example:
         Make sure once you delete the article, the test plan that corresponding to it will  deleted also to choose another one
-        Make sure once you delete the article, the test unit will not delete 
-        updated it then press on save button, and make sure that the article updated successfully according to that 
+        Make sure once you delete the article, the test unit will not delete
+        updated it then press on save button, and make sure that the article updated successfully according to that
         LIMS-6524
-
-        Apply this on the table view ( from the second suborder ) 
+        Apply this on the table view ( from the second suborder )
         In case I update the article then press on ok button ( In pop-up) & when you press on cancel button nothing updated
         LIMS-4297
         """
@@ -1947,7 +1916,6 @@ class OrdersTestCases(BaseTest):
         """
         New: Orders: Create Approach: I can create suborder with test unit successfully,
         make sure the record created successfully in the analysis section.
-
         LIMS-4255
         """
         article, article_data = self.article_api.create_article()
@@ -2001,7 +1969,6 @@ class OrdersTestCases(BaseTest):
          Orders: department Approach: In case I update the department then press on save button
          (the department updated successfully) & when I press on cancel button (this department
          not updated) (this will apply from the second order)
-
          LIMS-6523
         """
         self.info('create contact')
@@ -2041,7 +2008,6 @@ class OrdersTestCases(BaseTest):
         all those suborders numbers updated according to that and (this will effect in the
         analysis records also that mean all order number of those records will updated
         according to that in the active table )
-
         LIMS-4270
         """
         self.info('generate new order number to use it for update')
@@ -2073,7 +2039,6 @@ class OrdersTestCases(BaseTest):
     def test033_Duplicate_main_order_and_cahange_materiel_type(self):
         """
         duplicate the main order then change the materiel type
-
         LIMS-6219
         """
         self.info('get random order')
@@ -2125,7 +2090,46 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(suborder_data['Article Name'].replace("'", ""), selected_test_plan['article'][0])
         self.assertEqual(suborder_data['Test Units'], test_unit)
         self.assertEqual(suborder_data['Test Plans'], selected_test_plan['testPlanName'])
-        
+
+    def test034_duplicate_sub_order_table_with_add(self):
+        """
+        Orders: User can duplicate any suborder from the order form ( table with add )
+        LIMS-3738
+        :return:
+        """
+        # get random order
+        self.info('select random record')
+        orders, payload = self.orders_api.get_all_orders(limit=20)
+        data_before_duplicate_main_order = random.choice(orders['orders'])
+
+        self.orders_page.get_order_edit_page_by_id(id=data_before_duplicate_main_order['id'])
+        data_before_duplicate = self.order_page.get_suborder_data()
+
+        self.order_page.duplicate_from_table_view(index_to_duplicate_from=0)
+        after_duplicate_order = self.order_page.get_suborder_data()
+
+        # make sure that the new order has same order No
+        self.assertEqual(data_before_duplicate['orderNo'].replace("'", ""), after_duplicate_order['orderNo'].replace("'", ""))
+        # compare the contacts between two records
+        self.assertCountEqual(data_before_duplicate['contacts'], after_duplicate_order['contacts'])
+        # compare the data of suborders data in both orders
+        self.assertNotEqual(data_before_duplicate['suborders'], after_duplicate_order['suborders'])
+
+        # save the duplicated order
+        self.order_page.save(save_btn='orders:save_order')
+        # go back to the table view
+        self.order_page.get_orders_page()
+        # search for the created order no
+        self.order_page.search(after_duplicate_order['orderNo'])
+        suborder_data = self.order_page.get_child_table_data()[0]
+        order_result = self.order_page.result_table()[0].text
+        # check that it exists
+        self.assertIn(after_duplicate_order['orderNo'].replace("'", ""), order_result.replace("'", ""))
+        self.order_page.navigate_to_analysis_tab()
+        self.order_page.search(suborder_data['Analysis No.'])
+        analysis_result = self.order_page.result_table()[0].text
+        self.assertIn(suborder_data['Analysis No.'].replace("'", ""), analysis_result.replace("'", ""))
+             
     def test034_Duplicate_sub_order_and_cahange_materiel_type(self):
         """
         duplicate sub-order of any order then change the materiel type
@@ -2202,4 +2206,35 @@ class OrdersTestCases(BaseTest):
         self.analyses_page.apply_filter_scenario(filter_element='analysis_page:analysis_no_filter',
                                                  filter_text=suborder_data['Analysis No.'], field_type='text')
         self.assertEqual(len(self.order_page.result_table()), 1)
+
+    def test036_Duplicate_sub_order_with_multiple_testplans_and_testunits_delet_approach(self):
+        """
+        Duplicate suborder Approach: Duplicate any sub order then delete the units & test plans
+
+        LIMS-6852
+        """
+        self.info('create order data multiple testplans and test units')
+        response, payload = self.orders_api.create_order_with_double_test_plans()
+        self.orders_page.filter_by_order_no(payload[0]['orderNo'])
+        suborder_data_before_duplicate = self.orders_page.get_child_table_data()
+        test_plans = [suborder_data_before_duplicate[0]['Test Plans'].split(',\n')[0],
+                      suborder_data_before_duplicate[0]['Test Plans'].split(',\n')[1]]
+        test_units = [suborder_data_before_duplicate[0]['Test Units'].split(',\n')[0],
+                      suborder_data_before_duplicate[0]['Test Units'].split(',\n')[1]]
+        self.info("duplicate the sub order of order {} from suborder's options".format(payload[0]['orderNo']))
+        self.orders_page.duplicate_sub_order_from_table_overview()
+        self.base_selenium.clear_items_in_drop_down(element='order:test_plan', one_item_only=True)
+        self.base_selenium.clear_items_in_drop_down(element='order:test_unit', one_item_only=True)
+        self.order_page.save(save_btn='order:save')
+        self.order_page.wait_until_page_is_loaded()
+        self.info("navigate to orders' active table and check that duplicated suborder found")
+        self.order_page.get_orders_page()
+        self.orders_page.filter_by_order_no(payload[0]['orderNo'])
+        child_data = self.order_page.get_child_table_data()
+        duplicated_suborder_data = child_data[0]
+        self.assertEqual(len(child_data), 2)
+        self.assertEqual(duplicated_suborder_data['Article Name'], suborder_data_before_duplicate[0]['Article Name'])
+        self.assertEqual(duplicated_suborder_data['Material Type'], suborder_data_before_duplicate[0]['Material Type'])
+        self.assertIn(duplicated_suborder_data['Test Units'], test_units)
+        self.assertIn(duplicated_suborder_data['Test Plans'], test_plans)
 
