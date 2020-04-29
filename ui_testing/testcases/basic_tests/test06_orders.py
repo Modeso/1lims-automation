@@ -369,14 +369,15 @@ class OrdersTestCases(BaseTest):
 
         self.order_page.get_orders_page()
         suborders_data_after, _ = self.order_page.get_orders_and_suborders_data(order_no=order['orderNo'])
-        self.assertEqual(suborders_data_after[0]['Test Plans'], test_plan['testPlanName'])
-        self.assertEqual(suborders_data_after[0]['Material Type'], test_plan['materialType'])
-        self.assertEqual(suborders_data_after[0]['Article Name'], test_plan['article'][0])
+        suborder_data = suborders_data_after[0]
+        self.assertEqual(suborder_data['Test Plans'], test_plan['testPlanName'])
+        self.assertEqual(suborder_data['Material Type'], test_plan['materialType'])
+        self.assertEqual(suborder_data['Article Name'], test_plan['article'][0])
 
         self.order_page.navigate_to_analysis_active_table()
         self.info('Assert There is an analysis for this new suborder')
-        orders_analyess = self.analyses_page.search(order['orderNo'])
-        latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(row=orders_analyess[0])
+        orders_analyses = self.analyses_page.search(order['orderNo'])
+        latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(row=orders_analyses[0])
         self.assertEqual(suborders_data_after[0]['Analysis No.'], latest_order_data['Analysis No.'])
 
     # will change that the duplicate many copies will be from the the child table not from the active table     
