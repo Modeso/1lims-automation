@@ -344,47 +344,41 @@ class OrdersTestCases(BaseTest):
             for item in fixed_row_data:
                 self.assertIn(item, fixed_sheet_row_data)
 
-
     def test010_user_can_add_suborder(self):
-        '''
+        """
         New: Orders: Table view: Suborder Approach: User can add suborder from the main order
 
         LIMS-3817
-        '''
-        # Get active suborder data to use
-        test_plan = self.get_active_article_with_tst_plan(test_plan_status='complete')
+        """
+        self.info("get active suborder data to use")
+        completed_test_plans = TestPlanAPI().get_completed_testplans(limit=50)
+        test_plan = random.choice(completed_test_plans)
+        self.info("get random order")
+        orders, api = self.orders_api.get_all_orders(limit=50)
+        order = random.choice(orders['orders'])
+        self.orders_page.get_order_edit_page_by_id(order['id'])
+        suborder_data = self.order_page.create_new_suborder(material_type=test_plan['materialType'],
+                                                            article_name=test_plan['article'][0],
+                                                            test_plan=test_plan['testPlanName'],
+                                                            test_unit='',
+                                                            add_new_suborder_btn='order:add_another_suborder')
 
-        # Get random order
-        order_request = self.orders_api.get_all_orders(limit=20).json()
-        self.assertEqual(order_request['status'], 1)
-        orders_records = order_request['orders']
-        self.assertNotEqual(len(orders_records), 0)
-        random_order_index = self.generate_random_number(lower=0, upper=len(orders_records) - 1)
-        order_data = orders_records[random_order_index]
-        order_number = order_data['orderNo']
+        self.assertEqual(suborder_data['orderNo'].replace("'", "").split("-")[0],
+                         order['orderNo'].split("-")[0])
 
-        self.order_page.get_orders_page()
-        orders_duplicate_data_before, orders = self.order_page.get_orders_duplicate_data(order_no=order_number)
-        self.base_selenium.LOGGER.info('Select random order with number: {}'.format(order_number))
-
-        
-        self.order_page.open_edit_page(row=orders[0])
-        order_url = self.base_selenium.get_url()
-        self.base_selenium.LOGGER.info('Order url: {}'.format(order_url))
-        self.order_page.create_new_suborder(material_type=test_plan['Material Type'],
-                                            article_name=test_plan['Article No.'],
-                                            test_plan=test_plan['Test Plan Name'], add_new_suborder_btn='order:add_another_suborder')
         self.order_page.save(save_btn='order:save_btn')
 
         self.order_page.get_orders_page()
-        suborders_data_after, _ = self.order_page.get_orders_and_suborders_data(order_no=order_number)
+        suborders_data_after, _ = self.order_page.get_orders_and_suborders_data(order_no=order['orderNo'])
+        self.assertEqual(suborders_data_after[0]['Test Plans'], test_plan['testPlanName'])
+        self.assertEqual(suborders_data_after[0]['Material Type'], test_plan['materialType'])
+        self.assertEqual(suborders_data_after[0]['Article Name'], test_plan['article'][0])
 
         self.order_page.navigate_to_analysis_active_table()
-        self.base_selenium.LOGGER.info('Assert There is an analysis for this new suborder')
-        orders_analyess = self.analyses_page.search(order_number)
+        self.info('Assert There is an analysis for this new suborder')
+        orders_analyess = self.analyses_page.search(order['orderNo'])
         latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(row=orders_analyess[0])
         self.assertEqual(suborders_data_after[0]['Analysis No.'], latest_order_data['Analysis No.'])
-
 
     # will change that the duplicate many copies will be from the the child table not from the active table     
     def test012_duplicate_many_orders(self):
