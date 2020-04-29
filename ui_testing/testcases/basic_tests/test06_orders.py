@@ -372,7 +372,8 @@ class OrdersTestCases(BaseTest):
         suborder_data = suborders_data_after[0]
         self.assertEqual(suborder_data['Test Plans'], test_plan['testPlanName'])
         self.assertEqual(suborder_data['Material Type'], test_plan['materialType'])
-        self.assertEqual(suborder_data['Article Name'], test_plan['article'][0])
+        if test_plan['article'][0] != 'all'
+            self.assertEqual(suborder_data['Article Name'], test_plan['article'][0])
 
         self.order_page.navigate_to_analysis_active_table()
         self.info('Assert There is an analysis for this new suborder')
