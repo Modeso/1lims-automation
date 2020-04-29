@@ -283,19 +283,21 @@ class OrdersTestCases(BaseTest):
         LIMS-3270
         :return:
         """
-        # get random order
-        self.info('select random record')
-        orders, payload = self.orders_api.get_all_orders(limit=20)
-        data_before_duplicate_main_order = random.choice(orders['orders'])
-        print(data_before_duplicate_main_order)
+        random_testunit, payload = self.test_unit_api.get_all_test_units(limit=20)
+        test_unit = random.choice(random_testunit['testUnits'])
 
-        self.orders_page.get_order_edit_page_by_id(id=data_before_duplicate_main_order['id'])
+        data_before_duplicate = self.order_page.create_new_order(contact='', material_type='r', article='a',test_plans=[],
+                                                              test_units=[test_unit['name']])
 
-        before_duplicate_data, payload = self.orders_api.get_suborder_by_order_id(id=data_before_duplicate_main_order['id'])[0]['orders']
 
-        print(before_duplicate_data)
+        #print(created_order)
+        #self.orders_page.get_order_edit_page_by_id(id=data_before_duplicate_main_order['id'])
+
+        #before_duplicate_data, payload = self.orders_api.get_suborder_by_order_id(id=data_before_duplicate_main_order['id'])[0]['orders']
+
+        #print(before_duplicate_data)
         self.orders_page.get_orders_page()
-        order_no = data_before_duplicate_main_order['orderNo']
+        order_no = data_before_duplicate['orderNo']
         self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no,
                                               field_type='text')
 
@@ -303,10 +305,16 @@ class OrdersTestCases(BaseTest):
         self.order_page.click_check_box(source=row)
         # duplicate the main order
         self.order_page.duplicate_main_order_from_table_overview()
-        #after_duplicate_order = self.order_page.get_suborder_data()
+        self.orders_page.save(save_btn='orders:save_order')
+        diana = self.order_page.get_order_number()
+        print(diana)
+        orders, payload = self.orders_api.get_all_orders(filter='{"orderNo":"jhghg"}')
+        print(orders)
+        data_after_duplicate = self.order_page.get_suborder_data()
         # get the data after the duplication
-        after_duplicate_order, payload = self.orders_api.get_suborder_by_order_id(id=data_before_duplicate_main_order['id'])[0]['orders']
-        print(after_duplicate_order)
+
+        #after_duplicate_order, payload = self.orders_api.get_suborder_by_order_id(id=data_before_duplicate_main_order['id'])[0]['orders']
+        #print(after_duplicate_order)
 
 
         # make sure that its the duplication page
