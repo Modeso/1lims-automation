@@ -636,9 +636,8 @@ elements = {
                           'value': 'date_shipmentDate_0'},
         'test_date': {'method': 'id',
                       'value': 'date_testDate'},
-        'save': {'method': 'class_name',
-                 'value': 'btn-primary',
-                 'order': 1},
+        'save': {'method': 'id',
+                 'value': 'button_save_order'},
         'duplicate_table_view': {'method': 'id',
                                  'value': 'duplicate_table_view'},
         'delete_table_view': {'method': 'id',
@@ -661,8 +660,9 @@ elements = {
             'order': 0
         },
         'add_new_item11': {'method': 'class_name',
-                           'value': 'addNewItem',
-                           'order': 0},
+                         'value': 'addNewItem',
+                         'order': 0},
+
         'add_new_item': {'method': 'link_text',
                          'value': 'Add another item'},
         'order_no_error_message': {'method': 'xpath',
