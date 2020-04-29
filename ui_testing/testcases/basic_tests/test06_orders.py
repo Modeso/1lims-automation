@@ -7,6 +7,7 @@ from ui_testing.pages.orders_page import Orders
 from ui_testing.pages.contacts_page import Contacts
 from api_testing.apis.orders_api import OrdersAPI
 from random import randint
+import random
 import time
 
 
@@ -674,13 +675,8 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.LOGGER.info(' Running test case to check that at least test unit or test plan is mandatory in order')
 
         # Get random order
-        order_request = self.orders_api.get_all_orders(limit=20).json()
-        self.assertEqual(order_request['status'], 1)
-        orders_records = order_request['orders']
-        self.assertNotEqual(len(orders_records), 0)
-        random_order_index = self.generate_random_number(lower=0, upper=len(orders_records) - 1)
-        selected_order_record = orders_records[random_order_index]
-
+        orders, payload = self.orders_api.get_all_orders(limit=20)
+        selected_order_record = random.choice(orders['orders'])
         # Open random order edit page
         order_page_url = self.base_selenium.get_url()
         edit_page_url = order_page_url+'/'+str(selected_order_record['id'])
