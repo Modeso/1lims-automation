@@ -2262,4 +2262,4 @@ class OrdersTestCases(BaseTest):
         self.analyses_page.search(new_suborder['orderNo'])
         duplicated_suborder_data = self.order_page.get_child_table_data()[0]
         self.assertEqual(duplicated_suborder_data['Test Units'], new_test_unit)
-        self.assertEqual(duplicated_suborder_data['Test Plans'], new_test_plan)
+        self.assertEqual(duplicated_suborder_data['Test Plans'], new_test_plan['testPlanName']  )
