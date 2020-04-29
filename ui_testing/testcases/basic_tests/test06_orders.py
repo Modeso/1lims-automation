@@ -2260,6 +2260,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.get_orders_page()
         self.assertTrue(self.orders_page.is_order_in_table(new_suborder['orderNo']))
         self.analyses_page.search(new_suborder['orderNo'])
+        self.order_page.wait_until_page_is_loaded()
         duplicated_suborder_data = self.order_page.get_child_table_data()[0]
         self.assertEqual(duplicated_suborder_data['Test Units'], new_test_unit)
         self.assertEqual(duplicated_suborder_data['Test Plans'], new_test_plan['testPlanName']  )
