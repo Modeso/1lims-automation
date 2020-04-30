@@ -2257,7 +2257,6 @@ class OrdersTestCases(BaseTest):
             test_plans=[new_test_plan['testPlanName']], test_units=[new_test_unit], remove_old=True)
         self.order_page.save(save_btn='order:save', sleep=True)
         self.order_page.get_orders_page()
-        self.orders_page.wait_until_page_is_loaded()
         self.assertTrue(self.orders_page.is_order_in_table(new_suborder['orderNo']))
         self.analyses_page.search(new_suborder['orderNo'])
         self.order_page.wait_until_page_is_loaded()

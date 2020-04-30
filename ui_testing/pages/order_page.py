@@ -406,6 +406,7 @@ class Order(Orders):
         for testplan in test_plans:
             if remove_old:
                 self.clear_test_plan()
+                self.sleep_tiny()
             self.set_test_plan(test_plan=testplan)
             self.sleep_tiny()
 
@@ -413,6 +414,8 @@ class Order(Orders):
         for testunit in test_units:
             if remove_old:
                 self.clear_test_unit()
+                self.sleep_tiny()
+
             self.set_test_unit(test_unit=testunit)
             self.sleep_tiny()
 
