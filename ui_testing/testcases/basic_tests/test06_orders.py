@@ -2250,4 +2250,4 @@ class OrdersTestCases(BaseTest):
         result_analysis = []
         for suborder in child_data:
             result_analysis.append(suborder['Analysis No.'].replace("'", ""))
-        self.assertEqual(result_analysis, analysis_no_list)
+        self.assertCountEqual(result_analysis, analysis_no_list)
