@@ -406,18 +406,13 @@ class Order(Orders):
         for testplan in test_plans:
             if remove_old:
                 self.clear_test_plan()
-                self.sleep_tiny()
             self.set_test_plan(test_plan=testplan)
-            self.sleep_tiny()
 
         self.info('Set test unit : {} for {} time(s)'.format(test_units, len(test_units)))
         for testunit in test_units:
             if remove_old:
                 self.clear_test_unit()
-                self.sleep_tiny()
-
             self.set_test_unit(test_unit=testunit)
-            self.sleep_tiny()
 
         if shipment_date:
             return self.set_shipment_date(row_id=sub_order_index)

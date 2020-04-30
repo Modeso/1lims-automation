@@ -238,8 +238,8 @@ class Orders(BasePages):
         self.base_selenium.click(element='general:filter_btn')
         time.sleep(self.base_selenium.TIME_MEDIUM)
 
-    def is_order_in_table(self,value):
-        results=self.base_selenium.get_table_rows(element='general:table')
+    def is_order_in_table(self, value):
+        results = self.base_selenium.get_table_rows(element='general:table')
         if len(results) == 0:
             return False
         else:
