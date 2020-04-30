@@ -2255,13 +2255,12 @@ class OrdersTestCases(BaseTest):
         new_test_unit = TestPlanAPI().get_testplan_form_data(id=new_test_plan['id'])['specifications'][0]['name']
         new_suborder = self.order_page.update_suborder(
             test_plans=[new_test_plan['testPlanName']], test_units=[new_test_unit], remove_old=True)
-        self.order_page.save(save_btn='order:save')
-        self.order_page.sleep_small()
+        self.order_page.save(save_btn='order:save', sleep=True)
         self.order_page.get_orders_page()
+        self.orders_page.wait_until_page_is_loaded()
         self.assertTrue(self.orders_page.is_order_in_table(new_suborder['orderNo']))
         self.analyses_page.search(new_suborder['orderNo'])
         self.order_page.wait_until_page_is_loaded()
         duplicated_suborder_data = self.order_page.get_child_table_data()[0]
         self.assertEqual(duplicated_suborder_data['Test Units'], new_test_unit)
         self.assertEqual(duplicated_suborder_data['Test Plans'], new_test_plan['testPlanName'])
-       
