@@ -2256,7 +2256,7 @@ class OrdersTestCases(BaseTest):
         new_suborder = self.order_page.update_suborder(
             test_plans=[new_test_plan['testPlanName']], test_units=[new_test_unit], remove_old=True)
         self.order_page.save(save_btn='order:save')
-        self.order_page.sleep_tiny()
+        self.order_page.sleep_small()
         self.order_page.get_orders_page()
         self.assertTrue(self.orders_page.is_order_in_table(new_suborder['orderNo']))
         self.analyses_page.search(new_suborder['orderNo'])
