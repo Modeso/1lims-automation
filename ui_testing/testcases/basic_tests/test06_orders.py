@@ -2238,3 +2238,50 @@ class OrdersTestCases(BaseTest):
         self.assertIn(duplicated_suborder_data['Test Units'], test_units)
         self.assertIn(duplicated_suborder_data['Test Plans'], test_plans)
 
+    def test037_Duplicate_sub_order_with_multiple_testplans_and_testunits_add_approach(self):
+        """
+        Duplicate suborder Approach: Duplicate any sub order then add test unit & test plan
+
+        LIMS-6232
+        """
+        self.info('create order data multiple testplans and test units')
+        response, payload = self.orders_api.create_order_with_double_test_plans()
+        material_type = payload[0]['testPlans'][0]['materialType']
+        article = payload[0]['testPlans'][0]['article'][0]
+        test_plan_data =random.choice(TestPlanAPI().get_completed_testplans_with_material_and_same_article(
+            material_type=material_type, article=article))
+        test_plan = test_plan_data['testPlanName']
+        test_unit_data = TestPlanAPI().get_testunits_in_testplan(id=test_plan_data['id'])
+        test_unit = test_unit_data[0]['name']
+
+        if not test_plan:
+            # create completed test_plan
+            test_plan_data = TestPlanAPI().create_completed_testplan(material_type=material_type, article=article)
+            test_plan = test_plan_data['testPlanEntity']['name']
+            test_unit = test_plan_data['specifications'][0]['name']
+
+        self.orders_page.filter_by_order_no(payload[0]['orderNo'])
+        suborder_data_before_duplicate = self.orders_page.get_child_table_data()
+        test_plans = [suborder_data_before_duplicate[0]['Test Plans'].split(',\n')[0],
+                      suborder_data_before_duplicate[0]['Test Plans'].split(',\n')[1],
+                      test_plan]
+        test_units = [suborder_data_before_duplicate[0]['Test Units'].split(',\n')[0],
+                      suborder_data_before_duplicate[0]['Test Units'].split(',\n')[1],
+                      test_unit]
+        self.info("duplicate the sub order of order {} from suborder's options".format(payload[0]['orderNo']))
+        self.orders_page.duplicate_sub_order_from_table_overview()
+        self.order_page.set_test_plan(test_plan)
+        self.order_page.set_test_unit(test_unit)
+        self.order_page.save(save_btn='order:save', sleep=True)
+        self.info("navigate to orders' active table and check that duplicated suborder found")
+        self.order_page.get_orders_page()
+        self.orders_page.filter_by_order_no(payload[0]['orderNo'])
+        child_data = self.order_page.get_child_table_data()
+        duplicated_suborder_data = child_data[0]
+        self.assertEqual(len(child_data), 2)
+        self.assertEqual(duplicated_suborder_data['Article Name'], suborder_data_before_duplicate[0]['Article Name'])
+        self.assertEqual(duplicated_suborder_data['Material Type'], suborder_data_before_duplicate[0]['Material Type'])
+        duplicated_suborder_test_units = duplicated_suborder_data['Test Units'].split((',\n')) or []
+        duplicated_suborder_test_plans = duplicated_suborder_data['Test Plans'].split((',\n')) or []
+        self.assertCountEqual(duplicated_suborder_test_units, test_units)
+        self.assertCountEqual(duplicated_suborder_test_plans, test_plans)
