@@ -301,6 +301,8 @@ class OrdersTestCases(BaseTest):
         self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no,
                                               field_type='text')
 
+
+        new_test_unit = TestPlanAPI().get_testplan_form_data(id=new_test_plan['id'])['specifications'][0]['name']
         row = self.order_page.get_last_order_row()
         self.order_page.click_check_box(source=row)
         # duplicate the main order
@@ -336,7 +338,9 @@ class OrdersTestCases(BaseTest):
         # check that it exists
         self.assertIn(after_duplicate_order['orderNo'].replace("'", ""), results)
 
-    def test000_duplicate_main_order(self):
+
+
+    def test0088_duplicate_main_order(self):
         """
         New: Orders with test units: Duplicate an order with test unit 1 copy
         LIMS-3270
@@ -2264,6 +2268,7 @@ class OrdersTestCases(BaseTest):
 
         self.info('archive first suborder')
         suborder_data = self.order_page.get_child_table_data()[0]
+        print(suborder_data)
         self.order_page.archive_sub_order_from_active_table()
         self.orders_page.delete_sub_order(analysis_no=suborder_data['Analysis No.'])
 

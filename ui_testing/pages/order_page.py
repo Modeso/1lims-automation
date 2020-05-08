@@ -39,6 +39,12 @@ class Order(Orders):
 
     def get_article(self):
         return self.base_selenium.get_text(element='order:article').split(' No')[0]
+    def get_test_plan(self):
+        test_plans = self.base_selenium.get_text(element='order:test_plan')
+        if "×" in test_plans:
+            return test_plans.replace("× ", "").split('\n')
+        else:
+            return []
 
     def set_article(self, article=''):
         if article:
@@ -368,6 +374,52 @@ class Order(Orders):
                                                                                                 table_element='order:suborder_table')
         self.base_selenium.update_item_value(item=suborder_elements_dict['testUnits'],
                                              item_text=testunit_name.replace("'", ''))
+
+    def update_suborder(self, sub_order_index=0, contacts=False, departments=[], material_type=False, articles=False,
+                        test_plans=[], test_units=[], shipment_date=False, test_date=False, remove_old=False):
+
+        suborder_table_rows = \
+            self.base_selenium.get_table_rows(element='order:suborder_table')
+        suborder_row = suborder_table_rows[sub_order_index]
+        suborder_elements_dict = self.base_selenium.get_row_cells_id_dict_related_to_header(
+            row=suborder_row, table_element='order:suborder_table')
+        contacts_record = 'contact with many departments'
+        suborder_row.click()
+        if material_type:
+            self.info('Set material type : {}'.format(material_type))
+            self.set_material_type(material_type=material_type)
+            self.sleep_small()
+
+        if articles:
+            self.remove_article(testplans=suborder_elements_dict['testPlans'])
+            self.info('Set article name : {}'.format(articles))
+            self.set_article(article=articles)
+            self.sleep_small()
+
+        self.info(' Set test plan : {} for {} time(s)'.format(test_plans, len(test_plans)))
+        for testplan in test_plans:
+            if remove_old:
+                self.clear_test_plan()
+            self.set_test_plan(test_plan=testplan)
+
+        self.info('Set test unit : {} for {} time(s)'.format(test_units, len(test_units)))
+        for testunit in test_units:
+            if remove_old:
+                self.clear_test_unit()
+            self.set_test_unit(test_unit=testunit)
+
+        if shipment_date:
+            return self.set_shipment_date(row_id=sub_order_index)
+        if test_date:
+            return self.set_test_date(row_id=sub_order_index)
+        if contacts:
+            self.set_contact(contact=contacts_record)
+        if departments:
+            self.info(' Set departments : {}'.format(departments))
+            self.set_departments(departments=departments)
+            self.sleep_small()
+
+        return self.get_suborder_data()
 
     def update_suborder(self, sub_order_index=0, contacts=False, departments=[], material_type=False, articles=False,
                         test_plans=[], test_units=[], shipment_date=False, test_date=False):
