@@ -195,6 +195,7 @@ class OrdersTestCases(BaseTest):
         order = random.choice(orders['orders'])
 
         order_no = order['orderNo']
+        self.info('order no: {}'.format(order_no))
         self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no,
                                               field_type='text')
         suborders_data = self.order_page.get_child_table_data(index=0)
