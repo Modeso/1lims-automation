@@ -2246,20 +2246,34 @@ class OrdersTestCases(BaseTest):
         """
         self.info('create order with test plan and test unit')
         response, payload = self.orders_api.create_new_order()
-        self.orders_page.filter_by_order_no(payload[0]['orderNo'])
-        self.orders_page.duplicate_main_order_from_order_option()
         self.info("get new test plan and test unit")
         new_test_plan = random.choice(
             TestPlanAPI().get_completed_testplans_with_material_and_same_article(
                 material_type=payload[0]['materialType']['text'], article=payload[0]['article']['text']))
         new_test_unit = TestPlanAPI().get_testplan_form_data(id=new_test_plan['id'])['specifications'][0]['name']
-        new_suborder = self.order_page.update_suborder(
+        self.info("duplicate order No {} ".format(payload[0]['orderNo']))
+        self.orders_page.filter_by_order_no(payload[0]['orderNo'])
+        self.orders_page.duplicate_main_order_from_order_option()
+        self.order_page.update_suborder(
             test_plans=[new_test_plan['testPlanName']], test_units=[new_test_unit], remove_old=True)
-        self.order_page.save(save_btn='order:save', sleep=True)
+        self.order_page.save(save_btn='order:save')
+        self.order_page.sleep_small()
+        duplicated_order_No = self.order_page.get_no()
+        self.info("duplicated order No is {}".format(duplicated_order_No))
         self.order_page.get_orders_page()
-        self.assertTrue(self.orders_page.is_order_in_table(new_suborder['orderNo']))
-        self.analyses_page.search(new_suborder['orderNo'])
-        self.order_page.wait_until_page_is_loaded()
+        self.assertTrue(self.orders_page.is_order_in_table(duplicated_order_No))
+        self.orders_page.filter_by_order_no(duplicated_order_No)
         duplicated_suborder_data = self.order_page.get_child_table_data()[0]
         self.assertEqual(duplicated_suborder_data['Test Units'], new_test_unit)
         self.assertEqual(duplicated_suborder_data['Test Plans'], new_test_plan['testPlanName'])
+        self.order_page.navigate_to_analysis_tab()
+        self.analyses_page.filter_by_order_no(duplicated_order_No)
+        analyses = self.analyses_page.get_the_latest_row_data()
+        self.assertEqual(new_test_plan['testPlanName'], analyses['Test Plans'])
+        child_data = self.analyses_page.get_child_table_data()
+        test_unit_found = False
+        for test_unit in child_data:
+            if test_unit['Test Unit'] == new_test_unit:
+                test_unit_found = True
+        self.assertTrue(test_unit_found)
+

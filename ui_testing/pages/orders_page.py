@@ -127,8 +127,8 @@ class Orders(BasePages):
 
     def filter_by_order_no(self, filter_text):
         self.open_filter_menu()
-        self.base_selenium.LOGGER.info(' + Filter by order no. : {}'.format(filter_text))
-        self.filter_by(filter_element='orders:filter_order_no', filter_text=filter_text, field_type='text')
+        self.info('Filter by order no. : {}'.format(filter_text))
+        self.filter_by(filter_element='orders:order_filter', filter_text=filter_text, field_type='text')
         self.filter_apply()
 
     def open_filter_menu(self):

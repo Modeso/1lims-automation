@@ -10,3 +10,10 @@ class AllAnalysesPage(BasePages):
         self.base_selenium.get(url=self.analyses)
         self.wait_until_page_is_loaded()
 
+    def filter_by_order_no(self, filter_text):
+        self.open_filter_menu()
+        self.info(' + Filter by order no. : {}'.format(filter_text))
+        self.filter_by(filter_element='orders:filter_order_no',
+                       filter_text=filter_text.replace("'", ""),
+                       field_type='drop_down')
+        self.filter_apply()

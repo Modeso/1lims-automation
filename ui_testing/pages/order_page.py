@@ -425,8 +425,6 @@ class Order(Orders):
             self.set_departments(departments=departments)
             self.sleep_small()
 
-        return self.get_suborder_data()
-
     def update_material_type_suborder(self, row, material_type):
         self.base_selenium.LOGGER.info(' Set material type : {}'.format(material_type))
         self.base_selenium.update_item_value(item=row['materialType'],
