@@ -2174,3 +2174,50 @@ class OrdersTestCases(BaseTest):
         self.assertIn(duplicated_suborder_data['Test Units'], test_units)
         self.assertIn(duplicated_suborder_data['Test Plans'], test_plans)
 
+    def test034_Duplicate_main_order_and_cahange_article(self):
+        """
+        Duplicate from the main order Approach: Duplicate then change the article
+
+        LIMS-6220
+        """
+        self.info('get random main order data')
+        api, payload = self.orders_api.create_new_order()
+        self.assertEqual(api['status'], 1)
+        test_unit_before_duplicate = payload[0]['testUnits'][0]['name']
+        self.info('get random completed test plan with different article')
+        test_plans = TestPlanAPI().get_completed_testplans()
+        test_plans_without_duplicate = [test_plan for test_plan in test_plans if
+                                        test_plan['materialType'] == payload[0]['materialType']['text'] and
+                                        payload[0]['article']['text'] != test_plan['article'][0]]
+        if test_plans_without_duplicate:
+            test_plan_data = random.choice(test_plans_without_duplicate)
+            test_plan = test_plan_data['testPlanName']
+            article = test_plan_data['article'][0]
+        else:
+            article = ArticleAPI().get_aticle_with_material_type(payload[0]['materialType']['text'])
+            new_test_plan = TestPlanAPI().create_completed_testplan(
+                material_type=payload[0]['materialType']['text'], article=article)
+            test_plan = new_test_plan['testPlanEntity']['name']
+
+        self.info("duplicate order {}".format(payload[0]['orderNo']))
+        self.order_page.search(payload[0]['orderNo'])
+        self.order_page.duplicate_main_order_from_order_option()
+        if article == 'all':
+            self.order_page.update_duplicated_order_article(article='')
+        else:
+            self.order_page.update_duplicated_order_article(article=article)
+
+        duplicated_order_no = self.order_page.get_no()
+        self.assertFalse(self.order_page.get_test_plan())
+        self.assertEqual(test_unit_before_duplicate, self.order_page.get_test_unit())
+
+        self.order_page.set_test_plan(test_plan)
+        self.order_page.save(save_btn='order:save')
+        self.orders_page.get_orders_page()
+        self.orders_page.filter_by_order_no(duplicated_order_no)
+        order = self.orders_page.get_child_table_data()[0]
+        self.assertEqual(order['Test Plans'], test_plan)
+        self.assertEqual(order['Article Name'], article)
+        self.assertEqual(order['Test Units'], test_unit_before_duplicate)
+
+

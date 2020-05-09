@@ -537,3 +537,21 @@ class Order(Orders):
             row=suborder_row, table_element='order:suborder_table')
         return suborders_elements
 
+    def update_duplicated_order_article(self, sub_order_index=0, article=''):
+
+        suborder_table_rows = self.base_selenium.get_table_rows(
+            element='order:suborder_table')
+        suborder_row = suborder_table_rows[sub_order_index]
+        suborder_elements_dict = self.base_selenium.get_row_cells_id_dict_related_to_header(
+            row=suborder_row, table_element='order:suborder_table')
+        contacts_record = 'contact with many departments'
+        suborder_row.click()
+
+        self.info('clear article data')
+        self.base_selenium.clear_single_select_drop_down(element='order:article')
+        self.info(' Set article name : {}'.format(article))
+        self.set_article(article=article)
+        self.sleep_small()
+
+
+
