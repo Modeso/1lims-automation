@@ -2204,6 +2204,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.duplicate_main_order_from_order_option()
         if article == 'all':
             self.order_page.update_duplicated_order_article(article='')
+            article = self.order_page.get_article()
         else:
             self.order_page.update_duplicated_order_article(article=article)
 
