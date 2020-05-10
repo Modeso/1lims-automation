@@ -2189,16 +2189,17 @@ class OrdersTestCases(BaseTest):
         self.assertIn(duplicated_suborder_data['Test Units'], test_units)
         self.assertIn(duplicated_suborder_data['Test Plans'], test_plans)
 
-    @skip('https://modeso.atlassian.net/browse/LIMSA-136')
     def test036_delete_multiple_orders(self):
         """
-        Orders: Make sure that you can delete multiple orders records at the same time
+        Orders: Make sure that you can't delete multiple orders records at the same time
 
         LIMS-6854
         """
         self.info("navigate to archived items' table")
         self.orders_page.get_archived_items()
-        selected_orders_data, selected_rows = self.orders_page.select_random_multiple_table_rows()
-        self.orders_page.delete_selected_item()
-        for order in selected_orders_data:
-            self.assertFalse(self.orders_page.search(order['Order No.']))
+        self.orders_page.select_random_multiple_table_rows()
+        self.orders_page.delete_selected_item(confirm_pop_up=False)
+        confirm_edit = self.base_selenium.check_element_is_exist(element="general:cant_delete_message")
+        confirm_edit_message = self.base_selenium.get_text(element="general:confirmation_pop_up")
+        self.assertTrue(confirm_edit)
+        self.assertIn('You cannot do this action on more than one record', confirm_edit_message)
