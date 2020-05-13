@@ -2217,7 +2217,7 @@ class OrdersTestCases(BaseTest):
         if case == 'main_order':
             self.info("duplicate main order")
             self.order_page.duplicate_main_order_from_order_option()
-            self.order_page.sleep_tiny()
+            self.order_page.sleep_small()
             duplicated_order_no = self.order_page.get_no()
         else:
             self.info("duplicate sub order")
@@ -2231,7 +2231,7 @@ class OrdersTestCases(BaseTest):
             self.order_page.update_duplicated_order_article(article=article)
 
         self.info("article updated to {}".format(article))
-        self.inf("assert that test plan is empty and test unit is {}".format(test_unit_before_duplicate))
+        self.info("assert that test plan is empty and test unit is {}".format(test_unit_before_duplicate))
         self.assertFalse(self.order_page.get_test_plan())
         self.assertEqual(test_unit_before_duplicate, self.order_page.get_test_unit())
         self.info("update test plan to {}".format(test_plan))
