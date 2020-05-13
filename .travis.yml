@@ -26,9 +26,8 @@ script:
   #- export TESTS='test04_testunits.py:TestUnitsTestCases.test011_create_test_unit_with_random_category'
   - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then export TESTS=''; fi
   - cd $TRAVIS_BUILD_DIR && export PYTHONPATH='./'
+
   # - xvfb-run -a nosetests-3.4 -vs --nologcapture ui_testing/testcases/header_tests/$TESTS --tc-file=config.ini
   - xvfb-run -a nosetests-3.4 -vs --nologcapture --tc-file=config.ini ui_testing/testcases/header_tests/test09_my_profile.py:MyProfileTestCases.test007_my_profile_user_can_upload_logo
   - xvfb-run -a nosetests-3.4 -vs --nologcapture --tc-file=config.ini ui_testing/testcases/header_tests/test09_my_profile.py:MyProfileTestCases.test008_my_profile_user_can_update_logo 
   - xvfb-run -a nosetests-3.4 -vs --nologcapture --tc-file=config.ini ui_testing/testcases/header_tests/test09_my_profile.py:MyProfileTestCases.test009_you_cant_upload_more_than_one_logo 
-
-

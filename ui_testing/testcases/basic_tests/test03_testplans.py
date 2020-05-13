@@ -20,14 +20,12 @@ class TestPlansTestCases(BaseTest):
         self.articles_page = Articles()
         self.test_unit_page = TstUnit()
         self.order_page = Order()
-        self.header_page = Header()
         self.base_page = BasePages()
         self.test_plan_api = TestPlanAPI()
         self.users_api = UsersAPI()
         self.article_api = ArticleAPI()
 
-        self.login_page.login(username=self.base_selenium.username, password=self.base_selenium.password)
-        self.base_selenium.wait_until_page_url_has(text='dashboard')
+        self.set_authorization(auth=self.article_api.AUTHORIZATION_RESPONSE)
         self.test_plan.get_test_plans_page()
 
     def test001_test_plan_delete_testunit(self):
@@ -628,11 +626,13 @@ class TestPlansTestCases(BaseTest):
         LIMS-6475
         User can filter with changed by field
         '''
+        self.header_page = Header()
         random_user_name = self.generate_random_string()
         random_user_email = self.header_page.generate_random_email()
         random_user_password = self.generate_random_string()
         self.info('Calling the users api to create a new user with username: {}'.format(random_user_name))
-        self.users_api.create_new_user(random_user_name, random_user_email, random_user_password)
+        self.users_api.create_new_user(username=random_user_name, email=random_user_email,
+                                       password=random_user_password)
 
         self.header_page.click_on_header_button()
         self.base_selenium.click('header:logout')
