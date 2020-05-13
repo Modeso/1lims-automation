@@ -2181,8 +2181,13 @@ class OrdersTestCases(BaseTest):
 
         LIMS-6221
 
-         Duplicate suborder Approach: Duplicate any sub order then change the units & test plans
-         ( remove them and put another ones )
+        Duplicate from the main order Approach: Duplicate then update test unit/plan by deleting
+        any test plan & test unit
+
+        LIMS-6841
+
+        Duplicate suborder Approach: Duplicate any sub order then change the units & test plans
+        (remove them and put another ones )
 
          LIMS-6229
         """
@@ -2197,9 +2202,11 @@ class OrdersTestCases(BaseTest):
         self.orders_page.filter_by_order_no(payload[0]['orderNo'])
         if case == 'main_order':
             self.orders_page.duplicate_main_order_from_order_option()
+            self.assertIn("duplicateMainOrder", self.base_selenium.get_url())
             self.order_page.sleep_small()
             duplicated_order_No = self.order_page.get_no()
             self.info("duplicated order No is {}".format(duplicated_order_No))
+            self.assertNotEqual(duplicated_order_No, payload[0]['orderNo'])
         else:
             self.orders_page.get_child_table_data()
             self.orders_page.duplicate_sub_order_from_table_overview()
@@ -2207,15 +2214,18 @@ class OrdersTestCases(BaseTest):
         self.order_page.update_suborder(
             test_plans=[new_test_plan['testPlanName']], test_units=[new_test_unit], remove_old=True)
         self.order_page.save(save_btn='order:save')
+        self.info("navigate to active table")
         self.order_page.get_orders_page()
-
         if case == 'main_order':
             self.assertTrue(self.orders_page.is_order_in_table(duplicated_order_No))
             self.orders_page.filter_by_order_no(duplicated_order_No)
             duplicated_suborder_data = self.order_page.get_child_table_data()[0]
+            self.info("assert that test unit updated to {}, test plan {}".format(
+                new_test_unit, new_test_plan['testPlanName']))
             self.assertEqual(duplicated_suborder_data['Test Units'], new_test_unit)
             self.assertEqual(duplicated_suborder_data['Test Plans'], new_test_plan['testPlanName'])
 
+        self.info("navigate to analysis")
         self.order_page.navigate_to_analysis_tab()
         if case == 'main_order':
             self.analyses_page.filter_by_order_no(duplicated_order_No)
@@ -2229,4 +2239,3 @@ class OrdersTestCases(BaseTest):
             if test_unit['Test Unit'] == new_test_unit:
                 test_unit_found = True
         self.assertTrue(test_unit_found)
-
