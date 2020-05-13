@@ -2186,7 +2186,6 @@ class OrdersTestCases(BaseTest):
         LIMS-6228
         """
         self.info('create order with test_unit and test_plan')
-        import ipdb;ipdb.set_trace()
         api, payload = self.orders_api.create_new_order()
         self.assertEqual(api['status'], 1)
         test_unit_before_duplicate = payload[0]['testUnits'][0]['name']
