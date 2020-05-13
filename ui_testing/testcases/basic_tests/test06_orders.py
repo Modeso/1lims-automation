@@ -9,7 +9,6 @@ from ui_testing.pages.analysis_page import AllAnalysesPage
 from api_testing.apis.article_api import ArticleAPI
 from api_testing.apis.test_unit_api import TestUnitAPI
 from ui_testing.pages.analysis_page import SingleAnalysisPage
-from api_testing.apis.test_plan_api import TestPlanAPI
 from api_testing.apis.contacts_api import ContactsAPI
 from api_testing.apis.test_plan_api import TestPlanAPI
 from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
@@ -2201,19 +2200,23 @@ class OrdersTestCases(BaseTest):
         self.info("duplicate order No {} ".format(payload[0]['orderNo']))
         self.orders_page.filter_by_order_no(payload[0]['orderNo'])
         if case == 'main_order':
+            self.info("duplicate main order")
             self.orders_page.duplicate_main_order_from_order_option()
             self.assertIn("duplicateMainOrder", self.base_selenium.get_url())
-            self.order_page.sleep_small()
+            self.order_page.sleep_medium()
             duplicated_order_No = self.order_page.get_no()
             self.info("duplicated order No is {}".format(duplicated_order_No))
             self.assertNotEqual(duplicated_order_No, payload[0]['orderNo'])
         else:
-            self.orders_page.get_child_table_data()
+            self.info("duplicate sub order")
+            self.orders_page.open_child_table(source=self.orders_page.result_table()[0])
             self.orders_page.duplicate_sub_order_from_table_overview()
 
+        self.info("update test plan to {} and test unit to {}".format(new_test_plan['testPlanName'], new_test_unit))
         self.order_page.update_suborder(
             test_plans=[new_test_plan['testPlanName']], test_units=[new_test_unit], remove_old=True)
         self.order_page.save(save_btn='order:save')
+
         self.info("navigate to active table")
         self.order_page.get_orders_page()
         if case == 'main_order':
@@ -2231,6 +2234,7 @@ class OrdersTestCases(BaseTest):
             self.analyses_page.filter_by_order_no(duplicated_order_No)
         else:
             self.analyses_page.search(payload[0]['orderNo'])
+
         analyses = self.analyses_page.get_the_latest_row_data()
         self.assertEqual(new_test_plan['testPlanName'], analyses['Test Plans'])
         child_data = self.analyses_page.get_child_table_data()
