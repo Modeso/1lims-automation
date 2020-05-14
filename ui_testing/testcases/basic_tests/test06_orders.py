@@ -2194,13 +2194,14 @@ class OrdersTestCases(BaseTest):
         response, payload = self.orders_api.create_new_order()
         self.assertEqual(response['status'], 1)
         self.info("get new completed test plan and test unit")
-        new_test_plan = random.choice(
-            TestPlanAPI().get_completed_testplans_with_material_and_same_article(
-                material_type=payload[0]['materialType']['text'], article=payload[0]['article']['text']))
+        completed_test_plans = TestPlanAPI().get_completed_testplans_with_material_and_same_article(
+            material_type=payload[0]['materialType']['text'], article=payload[0]['article']['text'])
 
-        if new_test_plan:
+        if completed_test_plans:
+            new_test_plan_date = random.choice(completed_test_plans)
+            new_test_plan = new_test_plan_date['testPlanName']
             new_test_unit = TestPlanAPI().get_testplan_form_data(
-                id=new_test_plan['id'])['specifications'][0]['name']
+                id=new_test_plan_date['id'])['specifications'][0]['name']
         else:
             self.info("There is no completed test plan with material type {} and different article, "
                       "so create it ".format(payload[0]['materialType']['text']))
@@ -2208,6 +2209,7 @@ class OrdersTestCases(BaseTest):
             test_plan = TestPlanAPI().create_completed_testplan(
                 material_type=payload[0]['materialType']['text'], article=article)
             new_test_plan = test_plan['testPlanEntity']['name']
+            new_test_unit = test_plan['specifications'][0]['name']
 
         self.info("duplicate order No {} ".format(payload[0]['orderNo']))
         self.orders_page.filter_by_order_no(payload[0]['orderNo'])
@@ -2225,8 +2227,7 @@ class OrdersTestCases(BaseTest):
             self.orders_page.duplicate_sub_order_from_table_overview()
 
         self.info("update test plan to {} and test unit to {}".format(new_test_plan['testPlanName'], new_test_unit))
-        self.order_page.update_suborder(
-            test_plans=[new_test_plan['testPlanName']], test_units=[new_test_unit], remove_old=True)
+        self.order_page.update_suborder(test_plans=[new_test_plan], test_units=[new_test_unit], remove_old=True)
         self.order_page.save(save_btn='order:save')
 
         self.info("navigate to active table")

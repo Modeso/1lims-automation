@@ -52,19 +52,26 @@ class OrdersAPIFactory(BaseAPI):
         """
 
         order_no = self.get_auto_generated_order_no()[0]['id']
-
-        testplan = random.choice(TestPlanAPI().get_completed_testplans())
+        testplan = random.choice(TestPlanAPI().get_completed_testplans(limit=1000))
         material_type = testplan['materialType']
         material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
         article = testplan['article'][0]
         article_api = ArticleAPI()
         if article == "all":
-            res, _ = article_api.get_all_articles(limit=20)
+            article = article_api.get_article_with_material_type(material_type=material_type)
+            res, _ = article_api.quick_search_article(name=article)
         else:
             res, _ = article_api.quick_search_article(name=article)
-        article_id = res['articles'][0]['id']
-        testunit = random.choice(TestUnitAPI().list_testunit_by_name_and_material_type(
-            materialtype_id=material_type_id)[0]['testUnits'])
+
+        for _article in res['articles']:
+            if _article['materialType'] == material_type:
+                article_id = _article['id']
+                break
+        else:
+            raise Exception('There is no article with name: {} and material: {}'.format(article, material_type))
+
+        import ipdb;ipdb.set_trace()
+        testunit = random.choice(TestUnitAPI().list_testunit_by_name_and_material_type( materialtype_id=material_type_id)[0]['testUnits'])
 
         test_date = self.get_current_date()
         shipment_date = self.get_current_date()
