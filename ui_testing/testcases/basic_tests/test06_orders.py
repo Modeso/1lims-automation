@@ -2192,11 +2192,24 @@ class OrdersTestCases(BaseTest):
         """
         self.info('create order with test plan and test unit')
         response, payload = self.orders_api.create_new_order()
-        self.info("get new test plan and test unit")
+        self.assertEqual(response['status'], 1)
+        self.info("get new completed test plan and test unit")
+        import ipdb;ipdb.set_trace()
         new_test_plan = random.choice(
             TestPlanAPI().get_completed_testplans_with_material_and_same_article(
                 material_type=payload[0]['materialType']['text'], article=payload[0]['article']['text']))
-        new_test_unit = TestPlanAPI().get_testplan_form_data(id=new_test_plan['id'])['specifications'][0]['name']
+
+        if new_test_plan:
+            new_test_unit = TestPlanAPI().get_testplan_form_data(
+                id=new_test_plan['id'])['specifications'][0]['name']
+        else:
+            self.info("There is no completed test plan with material type {} and different article, "
+                      "so create it ".format(payload[0]['materialType']['text']))
+            article = ArticleAPI().get_article_with_material_type(payload[0]['materialType']['text'])
+            test_plan = TestPlanAPI().create_completed_testplan(
+                material_type=payload[0]['materialType']['text'], article=article)
+            new_test_plan = test_plan['testPlanEntity']['name']
+
         self.info("duplicate order No {} ".format(payload[0]['orderNo']))
         self.orders_page.filter_by_order_no(payload[0]['orderNo'])
         if case == 'main_order':

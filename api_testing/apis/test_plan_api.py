@@ -1,5 +1,10 @@
 from api_testing.apis.base_api import BaseAPI
 from api_testing.apis.base_api import api_factory
+from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
+from api_testing.apis.test_unit_api import TestUnitAPI
+from api_testing.apis.article_api import ArticleAPI
+from ui_testing.pages.testunit_page import TstUnit
+import random
 
 
 class TestPlanAPIFactory(BaseAPI):
@@ -215,3 +220,36 @@ class TestPlanAPI(TestPlanAPIFactory):
         completed_test_plans = [test_plan for test_plan in all_test_plans if test_plan['materialType'] == material_type]
         test_plan_same_article = [testplan for testplan in completed_test_plans if testplan['article'] == [article]]
         return test_plan_same_article
+
+    def create_completed_testplan(self, material_type, article, **kwargs):
+        article_api = ArticleAPI()
+        if article == "all":
+            article = article_api.get_article_with_material_type(material_type=material_type)
+            res, _ = article_api.quick_search_article(name=article)
+        else:
+            res, _ = article_api.quick_search_article(name=article)
+
+        for _article in res['articles']:
+            if _article['materialType'] == material_type:
+                article_id = _article['id']
+                break
+        else:
+            raise Exception('There is no article with name: {} and material: {}'.format(article, material_type))
+
+        formatted_article = {'id': article_id, 'text': article}
+
+        material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
+        formatted_material = {'id': material_type_id, 'text': material_type}
+
+        testunit = random.choice(TestUnitAPI().list_testunit_by_name_and_material_type(
+            materialtype_id=material_type_id)[0]['testUnits'])
+        testunit_data = TestUnitAPI().get_testunit_form_data(id=testunit['id'])[0]['testUnit']
+        formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
+
+        testplan, _ = self.create_testplan(
+            testUnits=[formated_testunit], selectedArticles=[formatted_article], materialType=formatted_material)
+
+        if testplan['status'] == 1:
+            return (self.get_testplan_form_data(id=testplan['testPlanDetails']['id']))
+        else:
+            self.info(testplan)
