@@ -36,17 +36,18 @@ class OrdersTestCases(BaseTest):
         self.set_authorization(auth=self.contacts_api.AUTHORIZATION_RESPONSE)
         self.order_page.get_orders_page()
 
-    # will continue with us
     @parameterized.expand(['save_btn', 'cancel'])
-    @skip('https://modeso.atlassian.net/browse//LIMS-4768')
-    def test001_cancel_button_edit_no(self, save):
+    def test001_edit_order_number_with_save_cancel_btn(self, save):
         """
         New: Orders: Save/Cancel button: After I edit no field then press on cancel button,
         a pop up will appear that the data will be
-        LIMS-5241
+        LIMS-7200
         :return:
         """
-        self.order_page.get_random_order()
+        orders, payload = self.orders_api.get_all_orders(limit=40)
+        random_order = random.choice(orders['orders'])
+
+        self.orders_page.get_order_edit_page_by_id(random_order['id'])
         order_url = self.base_selenium.get_url()
         self.base_selenium.LOGGER.info(' + order_url : {}'.format(order_url))
         current_no = self.order_page.get_no()
@@ -63,8 +64,8 @@ class OrdersTestCases(BaseTest):
         order_no = self.order_page.get_no()
         if 'save_btn' == save:
             self.base_selenium.LOGGER.info(
-                ' + Assert {} (new_no) == {} (order_no)'.format(new_no, order_no))
-            self.assertEqual(new_no, order_no)
+                ' + Assert {} (current_no) == {} (order_no)'.format(current_no, order_no))
+            self.assertNotEqual(current_no, order_no)
         else:
             self.base_selenium.LOGGER.info(
                 ' + Assert {} (current_no) == {} (order_no)'.format(current_no, order_no))
@@ -79,6 +80,7 @@ class OrdersTestCases(BaseTest):
         LIMS-4764
         :return:
         """
+
         orders, payload = self.orders_api.get_all_orders(limit=40)
         random_order = random.choice(orders['orders'])
 
