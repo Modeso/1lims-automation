@@ -798,76 +798,7 @@ class ContactsTestCases(BaseTest):
         self.contact_page.sleep_small()
         contact_person_data = self.contact_page.get_contact_persons_data()
         self.base_selenium.LOGGER.info('Asserting the title was changed successfully to Ms')
-        self.assertEqual(contact_person_data[0]['title'], 'Ms')
-
-    def test000_contact_title_translation(self):
-        """
-        LIMS-6492
-        Contacts: Title translation approach:
-        Mr. >> Herr
-        Ms >> Frau
-        """
-
-        # generate random data for new contacts
-        random_first_company_number = self.generate_random_number()
-
-        random_second_company_number = self.generate_random_number()
-        random_second_company_name = self.generate_random_string()
-
-        random_contact_person_name = self.generate_random_string()
-
-        contact_person_mr = [
-            {
-                    'gender': {
-                        'id': 0,
-                        'text': "Mr."
-                    },
-                    'name': random_contact_person_name,
-                }
-            ]
-
-        contact_person_ms = [
-                {
-                    'gender': {
-                        'id': 1,
-                        'text': "Ms"
-                    },
-                    'name': random_contact_person_name,
-                }
-            ]
-
-        # create two contacts using api call
-        self.base_selenium.LOGGER.info('Creating the first contact from an api call with the following data:\nnumber: {}\nname: {}\ncontact person with title: {}'
-                .format(random_first_company_number, random_first_company_name, 'Mr.'))
-        first_contact_data_with_mr, payload = self.contacts_api.create_contact(companyNo=random_first_company_number, name=random_first_company_name, persons=contact_person_mr)
-        self.base_selenium.LOGGER.info('Creating the second contact from an api call with the following data:\nnumber: {}\nname: {}\ncontact person with title: {}'
-                .format(random_second_company_number, random_second_company_name, 'Ms'))
-        second_contact_data_with_ms, _payload = self.contacts_api.create_contact(companyNo=random_second_company_number, name=random_second_company_name, persons=contact_person_ms)
-        # change language to german
-        self.base_selenium.LOGGER.info('Navigating to My profile to change the language to German')
-        self.my_profile_page.get_my_profile_page()
-        self.my_profile_page.chang_lang('DE')
-        
-        # go back to the contacts page to assert that the first contact's contact person is saved with title 'Herr'
-        self.contacts_page.get_contacts_page()
-        self.contact_page.sleep_small()
-
-        self.contacts_page.search_find_row_open_edit_page(payload['name'])
-        contact_person_data_first_contact = self.contact_page.navigate_to_contact_person_tab_get_data()
-        self.base_selenium.LOGGER.info('Asserting the title of the first contact person in the first contact: {} was translated successfully to Herr'.format(random_first_company_name))
-        self.assertEqual(contact_person_data_first_contact['title'], 'Herr')
-        
-        # go back to the contacts page to assert that the second contact's contact person is saved with title 'Frau'
-        self.contacts_page.get_contacts_page()
-        self.contacts_page.search_find_row_open_edit_page(_payload['name'])
-        contact_person_data_second_contact = self.contact_page.navigate_to_contact_person_tab_get_data()
-        self.base_selenium.LOGGER.info('Asserting the title of the first contact person in the second contact: {} was translated successfully to Frau'.format(random_second_company_name))
-        self.assertEqual(contact_person_data_second_contact['title'], 'Frau')
-        
-        # set the language back to english
-        self.base_selenium.LOGGER.info('Navigating to My Profile to change the language back to English')
-        self.my_profile_page.get_my_profile_page()
-        self.my_profile_page.chang_lang('EN')
+        self.assertEqual(contact_person_data[0]['title'], 'Ms')          
 
     def test032_contact_title_translation(self):
         """
