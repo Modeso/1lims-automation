@@ -2207,7 +2207,7 @@ class OrdersTestCases(BaseTest):
         else:
             self.info("There is no completed test plan with material type {} and different article, "
                       "so create it ".format(payload[0]['materialType']['text']))
-            article = ArticleAPI().get_aticle_with_material_type(payload[0]['materialType']['text'])
+            article = ArticleAPI().get_article_with_material_type(payload[0]['materialType']['text'])
             new_test_plan = TestPlanAPI().create_completed_testplan(
                 material_type=payload[0]['materialType']['text'], article=article)
             test_plan = new_test_plan['testPlanEntity']['name']

@@ -163,7 +163,7 @@ class ArticleAPI(ArticleAPIFactory):
         _filter = '{{"quickSearch":"{}","columns":["name"]}}'.format(name)
         return self.get_all_articles(filter=_filter)
 
-    def get_aticle_with_material_type(self, material_type):
+    def get_article_with_material_type(self, material_type):
         material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
         articles, payload = self.get_all_articles()
         self.info("search for article with material type {}".format(material_type))

@@ -223,10 +223,18 @@ class TestPlanAPI(TestPlanAPIFactory):
     def create_completed_testplan(self, material_type, article, **kwargs):
         article_api = ArticleAPI()
         if article == "all":
-            res, _ = article_api.get_all_articles(limit=20)
+            article = article_api.get_article_with_material_type(material_type=material_type)
+            res, _ = article_api.quick_search_article(name=article)
         else:
             res, _ = article_api.quick_search_article(name=article)
-        article_id = res['articles'][0]['id']
+
+        for _article in res['articles']:
+            if _article['materialType'] == material_type:
+                article_id = _article['id']
+                break
+        else:
+            raise Exception('There is no article with name: {} and material: {}'.format(article, material_type))
+
         formatted_article = {'id': article_id, 'text': article}
 
         material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
