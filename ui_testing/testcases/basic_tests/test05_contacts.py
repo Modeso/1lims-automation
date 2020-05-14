@@ -4,8 +4,8 @@ from ui_testing.pages.contact_page import Contact
 from ui_testing.pages.testplan_page import TstPlan
 from ui_testing.pages.testunit_page import TstUnit
 from ui_testing.pages.base_pages import BasePages
-from ui_testing.pages.my_profile_page import MyProfile
 from ui_testing.pages.order_page import Order
+from ui_testing.pages.my_profile_page import MyProfile
 from ui_testing.pages.contacts_page import Contacts
 from ui_testing.pages.header_page import Header
 from api_testing.apis.orders_api import OrdersAPI
@@ -30,10 +30,10 @@ class ContactsTestCases(BaseTest):
         self.header_page = Header()
         self.base_page = BasePages()
         self.my_profile_page = MyProfile()
-        self.login_page.login(username=self.base_selenium.username, password=self.base_selenium.password)
-        self.base_selenium.wait_until_page_url_has(text='dashboard')
+
+        self.set_authorization(auth=self.contacts_api.AUTHORIZATION_RESPONSE)
         self.contact_page.get_contacts_page()
-        table_fields = self.contacts_api.get_table_fields(component_id=3)
+        table_fields = self.contacts_api.get_table_fields(component_id=3)[0]['fields']
 
         if self.contact_page.check_for_hidden_table_fields(fields=table_fields):
             self.contact_page.set_all_configure_table_columns_to_specific_value(value=True,
@@ -283,7 +283,7 @@ class ContactsTestCases(BaseTest):
 
         LIMS-3565
         """
-        order_request = self.orders_api.get_all_orders().json()
+        order_request = self.orders_api.get_all_orders()
         self.assertEqual(order_request['status'], 1)
         orders_records = order_request['orders']
         self.assertNotEqual(len(orders_records), 0)
@@ -401,7 +401,7 @@ class ContactsTestCases(BaseTest):
         departments_list = new_updated_departments.split(', ')
 
         self.base_selenium.LOGGER.info('get order data of order with id {}'.format(order_id))
-        order_request = self.orders_api.get_order_by_id(id=order_id).json()
+        order_request = self.orders_api.get_order_by_id(id=order_id)
         self.assertEqual(order_request['status'], 1)
         order_data = order_request['orders']
         self.assertNotEqual(len(order_data), 0)
@@ -467,8 +467,8 @@ class ContactsTestCases(BaseTest):
 
         """
 
-        contacts_response = self.contacts_api.get_all_contacts()
-        contacts = contacts_response.json()['contacts']
+        contacts_response, _ = self.contacts_api.get_all_contacts()
+        contacts = contacts_response['contacts']
         contact_name = random.choice(contacts)['name']
         search_results = self.contact_page.search(contact_name)
         self.assertGreater(len(search_results), 1, " * There is no search results for it, Report a bug.")
@@ -492,7 +492,7 @@ class ContactsTestCases(BaseTest):
         LIMS-3569
         """
 
-        contact_request = self.contacts_api.get_all_contacts().json()
+        contact_request, _ = self.contacts_api.get_all_contacts()
         self.assertEqual(contact_request['status'], 1)
         self.assertNotEqual(contact_request['count'], 0)
         contacts_records = contact_request['contacts']
@@ -771,7 +771,6 @@ class ContactsTestCases(BaseTest):
             self.assertEqual(row_data['Location'], data_to_filter_with)
             counter = counter + 1
 
-    
     def test031_add_contact_title(self):
         """
         LIMS-6491
@@ -784,9 +783,10 @@ class ContactsTestCases(BaseTest):
         rows = self.contacts_page.search(contact_data['Contact Name'])
         self.contacts_page.open_edit_page_by_css_selector(row=rows[0])
         self.contact_page.get_contact_persons_page()
-        contact_person_data = self.contact_page.get_contact_persons_data()[0]
+        self.contact_page.sleep_small()
+        contact_person_data = self.contact_page.get_contact_persons_data()
         self.base_selenium.LOGGER.info('Asserting the title was saved successfully as Mr.')
-        self.assertEqual(contact_person_data['title'], 'Mr.')
+        self.assertEqual(contact_person_data[0]['title'], 'Mr.')
 
         # update it to be Ms
         contact_person_data = self.contact_page.create_update_contact_person(create=False, title='Ms', save=True)
@@ -795,9 +795,79 @@ class ContactsTestCases(BaseTest):
         rows = self.contacts_page.search(contact_data['Contact Name'])
         self.contacts_page.open_edit_page_by_css_selector(row=rows[0])
         self.contact_page.get_contact_persons_page()
-        contact_person_data = self.contact_page.get_contact_persons_data()[0]
+        self.contact_page.sleep_small()
+        contact_person_data = self.contact_page.get_contact_persons_data()
         self.base_selenium.LOGGER.info('Asserting the title was changed successfully to Ms')
-        self.assertEqual(contact_person_data['title'], 'Ms')
+        self.assertEqual(contact_person_data[0]['title'], 'Ms')
+
+    def test000_contact_title_translation(self):
+        """
+        LIMS-6492
+        Contacts: Title translation approach:
+        Mr. >> Herr
+        Ms >> Frau
+        """
+
+        # generate random data for new contacts
+        random_first_company_number = self.generate_random_number()
+
+        random_second_company_number = self.generate_random_number()
+        random_second_company_name = self.generate_random_string()
+
+        random_contact_person_name = self.generate_random_string()
+
+        contact_person_mr = [
+            {
+                    'gender': {
+                        'id': 0,
+                        'text': "Mr."
+                    },
+                    'name': random_contact_person_name,
+                }
+            ]
+
+        contact_person_ms = [
+                {
+                    'gender': {
+                        'id': 1,
+                        'text': "Ms"
+                    },
+                    'name': random_contact_person_name,
+                }
+            ]
+
+        # create two contacts using api call
+        self.base_selenium.LOGGER.info('Creating the first contact from an api call with the following data:\nnumber: {}\nname: {}\ncontact person with title: {}'
+                .format(random_first_company_number, random_first_company_name, 'Mr.'))
+        first_contact_data_with_mr, payload = self.contacts_api.create_contact(companyNo=random_first_company_number, name=random_first_company_name, persons=contact_person_mr)
+        self.base_selenium.LOGGER.info('Creating the second contact from an api call with the following data:\nnumber: {}\nname: {}\ncontact person with title: {}'
+                .format(random_second_company_number, random_second_company_name, 'Ms'))
+        second_contact_data_with_ms, _payload = self.contacts_api.create_contact(companyNo=random_second_company_number, name=random_second_company_name, persons=contact_person_ms)
+        # change language to german
+        self.base_selenium.LOGGER.info('Navigating to My profile to change the language to German')
+        self.my_profile_page.get_my_profile_page()
+        self.my_profile_page.chang_lang('DE')
+        
+        # go back to the contacts page to assert that the first contact's contact person is saved with title 'Herr'
+        self.contacts_page.get_contacts_page()
+        self.contact_page.sleep_small()
+
+        self.contacts_page.search_find_row_open_edit_page(payload['name'])
+        contact_person_data_first_contact = self.contact_page.navigate_to_contact_person_tab_get_data()
+        self.base_selenium.LOGGER.info('Asserting the title of the first contact person in the first contact: {} was translated successfully to Herr'.format(random_first_company_name))
+        self.assertEqual(contact_person_data_first_contact['title'], 'Herr')
+        
+        # go back to the contacts page to assert that the second contact's contact person is saved with title 'Frau'
+        self.contacts_page.get_contacts_page()
+        self.contacts_page.search_find_row_open_edit_page(_payload['name'])
+        contact_person_data_second_contact = self.contact_page.navigate_to_contact_person_tab_get_data()
+        self.base_selenium.LOGGER.info('Asserting the title of the first contact person in the second contact: {} was translated successfully to Frau'.format(random_second_company_name))
+        self.assertEqual(contact_person_data_second_contact['title'], 'Frau')
+        
+        # set the language back to english
+        self.base_selenium.LOGGER.info('Navigating to My Profile to change the language back to English')
+        self.my_profile_page.get_my_profile_page()
+        self.my_profile_page.chang_lang('EN')
 
     def test032_contact_title_translation(self):
         """
@@ -819,9 +889,9 @@ class ContactsTestCases(BaseTest):
         contact_person_mr = [
             {
                 'gender': {
-                    'id': 0, 
+                    'id': 0,
                     'text': "Mr."
-                    }, 
+                },
                 'name': random_contact_person_name,
             }
         ]
@@ -829,43 +899,52 @@ class ContactsTestCases(BaseTest):
         contact_person_ms = [
             {
                 'gender': {
-                    'id': 1, 
+                    'id': 1,
                     'text': "Ms"
-                    }, 
+                },
                 'name': random_contact_person_name,
             }
         ]
 
         # create two contacts using api call
-        self.base_selenium.LOGGER.info('Creating the first contact from an api call with the following data:\nnumber: {}\nname: {}\ncontact person with title: {}'
-                .format(random_first_company_number, random_first_company_name, 'Mr.'))
-        first_contact_data_with_mr = self.contacts_api.create_contact(companyNo=random_first_company_number, name=random_first_company_name, persons=contact_person_mr)
-        
-        self.base_selenium.LOGGER.info('Creating the second contact from an api call with the following data:\nnumber: {}\nname: {}\ncontact person with title: {}'
-                .format(random_second_company_number, random_second_company_name, 'Ms'))
-        second_contact_data_with_ms = self.contacts_api.create_contact(companyNo=random_second_company_number, name=random_second_company_name, persons=contact_person_ms)
+        self.base_selenium.LOGGER.info(
+            'Creating the first contact from an api call with the following data:\nnumber: {}\nname: {}\ncontact person with title: {}'
+            .format(random_first_company_number, random_first_company_name, 'Mr.'))
+        first_contact_data_with_mr, payload = self.contacts_api.create_contact(companyNo=random_first_company_number,
+                                                                      name=random_first_company_name,
+                                                                      persons=contact_person_mr)
+
+        self.base_selenium.LOGGER.info(
+            'Creating the second contact from an api call with the following data:\nnumber: {}\nname: {}\ncontact person with title: {}'
+            .format(random_second_company_number, random_second_company_name, 'Ms'))
+        second_contact_data_with_ms, _payload = self.contacts_api.create_contact(companyNo=random_second_company_number,
+                                                                       name=random_second_company_name,
+                                                                       persons=contact_person_ms)
 
         # change language to german
         self.base_selenium.LOGGER.info('Navigating to My profile to change the language to German')
         self.my_profile_page.get_my_profile_page()
         self.my_profile_page.chang_lang('DE')
-        
+
         # go back to the contacts page to assert that the first contact's contact person is saved with title 'Herr'
         self.contacts_page.get_contacts_page()
-        self.contacts_page.search_find_row_open_edit_page(first_contact_data_with_mr['name'])
+        self.contacts_page.search_find_row_open_edit_page(payload['name'])
         contact_person_data_first_contact = self.contact_page.navigate_to_contact_person_tab_get_data()
-        self.base_selenium.LOGGER.info('Asserting the title of the first contact person in the first contact: {} was translated successfully to Herr'.format(random_first_company_name))
+        self.base_selenium.LOGGER.info(
+            'Asserting the title of the first contact person in the first contact: {} was translated successfully to Herr'.format(
+                random_first_company_name))
         self.assertEqual(contact_person_data_first_contact['title'], 'Herr')
-        
+
         # go back to the contacts page to assert that the second contact's contact person is saved with title 'Frau'
         self.contacts_page.get_contacts_page()
-        self.contacts_page.search_find_row_open_edit_page(second_contact_data_with_ms['name'])
+        self.contacts_page.search_find_row_open_edit_page(_payload['name'])
         contact_person_data_second_contact = self.contact_page.navigate_to_contact_person_tab_get_data()
-        self.base_selenium.LOGGER.info('Asserting the title of the first contact person in the second contact: {} was translated successfully to Frau'.format(random_second_company_name))
+        self.base_selenium.LOGGER.info(
+            'Asserting the title of the first contact person in the second contact: {} was translated successfully to Frau'.format(
+                random_second_company_name))
         self.assertEqual(contact_person_data_second_contact['title'], 'Frau')
-        
+
         # set the language back to english
         self.base_selenium.LOGGER.info('Navigating to My Profile to change the language back to English')
         self.my_profile_page.get_my_profile_page()
         self.my_profile_page.chang_lang('EN')
-        

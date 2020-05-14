@@ -12,7 +12,7 @@ class BaseAPI:
     requests.packages.urllib3.disable_warnings()
 
     AUTHORIZATION = None
-
+    AUTHORIZATION_RESPONSE = None
     LOGGER = logger
 
     _instance = None
@@ -49,6 +49,7 @@ class BaseAPI:
                       'cache-control': "no-cache"}
             data = {'username': username, 'password': password}
             response = self.session.post(api, json=data, headers=header, verify=False)
+            BaseAPI.AUTHORIZATION_RESPONSE = response.json()['data']
             BaseAPI.AUTHORIZATION = 'Bearer {}'.format(response.json()['data']['sessionId'])
             self.info('session ID : {} .....'.format(response.json()['data']['sessionId'][:10]))
 
@@ -56,13 +57,19 @@ class BaseAPI:
         return BaseAPI.AUTHORIZATION
 
     @staticmethod
-    def update_payload(payload, **kwargs):
+    def _update_payload(payload, **kwargs):
         for key in kwargs:
             if key in payload.keys():
                 payload[key] = kwargs[key]
             else:
                 payload[key] = kwargs[key]
         return payload
+
+    @staticmethod
+    def update_payload(payload, **kwargs):
+        if type(payload) == list:
+            return [BaseAPI._update_payload(payload[0], **kwargs)]
+        return BaseAPI._update_payload(payload, **kwargs)
 
     @staticmethod
     def info(message):
@@ -80,6 +87,10 @@ class BaseAPI:
     def get_current_date():
         return datetime.today().strftime('%Y-%m-%d')
 
+    @staticmethod
+    def get_current_year():
+        return str(datetime.now().year)
+
 
 def api_factory(method):
     if method not in ['get', 'post', 'put', 'delete']:
@@ -92,11 +103,17 @@ def api_factory(method):
             api, _payload = func(*args, **kwargs)
             payload = base_api.update_payload(_payload, **kwargs)
             base_api.info('GET : {}'.format(api))
-            response_json = base_api.session.__getattribute__(method)(api, params=payload, headers=base_api.headers,
-                                                                      verify=False).json()
+            if method in ["post"]:
+                response_json = base_api.session.post(api, json=payload, headers=base_api.headers,
+                                                      verify=False).json()
+            else:
+                response_json = base_api.session.__getattribute__(method)(api, params=payload, headers=base_api.headers,
+                                                                          verify=False).json()
             base_api.info('Status code: {}'.format(response_json['status']))
             return response_json, payload
 
         return wrapper
 
     return api_request
+
+

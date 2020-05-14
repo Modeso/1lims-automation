@@ -1,7 +1,7 @@
 from ui_testing.pages.analyses_page import AllAnalysesPage
 
-class SingleAnalysisPage(AllAnalysesPage):
 
+class SingleAnalysisPage(AllAnalysesPage):
     '''
     Opens the accordion for a specific analysis given its index
     '''
@@ -67,3 +67,4 @@ class SingleAnalysisPage(AllAnalysesPage):
                     temp_record.append(cell.text)
             records_data.append(temp_record)
         return records_data
+
