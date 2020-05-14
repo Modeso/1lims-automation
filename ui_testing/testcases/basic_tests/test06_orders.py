@@ -2226,7 +2226,7 @@ class OrdersTestCases(BaseTest):
             self.orders_page.open_child_table(source=self.orders_page.result_table()[0])
             self.orders_page.duplicate_sub_order_from_table_overview()
 
-        self.info("update test plan to {} and test unit to {}".format(new_test_plan['testPlanName'], new_test_unit))
+        self.info("update test plan to {} and test unit to {}".format(new_test_plan, new_test_unit))
         self.order_page.update_suborder(test_plans=[new_test_plan], test_units=[new_test_unit], remove_old=True)
         self.order_page.save(save_btn='order:save')
 
@@ -2237,9 +2237,9 @@ class OrdersTestCases(BaseTest):
             self.orders_page.filter_by_order_no(duplicated_order_No)
             duplicated_suborder_data = self.order_page.get_child_table_data()[0]
             self.info("assert that test unit updated to {}, test plan {}".format(
-                new_test_unit, new_test_plan['testPlanName']))
+                new_test_unit, new_test_plan))
             self.assertEqual(duplicated_suborder_data['Test Units'], new_test_unit)
-            self.assertEqual(duplicated_suborder_data['Test Plans'], new_test_plan['testPlanName'])
+            self.assertEqual(duplicated_suborder_data['Test Plans'], new_test_plan)
 
         self.info("navigate to analysis")
         self.order_page.navigate_to_analysis_tab()
@@ -2249,7 +2249,7 @@ class OrdersTestCases(BaseTest):
             self.analyses_page.search(payload[0]['orderNo'])
 
         analyses = self.analyses_page.get_the_latest_row_data()
-        self.assertEqual(new_test_plan['testPlanName'], analyses['Test Plans'])
+        self.assertEqual(new_test_plan, analyses['Test Plans'])
         child_data = self.analyses_page.get_child_table_data()
         test_unit_found = False
         for test_unit in child_data:
