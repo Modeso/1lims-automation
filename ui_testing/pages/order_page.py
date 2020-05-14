@@ -377,7 +377,7 @@ class Order(Orders):
                                              item_text=testunit_name.replace("'", ''))
 
     def update_suborder(self, sub_order_index=0, contacts=False, departments=[], material_type=False, articles=False,
-                        test_plans=[], test_units=[], shipment_date=False, test_date=False):
+                        test_plans=[], test_units=[], shipment_date=False, test_date=False, remove_old=False):
 
         suborder_table_rows = self.base_selenium.get_table_rows(
             element='order:suborder_table')
@@ -397,9 +397,10 @@ class Order(Orders):
                 ' Set article name : {}'.format(articles))
             self.set_article(article=articles)
             self.sleep_small()
-        self.base_selenium.LOGGER.info(
-            ' Set test plan : {} for {} time(s)'.format(test_plans, len(test_plans)))
+        self.info(' Set test plan : {} for {} time(s)'.format(test_plans, len(test_plans)))
         for testplan in test_plans:
+            if remove_old:
+                self.clear_test_plan()
             self.set_test_plan(test_plan=testplan)
         self.base_selenium.LOGGER.info(
             ' Set test unit : {} for {} time(s)'.format(test_units, len(test_units)))

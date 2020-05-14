@@ -70,7 +70,7 @@ class Orders(BasePages):
         self.sleep_medium()
 
     def duplicate_main_order_from_order_option(self, index=0):
-        self.info('duplicate suborder from the order\'s active table')
+        self.info('duplicate main order from the order\'s active table')
         table_records = self.result_table(element='general:table')
         self.open_row_options(row=table_records[index])
         self.base_selenium.click(element='orders:mainorder_duplicate')
@@ -127,8 +127,8 @@ class Orders(BasePages):
 
     def filter_by_order_no(self, filter_text):
         self.open_filter_menu()
-        self.base_selenium.LOGGER.info(' + Filter by order no. : {}'.format(filter_text))
-        self.filter_by(filter_element='orders:filter_order_no', filter_text=filter_text, field_type='text')
+        self.info('Filter by order no. : {}'.format(filter_text))
+        self.filter_by(filter_element='orders:order_filter', filter_text=filter_text, field_type='text')
         self.filter_apply()
 
     def open_filter_menu(self):

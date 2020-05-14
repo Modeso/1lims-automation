@@ -2174,3 +2174,62 @@ class OrdersTestCases(BaseTest):
         self.assertIn(duplicated_suborder_data['Test Units'], test_units)
         self.assertIn(duplicated_suborder_data['Test Plans'], test_plans)
 
+    def test037_Duplicate_order_with_test_plan_only(self):
+        """
+        Duplicate main order Approach: duplicate order with test plan
+
+        LIMS-6849
+        """
+        self.info("get random order with test plans")
+        order, sub_order, sub_order_index =\
+            self.orders_api.get_order_with_field_name(field='testPlans', no_of_field=1)
+
+        self.info("get completed test plan with article {}".format(sub_order[sub_order_index]['article']))
+
+        test_plans = TestPlanAPI().get_completed_testplans_with_material_and_same_article(
+            material_type=sub_order[sub_order_index]['materialType'])
+
+        if test_plans:
+            test_plans_list_without_old_one = \
+                [test_plan['testPlanName'] for test_plan in test_plans if
+                 test_plan['testPlanName'] not in sub_order[sub_order_index]['testPlans']]
+            if test_plans_list_without_old_one:
+                test_plan = random.choice(test_plans_list_without_old_one)
+            else:
+                new_test_plan = TestPlanAPI().create_completed_testplan(
+                    material_type=sub_order[sub_order_index]['materialType'],
+                    article=sub_order[sub_order_index]['article'])
+                test_plan = new_test_plan['testPlanEntity']['name']
+        else:
+            new_test_plan = TestPlanAPI().create_completed_testplan(
+                material_type=sub_order[sub_order_index]['materialType'],
+                article=sub_order[sub_order_index]['article'])
+            test_plan = new_test_plan['testPlanEntity']['name']
+
+        self.info("duplicate order with order no. {}".format(order['orderNo']))
+        self.orders_page.filter_by_order_no(order['orderNo'])
+
+        self.orders_page.duplicate_main_order_from_order_option()
+        self.info("remove suborder test plan and update it to {}".format(test_plan))
+        self.order_page.update_suborder(sub_order_index=int(len(sub_order) - 1 - sub_order_index),
+                                        test_plans=[test_plan], remove_old=True)
+        self.order_page.save(save_btn='order:save_btn', sleep=True)
+        self.info('Refresh to make sure that data are saved correctly and analysis no appeared')
+        self.base_selenium.refresh()
+        self.order_page.wait_until_page_is_loaded()
+        self.info('Get suborder data to check it updated correctly')
+        suborder_after_refresh = \
+            self.order_page.get_suborder_data()['suborders'][int(len(sub_order) - 1 - sub_order_index)]
+        suborder_testplan_after_refresh = suborder_after_refresh['testplans']
+        self.info('Assert Test plan is: {}, and should be: {}'.format(suborder_testplan_after_refresh, [test_plan]))
+        self.assertCountEqual(suborder_testplan_after_refresh, [test_plan])
+        self.info('Getting analysis page to check the data in this child table')
+        self.order_page.get_orders_page()
+        self.order_page.navigate_to_analysis_tab()
+        self.analyses_page.apply_filter_scenario(filter_element='analysis_page:analysis_no_filter',
+                                                 filter_text=suborder_after_refresh['analysis_no'],
+                                                 field_type='text')
+
+        self.info('Assert analysis is updated with new test plan')
+        analyses = self.analyses_page.get_the_latest_row_data()
+        self.assertEqual(test_plan, analyses['Test Plans'])
