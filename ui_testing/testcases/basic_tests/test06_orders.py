@@ -2194,7 +2194,6 @@ class OrdersTestCases(BaseTest):
         response, payload = self.orders_api.create_new_order()
         self.assertEqual(response['status'], 1)
         self.info("get new completed test plan and test unit")
-        import ipdb;ipdb.set_trace()
         new_test_plan = random.choice(
             TestPlanAPI().get_completed_testplans_with_material_and_same_article(
                 material_type=payload[0]['materialType']['text'], article=payload[0]['article']['text']))
