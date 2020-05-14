@@ -70,7 +70,8 @@ class OrdersAPIFactory(BaseAPI):
         else:
             raise Exception('There is no article with name: {} and material: {}'.format(article, material_type))
 
-        testunit = random.choice(TestUnitAPI().list_testunit_by_name_and_material_type( materialtype_id=material_type_id)[0]['testUnits'])
+        testunit = random.choice(TestUnitAPI().list_testunit_by_name_and_material_type(
+            materialtype_id=material_type_id)[0]['testUnits'])
 
         test_date = self.get_current_date()
         shipment_date = self.get_current_date()
@@ -251,17 +252,11 @@ class OrdersAPI(OrdersAPIFactory):
         article = testplan['article'][0]
         article_api = ArticleAPI()
         if article == "all":
-            article = article_api.get_article_with_material_type(material_type=material_type)
-            res, _ = article_api.quick_search_article(name=article)
+            res, _ = article_api.get_all_articles(limit=20)
         else:
             res, _ = article_api.quick_search_article(name=article)
 
-        for _article in res['articles']:
-            if _article['materialType'] == material_type:
-                article_id = _article['id']
-                break
-        else:
-            raise Exception('There is no article with name: {} and material: {}'.format(article, material_type))
+        article_id = res['articles'][0]['id']
 
         testunit = random.choice(TestUnitAPI().list_testunit_by_name_and_material_type(
             materialtype_id=material_type_id)[0]['testUnits'])
