@@ -116,8 +116,6 @@ class ContactsAPIFactory(BaseAPI):
 
         api = '{}{}'.format(self.url, self.END_POINTS['contacts_api']['create_contact'])
         return api, _payload
-        #return api, {}
-
 
 class ContactsAPI(ContactsAPIFactory):
     def get_first_record_with_data_in_attribute(self, attribute):
