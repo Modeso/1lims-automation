@@ -2173,7 +2173,7 @@ class OrdersTestCases(BaseTest):
         self.assertIn(duplicated_suborder_data['Test Units'], test_units)
         self.assertIn(duplicated_suborder_data['Test Plans'], test_plans)
 
-    @parameterized.expand(['main_order', 'sub_order'])
+    @parameterized.expand(['main_order', 'sub_order', 'main_order_add_only'])
     def test036_duplicate_order_with_testPlan_and_testUnit_change_both(self, case):
         """
         Duplicate from the main order Approach: Duplicate then change the test units & test plans
@@ -2184,6 +2184,10 @@ class OrdersTestCases(BaseTest):
         any test plan & test unit
 
         LIMS-6841
+
+        Duplicate from the main order Approach: Duplicate by adding test unit & plan
+
+        LIMS-6231
 
         Duplicate suborder Approach: Duplicate any sub order then change the units & test plans
         (remove them and put another ones )
@@ -2213,7 +2217,7 @@ class OrdersTestCases(BaseTest):
 
         self.info("duplicate order No {} ".format(payload[0]['orderNo']))
         self.orders_page.filter_by_order_no(payload[0]['orderNo'])
-        if case == 'main_order':
+        if case == 'main_order' or 'main_order_add_only':
             self.info("duplicate main order")
             self.orders_page.duplicate_main_order_from_order_option()
             self.assertIn("duplicateMainOrder", self.base_selenium.get_url())
@@ -2226,30 +2230,43 @@ class OrdersTestCases(BaseTest):
             self.orders_page.open_child_table(source=self.orders_page.result_table()[0])
             self.orders_page.duplicate_sub_order_from_table_overview()
 
-        self.info("update test plan to {} and test unit to {}".format(new_test_plan, new_test_unit))
-        self.order_page.update_suborder(test_plans=[new_test_plan], test_units=[new_test_unit], remove_old=True)
+        if case == 'main_order_add_only':
+            self.info("add test plan {} and test unit {}".format(new_test_plan, new_test_unit))
+            self.order_page.update_suborder(test_plans=[new_test_plan], test_units=[new_test_unit], remove_old=False)
+        else:
+            self.info("update test plan to {} and test unit to {}".format(new_test_plan, new_test_unit))
+            self.order_page.update_suborder(test_plans=[new_test_plan], test_units=[new_test_unit], remove_old=True)
         self.order_page.save(save_btn='order:save')
 
         self.info("navigate to active table")
         self.order_page.get_orders_page()
-        if case == 'main_order':
+        if case == 'main_order' or 'main_order_add_only':
             self.assertTrue(self.orders_page.is_order_in_table(duplicated_order_No))
             self.orders_page.filter_by_order_no(duplicated_order_No)
             duplicated_suborder_data = self.order_page.get_child_table_data()[0]
-            self.info("assert that test unit updated to {}, test plan {}".format(
-                new_test_unit, new_test_plan))
-            self.assertEqual(duplicated_suborder_data['Test Units'], new_test_unit)
-            self.assertEqual(duplicated_suborder_data['Test Plans'], new_test_plan)
+            if case == 'main_order':
+                self.info("assert that test unit updated to {}, test plan {}".format(
+                    new_test_unit, new_test_plan))
+                self.assertEqual(duplicated_suborder_data['Test Units'], new_test_unit)
+                self.assertEqual(duplicated_suborder_data['Test Plans'], new_test_plan)
+            else:
+                self.info("assert that test unit {}, test plan {} added to duplicated order".format(
+                    new_test_unit, new_test_plan))
+                self.assertIn(new_test_unit, duplicated_suborder_data['Test Units'])
+                self.assertIn(new_test_plan, duplicated_suborder_data['Test Plans'])
 
         self.info("navigate to analysis")
         self.order_page.navigate_to_analysis_tab()
-        if case == 'main_order':
+        if case == 'main_order' or 'main_order_add_only':
             self.analyses_page.filter_by_order_no(duplicated_order_No)
         else:
             self.analyses_page.search(payload[0]['orderNo'])
 
         analyses = self.analyses_page.get_the_latest_row_data()
-        self.assertEqual(new_test_plan, analyses['Test Plans'])
+        if case == 'main_order_add_only':
+            self.assertIn(new_test_plan, analyses['Test Plans'])
+        else:
+            self.assertEqual(new_test_plan, analyses['Test Plans'])
         child_data = self.analyses_page.get_child_table_data()
         test_unit_found = False
         for test_unit in child_data:
