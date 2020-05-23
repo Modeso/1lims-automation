@@ -2240,7 +2240,7 @@ class OrdersTestCases(BaseTest):
 
         self.info("navigate to active table")
         self.order_page.get_orders_page()
-        if case == 'main_order' or 'main_order_add_only':
+        if case != 'sub_order':
             self.assertTrue(self.orders_page.is_order_in_table(duplicated_order_No))
             self.orders_page.filter_by_order_no(duplicated_order_No)
             duplicated_suborder_data = self.order_page.get_child_table_data()[0]
@@ -2257,10 +2257,10 @@ class OrdersTestCases(BaseTest):
 
         self.info("navigate to analysis")
         self.order_page.navigate_to_analysis_tab()
-        if case == 'main_order' or 'main_order_add_only':
-            self.analyses_page.filter_by_order_no(duplicated_order_No)
-        else:
+        if case == 'sub_order':
             self.analyses_page.search(payload[0]['orderNo'])
+        else:
+            self.analyses_page.filter_by_order_no(duplicated_order_No)
 
         analyses = self.analyses_page.get_the_latest_row_data()
         if case == 'main_order_add_only':
