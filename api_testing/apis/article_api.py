@@ -169,7 +169,7 @@ class ArticleAPI(ArticleAPIFactory):
         self.info("search for article with material type {}".format(material_type))
         for article in articles['articles']:
             if article['materialType'] == material_type:
-                return article['name']
+                return article
 
         self.info("No article with requested material type, So create atricle")
         materialType = {"id": material_type_id, "text": material_type}

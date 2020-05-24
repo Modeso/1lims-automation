@@ -2199,7 +2199,8 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(response['status'], 1)
         self.info("get new completed test plan and test unit")
         completed_test_plans = TestPlanAPI().get_completed_testplans_with_material_and_same_article(
-            material_type=payload[0]['materialType']['text'], article=payload[0]['article']['text'])
+            material_type=payload[0]['materialType']['text'], article=payload[0]['article']['text'],
+            articleNo=ArticleAPI().get_article_form_data(id=payload[0]['article']['id']))
 
         if completed_test_plans:
             new_test_plan_date = random.choice(completed_test_plans)
@@ -2210,8 +2211,12 @@ class OrdersTestCases(BaseTest):
             self.info("There is no completed test plan with material type {} and different article, "
                       "so create it ".format(payload[0]['materialType']['text']))
             article = ArticleAPI().get_article_with_material_type(payload[0]['materialType']['text'])
+            formatted_article = {'id': article['id'], 'text': article['name']}
+
             test_plan = TestPlanAPI().create_completed_testplan(
-                material_type=payload[0]['materialType']['text'], article=article)
+                material_type=payload[0]['materialType']['text'],
+                formatted_article=formatted_article)
+
             new_test_plan = test_plan['testPlanEntity']['name']
             new_test_unit = test_plan['specifications'][0]['name']
 
