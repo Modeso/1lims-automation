@@ -50,19 +50,13 @@ class OrdersAPIFactory(BaseAPI):
         :param kwargs:
         :return: response, payload
         """
-
         order_no = self.get_auto_generated_order_no()[0]['id']
-
-        testplan = random.choice(TestPlanAPI().get_completed_testplans())
+        testplan = random.choice(TestPlanAPI().get_completed_testplans(limit=1000))
         material_type = testplan['materialType']
         material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
-        article = testplan['article'][0]
-        article_api = ArticleAPI()
-        if article == "all":
-            res, _ = article_api.get_all_articles(limit=20)
-        else:
-            res, _ = article_api.quick_search_article(name=article)
-        article_id = res['articles'][0]['id']
+        testplan_form_data = TestPlanAPI()._get_testplan_form_data(id=testplan['id'])[0]
+        article = testplan_form_data['testPlan']['selectedArticles'][0]['name']
+        article_id =testplan_form_data['testPlan']['selectedArticles'][0]['id']
         testunit = random.choice(TestUnitAPI().list_testunit_by_name_and_material_type(
             materialtype_id=material_type_id)[0]['testUnits'])
 
@@ -240,17 +234,11 @@ class OrdersAPI(OrdersAPIFactory):
 
     def create_order_with_double_test_plans(self):
         testplan = random.choice(TestPlanAPI().get_completed_testplans())
+        testplan_form_data = TestPlanAPI()._get_testplan_form_data(id=testplan['id'])[0]
+        article = testplan_form_data['testPlan']['selectedArticles'][0]['name']
+        article_id = testplan_form_data['testPlan']['selectedArticles'][0]['id']
         material_type = testplan['materialType']
         material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
-        article = testplan['article'][0]
-        article_api = ArticleAPI()
-        if article == "all":
-            res, _ = article_api.get_all_articles(limit=20)
-        else:
-            res, _ = article_api.quick_search_article(name=article)
-
-        article_id = res['articles'][0]['id']
-
         testunit = random.choice(TestUnitAPI().list_testunit_by_name_and_material_type(
             materialtype_id=material_type_id)[0]['testUnits'])
         testunit_data = TestUnitAPI().get_testunit_form_data(id=testunit['id'])[0]['testUnit']

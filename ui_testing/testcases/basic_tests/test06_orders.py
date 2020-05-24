@@ -2174,3 +2174,11 @@ class OrdersTestCases(BaseTest):
         self.assertIn(duplicated_suborder_data['Test Units'], test_units)
         self.assertIn(duplicated_suborder_data['Test Plans'], test_plans)
 
+    def test040_test_creat_order(self):
+        import ipdb;ipdb.set_trace()
+        api, payload = self.orders_api.create_new_order()
+        self.info(payload)
+        self.orders_page.filter_by_order_no(payload[0]['orderNo'])
+        self.info(self.orders_page.get_the_latest_row_data())
+        self.info(self.orders_page.get_child_table_data())
+
