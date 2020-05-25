@@ -245,7 +245,7 @@ class OrdersTestCases(BaseTest):
         orders, payload = self.orders_api.get_all_orders(limit=40, deleted=1)
         random_order = random.choice(orders['orders'])
         self.orders_page.get_archived_items()
-        order_row = self.orders_page.search(random_order['orderNo'])[0]
+        order_row =self.orders_page.search(random_order['orderNo'])[0]
 
         self.order_page.click_check_box(source=order_row)
 
@@ -619,8 +619,8 @@ class OrdersTestCases(BaseTest):
         New: orders Test plan /test unit validation in edit mode
         LIMS-4826
         """
-        self.base_selenium.LOGGER.info(
-            ' Running test case to check that at least test unit or test plan is mandatory in order')
+        self.base_selenium.LOGGER.info(' Running test case to check that '
+                                       'at least test unit or test plan is mandatory in order')
         # Get random order
         orders, payload = self.orders_api.get_all_orders(limit=20)
         selected_order_record = random.choice(orders['orders'])
@@ -867,7 +867,7 @@ class OrdersTestCases(BaseTest):
         random_name = random.choice(random_testunit['testUnits'])
 
         self.order_page.get_orders_page()
-        created_order = self.order_page.create_existing_order(no='', material_type='s', article='a', contact='',
+        created_order = self.order_page.create_existing_order(no='',material_type='s', article='a', contact='',
                                                               test_units=[random_name['name']])
         self.order_page.get_orders_page()
         self.order_page.navigate_to_analysis_tab()
