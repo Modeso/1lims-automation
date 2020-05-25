@@ -2198,9 +2198,10 @@ class OrdersTestCases(BaseTest):
         response, payload = self.orders_api.create_new_order()
         self.assertEqual(response['status'], 1)
         self.info("get new completed test plan and test unit")
+        article_no = ArticleAPI().get_article_form_data(id=payload[0]['article']['id'])[0]['article']['No']
         completed_test_plans = TestPlanAPI().get_completed_testplans_with_material_and_same_article(
             material_type=payload[0]['materialType']['text'], article=payload[0]['article']['text'],
-            articleNo=ArticleAPI().get_article_form_data(id=payload[0]['article']['id']))
+            articleNo=article_no)
 
         if completed_test_plans:
             new_test_plan_date = random.choice(completed_test_plans)
@@ -2208,11 +2209,9 @@ class OrdersTestCases(BaseTest):
             new_test_unit = TestPlanAPI().get_testplan_form_data(
                 id=new_test_plan_date['id'])['specifications'][0]['name']
         else:
-            self.info("There is no completed test plan with material type {} and different article, "
+            self.info("There is no completed test plan with material type {} and same article, "
                       "so create it ".format(payload[0]['materialType']['text']))
-            article = ArticleAPI().get_article_with_material_type(payload[0]['materialType']['text'])
-            formatted_article = {'id': article['id'], 'text': article['name']}
-
+            formatted_article = {'id':payload[0]['article']['id'], 'text': payload[0]['article']['text']}
             test_plan = TestPlanAPI().create_completed_testplan(
                 material_type=payload[0]['materialType']['text'],
                 formatted_article=formatted_article)
@@ -2222,7 +2221,7 @@ class OrdersTestCases(BaseTest):
 
         self.info("duplicate order No {} ".format(payload[0]['orderNo']))
         self.orders_page.filter_by_order_no(payload[0]['orderNo'])
-        if case == 'main_order' or 'main_order_add_only':
+        if case != 'sub_order':
             self.info("duplicate main order")
             self.orders_page.duplicate_main_order_from_order_option()
             self.assertIn("duplicateMainOrder", self.base_selenium.get_url())
