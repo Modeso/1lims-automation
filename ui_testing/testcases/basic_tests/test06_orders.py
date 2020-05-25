@@ -2223,7 +2223,7 @@ class OrdersTestCases(BaseTest):
             self.info("completed test plan created with name {} and test unit {}".format(new_test_plan, new_test_unit))
 
         self.info("duplicate order No {} ".format(payload[0]['orderNo']))
-        self.orders_page.filter_by_order_no(payload[0]['orderNo'])
+        self.orders_page.search(payload[0]['orderNo'])
         if case != 'sub_order':
             self.info("duplicate main order")
             self.orders_page.duplicate_main_order_from_order_option()
@@ -2249,7 +2249,7 @@ class OrdersTestCases(BaseTest):
         self.info("navigate to active table")
         self.order_page.get_orders_page()
         if case != 'sub_order':
-            self.orders_page.filter_by_order_no(duplicated_order_No)
+            self.orders_page.search(duplicated_order_No)
             self.assertTrue(self.orders_page.is_order_in_table(duplicated_order_No))
             duplicated_suborder_data = self.order_page.get_child_table_data()[0]
             if case == 'main_order':
