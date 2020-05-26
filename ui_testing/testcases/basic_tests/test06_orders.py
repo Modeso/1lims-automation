@@ -2174,45 +2174,60 @@ class OrdersTestCases(BaseTest):
         self.assertIn(duplicated_suborder_data['Test Units'], test_units)
         self.assertIn(duplicated_suborder_data['Test Plans'], test_plans)
 
-    def test037_Duplicate_order_with_test_plan_only(self):
+    @parameterized.expand(["duplicate", "edit"])
+    def test037_Duplicate_or_update_order_with_test_plan_only(self, case):
         """
         Duplicate main order Approach: duplicate order with test plan
 
         LIMS-6849
+
+        -When I edit order by deleting test plan message will appear
+        (This Test Plan will be removed from the corresponding analysis )
+        -make sure the corresponding analysis records created according to this update in test unit.
+
+        LIMS-4269 case 1
         """
         self.info("get random order with test plans")
         order, sub_order, sub_order_index =\
             self.orders_api.get_order_with_field_name(field='testPlans', no_of_field=1)
 
         self.info("get completed test plan with article {}".format(sub_order[sub_order_index]['article']))
-
         test_plans = TestPlanAPI().get_completed_testplans_with_material_and_same_article(
-            material_type=sub_order[sub_order_index]['materialType'])
+            material_type=sub_order[sub_order_index]['materialType'],
+            article=sub_order[sub_order_index]['article'],
+            articleNo=sub_order[sub_order_index]['articleNo'])
 
-        if test_plans:
-            test_plans_list_without_old_one = \
-                [test_plan['testPlanName'] for test_plan in test_plans if
-                 test_plan['testPlanName'] not in sub_order[sub_order_index]['testPlans']]
-            if test_plans_list_without_old_one:
-                test_plan = random.choice(test_plans_list_without_old_one)
-            else:
-                new_test_plan = TestPlanAPI().create_completed_testplan(
-                    material_type=sub_order[sub_order_index]['materialType'],
-                    article=sub_order[sub_order_index]['article'])
-                test_plan = new_test_plan['testPlanEntity']['name']
+        test_plans_list_without_old_one = [test_plan['testPlanName'] for test_plan in test_plans
+                                           if test_plan['testPlanName'] not in sub_order[sub_order_index]['testPlans']]
+
+        if test_plans_list_without_old_one:
+            test_plan = random.choice(test_plans_list_without_old_one)
+            self.info("completed test plan found with name {}".format(test_plan))
         else:
+            self.info("there is no completed test plans with required article so create one")
+            article_id = ArticleAPI().get_article_id(article=sub_order[sub_order_index]['article'],
+                                                     articleNo=sub_order[sub_order_index]['articleNo'])
+            article = {'id': article_id, 'text': sub_order[sub_order_index]['article']}
             new_test_plan = TestPlanAPI().create_completed_testplan(
-                material_type=sub_order[sub_order_index]['materialType'],
-                article=sub_order[sub_order_index]['article'])
+                material_type=sub_order[sub_order_index]['materialType'], formatted_article=article)
             test_plan = new_test_plan['testPlanEntity']['name']
 
-        self.info("duplicate order with order no. {}".format(order['orderNo']))
-        self.orders_page.filter_by_order_no(order['orderNo'])
+        if case == 'duplicate':
+            self.info("duplicate order with order no. {}".format(order['orderNo']))
+            self.orders_page.search(order['orderNo'])
+            self.orders_page.duplicate_main_order_from_order_option()
+        else:
+            self.info("Edit order with order no. {}".format(order['orderNo']))
+            self.orders_page.get_order_edit_page_by_id(order['orderId'])
 
-        self.orders_page.duplicate_main_order_from_order_option()
         self.info("remove suborder test plan and update it to {}".format(test_plan))
-        self.order_page.update_suborder(sub_order_index=int(len(sub_order) - 1 - sub_order_index),
-                                        test_plans=[test_plan], remove_old=True)
+        if case == 'duplicate':
+            self.order_page.update_suborder(sub_order_index=int(len(sub_order)-1-sub_order_index),
+                                            test_plans=[test_plan], remove_old=True)
+        else:
+            self.order_page.update_suborder(sub_order_index=int(len(sub_order) - 1 - sub_order_index),
+                                            test_plans=[test_plan], remove_old=True, confirm=True)
+
         self.order_page.save(save_btn='order:save_btn', sleep=True)
         self.info('Refresh to make sure that data are saved correctly and analysis no appeared')
         self.base_selenium.refresh()

@@ -214,35 +214,43 @@ class TestPlanAPI(TestPlanAPIFactory):
         else:
             return False
 
-    def get_completed_testplans_with_material_and_same_article(self, material_type='Raw Material', article='all'):
-        all_test_plans = self.get_completed_testplans()
+    def get_completed_testplans_with_material_and_same_article(self, material_type, article, articleNo):
+        all_test_plans = self.get_completed_testplans(limit=1000)
         completed_test_plans = [test_plan for test_plan in all_test_plans if test_plan['materialType'] == material_type]
-        test_plan_same_article = [testplan for testplan in completed_test_plans if testplan['article'] == [article]]
+        test_plan_same_article = []
+        for testplan in completed_test_plans:
+            if testplan['article'][0] in [article, 'all'] and testplan['articleNo'][0] in [articleNo, 'all']:
+                test_plan_same_article.append(testplan)
         return test_plan_same_article
 
-    def create_completed_testplan(self, material_type, article, **kwargs):
-        article_api = ArticleAPI()
-        if article == "all":
-            article = article_api.get_article_with_material_type(material_type=material_type)
-            res, _ = article_api.quick_search_article(name=article)
-        else:
-            res, _ = article_api.quick_search_article(name=article)
-
-        for _article in res['articles']:
-            if _article['materialType'] == material_type:
-                article_id = _article['id']
-                break
-        else:
-            raise Exception('There is no article with name: {} and material: {}'.format(article, material_type))
-
-        formatted_article = {'id': article_id, 'text': article}
-
+    def create_completed_testplan(self, material_type, formatted_article, **kwargs):
         material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
         formatted_material = {'id': material_type_id, 'text': material_type}
+        testunits = TestUnitAPI().list_testunit_by_name_and_material_type(
+            materialtype_id=material_type_id)
 
-        testunit = random.choice(TestUnitAPI().list_testunit_by_name_and_material_type(
-            materialtype_id=material_type_id)[0]['testUnits'])
-        testunit_data = TestUnitAPI().get_testunit_form_data(id=testunit['id'])[0]['testUnit']
+        selected_test_unit_id = []
+        for testunit in testunits[0]['testUnits']:  # make sure test unit have value
+            if testunit['typeName'] == ['Quantitative MiBi']:
+                if testunit['mibiValue']:
+                    selected_test_unit_id = [testunit['id']]
+                    break
+            elif testunit['typeName'] == ['Quantitative']:
+                if testunit['lowerLimit'] and testunit['upperLimit']:
+                    selected_test_unit_id = [testunit['id']]
+                    break
+            elif testunit['typeName'] == ['Qualitative']:
+                if testunit['textValue']:
+                    selected_test_unit_id = [testunit['id']]
+                    break
+            else:
+                continue
+        # in case I have no test units with required material type and has values, create one
+        if not selected_test_unit_id:
+            api, testunit_payload = TestUnitAPI().create_quantitative_testunit()
+            selected_test_unit_id = [api['testUnit']['testUnitId']]
+
+        testunit_data = TestUnitAPI().get_testunit_form_data(id=selected_test_unit_id[0])[0]['testUnit']
         formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
 
         testplan, _ = self.create_testplan(

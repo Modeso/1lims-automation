@@ -320,23 +320,25 @@ class Order(Orders):
     def get_suborder_data(self):
         webdriver.ActionChains(self.base_selenium.driver).send_keys(Keys.ESCAPE).perform()
         table_suborders = self.base_selenium.get_table_rows(element='order:suborder_table')
-        self.base_selenium.LOGGER.info('getting main order data')
+        self.info('getting main order data')
         order_data = {
             "orderNo": self.get_no(),
-            "contacts": self.get_contact(),
+            "contacts": [],
             "suborders": []
         }
         suborders_data = []
-        self.base_selenium.LOGGER.info('getting suborders data')
+        self.info('getting suborders data')
         for suborder in table_suborders:
-            suborder_data = self.base_selenium.get_row_cells_id_dict_related_to_header(row=suborder,
-                                                                                       table_element='order:suborder_table')
+            suborder_data = \
+                self.base_selenium.get_row_cells_id_dict_related_to_header(
+                    row=suborder, table_element='order:suborder_table')
+
             article = {"name": suborder_data['article'].split(' No:')[0],
-                       "no": suborder_data['article'].split(' No:')[1]} if len(
-                suborder_data['article'].split(' No:')) > 1 else '-'
+                       "no": suborder_data['article'].split(' No:')[1]} \
+                if len(suborder_data['article'].split(' No:')) > 1 else '-'
+
             testunits = []
             rawTestunitArr = suborder_data['testUnits'].split(',\n')
-
             for testunit in rawTestunitArr:
                 if len(testunit.split(' No: ')) > 1:
                     testunits.append({
@@ -377,7 +379,8 @@ class Order(Orders):
                                              item_text=testunit_name.replace("'", ''))
 
     def update_suborder(self, sub_order_index=0, contacts=False, departments=[], material_type=False, articles=False,
-                        test_plans=[], test_units=[], shipment_date=False, test_date=False, remove_old=False):
+                        test_plans=[], test_units=[], shipment_date=False, test_date=False, remove_old=False,
+                        confirm=False):
 
         suborder_table_rows = self.base_selenium.get_table_rows(
             element='order:suborder_table')
@@ -387,23 +390,24 @@ class Order(Orders):
         contacts_record = 'contact with many departments'
         suborder_row.click()
         if material_type:
-            self.base_selenium.LOGGER.info(
-                ' Set material type : {}'.format(material_type))
+            self.info('Set material type : {}'.format(material_type))
             self.set_material_type(material_type=material_type)
             self.sleep_small()
         if articles:
             self.remove_article(testplans=suborder_elements_dict['testPlans'])
-            self.base_selenium.LOGGER.info(
-                ' Set article name : {}'.format(articles))
+            self.info(' Set article name : {}'.format(articles))
             self.set_article(article=articles)
             self.sleep_small()
         self.info(' Set test plan : {} for {} time(s)'.format(test_plans, len(test_plans)))
         for testplan in test_plans:
             if remove_old:
                 self.clear_test_plan()
+                if confirm:
+                    self.base_selenium.wait_element('general:cant_delete_message')
+                    self.confirm_popup()
             self.set_test_plan(test_plan=testplan)
-        self.base_selenium.LOGGER.info(
-            ' Set test unit : {} for {} time(s)'.format(test_units, len(test_units)))
+
+        self.info(' Set test unit : {} for {} time(s)'.format(test_units, len(test_units)))
         for testunit in test_units:
             self.set_test_unit(test_unit=testunit)
 
