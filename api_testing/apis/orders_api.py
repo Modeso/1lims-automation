@@ -57,6 +57,18 @@ class OrdersAPIFactory(BaseAPI):
         testplan_form_data = TestPlanAPI()._get_testplan_form_data(id=testplan['id'])[0]
         article = testplan_form_data['testPlan']['selectedArticles'][0]['name']
         article_id =testplan_form_data['testPlan']['selectedArticles'][0]['id']
+
+        #modify_test_plan_ID
+        testplan['id'] = testplan_form_data['testPlan']['testPlanEntity']['id']
+
+        # import ipdb; ipdb.set_trace()
+        # res, payload = ArticleAPI().list_testplans_by_article_and_materialtype(materialtype_id=material_type_id,
+        #                                                                       article_id=article_id)
+        # for _testplan in res['testPlans']:
+        #     if _testplan['number'] == testplan["number"]:
+        #         testplan["id"] = _testplan["id"]
+        #         break
+
         testunit = random.choice(TestUnitAPI().list_testunit_by_name_and_material_type(
             materialtype_id=material_type_id)[0]['testUnits'])
 
