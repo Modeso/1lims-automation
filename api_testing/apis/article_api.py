@@ -1,6 +1,5 @@
 from api_testing.apis.base_api import BaseAPI
 from api_testing.apis.base_api import api_factory
-from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 
 
 class ArticleAPIFactory(BaseAPI):
