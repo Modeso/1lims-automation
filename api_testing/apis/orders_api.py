@@ -57,7 +57,6 @@ class OrdersAPIFactory(BaseAPI):
         testplan_form_data = TestPlanAPI()._get_testplan_form_data(id=testplan['id'])[0]
         article = testplan_form_data['testPlan']['selectedArticles'][0]['name']
         article_id =testplan_form_data['testPlan']['selectedArticles'][0]['id']
-
         #modify_test_plan_ID
         testplan['id'] = testplan_form_data['testPlan']['testPlanEntity']['id']
 
@@ -69,8 +68,7 @@ class OrdersAPIFactory(BaseAPI):
         #         testplan["id"] = _testplan["id"]
         #         break
 
-        testunit = random.choice(TestUnitAPI().list_testunit_by_name_and_material_type(
-            materialtype_id=material_type_id)[0]['testUnits'])
+        testunit = testplan_form_data['testPlan']['specifications'][0]
 
         test_date = self.get_current_date()
         shipment_date = self.get_current_date()
@@ -247,13 +245,13 @@ class OrdersAPI(OrdersAPIFactory):
     def create_order_with_double_test_plans(self):
         testplan = random.choice(TestPlanAPI().get_completed_testplans())
         testplan_form_data = TestPlanAPI()._get_testplan_form_data(id=testplan['id'])[0]
+        testplan['id'] = testplan_form_data['testPlan']['testPlanEntity']['id']
         article = testplan_form_data['testPlan']['selectedArticles'][0]['name']
         article_id = testplan_form_data['testPlan']['selectedArticles'][0]['id']
         material_type = testplan['materialType']
         material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
-        testunit = random.choice(TestUnitAPI().list_testunit_by_name_and_material_type(
-            materialtype_id=material_type_id)[0]['testUnits'])
-        testunit_data = TestUnitAPI().get_testunit_form_data(id=testunit['id'])[0]['testUnit']
+        testunit1 = testplan_form_data['testPlan']['specifications'][0]
+        testunit_data = TestUnitAPI().get_testunit_form_data(id=testunit1['id'])[0]['testUnit']
         formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
 
         formatted_article = {'id': article_id, 'text': article}
@@ -263,18 +261,46 @@ class OrdersAPI(OrdersAPIFactory):
         testplan2, _ = TestPlanAPI().create_testplan(
             testUnits=[formated_testunit], selectedArticles=[formatted_article], materialType=formatted_material)
 
+        if testplan2['status'] != 1:
+            testplan2, _ = TestPlanAPI().create_testplan(
+                testUnits=[formated_testunit], selectedArticles=[formatted_article], materialType=formatted_material)
+
         second_testPlan_data = TestPlanAPI()._get_testplan_form_data(id=testplan2['testPlanDetails']['id'])
 
         testPlan2 = {
-            'id': int(second_testPlan_data[0]['testPlan']['id']),
+            'id': int(second_testPlan_data[0]['testPlan']['testPlanEntity']['id']),
             'testPlanName': second_testPlan_data[0]['testPlan']['testPlanEntity']['name'],
             'version': 1
         }
         testplan_list = [testplan, testPlan2]
 
-        testunit2 = random.choice(TestUnitAPI().list_testunit_by_name_and_material_type(
-            materialtype_id=material_type_id)[0]['testUnits'])
-        testunit_list = [testunit, testunit2]
+        testunits = TestUnitAPI().list_testunit_by_name_and_material_type(materialtype_id=material_type_id)
+        selected_test_unit_list = []
+        for testunit in testunits[0]['testUnits']:  # make sure test unit have value
+            if testunit['name'] == testunit1['name']: # select test unit != first test unit
+                continue
+            if testunit['typeName'] == 'Quantitative MiBi':
+                if testunit['mibiValue']:
+                    selected_test_unit_list = [testunit]
+                    break
+            elif testunit['typeName'] == 'Quantitative':
+                if testunit['lowerLimit'] and testunit['upperLimit']:
+                    selected_test_unit_list = [testunit]
+                    break
+            elif testunit['typeName'] == 'Qualitative':
+                if testunit['textValue']:
+                    selected_test_unit_list = [testunit]
+                    break
+
+        # in case I have no test units with required material type and has values, create one
+        if not selected_test_unit_list:
+            api, testunit_payload = TestUnitAPI().create_quantitative_testunit()
+            selected_test_unit_list = TestUnitAPI().get_testunit_form_data(id=api['testUnit']['testUnitId'])[0]['testUnit']
+
+        testunit2 = selected_test_unit_list[0]
+
+
+        testunit_list = [testunit1, testunit2]
 
         payload = {
             'testPlans': testplan_list,
