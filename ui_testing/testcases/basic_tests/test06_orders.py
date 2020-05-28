@@ -2174,3 +2174,8 @@ class OrdersTestCases(BaseTest):
         self.assertIn(duplicated_suborder_data['Test Units'], test_units)
         self.assertIn(duplicated_suborder_data['Test Plans'], test_plans)
 
+    def get_contact(self):
+        self.orders_page.get_order_edit_page_by_id(id=1568)
+        self.info(self.order_page.get_contact())
+        self.orders_page.get_order_edit_page_by_id(id=1567)
+        self.info(self.order_page.get_contact())
