@@ -2190,8 +2190,6 @@ class OrdersTestCases(BaseTest):
         api, payload = self.orders_api.create_order_with_double_test_plans()
         self.info(payload)
         self.orders_page.search(payload[0]['orderNo'])
-        order_data = self.orders_page.get_the_latest_row_data()
-        self.assertEqual(order_data['Order No.'].split('-')[0].replace("'", ""), str(payload[0]['orderNo']))
         suborder_data = self.orders_page.get_child_table_data()[0]
         self.assertEqual(suborder_data['Test Plans'].split(',\n')[0], payload[0]['testPlans'][0]['testPlanName'])
         self.assertEqual(suborder_data['Test Plans'].split(',\n')[1], payload[0]['testPlans'][1]['testPlanName'])
