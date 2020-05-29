@@ -50,9 +50,9 @@ class OrdersTestCases(BaseTest):
         self.orders_page.get_order_edit_page_by_id(random_order['id'])
         order_url = self.base_selenium.get_url()
         self.base_selenium.LOGGER.info(' + order_url : {}'.format(order_url))
-        current_no = self.order_page.get_no()
-        new_no = self.generate_random_string()
-        self.order_page.set_no(new_no)
+        old_number = self.order_page.get_no()
+        new_number = self.generate_random_string()
+        self.order_page.set_no(new_number)
         if 'save_btn' == save:
             self.order_page.save(save_btn='order:save_btn')
         else:
@@ -61,15 +61,15 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.get(
             url=order_url, sleep=self.base_selenium.TIME_MEDIUM)
 
-        order_no = self.order_page.get_no()
+        current_number = self.order_page.get_no()
         if 'save_btn' == save:
             self.base_selenium.LOGGER.info(
-                ' + Assert {} (current_no) == {} (order_no)'.format(current_no, order_no))
-            self.assertNotEqual(current_no, order_no)
+                ' + Assert {} (current_number) == {} (new_number)'.format(current_number, new_number))
+            self.assertNotEqual(current_number, new_number)
         else:
             self.base_selenium.LOGGER.info(
-                ' + Assert {} (current_no) == {} (order_no)'.format(current_no, order_no))
-            self.assertEqual(current_no, order_no)
+                ' + Assert {} (current_number) == {} (old_number)'.format(current_number, old_number))
+            self.assertEqual(current_number, old_number)
 
     @parameterized.expand(['save_btn', 'cancel'])
     def test002_update_contact_with_save_cancel_btn(self, save):
