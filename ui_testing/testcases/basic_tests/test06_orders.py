@@ -2198,17 +2198,27 @@ class OrdersTestCases(BaseTest):
         response, payload = self.orders_api.create_order_with_double_test_plans()
         material_type = payload[0]['testPlans'][0]['materialType']
         article = payload[0]['testPlans'][0]['article'][0]
-        test_plan_data =random.choice(TestPlanAPI().get_completed_testplans_with_material_and_same_article(
-            material_type=material_type, article=article))
-        test_plan = test_plan_data['testPlanName']
-        test_unit_data = TestPlanAPI().get_testunits_in_testplan(id=test_plan_data['id'])
-        test_unit = test_unit_data[0]['name']
+        article_no = ArticleAPI().get_article_form_data(id=payload[0]['article']['id'])[0]['article']['No']
+        self.info("get new completed test plan with article {} No: {} and material_type {}".format(
+            payload[0]['article']['text'], article_no, payload[0]['materialType']['text']))
 
-        if not test_plan:
-            # create completed test_plan
-            test_plan_data = TestPlanAPI().create_completed_testplan(material_type=material_type, article=article)
-            test_plan = test_plan_data['testPlanEntity']['name']
-            test_unit = test_plan_data['specifications'][0]['name']
+        completed_test_plans = TestPlanAPI().get_completed_testplans_with_material_and_same_article(
+            material_type=payload[0]['materialType']['text'], article=payload[0]['article']['text'],
+            articleNo=article_no)
+
+        if completed_test_plans:
+            test_plan_data = random.choice(completed_test_plans)
+            test_plan = test_plan_data['testPlanName']
+            test_unit_data = TestPlanAPI().get_testunits_in_testplan(id=test_plan_data['id'])
+            test_unit = test_unit_data[0]['name']
+        else:
+            self.info("There is no completed test plan so create it ")
+            formatted_article = {'id': payload[0]['article']['id'], 'text': payload[0]['article']['text']}
+            new_test_plan = TestPlanAPI().create_completed_testplan(
+                material_type=payload[0]['materialType']['text'], formatted_article=formatted_article)
+            test_plan = new_test_plan['testPlanEntity']['name']
+            test_unit = new_test_plan['specifications'][0]['name']
+            self.info("completed test plan created with name {} and test unit {}".format(test_plan, test_unit))
 
         self.orders_page.filter_by_order_no(payload[0]['orderNo'])
         suborder_data_before_duplicate = self.orders_page.get_child_table_data()

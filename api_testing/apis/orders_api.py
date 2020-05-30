@@ -28,7 +28,6 @@ class OrdersAPIFactory(BaseAPI):
     @api_factory('get')
     def get_order_by_id(self, id=1, **kwargs):
         """
-
         :param id: order ID
         :param kwargs:
         :return: response, payload
