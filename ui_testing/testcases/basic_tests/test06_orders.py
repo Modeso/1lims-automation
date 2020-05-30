@@ -2285,9 +2285,9 @@ class OrdersTestCases(BaseTest):
 
         analyses = self.analyses_page.get_the_latest_row_data()
         if case == 'main_order_add_only':
-            self.assertIn(new_test_plan, analyses['Test Plans'])
+            self.assertIn(new_test_plan, analyses['Test Plans'].replace("'", ""))
         else:
-            self.assertEqual(new_test_plan, analyses['Test Plans'])
+            self.assertEqual(new_test_plan, analyses['Test Plans'].replace("'", ""))
         child_data = self.analyses_page.get_child_table_data()
         test_unit_found = False
         for test_unit in child_data:
