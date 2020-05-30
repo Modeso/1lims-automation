@@ -2194,7 +2194,7 @@ class OrdersTestCases(BaseTest):
         Duplicate suborder Approach: Duplicate any sub order then change the units & test plans
         (remove them and put another ones )
 
-         LIMS-6229
+        LIMS-6229
         """
         self.info('create order with test plan and test unit')
         response, payload = self.orders_api.create_new_order()
@@ -2207,11 +2207,10 @@ class OrdersTestCases(BaseTest):
             articleNo=article_no)
 
         if completed_test_plans:
-            new_test_plan_date = random.choice(completed_test_plans)
-            new_test_plan = new_test_plan_date['testPlanName']
+            new_test_plan_data = random.choice(completed_test_plans)
+            new_test_plan = new_test_plan_data['testPlanName']
             new_test_unit = TestPlanAPI().get_testplan_form_data(
-                id=new_test_plan_date['id'])['specifications'][0]['name']
-
+                id=new_test_plan_data['id'])['specifications'][0]['name']
             self.info("completed test plan found with name {} and test unit {}".format(new_test_plan, new_test_unit))
         else:
             self.info("There is no completed test plan so create it ")
@@ -2224,7 +2223,11 @@ class OrdersTestCases(BaseTest):
 
         self.info("duplicate order No {} ".format(payload[0]['orderNo']))
         self.orders_page.search(payload[0]['orderNo'])
-        if case != 'sub_order':
+        if case == 'sub_order':
+            self.info("duplicate sub order with one copy only")
+            self.orders_page.open_child_table(source=self.orders_page.result_table()[0])
+            self.orders_page.duplicate_sub_order_from_table_overview()
+        else:
             self.info("duplicate main order")
             self.orders_page.duplicate_main_order_from_order_option()
             self.assertIn("duplicateMainOrder", self.base_selenium.get_url())
@@ -2232,10 +2235,6 @@ class OrdersTestCases(BaseTest):
             duplicated_order_No = self.order_page.get_no()
             self.info("duplicated order No is {}".format(duplicated_order_No))
             self.assertNotEqual(duplicated_order_No, payload[0]['orderNo'])
-        else:
-            self.info("duplicate sub order with one copy only")
-            self.orders_page.open_child_table(source=self.orders_page.result_table()[0])
-            self.orders_page.duplicate_sub_order_from_table_overview()
 
         if case == 'main_order_add_only':
             self.info("add test plan {} and test unit {} to duplicated order".format(new_test_plan, new_test_unit))
@@ -2263,7 +2262,7 @@ class OrdersTestCases(BaseTest):
                 self.assertIn(new_test_unit, duplicated_suborder_data['Test Units'])
                 self.assertIn(new_test_plan, duplicated_suborder_data['Test Plans'])
 
-        self.info("navigate to analysis")
+        self.info("navigate to analysis page")
         self.order_page.navigate_to_analysis_tab()
         if case == 'sub_order':
             self.analyses_page.search(payload[0]['orderNo'])
