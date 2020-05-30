@@ -2277,7 +2277,8 @@ class OrdersTestCases(BaseTest):
         child_data = self.order_page.get_child_table_data()
         duplicated_suborder_data = child_data[0]
         self.assertEqual(len(child_data), 2)
-        self.assertEqual(duplicated_suborder_data['Article Name'], payload[0]['article']['text'])
+        self.assertEqual(duplicated_suborder_data['Article Name'].replace(' ', ''),
+                         payload[0]['article']['text'].replace(' ', ''))
         self.assertEqual(duplicated_suborder_data['Material Type'], payload[0]['materialType']['text'])
         duplicated_suborder_test_units = duplicated_suborder_data['Test Units'].split(',\n') or []
         duplicated_suborder_test_plans = duplicated_suborder_data['Test Plans'].split(',\n') or []
