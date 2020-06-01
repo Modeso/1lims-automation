@@ -1395,8 +1395,8 @@ class OrdersTestCases(BaseTest):
             contacta_after_pressing_cancel = self.order_page.get_contact()
             departmentsa_after_pressing_cancel = self.order_page.get_departments()
 
-        # will continue with us
-        @skip('https://modeso.atlassian.net/browse/LIMS-5070')
+    # will continue with us
+    @skip('https://modeso.atlassian.net/browse/LIMS-5070')
     def test031_user_can_add_suborder_with_test_units(self):
         """
         New: Orders: Create Approach: I can create suborder with test unit successfully,
