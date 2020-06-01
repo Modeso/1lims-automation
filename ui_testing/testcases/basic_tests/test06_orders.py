@@ -209,7 +209,7 @@ class OrdersTestCases(BaseTest):
             rows = self.order_page.result_table()
             self.assertEqual(len(rows), 1)
             
-     def test005_restore_archived_orders(self):
+    def test005_restore_archived_orders(self):
         """
         Restore Order
         I can restore any order successfully
