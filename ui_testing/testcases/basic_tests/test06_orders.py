@@ -184,30 +184,39 @@ class OrdersTestCases(BaseTest):
             rows = self.order_page.result_table()
             self.assertEqual(len(rows), 1)
 
-    # will continue with us
     def test005_restore_archived_orders(self):
         """
-               Restore Order
-               I can restore any order successfully
-               LIMS-4374
-               """
-        self.base_selenium.LOGGER.info(' + Get Archived orders ')
-        self.order_page.get_archived_items()
-        self.base_selenium.LOGGER.info(' + Select Rows ')
-        selected_orders_data, _ = self.order_page.select_random_multiple_table_rows()
+        Restore Order
+        I can restore any order successfully
+        LIMS-4374
+        """
+        self.orders_page.get_archived_items()
+        orders, payload = self.orders_api.get_all_orders(deleted=1, limit=20)
+        order = random.choice(orders['orders'])
 
-        self.base_selenium.LOGGER.info(' + Restore Selected Rows ')
-        self.order_page.restore_selected_items()
-        self.base_selenium.LOGGER.info(' + Get Active orders')
-        self.order_page.get_active_items()
-        for selected_order_data in selected_orders_data:
-            self.base_selenium.LOGGER.info(' + Order with analysis number =  {} restored successfully?'.format(
-                selected_order_data['Analysis No.']))
-            self.assertTrue(self.order_page.is_order_exist(
-                value=selected_order_data['Analysis No.']))
+        order_no = order['orderNo']
+        self.info('order no: {}'.format(order_no))
+        self.order_page.apply_filter_scenario(filter_element='orders:filter_order_no', filter_text=order_no,
+                                              field_type='text')
+        suborders_data = self.order_page.get_child_table_data(index=0)
+        self.order_page.restore_table_suborder(index=0)
+        self.info('make sure that suborder is restored successfully')
+        if len(suborders_data) > 1:
+            suborder_data_after_restore = self.order_page.get_table_data()
+            self.assertNotEqual(suborder_data_after_restore[0], suborders_data[0])
+        else:
+            table_records_count = len(self.order_page.result_table()) - 1
+            self.assertEqual(table_records_count, 0)
+
+        self.orders_page.get_orders_page()
+        analysis_no = self.order_page.search(suborders_data[0]['Analysis No.'])
+        self.single_analysis_page.open_child_table(source=analysis_no[0])
+        results = self.order_page.result_table(element='general:table_child')[0].text
+        self.assertIn(suborders_data[0]['Analysis No.'].replace("'", ""), results.replace("'", ""))
 
     # will continue with us
-    def test006_deleted_archived_order(self):
+    def test006_delete_main_order(self):
+
         """
         New: Order without/with article: Deleting of orders
         The user can hard delete any archived order
