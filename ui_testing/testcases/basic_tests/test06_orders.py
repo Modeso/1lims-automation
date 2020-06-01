@@ -18,7 +18,6 @@ from random import randint
 import random
 import time
 
-
 class OrdersTestCases(BaseTest):
     def setUp(self):
         super().setUp()
