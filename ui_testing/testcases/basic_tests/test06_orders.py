@@ -2318,11 +2318,11 @@ class OrdersTestCases(BaseTest):
 
         -When I edit order by deleting test plan message will appear
         (This Test Plan will be removed from the corresponding analysis )
-        -make sure the corresponding analysis records created according to this update in test unit.
+        -make sure the corresponding analysis records created according to this update in test plan.
 
         LIMS-4269 case 1
         """
-        self.info("get random order with test plans")
+        self.info("get random order with test plan only")
         order, sub_order, sub_order_index =\
             self.orders_api.get_order_with_field_name(field='testPlans', no_of_field=1)
 
@@ -2332,11 +2332,12 @@ class OrdersTestCases(BaseTest):
             article=sub_order[sub_order_index]['article'],
             articleNo=sub_order[sub_order_index]['articleNo'])
 
+        import ipdb;ipdb.set_trace()
         test_plans_list_without_old_one = [test_plan['testPlanName'] for test_plan in test_plans
                                            if test_plan['testPlanName'] not in sub_order[sub_order_index]['testPlans']]
 
         if test_plans_list_without_old_one:
-            test_plan = random.choice(test_plans_list_without_old_one)
+            test_plan = [random.choice(test_plans_list_without_old_one)]
             self.info("completed test plan found with name {}".format(test_plan))
         else:
             self.info("there is no completed test plans with required article so create one")
@@ -2345,7 +2346,7 @@ class OrdersTestCases(BaseTest):
             article = {'id': article_id, 'text': sub_order[sub_order_index]['article']}
             new_test_plan = TestPlanAPI().create_completed_testplan(
                 material_type=sub_order[sub_order_index]['materialType'], formatted_article=article)
-            test_plan = new_test_plan['testPlanEntity']['name']
+            test_plan = [new_test_plan['testPlanEntity']['name']]
 
         if case == 'duplicate':
             self.info("duplicate order with order no. {}".format(order['orderNo']))
@@ -2358,10 +2359,10 @@ class OrdersTestCases(BaseTest):
         self.info("remove suborder test plan and update it to {}".format(test_plan))
         if case == 'duplicate':
             self.order_page.update_suborder(sub_order_index=int(len(sub_order)-1-sub_order_index),
-                                            test_plans=[test_plan], remove_old=True)
+                                            test_plans=test_plan, remove_old=True)
         else:
             self.order_page.update_suborder(sub_order_index=int(len(sub_order) - 1 - sub_order_index),
-                                            test_plans=[test_plan], remove_old=True, confirm=True)
+                                            test_plans=test_plan, remove_old=True, confirm=True)
 
         self.order_page.save(save_btn='order:save_btn', sleep=True)
         self.info('Refresh to make sure that data are saved correctly and analysis no appeared')
@@ -2371,8 +2372,8 @@ class OrdersTestCases(BaseTest):
         suborder_after_refresh = \
             self.order_page.get_suborder_data()['suborders'][int(len(sub_order) - 1 - sub_order_index)]
         suborder_testplan_after_refresh = suborder_after_refresh['testplans']
-        self.info('Assert Test plan is: {}, and should be: {}'.format(suborder_testplan_after_refresh, [test_plan]))
-        self.assertCountEqual(suborder_testplan_after_refresh, [test_plan])
+        self.info('Assert Test plan is: {}, and should be: {}'.format(suborder_testplan_after_refresh, test_plan))
+        self.assertCountEqual(suborder_testplan_after_refresh, test_plan)
         self.info('Getting analysis page to check the data in this child table')
         self.order_page.get_orders_page()
         self.order_page.navigate_to_analysis_tab()
@@ -2382,6 +2383,6 @@ class OrdersTestCases(BaseTest):
 
         self.info('Assert analysis is updated with new test plan')
         analyses = self.analyses_page.get_the_latest_row_data()
-        self.assertEqual(test_plan, analyses['Test Plans'])
+        self.assertCountEqual(test_plan, analyses['Test Plans'].split(', '))
 
 
