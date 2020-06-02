@@ -2332,7 +2332,6 @@ class OrdersTestCases(BaseTest):
             article=sub_order[sub_order_index]['article'],
             articleNo=sub_order[sub_order_index]['articleNo'])
 
-        import ipdb;ipdb.set_trace()
         test_plans_list_without_old_one = [test_plan['testPlanName'] for test_plan in test_plans
                                            if test_plan['testPlanName'] not in sub_order[sub_order_index]['testPlans']]
 
