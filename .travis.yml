@@ -8,7 +8,7 @@ python:
 
 install:
   #https://www.slimjet.com/chrome/google-chrome-old-version.php
-  - wget -N "https://www.slimjet.com/chrome/download-chrome.php?file=files%2F79.0.3945.88%2Fgoogle-chrome-stable_current_amd64.deb" -O ~/google-chrome-stable_current_amd64.deb
+  - wget -N --no-check-certificate "https://www.slimjet.com/chrome/download-chrome.php?file=files%2F79.0.3945.88%2Fgoogle-chrome-stable_current_amd64.deb" -O ~/google-chrome-stable_current_amd64.deb
   - sudo apt install -y ~/google-chrome-stable_current_amd64.deb
   - echo $(google-chrome --version)
   - wget -N "https://chromedriver.storage.googleapis.com/79.0.3945.36/chromedriver_linux64.zip" -P ~/
@@ -30,5 +30,3 @@ script:
   # - xvfb-run -a nosetests-3.4 -vs --nologcapture ui_testing/testcases/header_tests/$TESTS --tc-file=config.ini
   - xvfb-run -a nosetests -vs --nologcapture --tc-file=config.ini ui_testing/testcases/basic_tests/test05_contacts.py:ContactsTestCases.test031_add_contact_title
   - xvfb-run -a nosetests -vs --nologcapture --tc-file=config.ini ui_testing/testcases/basic_tests/test05_contacts.py:ContactsTestCases.test032_contact_title_translation
-
-
