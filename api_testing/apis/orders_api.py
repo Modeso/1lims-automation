@@ -318,3 +318,25 @@ class OrdersAPI(OrdersAPIFactory):
                 if field in suborders[i].keys():
                     if suborders[i][field] and len(suborders[i][field]) == int(no_of_field):
                         return order, suborders, i
+
+    def create_order_with_multiple_contacts(self):
+        contacts = ContactsAPI().get_all_contacts()[0]['contacts']
+        first_contact = contacts[0]
+        second_contact = contacts[1]
+        third_contact = contacts[2]
+        payload = {
+            'contact': [
+                {"id": first_contact['id'],
+                 "text": first_contact['name'],
+                 'No': first_contact['companyNo']},
+                {"id": second_contact['id'],
+                 "text": second_contact['name'],
+                 'No': second_contact['companyNo']},
+                {"id": third_contact['id'],
+                 "text": third_contact['name'],
+                 'No': third_contact['companyNo']}
+
+            ]
+
+        }
+        return self.create_new_order(**payload)
