@@ -91,9 +91,9 @@ class Order(Orders):
         if self.get_test_plan():
             self.base_selenium.clear_items_in_drop_down(element='order:test_plan')
 
-    def clear_test_unit(self):
+    def clear_test_unit(self, confirm=True):
         if self.get_test_unit():
-            self.base_selenium.clear_items_in_drop_down(element='order:test_unit', confirm_popup=True)
+            self.base_selenium.clear_items_in_drop_down(element='order:test_unit', confirm_popup=confirm)
 
     def set_test_unit(self, test_unit=''):
         if test_unit:
@@ -396,7 +396,8 @@ class Order(Orders):
                                              item_text=testunit_name.replace("'", ''))
 
     def update_suborder(self, sub_order_index=0, contacts=False, departments=[], material_type=False, articles=False,
-                        test_plans=[], test_units=[], shipment_date=False, test_date=False, remove_old=False):
+                        test_plans=[], test_units=[], shipment_date=False, test_date=False, remove_old=False,
+                        confirm_pop_up=False):
 
         suborder_table_rows = \
             self.base_selenium.get_table_rows(element='order:suborder_table')
@@ -429,7 +430,7 @@ class Order(Orders):
         self.info(' Set test unit : {} for {} time(s)'.format(test_units, len(test_units)))
         for testunit in test_units:
             if remove_old:
-                self.clear_test_unit()
+                self.clear_test_unit(confirm_pop_up)
                 self.sleep_small()
             self.set_test_unit(test_unit=testunit)
             self.sleep_small()
