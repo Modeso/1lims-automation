@@ -443,7 +443,6 @@ class OrdersTestCases(BaseTest):
         self.info('Make sure that the Analysis No. exist')
         self.assertTrue(suborder['Analysis No.'])
 
-
     # will change that the duplicate many copies will be from the the child table not from the active table
     def test012_duplicate_many_orders(self):
         """
@@ -525,8 +524,8 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.LOGGER.info(
             ' Create order with 5 sub orders to make sure of the count of the created/ updated orders')
         order_no_created = self.order_page.create_new_order(material_type='r', article='a', contact='a',
-                                                                test_plans=['a'],
-                                                                test_units=['a'], multiple_suborders=5)
+                                                            test_plans=['a'],
+                                                            test_units=['a'], multiple_suborders=5)
         self.base_selenium.LOGGER.info(
             ' + orders_created_with_number : {}'.format(order_no_created))
         order_no_created = order_no_created.replace("'", '')
@@ -546,7 +545,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.save(save_btn='order:save_btn')
         self.base_selenium.LOGGER.info(
             ' + order_updated_with_number : {}'.format(new_order_no))
-    
+
     @parameterized.expand(['save_btn', 'cancel'])
     def test014_update_first_order_material_type(self, save):
         """
@@ -656,7 +655,8 @@ class OrdersTestCases(BaseTest):
         New: orders Test plan /test unit validation in edit mode
         LIMS-4826
         """
-        self.base_selenium.LOGGER.info(' Running test case to check that at least test unit or test plan is mandatory in order')
+        self.base_selenium.LOGGER.info(
+            ' Running test case to check that at least test unit or test plan is mandatory in order')
         # Get random order
         orders, payload = self.orders_api.get_all_orders(limit=20)
         selected_order_record = random.choice(orders['orders'])
@@ -930,7 +930,7 @@ class OrdersTestCases(BaseTest):
         New: Orders with test units: Create a new order from an existing order with
         test units but change the material type
         LIMS-3269-case 1
-        """   
+        """
         order_no = self.order_page.create_existing_order_with_auto_fill()
         self.order_page.sleep_tiny()
 
@@ -996,7 +996,7 @@ class OrdersTestCases(BaseTest):
         New: Orders: Table:  Suborder /Archive Approach: : User can archive any suborder successfully
         LIMS-3739
         """
-        orders, payload = self.orders_api.get_all_orders(limit =20)
+        orders, payload = self.orders_api.get_all_orders(limit=20)
         order = random.choice(orders['orders'])
 
         order_no = order['orderNo']
@@ -1012,7 +1012,7 @@ class OrdersTestCases(BaseTest):
         else:
             table_records_count = len(self.order_page.result_table()) - 1
             self.assertEqual(table_records_count, 0)
-            
+
         self.base_selenium.refresh()
         self.orders_page.get_archived_items()
         analysis_no = self.order_page.search(suborders_data[0]['Analysis No.'])
@@ -1429,7 +1429,6 @@ class OrdersTestCases(BaseTest):
             '+ Assert test plan is: {}, and it should be {}'.format(analysis_test_plan_after_update,
                                                                     suborder_testplans[1]))
         self.assertEqual(analysis_test_plan_after_update, suborder_testplans[1])
-
 
     ### SYNTAX ERROR ###
     # will continue with us ( apply it from the second order & need diff test case number for it
@@ -1982,7 +1981,8 @@ class OrdersTestCases(BaseTest):
         after_duplicate_order = self.order_page.get_suborder_data()
 
         # make sure that the new order has same order No
-        self.assertEqual(data_before_duplicate['orderNo'].replace("'", ""), after_duplicate_order['orderNo'].replace("'", ""))
+        self.assertEqual(data_before_duplicate['orderNo'].replace("'", ""),
+                         after_duplicate_order['orderNo'].replace("'", ""))
         # compare the contacts between two records
         self.assertCountEqual(data_before_duplicate['contacts'], after_duplicate_order['contacts'])
         # compare the data of suborders data in both orders
@@ -2002,7 +2002,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.search(suborder_data['Analysis No.'])
         analysis_result = self.order_page.result_table()[0].text
         self.assertIn(suborder_data['Analysis No.'].replace("'", ""), analysis_result.replace("'", ""))
-             
+
     def test034_Duplicate_sub_order_and_cahange_materiel_type(self):
         """
         duplicate sub-order of any order then change the materiel type
@@ -2249,8 +2249,9 @@ class OrdersTestCases(BaseTest):
         order_data = self.orders_page.get_the_latest_row_data()
         self.assertEqual(order_data['Order No.'].split('-')[0].replace("'", ""), str(payload[0]['orderNo']))
         suborder_data = self.orders_page.get_child_table_data()[0]
-        self.assertEqual(suborder_data['Test Plans'],  payload[0]['testPlans'][0]['name'])
-        self.assertEqual(suborder_data['Material Type'].replace(' ',''), payload[0]['materialType']['text'].replace(' ',''))
+        self.assertEqual(suborder_data['Test Plans'], payload[0]['testPlans'][0]['name'])
+        self.assertEqual(suborder_data['Material Type'].replace(' ', ''),
+                         payload[0]['materialType']['text'].replace(' ', ''))
         self.assertEqual(suborder_data['Article Name'], payload[0]['article']['text'])
         self.assertEqual(suborder_data['Test Units'], payload[0]['selectedTestUnits'][0]['name'])
 
@@ -2264,5 +2265,4 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(suborder_data['Article Name'], payload[0]['article']['text'])
         self.assertEqual(suborder_data['Test Units'].split(',\n')[0], payload[0]['testUnits'][0]['name'])
         self.assertEqual(suborder_data['Test Units'].split(',\n')[1], payload[0]['testUnits'][1]['name'])
-
 
