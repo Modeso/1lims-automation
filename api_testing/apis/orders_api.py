@@ -235,6 +235,22 @@ class OrdersAPI(OrdersAPIFactory):
             suborder = self.get_suborder_by_order_id(id=order['orderId'])[0]['orders']
             if len(suborder) > 1:
                 return order
+              
+    def get_order_with_field_name(self, field, no_of_field):
+        """
+        :param field: must be in this list ['article', 'materialType','analysis','testPlans','testUnit']
+        :return: order, suborder, suborder_index
+        """
+        orders_data, payload = self.get_all_orders()
+        orders = orders_data['orders']
+        for order in orders:
+            suborders_data, a = self.get_suborder_by_order_id(order['id'])
+            suborders = suborders_data['orders']
+            for i in range(0, len(suborders)-1):
+                if field in suborders[i].keys():
+                    if suborders[i][field] and suborders[i][field] != "-" \
+                            and len(suborders[i][field]) == int(no_of_field):
+                        return order, suborders, i
 
     def create_order_with_double_test_plans(self):
         testplan = random.choice(TestPlanAPI().get_completed_testplans())
