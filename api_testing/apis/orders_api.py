@@ -37,19 +37,13 @@ class OrdersAPIFactory(BaseAPI):
         return api, {}
 
     @api_factory('get')
-
     def get_suborder_by_order_id(self, id=0):
         """
+        param id: order ID
+        :return: response, payload
         """
-<<<<<<< HEAD
-        api = '{}{}{}'.format(self.url, self.END_POINTS['orders_api']['get_suborder'], str(id)+'&deleted=0')
-        _payload = {}
-        return api, _payload
-        #return api, {}
-=======
         api = '{}{}{}'.format(self.url, self.END_POINTS['orders_api']['get_suborder'], str(id) + '&deleted=0')
         return api, {}
->>>>>>> 18ebac362c9cc18a599e28f62d2c85dd00ad94d5
 
     @api_factory('post')
     def create_new_order(self, **kwargs):
@@ -233,12 +227,7 @@ class OrdersAPIFactory(BaseAPI):
 
         return [payload]
 
-<<<<<<< HEAD
-
-class  OrdersAPI(OrdersAPIFactory):
-=======
 class OrdersAPI(OrdersAPIFactory):
->>>>>>> 18ebac362c9cc18a599e28f62d2c85dd00ad94d5
     def get_order_with_multiple_sub_orders(self):
         api, payload = self.get_all_orders(limit=100)
         all_orders = api['orders']
