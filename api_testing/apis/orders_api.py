@@ -250,7 +250,12 @@ class OrdersAPI(OrdersAPIFactory):
                 if field in suborders[i].keys():
                     if suborders[i][field] and suborders[i][field] != "-" \
                             and len(suborders[i][field]) == int(no_of_field):
-                        return order, suborders, i
+                        if field == 'testPlans' and not suborders[i]['testUnit']:
+                            return order, suborders, i
+                        elif field == 'testUnit' and not suborders[i]['testPlans']:
+                            return order, suborders, i
+                        elif field in ['article', 'materialType', 'analysis']:
+                            return order, suborders, i
 
     def create_order_with_double_test_plans(self):
         testplan = random.choice(TestPlanAPI().get_completed_testplans())
