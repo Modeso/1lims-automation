@@ -252,7 +252,7 @@ class OrdersAPI(OrdersAPIFactory):
                         return order, suborders, i
 
     def create_order_with_double_test_plans(self):
-        testplan = random.choice(TestPlanAPI().get_completed_testplans())
+        testplan = random.choice(TestPlanAPI().get_completed_testplans(limit=1000))
         testplan_form_data = TestPlanAPI()._get_testplan_form_data(id=testplan['id'])[0]
         testplan['id'] = testplan_form_data['testPlan']['testPlanEntity']['id']
         article = testplan_form_data['testPlan']['selectedArticles'][0]['name']
@@ -281,39 +281,13 @@ class OrdersAPI(OrdersAPIFactory):
             'testPlanName': second_testPlan_data[0]['testPlan']['testPlanEntity']['name'],
             'version': 1
         }
-        testplan_list = [testplan, testPlan2]
 
-        testunits = TestUnitAPI().list_testunit_by_name_and_material_type(materialtype_id=material_type_id)
-        selected_test_unit_list = []
-        for testunit in testunits[0]['testUnits']:  # make sure test unit have value
-            if testunit['name'] == testunit1['name']: # select test unit != first test unit
-                continue
-            if testunit['typeName'] == 'Quantitative MiBi':
-                if testunit['mibiValue']:
-                    selected_test_unit_list = [testunit]
-                    break
-            elif testunit['typeName'] == 'Quantitative':
-                if testunit['lowerLimit'] and testunit['upperLimit']:
-                    selected_test_unit_list = [testunit]
-                    break
-            elif testunit['typeName'] == 'Qualitative':
-                if testunit['textValue']:
-                    selected_test_unit_list = [testunit]
-                    break
-
-        # in case I have no test units with required material type and has values, create one
-        if not selected_test_unit_list:
-            api, testunit_payload = TestUnitAPI().create_quantitative_testunit()
-            selected_test_unit_list = TestUnitAPI().get_testunit_form_data(id=api['testUnit']['testUnitId'])[0]['testUnit']
-
-        testunit2 = selected_test_unit_list[0]
-
-
-        testunit_list = [testunit1, testunit2]
+        testunit2 = TestUnitAPI().get_test_unit_name_with_value_with_material_type(
+            material_type=material_type, avoid_duplicate=True, duplicated_test_unit=testunit1['name'])
 
         payload = {
-            'testPlans': testplan_list,
-            'testUnits': testunit_list,
+            'testPlans': [testplan, testPlan2],
+            'testUnits': [testunit1, testunit2],
             'materialType': {"id": material_type_id, "text": material_type},
             'materialTypeId': material_type_id,
             'article': {'id': article_id, 'text': article},

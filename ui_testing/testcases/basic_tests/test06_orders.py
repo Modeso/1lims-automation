@@ -2232,34 +2232,19 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(response['status'], 1)
         test_plans = [payload[0]['testPlans'][0]['testPlanName'], payload[0]['testPlans'][1]['testPlanName']]
         test_units = [payload[0]['testUnits'][0]['name'], payload[0]['testUnits'][1]['name']]
-        article_no = ArticleAPI().get_article_form_data(id=payload[0]['article']['id'])[0]['article']['No']
-        self.info("get new completed test plan with article {} No: {} and material_type {}".format(
-            payload[0]['article']['text'], article_no, payload[0]['materialType']['text']))
+        self.info("get new completed test plan with article {} and material_type {}".format(
+            payload[0]['article']['text'], payload[0]['materialType']['text']))
 
-        completed_test_plans = TestPlanAPI().get_completed_testplans_with_material_and_same_article(
-            material_type=payload[0]['materialType']['text'], article=payload[0]['article']['text'],
-            articleNo=article_no)
-        completed_test_plans_without_old = [testplan for testplan in completed_test_plans
-                                            if testplan['testPlanName'] not in test_plans]
-
-        if completed_test_plans_without_old:
-            test_plan_data = random.choice(completed_test_plans_without_old)
-            test_plan = test_plan_data['testPlanName']
-            test_unit_data = TestPlanAPI().get_testunits_in_testplan(id=test_plan_data['id'])
-            test_unit = test_unit_data[0]['name']
-        else:
-            self.info("There is no completed test plan so create it ")
-            formatted_article = {'id': payload[0]['article']['id'], 'text': payload[0]['article']['text']}
-            new_test_plan = TestPlanAPI().create_completed_testplan(
-                material_type=payload[0]['materialType']['text'], formatted_article=formatted_article)
-            test_plan = new_test_plan['testPlanEntity']['name']
-            test_unit = new_test_plan['specifications'][0]['name']
-            self.info("completed test plan created with name {} and test unit {}".format(test_plan, test_unit))
+        test_plan, test_unit = TestPlanAPI().get_order_valid_testplan_and_test_unit(
+            material_type=payload[0]['materialType']['text'],
+            used_test_plan=test_plans,
+            used_test_unit=test_units,
+            article_id=payload[0]['article']['id'], article=payload[0]['article']['text'])
 
         test_plans.append(test_plan)
         test_units.append(test_unit)
 
-        self.orders_page.filter_by_order_no(payload[0]['orderNo'])
+        self.orders_page.search(payload[0]['orderNo'])
         self.info("duplicate the sub order of order {} from suborder's options".format(payload[0]['orderNo']))
         self.orders_page.get_child_table_data()
         self.orders_page.duplicate_sub_order_from_table_overview()
@@ -2268,7 +2253,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.save(save_btn='order:save', sleep=True)
         self.info("navigate to orders' active table and check that duplicated suborder found")
         self.order_page.get_orders_page()
-        self.orders_page.filter_by_order_no(payload[0]['orderNo'])
+        self.orders_page.search(payload[0]['orderNo'])
         child_data = self.order_page.get_child_table_data()
         duplicated_suborder_data = child_data[0]
         self.assertEqual(len(child_data), 2)
