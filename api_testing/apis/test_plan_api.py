@@ -239,7 +239,7 @@ class TestPlanAPI(TestPlanAPIFactory):
         else:
             self.info(testplan)
 
-    def get_order_valid_testplan_and_test_unit(self, material_type, article_id, article, used_test_plan):
+    def get_order_valid_testplan_and_test_unit(self, material_type, article_id, article, used_test_plan, used_test_unit):
         article_no = ArticleAPI().get_article_form_data(id=article_id)[0]['article']['No']
         self.info("get new completed test plan with article {} No: {} and material_type {}".format(
             article, article_no, material_type))
@@ -259,5 +259,8 @@ class TestPlanAPI(TestPlanAPIFactory):
             new_test_plan = test_plan['testPlanEntity']['name']
             new_test_unit = test_plan['specifications'][0]['name']
             self.info("completed test plan created with name {} and test unit {}".format(new_test_plan, new_test_unit))
-
+        if new_test_unit == used_test_unit:
+            api, payload = TestUnitAPI().create_quantitative_testunit()
+            if api['status'] == 1:
+                new_test_unit = payload['name']
         return new_test_plan, new_test_unit

@@ -2245,6 +2245,7 @@ class OrdersTestCases(BaseTest):
         new_test_plan, new_test_unit = TestPlanAPI().get_order_valid_testplan_and_test_unit(
             material_type=payload[0]['materialType']['text'],
             used_test_plan=payload[0]['testPlans'][0]['name'],
+            used_test_unit=payload[0]['testUnits'][0]['name'],
             article_id=payload[0]['article']['id'], article=payload[0]['article']['text'])
 
         self.info("duplicate order No {} ".format(payload[0]['orderNo']))
@@ -2253,14 +2254,14 @@ class OrdersTestCases(BaseTest):
         self.info("duplicate main order")
         self.orders_page.duplicate_main_order_from_order_option()
         self.assertIn("duplicateMainOrder", self.base_selenium.get_url())
-        self.order_page.sleep_medium()
+        self.order_page.sleep_small()
         duplicated_order_No = self.order_page.get_no()
         self.info("duplicated order No is {}".format(duplicated_order_No))
         self.assertNotEqual(duplicated_order_No, payload[0]['orderNo'])
 
         if case == 'add':
             self.info("add test plan {} and test unit {} to duplicated order".format(new_test_plan, new_test_unit))
-            self.order_page.update_suborder(test_plans=[new_test_plan], test_units=[new_test_unit], remove_old=False)
+            self.order_page.update_suborder(test_plans=[new_test_plan], test_units=[new_test_unit])
         else:
             self.info("update test plan to {} and test unit to {}".format(new_test_plan, new_test_unit))
             self.order_page.update_suborder(test_plans=[new_test_plan], test_units=[new_test_unit], remove_old=True)
@@ -2309,6 +2310,7 @@ class OrdersTestCases(BaseTest):
         new_test_plan, new_test_unit = TestPlanAPI().get_order_valid_testplan_and_test_unit(
             material_type=payload[0]['materialType']['text'],
             used_test_plan=payload[0]['testPlans'][0]['name'],
+            used_test_unit=payload[0]['testUnits'][0]['name'],
             article_id=payload[0]['article']['id'], article=payload[0]['article']['text']
         )
 
