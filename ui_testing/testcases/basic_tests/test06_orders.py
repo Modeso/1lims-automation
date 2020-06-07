@@ -1012,9 +1012,8 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(self.order_page.get_article(), 'Search')  # empty article return 'Search'
         self.assertFalse(self.order_page.get_test_plan())
         self.assertFalse(self.order_page.get_test_unit())
-
         if test_plan['article'][0] == 'all':
-            article = self.order_page.set_article('')
+            article = self.order_page.set_article('a')
         else:
             self.order_page.set_article(test_plan['article'][0])
             article = test_plan['article'][0]
