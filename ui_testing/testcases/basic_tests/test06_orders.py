@@ -999,18 +999,11 @@ class OrdersTestCases(BaseTest):
         test_plan = random.choice(test_plans_without_duplicate)
         test_unit = TestPlanAPI().get_testunits_in_testplan(test_plan['id'])[0]
 
-        self.info('update material type of order {} with {}'.format(order['orderNo'], test_plan['materialType']))
+        self.info('update material type of order {}  from {} to {}'.format(
+            order['orderNo'], suborders[index]['materialType'], test_plan['materialType']))
         self.orders_page.get_order_edit_page_by_id(order['orderId'])
         self.order_page.update_suborder(sub_order_index=suborder_update_index, material_type=test_plan['materialType'])
-
-        confirm_edit = self.base_selenium.check_element_is_exist(element="general:confirmation_pop_up")
-        confirm_edit_message = self.base_selenium.get_text(element="general:confirmation_pop_up")
-        self.assertTrue(confirm_edit)
-        if case == 'testPlans':
-            self.assertIn('All analysis created with this order and test plan will be deleted', confirm_edit_message)
-        else:
-            self.assertIn('This Test Unit will be removed from the corresponding analysis', confirm_edit_message)
-
+        self.assertTrue(self.base_selenium.check_element_is_exist(element="general:confirmation_pop_up"))
         self.info('confirm pop_up')
         self.orders_page.confirm_popup()
         self.info('assert article and test plan/ test unit  are empty')
