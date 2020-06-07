@@ -1043,6 +1043,7 @@ class OrdersTestCases(BaseTest):
         analyses = self.analyses_page.get_the_latest_row_data()
         self.assertEqual(test_plan['materialType'], analyses['Material Type'])
         self.assertEqual(article, analyses['Article Name'])
+        import ipdb;ipdb.set_trace()
         if case == 'testPlans':
             self.assertEqual(test_plan['testPlanName'], analyses['Test Plans'])
         else:
