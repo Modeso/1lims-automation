@@ -1002,10 +1002,12 @@ class OrdersTestCases(BaseTest):
         self.info('update material type of order {}  from {} to {}'.format(
             order['orderNo'], suborders[index]['materialType'], test_plan['materialType']))
         self.orders_page.get_order_edit_page_by_id(order['orderId'])
+        self.order_page.sleep_small()
         self.order_page.update_suborder(sub_order_index=suborder_update_index, material_type=test_plan['materialType'])
         self.assertTrue(self.base_selenium.check_element_is_exist(element="general:confirmation_pop_up"))
         self.info('confirm pop_up')
         self.orders_page.confirm_popup()
+        self.order_page.sleep_small()
         self.info('assert article and test plan/ test unit  are empty')
         self.assertEqual(self.order_page.get_article(), 'Search')  # empty article return 'Search'
         self.assertFalse(self.order_page.get_test_plan())
@@ -1021,11 +1023,12 @@ class OrdersTestCases(BaseTest):
             self.info("set article to {} and test plan to {}".
                       format(test_plan['article'][0], test_plan['testPlanName']))
             self.order_page.set_test_plan(test_plan['testPlanName'])
+
         else:
             self.info("set article to {} and test unit to {}".format(test_plan['article'][0],
                                                                      test_unit['name']))
             self.order_page.set_test_unit(test_unit['name'])
-
+        self.order_page.sleep_small()
         self.order_page.save_and_wait(save_btn='order:save_btn')
         self.info('get order data after edit and refresh')
         suborder_after_refresh = self.orders_api.get_order_by_id(order['orderId'])[0]['orders'][suborder_update_index]
