@@ -264,3 +264,8 @@ class TestPlanAPI(TestPlanAPIFactory):
             if api['status'] == 1:
                 new_test_unit = payload['name']
         return new_test_plan, new_test_unit
+ 
+    def get_testunits_in_testplan_by_No(self, no):
+        test_plan_id = self.get_testplan_with_filter(filter_option='number', filter_text=str(no))[0]['id']
+        test_unit = self.get_testunits_in_testplan(test_plan_id)
+        return test_unit[0]['name']
