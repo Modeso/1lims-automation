@@ -1116,38 +1116,36 @@ class OrdersTestCases(BaseTest):
         (All analysis created with this order and test plan/ test unit will be deleted )
         -Once you press on OK button, the material type & article & test pan/ test unit will delete
         -You can update it by choose another one and choose corresponding article & test plan/ test unit
-
-        LIMS-4264 ( order with test plan only)
-        LIMS-4267 (order with test unit only)
+        LIMS-4264 ( order with test plan )
+        LIMS-4267 (order with test unit )
         """
-        self.info('get random order')
-        order, suborders, index = self.orders_api.get_order_with_field_name(field=case, no_of_field=1)
-        suborder_update_index = len(suborders) - index -1
-
+        api, order_payload = self.orders_api.create_new_order()
+        self.assertEqual(api['status'], 1)
+        self.info('new order created with order data {}'.format(order_payload))
         self.info('get random completed test plan with different material type')
         test_plans = TestPlanAPI().get_completed_testplans(limit=1000)
         # I need to make sure that material type not equal '47d56b4399' due to this open bug
         # https://modeso.atlassian.net/browse/LIMS-7710
         test_plans_without_duplicate = [test_plan for test_plan in test_plans if test_plan['materialType']
-                                        not in [suborders[index]['materialType'], '47d56b4399']]
+                                        not in [order_payload[0]['materialType']['text'], '47d56b4399']]
         test_plan = random.choice(test_plans_without_duplicate)
         test_unit = TestPlanAPI().get_testunits_in_testplan(test_plan['id'])[0]
 
-        self.info('update material type of order {}  from {} to {}'.format(
-            order['orderNo'], suborders[index]['materialType'], test_plan['materialType']))
-        self.orders_page.get_order_edit_page_by_id(order['orderId'])
-        self.order_page.sleep_small()
-        self.order_page.update_suborder(sub_order_index=suborder_update_index, material_type=test_plan['materialType'])
+        self.info('update material type of order from {} to {}'.format(
+            order_payload[0]['materialType']['text'], test_plan['materialType']))
+        self.orders_page.get_order_edit_page_by_id(api['order']['mainOrderId'])
+        suborder_row = self.base_selenium.get_table_rows(element='order:suborder_table')[0]
+        suborder_row.click()
+        self.order_page.set_material_type(test_plan['materialType'])
         self.assertTrue(self.base_selenium.check_element_is_exist(element="general:confirmation_pop_up"))
         self.info('confirm pop_up')
         self.orders_page.confirm_popup()
-        self.order_page.sleep_small()
         self.info('assert article and test plan/ test unit  are empty')
         self.assertEqual(self.order_page.get_article(), 'Search')  # empty article return 'Search'
         self.assertFalse(self.order_page.get_test_plan())
         self.assertFalse(self.order_page.get_test_unit())
         if test_plan['article'][0] == 'all':
-            article = self.order_page.set_article('a')
+            article = self.order_page.set_article('')
         else:
             self.order_page.set_article(test_plan['article'][0])
             article = test_plan['article'][0]
@@ -1161,10 +1159,10 @@ class OrdersTestCases(BaseTest):
             self.info("set article to {} and test unit to {}".format(test_plan['article'][0],
                                                                      test_unit['name']))
             self.order_page.set_test_unit(test_unit['name'])
-        self.order_page.sleep_small()
+
         self.order_page.save_and_wait(save_btn='order:save_btn')
         self.info('get order data after edit and refresh')
-        suborder_after_refresh = self.orders_api.get_order_by_id(order['orderId'])[0]['orders'][suborder_update_index]
+        suborder_after_refresh = self.orders_api.get_order_by_id(api['order']['mainOrderId'])[0]['orders'][0]
         self.info('navigate to analysis page to make sure analysis corresponding to suborder updated')
         self.order_page.get_orders_page()
         self.order_page.navigate_to_analysis_tab()
@@ -1177,8 +1175,7 @@ class OrdersTestCases(BaseTest):
         else:
             child_table_data = self.analyses_page.get_child_table_data()[0]
             self.assertEqual(test_unit['name'], child_table_data['Test Unit'])
-
-
+        
     # will continue with us & then put the test case number for it
     def test026_update_suborder_article(self):
         self.base_selenium.LOGGER.info('Order created with 4 suborders with the following data')
