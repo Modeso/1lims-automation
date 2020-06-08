@@ -146,7 +146,7 @@ class Order(Orders):
         self.set_contact('')
         self.sleep_medium()
         self.set_contact('')
-        self.sleep_small()
+        self.sleep_medium()
         self.set_material_type('Raw Material')
         self.sleep_small()
         self.set_article('')
