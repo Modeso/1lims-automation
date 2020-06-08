@@ -2419,45 +2419,34 @@ class OrdersTestCases(BaseTest):
         """
         self.info(" create order with multiple contacts")
         self.order_page.create_multiple_contacts_new_order()
-        selected_contacts = self.order_page.get_contact()
-        selected_contacts = sorted(selected_contacts, key=str.lower)
-        self.info('selected contacts are {}'.format(selected_contacts))
-        departments_list_with_contacts = []
-        for contact in selected_contacts:
-            departments = ContactsAPI().get_departments_in_contact(contact)
-            if departments:
-                departments_list_with_contacts.append(contact)
-                departments_list_with_contacts.extend(departments)
-
+        contacts = self.order_page.get_contact()
+        self.info('selected contacts are {}'.format(contacts))
+        departments_list_with_contacts = ContactsAPI().get_department_contact_list(contacts)
         if case == 'create':
-            department = self.base_selenium.find_element(element='order:departments')
-            department.click()
-            suggested_department_list = self.base_selenium.get_drop_down_suggestion_list(
-                element='order:departments', item_text='', options_element='general:drop_down_div')[0].split('\n')
+            suggested_department_list, departments_only_list = self.order_page.get_department_suggestion_lists()
             self.info('suggested department list {}'.format(suggested_department_list))
             self.info('and it should be {}'.format(departments_list_with_contacts))
-            departments_only_list = self.base_selenium.get_drop_down_suggestion_list(
-                element='order:departments', item_text='')
             self.assertCountEqual(departments_list_with_contacts, suggested_department_list)
             department = random.choice(departments_only_list)
             self.info('set department to {}'.format(department))
             self.order_page.set_departments(department)
             self.order_page.sleep_tiny()
 
-        self.order_page.save()
+        self.order_page.save_and_wait(save_btn='order:save')
         order_data = self.order_page.get_suborder_data()
         self.info('assert that new order with multiple contacts created')
-        self.assertEqual(len(order_data['contacts']), 3)
+        self.assertEqual(len(order_data['contacts']), 2)
         if case == 'edit':
-            suborder_row = self.base_selenium.get_table_rows(element='order:suborder_table')[0]
-            suborder_row.click()
-            department = self.base_selenium.find_element(element='order:departments')
-            department.click()
-            suggested_department_list = self.base_selenium.get_drop_down_suggestion_list(
-                element='order:departments', item_text='', options_element='general:drop_down_div')[0].split('\n')
-
+            suggested_department_list, departments_only_list = \
+                self.order_page.get_department_suggestion_lists(open_suborder_table=True)
+            self.info('suggested department list {}'.format(suggested_department_list))
+            self.info('and it should be {}'.format(departments_list_with_contacts))
             self.assertCountEqual(departments_list_with_contacts, suggested_department_list)
-            department = random.choice(self.base_selenium.get_drop_down_suggestion_list(
-                element='order:departments', item_text=''))
-            self.inf('set department to {}'.format(department))
+            self.assertCountEqual(departments_list_with_contacts, suggested_department_list)
+            department = random.choice(departments_only_list)
+            self.info('set department to {}'.format(department))
             self.order_page.set_departments(department)
+            self.order_page.save_and_wait(save_btn='order:save')
+            suborder_data = self.order_page.get_suborder_data()
+            self.assertEqual(len(suborder_data['contacts']), 2)
+            self.assertEqual([department], suborder_data['suborders'][0]['departments'])
