@@ -157,3 +157,13 @@ class ContactsAPI(ContactsAPIFactory):
                 if contact['name'] == contact_name:
                     return contact['departments'].split(', ')
 
+    def get_department_contact_list(self, contact_list=[]):
+        selected_contacts = sorted(contact_list, key=str.lower)
+        departments_list_with_contacts = []
+        for contact in selected_contacts:
+            departments = self.get_departments_in_contact(contact)
+            if departments and departments != '':
+                departments_list_with_contacts.append(contact)
+                departments_list_with_contacts.extend(departments)
+
+        return departments_list_with_contacts
