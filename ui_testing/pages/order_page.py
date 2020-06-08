@@ -63,8 +63,7 @@ class Order(Orders):
             self.base_selenium.select_item_from_drop_down(
                 element='order:contact', item_text=contact)
         else:
-            self.base_selenium.select_item_from_drop_down(
-                element='order:contact', avoid_duplicate=True)
+            self.base_selenium.select_item_from_drop_down(element='order:contact', avoid_duplicate=True)
             return self.get_contact()
 
     def get_contact(self):
@@ -137,8 +136,23 @@ class Order(Orders):
             self.duplicate_from_table_view(number_of_duplicates=multiple_suborders)
 
         self.save(save_btn='order:save_btn')
-        self.base_selenium.LOGGER.info(' Order created with no : {} '.format(order_no))
-        return self.get_suborder_data()
+        self.info(' Order created with no : {} '.format(order_no))
+
+    def create_multiple_contacts_new_order(self):
+        self.info(" click on create new order button")
+        self.click_create_order_button()
+        self.set_new_order()
+        self.sleep_tiny()
+        self.set_contact('')
+        self.sleep_small()
+        self.set_contact('')
+        self.sleep_small()
+        self.set_contact('')
+        self.sleep_small()
+        self.set_material_type('Raw Material')
+        self.sleep_small()
+        self.set_article('')
+        self.set_test_unit('')
 
     def create_existing_order(self, no='', material_type='', article='', contact='', test_units=[],
                               multiple_suborders=0):

@@ -2441,28 +2441,61 @@ class OrdersTestCases(BaseTest):
         self.assertCountEqual(test_plans, found_test_plans)
         self.assertCountEqual(test_units, found_test_units)
 
-    def test040_test_create_order(self):
-        api, payload = self.orders_api.create_new_order()
-        self.info(payload)
-        self.orders_page.search(payload[0]['orderNo'])
-        order_data = self.orders_page.get_the_latest_row_data()
-        self.assertEqual(order_data['Order No.'].split('-')[0].replace("'", ""), str(payload[0]['orderNo']))
-        suborder_data = self.orders_page.get_child_table_data()[0]
-        self.assertEqual(suborder_data['Test Plans'],  payload[0]['testPlans'][0]['name'])
-        self.assertEqual(suborder_data['Material Type'].replace(' ',''), payload[0]['materialType']['text'].replace(' ',''))
-        self.assertEqual(suborder_data['Article Name'], payload[0]['article']['text'])
-        self.assertEqual(suborder_data['Test Units'], payload[0]['selectedTestUnits'][0]['name'])
+    @parameterized.expand(['create', 'edit'])
+    def test040_create_order_with_multiple_contacts_and_departments(self, case):
+        """
+        User should be able to choose more than one contact from drop down menu upon creating a new order
 
-    def test041_test_create_order_with_multiple_testplans(self):
-        api, payload = self.orders_api.create_order_with_double_test_plans()
-        self.orders_page.search(payload[0]['orderNo'])
-        suborder_data = self.orders_page.get_child_table_data()[0]
-        self.assertEqual(suborder_data['Test Plans'].split(',\n')[0], payload[0]['testPlans'][0]['testPlanName'])
-        self.assertEqual(suborder_data['Test Plans'].split(',\n')[1], payload[0]['testPlans'][1]['testPlanName'])
-        self.assertEqual(suborder_data['Material Type'], payload[0]['materialType']['text'])
-        self.assertEqual(suborder_data['Article Name'], payload[0]['article']['text'])
-        self.assertEqual(suborder_data['Test Units'].split(',\n')[0], payload[0]['testUnits'][0]['name'])
-        self.assertEqual(suborder_data['Test Units'].split(',\n')[1], payload[0]['testUnits'][1]['name'])
+        LIMS-5704 'create mode'
+
+        In case I select multiple contacts the departments should be updated according to that
+
+        LIMS-5705 'edit mode'
+        """
+        self.info(" create order with multiple contacts")
+        self.order_page.create_multiple_contacts_new_order()
+        selected_contacts = self.order_page.get_contact()
+        selected_contacts = sorted(selected_contacts, key=str.lower)
+        self.info('selected contacts are {}'.format(selected_contacts))
+        departments_list_with_contacts = []
+        for contact in selected_contacts:
+            departments = ContactsAPI().get_departments_in_contact(contact)
+            if departments:
+                departments_list_with_contacts.append(contact)
+                departments_list_with_contacts.extend(departments)
+
+        if case == 'create':
+            department = self.base_selenium.find_element(element='order:departments')
+            department.click()
+            suggested_department_list = self.base_selenium.get_drop_down_suggestion_list(
+                element='order:departments', item_text='', options_element='general:drop_down_div')[0].split('\n')
+            self.info('suggested department list {}'.format(suggested_department_list))
+            self.info('and it should be {}'.format(departments_list_with_contacts))
+            departments_only_list = self.base_selenium.get_drop_down_suggestion_list(
+                element='order:departments', item_text='')
+            self.assertCountEqual(departments_list_with_contacts, suggested_department_list)
+            department = random.choice(departments_only_list)
+            self.info('set department to {}'.format(department))
+            self.order_page.set_departments(department)
+            self.order_page.sleep_tiny()
+
+        self.order_page.save()
+        order_data = self.order_page.get_suborder_data()
+        self.info('assert that new order with multiple contacts created')
+        self.assertEqual(len(order_data['contacts']), 3)
+        if case == 'edit':
+            suborder_row = self.base_selenium.get_table_rows(element='order:suborder_table')[0]
+            suborder_row.click()
+            department = self.base_selenium.find_element(element='order:departments')
+            department.click()
+            suggested_department_list = self.base_selenium.get_drop_down_suggestion_list(
+                element='order:departments', item_text='', options_element='general:drop_down_div')[0].split('\n')
+
+            self.assertCountEqual(departments_list_with_contacts, suggested_department_list)
+            department = random.choice(self.base_selenium.get_drop_down_suggestion_list(
+                element='order:departments', item_text=''))
+            self.inf('set department to {}'.format(department))
+            self.order_page.set_departments(department)
 
 
 
