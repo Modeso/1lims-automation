@@ -260,7 +260,7 @@ class TestPlanAPI(TestPlanAPIFactory):
             new_test_plan = test_plan['testPlanEntity']['name']
             new_test_unit = test_plan['specifications'][0]['name']
             self.info("completed test plan created with name {} and test unit {}".format(new_test_plan, new_test_unit))
-        if new_test_unit not in used_test_unit:
+        if new_test_unit in used_test_unit:
             api, payload = TestUnitAPI().create_quantitative_testunit()
             if api['status'] == 1:
                 new_test_unit = payload['name']
