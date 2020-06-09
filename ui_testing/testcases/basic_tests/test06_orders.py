@@ -1101,14 +1101,8 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(api['status'], 1)
         self.info('new order created with order data {}'.format(order_payload))
         self.info('get random completed test plan with different material type')
-        test_plans = TestPlanAPI().get_completed_testplans(limit=1000)
-        # I need to make sure that material type not equal '47d56b4399' due to this open bug
-        # https://modeso.atlassian.net/browse/LIMS-7710
-        test_plans_without_duplicate = [test_plan for test_plan in test_plans if test_plan['materialType']
-                                        not in [order_payload[0]['materialType']['text'], '47d56b4399']]
-        test_plan = random.choice(test_plans_without_duplicate)
-        test_unit = TestPlanAPI().get_testunits_in_testplan(test_plan['id'])[0]
-
+        test_plan,  test_unit = TestPlanAPI().get_suborder_data_with_different_material_type(
+            order_payload[0]['materialType']['text'])
         self.info('update material type of order from {} to {}'.format(
             order_payload[0]['materialType']['text'], test_plan['materialType']))
 

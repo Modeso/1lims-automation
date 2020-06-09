@@ -3,6 +3,7 @@ from api_testing.apis.base_api import api_factory
 from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from api_testing.apis.test_unit_api import TestUnitAPI
 from ui_testing.pages.testunit_page import TstUnit
+import random
 
 
 class TestPlanAPIFactory(BaseAPI):
@@ -264,3 +265,14 @@ class TestPlanAPI(TestPlanAPIFactory):
         test_plan_id = self.get_testplan_with_filter(filter_option='number', filter_text=str(no))[0]['id']
         test_unit = self.get_testunits_in_testplan(test_plan_id)
         return test_unit[0]['name']
+
+    def get_suborder_data_with_different_material_type(self, material_type):
+        test_plans = self.get_completed_testplans(limit=1000)
+        # I need to make sure that material type not equal '47d56b4399' due to this open bug
+        # https://modeso.atlassian.net/browse/LIMS-7710
+        test_plans_without_duplicate = [test_plan for test_plan in test_plans if test_plan['materialType']
+                                        not in [material_type, '47d56b4399']]
+        test_plan = random.choice(test_plans_without_duplicate)
+        test_unit = TestPlanAPI().get_testunits_in_testplan(test_plan['id'])[0]
+
+        return test_plan, test_unit
