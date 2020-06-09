@@ -1111,10 +1111,12 @@ class OrdersTestCases(BaseTest):
 
         self.info('update material type of order from {} to {}'.format(
             order_payload[0]['materialType']['text'], test_plan['materialType']))
+
         self.orders_page.get_order_edit_page_by_id(api['order']['mainOrderId'])
         suborder_row = self.base_selenium.get_table_rows(element='order:suborder_table')[0]
         suborder_row.click()
         self.order_page.set_material_type(test_plan['materialType'])
+        self.order_page.sleep_small()
         self.assertTrue(self.base_selenium.check_element_is_exist(element="general:confirmation_pop_up"))
         self.info('confirm pop_up')
         self.orders_page.confirm_popup()
@@ -1124,6 +1126,7 @@ class OrdersTestCases(BaseTest):
         self.assertFalse(self.order_page.get_test_unit())
         if test_plan['article'][0] == 'all':
             article = self.order_page.set_article('')
+            self.order_page.sleep_small()
         else:
             self.order_page.set_article(test_plan['article'][0])
             article = test_plan['article'][0]
@@ -1132,11 +1135,14 @@ class OrdersTestCases(BaseTest):
             self.info("set article to {} and test plan to {}".
                       format(test_plan['article'][0], test_plan['testPlanName']))
             self.order_page.set_test_plan(test_plan['testPlanName'])
+            self.order_page.sleep_small()
 
         else:
             self.info("set article to {} and test unit to {}".format(test_plan['article'][0],
                                                                      test_unit['name']))
             self.order_page.set_test_unit(test_unit['name'])
+            self.order_page.sleep_small()
+
 
         self.order_page.save_and_wait(save_btn='order:save_btn')
         self.info('get order data after edit and refresh')
@@ -2413,30 +2419,3 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(len(found_test_units), 3)
         self.assertCountEqual(test_plans, found_test_plans)
         self.assertCountEqual(test_units, found_test_units)
-
-    def test040_test_create_order(self):
-        api, payload = self.orders_api.create_new_order()
-        self.info(payload)
-        self.orders_page.search(payload[0]['orderNo'])
-        order_data = self.orders_page.get_the_latest_row_data()
-        self.assertEqual(order_data['Order No.'].split('-')[0].replace("'", ""), str(payload[0]['orderNo']))
-        suborder_data = self.orders_page.get_child_table_data()[0]
-        self.assertEqual(suborder_data['Test Plans'], payload[0]['testPlans'][0]['name'])
-        self.assertEqual(suborder_data['Material Type'].replace(' ', ''),
-                         payload[0]['materialType']['text'].replace(' ', ''))
-        self.assertEqual(suborder_data['Article Name'], payload[0]['article']['text'])
-        self.assertEqual(suborder_data['Test Units'], payload[0]['selectedTestUnits'][0]['name'])
-
-    def test041_test_create_order_with_multiple_testplans(self):
-        api, payload = self.orders_api.create_order_with_double_test_plans()
-        self.orders_page.search(payload[0]['orderNo'])
-        suborder_data = self.orders_page.get_child_table_data()[0]
-        self.assertEqual(suborder_data['Test Plans'].split(',\n')[0], payload[0]['testPlans'][0]['testPlanName'])
-        self.assertEqual(suborder_data['Test Plans'].split(',\n')[1], payload[0]['testPlans'][1]['testPlanName'])
-        self.assertEqual(suborder_data['Material Type'], payload[0]['materialType']['text'])
-        self.assertEqual(suborder_data['Article Name'], payload[0]['article']['text'])
-        self.assertEqual(suborder_data['Test Units'].split(',\n')[0], payload[0]['testUnits'][0]['name'])
-        self.assertEqual(suborder_data['Test Units'].split(',\n')[1], payload[0]['testUnits'][1]['name'])
-
-
-
