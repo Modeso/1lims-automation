@@ -1087,8 +1087,9 @@ class OrdersTestCases(BaseTest):
         LIMS-4264 ( order with test plan )
         LIMS-4267 (order with test unit )
         """
+        self.info('create new order')
         api, order_payload = self.orders_api.create_new_order()
-        self.assertEqual(api['status'], 1)
+        self.assertEqual(api['status'], 1, api)
         self.info('new order created with order data {}'.format(order_payload))
         self.info('get random completed test plan with different material type')
         test_plan,  test_unit = TestPlanAPI().get_suborder_data_with_different_material_type(
@@ -1100,12 +1101,12 @@ class OrdersTestCases(BaseTest):
         suborder_row = self.base_selenium.get_table_rows(element='order:suborder_table')[0]
         suborder_row.click()
         self.order_page.set_material_type(test_plan['materialType'])
-        self.order_page.sleep_small()
+        self.order_page.sleep_medium()
         self.assertTrue(self.base_selenium.check_element_is_exist(element="general:confirmation_pop_up"))
         self.info('confirm pop_up')
         self.orders_page.confirm_popup()
         self.info('assert article and test plan/ test unit  are empty')
-        self.assertEqual(self.order_page.get_article(), 'Search')  # empty article return 'Search'
+        self.assertFalse(self.order_page.get_article())
         self.assertFalse(self.order_page.get_test_plan())
         self.assertFalse(self.order_page.get_test_unit())
         if test_plan['article'][0] == 'all':
@@ -1120,13 +1121,11 @@ class OrdersTestCases(BaseTest):
                       format(test_plan['article'][0], test_plan['testPlanName']))
             self.order_page.set_test_plan(test_plan['testPlanName'])
             self.order_page.sleep_small()
-
         else:
             self.info("set article to {} and test unit to {}".format(test_plan['article'][0],
                                                                      test_unit['name']))
             self.order_page.set_test_unit(test_unit['name'])
             self.order_page.sleep_small()
-
 
         self.order_page.save_and_wait(save_btn='order:save_btn')
         self.info('get order data after edit and refresh')

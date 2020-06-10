@@ -42,7 +42,11 @@ class Order(Orders):
         return self.base_selenium.get_text(element='order:material_type').split('\n')[0]
 
     def get_article(self):
-        return self.base_selenium.get_text(element='order:article').split(' No')[0]
+        article = self.base_selenium.get_text(element='order:article').split(' No')[0]
+        if article == 'Search':
+            return None
+        else:
+            return article
 
     def set_article(self, article=''):
         if article:
@@ -109,7 +113,7 @@ class Order(Orders):
 
     def get_test_unit(self):
         test_units = self.base_selenium.get_text(element='order:test_unit')
-        if test_units:
+        if test_units and test_units != 'Search':
             return test_units.replace("×", "").split("\n")
         else:
             return []

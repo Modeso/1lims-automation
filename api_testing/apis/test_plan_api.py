@@ -246,7 +246,7 @@ class TestPlanAPI(TestPlanAPIFactory):
         test_units_names = [testunit['name'] for testunit in test_units]
         return test_units_names
 
-     def get_suborder_data_with_different_material_type(self, material_type):
+    def get_suborder_data_with_different_material_type(self, material_type):
         test_plans = self.get_completed_testplans(limit=1000)
         # I need to make sure that material type not equal '47d56b4399' due to this open bug
         # https://modeso.atlassian.net/browse/LIMS-7710
