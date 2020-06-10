@@ -2,10 +2,9 @@ from api_testing.apis.base_api import BaseAPI
 from api_testing.apis.base_api import api_factory
 from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from api_testing.apis.test_unit_api import TestUnitAPI
-from ui_testing.pages.testunit_page import TstUnit
 from api_testing.apis.article_api import ArticleAPI
+from ui_testing.pages.testunit_page import TstUnit
 import random
-
 
 
 class TestPlanAPIFactory(BaseAPI):
@@ -136,13 +135,14 @@ class TestPlanAPIFactory(BaseAPI):
             'selectedTestUnits': [],
             'materialTypeId': 1,
             'dynamicFieldsValues': [],
-            'testUnits': []
+            'testUnits': [],
+            'testplan_name': []
         }
         payload = self.update_payload(_payload, **kwargs)
         if 'testPlan' in kwargs:
-            payload['selectedTestPlan'] = [kwargs['testPlan']]
+            payload['selectedTestPlan'] = [kwargs['testPlan']['text']]
         if 'materialType' in kwargs:
-            payload['materialTypeId'] = kwargs['materialType']['id']
+            payload['materialType'] = kwargs['materialType']
         api = '{}{}'.format(self.url, self.END_POINTS['test_plan_api']['create_testplan'])
         return api, payload
 
@@ -171,7 +171,7 @@ class TestPlanAPI(TestPlanAPIFactory):
         return testplans_response['testPlans']
 
     def get_completed_testplans(self, **kwargs):
-        response, _ = self.get_all_test_plans(**kwargs)
+        response, _ = self.get_all_test_plans(limit=1000)
         all_test_plans = response['testPlans']
         completed_test_plans = [test_plan for test_plan in all_test_plans if test_plan['status'] == 'Completed']
         return completed_test_plans
@@ -268,6 +268,6 @@ class TestPlanAPI(TestPlanAPIFactory):
 
     def get_testunits_in_testplan_by_No(self, no):
         test_plan_id = self.get_testplan_with_filter(filter_option='number', filter_text=str(no))[0]['id']
-        test_unit = self.get_testunits_in_testplan(test_plan_id)
-        return test_unit[0]['name']
- 
+        test_units = self.get_testunits_in_testplan(test_plan_id)
+        test_units_names = [testunit['name'] for testunit in test_units]
+        return test_units_names
