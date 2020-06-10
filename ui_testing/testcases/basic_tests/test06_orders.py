@@ -2419,9 +2419,10 @@ class OrdersTestCases(BaseTest):
         self.order_page.set_test_plan(test_plan)
         self.order_page.set_test_unit(test_unit)
         self.order_page.save(save_btn='order:save', sleep=True)
+        analysis_no = self.order_page.get_suborder_data()['suborders'][1]['analysis_no']
         self.info("navigate to orders' active table and check that duplicated suborder found")
         self.order_page.get_orders_page()
-        self.orders_page.search(payload[0]['orderNo'])
+        self.orders_page.filter_by_analysis_number(analysis_no)
         child_data = self.order_page.get_child_table_data()
         duplicated_suborder_data = child_data[0]
         self.assertEqual(len(child_data), 2)
