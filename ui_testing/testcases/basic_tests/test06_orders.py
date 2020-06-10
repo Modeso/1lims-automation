@@ -1079,12 +1079,13 @@ class OrdersTestCases(BaseTest):
     @parameterized.expand(['testPlans', 'testUnit'])
     def test027_update_material_type(self, case):
         """
-        Apply this on suborder number 5 for example:-
         -When user update the materiel type from table view once I delete it message will appear
         (All analysis created with this order and test plan/ test unit will be deleted )
         -Once you press on OK button, the material type & article & test pan/ test unit will delete
         -You can update it by choose another one and choose corresponding article & test plan/ test unit
+
         LIMS-4264 ( order with test plan )
+
         LIMS-4267 (order with test unit )
         """
         self.info('create new order')
@@ -1101,7 +1102,7 @@ class OrdersTestCases(BaseTest):
         suborder_row = self.base_selenium.get_table_rows(element='order:suborder_table')[0]
         suborder_row.click()
         self.order_page.set_material_type(test_plan['materialType'])
-        self.order_page.sleep_medium()
+        self.order_page.sleep_small()
         self.assertTrue(self.base_selenium.check_element_is_exist(element="general:confirmation_pop_up"))
         self.info('confirm pop_up')
         self.orders_page.confirm_popup()
