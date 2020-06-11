@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test_cases: ["--with-id 1 2 ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases"]
+        test_cases: ["ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases"]
 
     steps:
       - uses: actions/checkout@master
@@ -19,5 +19,5 @@ jobs:
       - name: Execute test case
         run: |
           export PYTHONPATH='$PYTHONPATH:./'
-          script -e -c $'xvfb-run -a ~/.local/bin/nosetests-3.4 -v --nologcapture --tc-file=config.ini ${{ matrix.test_cases }} --collect-only --with-id'
-          script -e -c $'xvfb-run -a ~/.local/bin/nosetests-3.4 -v --nologcapture --tc-file=config.ini ${{ matrix.test_cases }} --with-id 1 2'
+          script -e -c $'xvfb-run -a ~/.local/bin/nosetests-3.4 -v --nologcapture --tc-file=config.ini ${{ matrix.test_cases }}'
+          
