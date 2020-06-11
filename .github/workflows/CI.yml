@@ -19,4 +19,5 @@ jobs:
       - name: Execute test case
         run: |
           export PYTHONPATH='$PYTHONPATH:./'
-          script -e -c $'xvfb-run -a ~/.local/bin/nosetests-3.4 -v --nologcapture --tc-file=config.ini ${{ matrix.test_cases }}'
+#          script -e -c $'xvfb-run -a ~/.local/bin/nosetests-3.4 -v --nologcapture --tc-file=config.ini ${{ matrix.test_cases }}'
+          script -e -c $'xvfb-run -a ~/.local/bin/nosetests-3.4 --help'
