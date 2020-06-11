@@ -2397,7 +2397,7 @@ class OrdersTestCases(BaseTest):
         """
         self.info('create order data multiple testplans and test units')
         response, payload = self.orders_api.create_order_with_double_test_plans()
-        self.assertEqual(response['status'], 1)
+        self.assertEqual(response['status'], 1, payload)
         test_plans = [payload[0]['testPlans'][0]['testPlanName'], payload[0]['testPlans'][1]['testPlanName']]
         test_units = [payload[0]['testUnits'][0]['name'], payload[0]['testUnits'][1]['name']]
         self.info("get new completed test plan with article {} and material_type {}".format(
