@@ -347,8 +347,12 @@ elements = {
                            'value': '[class="category-label"]'},
         'test_units': {'method': 'id',
                        'value': 'selectedTestUnitsfield'},
+        'test_unit': {'method': 'id',
+                       'value': 'selectedTestUnits'},
         'add': {'method': 'id',
                 'value': 'new_testunit_add_button'},
+        'check_btn': {'method': 'xpath',
+                'value': '//i[@class="la la-check"]'},
         'save_btn': {'method': 'id',
                      'value': 'save_btn'},
         'save_and_complete': {'method': 'id',
@@ -391,11 +395,11 @@ elements = {
                            },
         'remove_testunit': {'method': 'id',
                             'value': 'remove_testunit'},
-        'testunit_category': {'method': 'class_name',
-                              'value': 'category-label',
-                              'order': 0},
-        'testunit_iteration': {'method': 'id',
-                               'value': 'testunit_iterations_value'},
+        'test_unit_category': {'method': 'class_name',
+                              'value': 'testunitCell-positioning',
+                               'order': 1},
+        'test_unit_iteration': {'method': 'xpath',
+                               'value': '//input[@placeholder="Iterations"]'},
         'testunit_unit': {'method': 'id',
                           'value': 'testunit_unit'},
         'testunit_quantification_upper_limit': {
@@ -409,7 +413,9 @@ elements = {
         'add_testunit_error_msg': {
             'method': 'xpath',
             'value': '//span[@class="m-form__help"]'
-        }
+        },
+        'add_new_item': {'method': 'link_text',
+                         'value': 'Add another item'},
     },
 
     'test_unit': {
@@ -545,6 +551,8 @@ elements = {
                             'value': 'orderNofield'},
         'analysis_filter': {'method': 'id',
                             'value': 'analysisfield'},
+        'analysis_result_filter': {'method': 'id',
+                            'value': 'analysisResultsfield'},
         'order_filter': {'method': 'id',
                          'value': 'orderNofield'},
         'contact_filter': {'method': 'id',
@@ -555,12 +563,27 @@ elements = {
                                  'value': 'materialTypefield'},
         'article_filter': {'method': 'id',
                            'value': 'articlefield'},
-        'chnaged_on_filter': {'method': 'id',
-                              'value': 'start_createdAt'},
+        'test_plans_filter': {'method': 'id',
+                              'value': 'testPlanfield'},
+        'test_units_filter': {'method': 'id',
+                              'value': 'testUnitfield'},
+        'status_filter': {'method': 'id',
+                          'value': 'status_idfield'},
+        'departments_filter': {'method': 'id', 'value': 'departmentsfield'},
+        'created_on_filter': {'method': 'id',
+                              'value': "start_createdAt"},
+        'created_on_filter_end': {'method': 'id',
+                                  'value': 'end_createdAt'},
         'test_date_filter': {'method': 'id',
                              'value': 'start_testDate'},
+        'test_date_filter_end': {'method': 'id', 'value': 'end_testDate'},
+        'shipment_date_filter_end': {'method': 'id',
+                                     'value': 'end_shipmentDate',
+                                     'order': 1
+                                     },
         'shipment_date_filter': {'method': 'id',
-                                 'value': 'start_shipmentDate'},
+                                 'value': 'start_shipmentDate',
+                                 'order': 1},
         'analysis_tab': {
             'method': 'xpath',
             'value': "//label[@class='btn tab']"},
@@ -582,6 +605,8 @@ elements = {
         'filter_entity': {'method': 'id', 'value': 'entityfield'},
         'filter_entity_number': {'method': 'id', 'value': 'entityNumberfield'},
     },
+
+
 
     'order': {
         'order': {'method': 'id',
@@ -1052,7 +1077,9 @@ elements = {
         },
         'analysis_page_table': {'method': 'class_name', 'value': 'm_accordion_7', 'order': 0},
         'headers': {'method': 'id', 'value': 'headers'},
-        'analysis_no_filter': {'method': 'id', 'value': 'nofield'}
+        'analysis_no_filter': {'method': 'id', 'value': 'nofield'},
+        'order_no_filter': {'method': 'id', 'value': 'orderNofield'}
+
     },
 
     'company_profile': {
