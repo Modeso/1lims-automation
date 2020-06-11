@@ -14,6 +14,7 @@ jobs:
                      "ui_testing/testcases/header_tests/test09_my_profile.py:MyProfileTestCases.test008_my_profile_user_can_update_logo",
                      "ui_testing/testcases/header_tests/test09_my_profile.py:MyProfileTestCases.test009_you_cant_upload_more_than_one_logo"]
 
+
     steps:
       - uses: actions/checkout@master
       - name: Install dependencies
