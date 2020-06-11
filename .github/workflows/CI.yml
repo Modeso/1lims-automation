@@ -8,6 +8,7 @@ jobs:
   test_pull_request:
     runs-on: ubuntu-20.04
     strategy:
+      fail-fast: false
       matrix:
         test_cases: ["ui_testing/testcases/header_tests/test09_my_profile.py:MyProfileTestCases.test007_my_profile_user_can_upload_logo",
                      "ui_testing/testcases/header_tests/test09_my_profile.py:MyProfileTestCases.test008_my_profile_user_can_update_logo",
