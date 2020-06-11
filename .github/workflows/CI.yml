@@ -11,7 +11,6 @@ jobs:
       matrix:
         test_cases: ["ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases.test040_create_order_with_multiple_contacts_and_departments_0_create",
                      "ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases.test040_create_order_with_multiple_contacts_and_departments_1_edit"]
-
     steps:
       - uses: actions/checkout@master
       - name: Install dependencies
