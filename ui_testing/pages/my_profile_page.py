@@ -5,7 +5,7 @@ from random import randint
 class MyProfile(BasePages):
     def __init__(self):
         super().__init__()
-        self.base_selenium.wait_until_page_url_has(text='dashboard')
+        # self.base_selenium.wait_until_page_url_has(text='dashboard')
         self.my_profile_url = "{}settings#myProfile".format(self.base_selenium.url)
         
     def get_my_profile_page(self):

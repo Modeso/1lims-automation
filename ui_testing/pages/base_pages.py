@@ -449,18 +449,18 @@ class BasePages:
         :param drop_zone_element: the dropZone element 
         :return:
         """
-        self.base_selenium.LOGGER.info("+ Uploading file")
+        self.base_selenium.LOGGER.info(" uploading file")
 
         # remove the current file and save
         if remove_current_file:
-            self.base_selenium.LOGGER.info("Remove current file")
+            self.base_selenium.LOGGER.info(" remove current file")
             is_the_file_exist = self.base_selenium.check_element_is_exist(
             element='general:file_upload_success_flag')
             if is_the_file_exist:
                 self.base_selenium.click('general:remove_file')
                 self.save()      
             else:
-                self.base_selenium.LOGGER.info("There is no current file")
+                self.base_selenium.LOGGER.info(" there is no current file")
 
         # get the absolute path of the file
         file_path = os.path.abspath('ui_testing/assets/{}'.format(file_name))

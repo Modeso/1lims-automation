@@ -15,12 +15,14 @@ class MyProfileTestCases(BaseTest):
         # generate random username/email & password
         self.username = self.generate_random_string()
         self.email = self.header_page.generate_random_email()
-        self.current_password = self.generate_random_string()
 
-        # create new user
         self.info('Create User {}'.format(self.username))
-        self.users_api.create_new_user(username=self.username, emai=self.email, password=self.current_password)
+        response, payload = self.users_api.create_new_user(username=self.username, emai=self.email)
+        self.current_password = payload["password"]
+
+        self.users_api._get_authorized_session(username=self.username, password=self.current_password, reset_token=True)
         self.set_authorization(auth=self.users_api.AUTHORIZATION_RESPONSE)
+
         self.my_profile_page.get_my_profile_page()
 
     # Blocked by https://modeso.atlassian.net/browse/LIMS-6425
