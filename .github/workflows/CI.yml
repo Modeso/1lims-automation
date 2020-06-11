@@ -9,22 +9,7 @@ jobs:
     runs-on: ubuntu-20.04
     strategy:
       matrix:
-        test_cases: ["ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases --with-id 1 2 3 4 5",
-                     "ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases --with-id 6 7 8 9 10",
-                     "ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases --with-id 11 12 13 14 15",
-                     "ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases --with-id 16 17 18 19 20",
-                     "ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases --with-id 21 22 23 24 25",
-                     "ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases --with-id 26 27 28 29 30",
-                     "ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases --with-id 31 32 33 34 35",
-                     "ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases --with-id 36 37 38 39 40",
-                     "ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases --with-id 41 42 43 44 45",
-                     "ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases --with-id 46 47 48 49 50",
-                     "ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases --with-id 51 52 53 54 55",
-                     "ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases --with-id 56 57 58 59 60",
-                     "ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases --with-id 61 62 63 64 65",
-                     "ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases --with-id 66 67 68 69 70",
-                     "ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases --with-id 71 72 73 74 75",
-                     "ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases --with-id 76 77",]
+        test_cases: ["ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases --with-id 1 2 3 4 5"]
 
     steps:
       - uses: actions/checkout@master
