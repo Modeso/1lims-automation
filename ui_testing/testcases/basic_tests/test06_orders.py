@@ -1137,7 +1137,7 @@ class OrdersTestCases(BaseTest):
         self.analyses_page.filter_by_analysis_number(suborder_after_refresh['analysisNos'][0]['analysisNo'])
         analyses = self.analyses_page.get_the_latest_row_data()
         self.assertEqual(test_plan['materialType'], analyses['Material Type'])
-        self.assertEqual(article, analyses['Article Name'])
+        self.assertEqual(article.replace(" ",""), analyses['Article Name'].replace(" ",""))
         if case == 'testPlans':
             self.assertEqual(test_plan['testPlanName'], analyses['Test Plans'])
         else:
