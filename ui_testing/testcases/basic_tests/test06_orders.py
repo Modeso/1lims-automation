@@ -2402,6 +2402,7 @@ class OrdersTestCases(BaseTest):
         """
         self.info(" create order with multiple contacts")
         self.order_page.create_multiple_contacts_new_order()
+        self.order_page.sleep_small()
         contacts = self.order_page.get_contact()
         self.info('selected contacts are {}'.format(contacts))
         departments_list_with_contacts = ContactsAPI().get_department_contact_list(contacts)
