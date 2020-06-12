@@ -53,12 +53,9 @@ class BasePages:
 
     def save(self, sleep=True, save_btn='general:save', logger_msg='save the changes'):
         self.info(logger_msg)
-        if self.base_selenium.check_element_is_exist(element=save_btn):
-            if sleep:
-                self.sleep_tiny()
-            self.base_selenium.click(element=save_btn)
-        else:
-            self.base_selenium.click(element='my_profile:save_button')
+        if sleep:
+            self.sleep_tiny()
+        self.base_selenium.click(element=save_btn)
         if sleep:
             self.sleep_tiny()
 
@@ -440,7 +437,7 @@ class BasePages:
         else:
             return True
         
-    def upload_file(self, file_name, drop_zone_element, save=True, remove_current_file=False):
+    def upload_file(self, file_name, drop_zone_element, remove_current_file=False):
         """
         Upload single file to a page that only have 1 drop zone
         
@@ -504,17 +501,7 @@ class BasePages:
         self.base_selenium.LOGGER.info(
             "{} file is uploaded successfully".format(file_name))
 
-        # save the form or cancel
-        if save:
-            self.save()
-            # show the file name
-            self.base_selenium.driver.execute_script("document.querySelector('.dz-details').style.opacity = 'initial';")
-            # get the file name
-            uploaded_file_name = self.base_selenium.find_element(element='general:uploaded_file_name').text
-            return uploaded_file_name
-        else:
-            self.cancel(True)
-            return True
+
 
     def open_pagination_menu(self):
         self.base_selenium.wait_element(element='general:pagination_button')

@@ -33,7 +33,15 @@ class MyProfile(BasePages):
 
     def chang_lang(self, lang):
         self.base_selenium.LOGGER.info(' + Change language to {}'.format(lang))
-        # change the language
         self.base_selenium.select_item_from_drop_down(element='my_profile:language_field', item_text=lang)
-        # wait till the page reloads
-        self.sleep_large()
+        self.wait_until_page_is_loaded()
+
+    def upload_logo(self, file_name, drop_zone_element, save=True, remove_current_file=False):
+        super().upload_file(file_name, drop_zone_element, remove_current_file)
+        if save:
+            self.save(save_btn="my_profile:save_button")
+            self.base_selenium.driver.execute_script("document.querySelector('.dz-details').style.opacity = 'initial';")
+            uploaded_file_name = self.base_selenium.find_element(element='general:uploaded_file_name').text
+            return uploaded_file_name
+        else:
+            self.cancel(True)
