@@ -265,6 +265,7 @@ class TestPlanAPI(TestPlanAPIFactory):
             api, payload = TestUnitAPI().create_quantitative_testunit()
             if api['status'] == 1:
                 new_test_unit = payload['name']
+        
         return new_test_plan, new_test_unit
 
     def get_testunits_in_testplan_by_No(self, no):
