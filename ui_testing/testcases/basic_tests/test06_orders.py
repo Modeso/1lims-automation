@@ -2397,10 +2397,54 @@ class OrdersTestCases(BaseTest):
         self.assertCountEqual(test_plans, found_test_plans)
         self.assertCountEqual(test_units, found_test_units)
 
+    def test042_Duplicate_sub_order_with_multiple_testplans_and_testunits_add_approach(self):
+        """
+        Duplicate suborder Approach: Duplicate any sub order then add test unit & test plan
+
+        LIMS-6232
+        """
+        self.info('create order data multiple testplans and test units')
+        response, payload = self.orders_api.create_order_with_double_test_plans()
+        self.assertEqual(response['status'], 1, payload)
+        test_plans = [payload[0]['testPlans'][0]['testPlanName'], payload[0]['testPlans'][1]['testPlanName']]
+        test_units = [payload[0]['testUnits'][0]['name'], payload[0]['testUnits'][1]['name']]
+        self.info("get new completed test plan with article {} and material_type {}".format(
+            payload[0]['article']['text'], payload[0]['materialType']['text']))
+
+        test_plan, test_unit = TestPlanAPI().get_order_valid_testplan_and_test_unit(
+            material_type=payload[0]['materialType']['text'],
+            used_test_plan=test_plans,
+            used_test_unit=test_units,
+            article_id=payload[0]['article']['id'], article=payload[0]['article']['text'])
+
+        test_plans.append(test_plan)
+        test_units.append(test_unit)
+
+        self.orders_page.search(payload[0]['orderNo'])
+        self.info("duplicate the sub order of order {} from suborder's options".format(payload[0]['orderNo']))
+        self.orders_page.get_child_table_data()
+        self.orders_page.duplicate_sub_order_from_table_overview()
+        self.order_page.set_test_plan(test_plan)
+        self.order_page.set_test_unit(test_unit)
+        self.order_page.save(save_btn='order:save', sleep=True)
+        analysis_no = self.order_page.get_suborder_data()['suborders'][1]['analysis_no']
+        self.info("navigate to orders' active table and check that duplicated suborder found")
+        self.order_page.get_orders_page()
+        self.orders_page.filter_by_analysis_number(analysis_no)
+        child_data = self.order_page.get_child_table_data()
+        duplicated_suborder_data = child_data[0]
+        self.assertEqual(len(child_data), 2)
+        self.assertEqual(duplicated_suborder_data['Article Name'].replace(' ', ''),
+                         payload[0]['article']['text'].replace(' ', ''))
+        self.assertEqual(duplicated_suborder_data['Material Type'], payload[0]['materialType']['text'])
+        duplicated_suborder_test_units = duplicated_suborder_data['Test Units'].split(',\n') or []
+        duplicated_suborder_test_plans = duplicated_suborder_data['Test Plans'].split(',\n') or []
+        self.assertCountEqual(duplicated_suborder_test_units, test_units)
+        self.assertCountEqual(duplicated_suborder_test_plans, test_plans)
+        
     def test040_user_can_edit_multiple_columns(self):
         """
         user can edit multiple columns at the same time
-
         LIMS-5221
         """
         self.info('get random order with multiple suborders edit page')
@@ -2478,3 +2522,43 @@ class OrdersTestCases(BaseTest):
         duplicated_suborder_data = self.order_page.get_child_table_data()
         duplicated_test_units = [testunit['Test Unit'] for testunit in duplicated_suborder_data]
         self.assertCountEqual(test_units, duplicated_test_units)
+
+    def test042_table_with_add_edit_single_row(self):
+        """
+        Orders: Table with add: In case I have two suborders and I update the first one
+        then press on the second one the first one should updated according to that
+        LIMS-5204
+        """
+        self.info("create new test unit edit the suborder by it ( because the test unit name is not a unique ")
+        re, payload1 = self.test_unit_api.create_qualitative_testunit()
+
+        order, payload = self.orders_api.create_new_order()
+        self.orders_page.get_order_edit_page_by_id(id=order['order']['mainOrderId'])
+
+        self.info(" Duplicate it to make sure we have two suborders to edit in one and press on the other to save data in the first one ")
+        self.order_page.duplicate_from_table_view(index_to_duplicate_from=0)
+
+        testunit_before_edit_row = self.order_page.get_suborder_data()['suborders'][0]['testunits']
+        self.info("test unit before I update the first row {}".format(testunit_before_edit_row))
+
+        # update the first suborder to update the test unit one it
+        self.order_page.update_suborder(test_units=[payload1['name']], sub_order_index=0)
+        # press on the second row because I want to save data in the first one
+        self.order_page.update_suborder(sub_order_index=1)
+
+        testunit_after_edit_row = self.order_page.get_sub_order_data_first_row()['suborders'][0]['testunits']
+        self.info("test unit after I press on the second row to make sure it saved in the first one {}".format(testunit_after_edit_row))
+
+        self.info('Assert that the test unit not equal ')
+        self.assertNotEqual(testunit_before_edit_row, testunit_after_edit_row)
+
+
+
+
+
+
+
+
+
+
+
