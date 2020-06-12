@@ -702,6 +702,13 @@ elements = {
         'confirm_cancel': {'method': 'class_name',
                            'value': 'btn-secondary',
                            'order': 2},
+        'testplan_popup11': {'method': 'xpath',
+                           'value': '//i[@class="la la-info"]',
+                           },
+
+        'testplan_popup': {'method': 'class',
+                           'value': 'la la-info',
+                           },
         'analysis': {
             'filter_order_no': {
                 'method': 'id',

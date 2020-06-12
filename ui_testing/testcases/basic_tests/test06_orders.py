@@ -2470,3 +2470,15 @@ class OrdersTestCases(BaseTest):
         duplicated_suborder_data = self.order_page.get_child_table_data()
         duplicated_test_units = [testunit['Test Unit'] for testunit in duplicated_suborder_data]
         self.assertCountEqual(test_units, duplicated_test_units)
+
+    def test044_edit(self):
+        """
+        Duplicate main order Approach: duplicate order with test plan & test units
+        LIMS-4353
+        """
+        order, payload = self.orders_api.create_new_order()
+        self.orders_page.get_order_edit_page_by_id(id=order['order']['mainOrderId'])
+        self.order_page.sleep_small()
+        self.order_page.update_suborder(sub_order_index=0)
+        self.order_page.sleep_small()
+        self.base_selenium.click(element='order:testplan_popup')
