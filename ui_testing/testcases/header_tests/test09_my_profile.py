@@ -16,9 +16,9 @@ class MyProfileTestCases(BaseTest):
         self.username = self.generate_random_string()
         self.email = self.header_page.generate_random_email()
 
-        self.info('Create User {}'.format(self.username))
         response, payload = self.users_api.create_new_user(username=self.username, emai=self.email)
         self.current_password = payload["password"]
+        self.info('create User {}:{}'.format(self.username, self.current_password))
 
         self.users_api._get_authorized_session(username=self.username, password=self.current_password, reset_token=True)
         self.set_authorization(auth=self.users_api.AUTHORIZATION_RESPONSE)
