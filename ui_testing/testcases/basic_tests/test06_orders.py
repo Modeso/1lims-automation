@@ -2407,7 +2407,9 @@ class OrdersTestCases(BaseTest):
         """
         self.info('create order with test plan and test unit')
         response, payload = self.orders_api.create_new_order()
-        self.assertEqual(response['status'], 1)
+        self.assertEqual(response['status'], 1, response)
+        self.info('order created with payload {}'.format(payload))
+        self.info('get valid test plan and test unit to edit suborder data')
         new_test_plan, new_test_unit = TestPlanAPI().get_order_valid_testplan_and_test_unit(
             material_type=payload[0]['materialType']['text'],
             used_test_plan=payload[0]['testPlans'][0]['name'],
@@ -2416,15 +2418,13 @@ class OrdersTestCases(BaseTest):
 
         self.info("duplicate order No {} ".format(payload[0]['orderNo']))
         self.orders_page.search(payload[0]['orderNo'])
-
         self.info("duplicate main order")
         self.orders_page.duplicate_main_order_from_order_option()
         self.assertIn("duplicateMainOrder", self.base_selenium.get_url())
-        self.order_page.sleep_small()
+        self.order_page.sleep_medium()
         duplicated_order_No = self.order_page.get_no()
         self.info("duplicated order No is {}".format(duplicated_order_No))
         self.assertNotEqual(duplicated_order_No, payload[0]['orderNo'])
-
         if case == 'add':
             self.info("add test plan {} and test unit {} to duplicated order".format(new_test_plan, new_test_unit))
             self.order_page.update_suborder(test_plans=[new_test_plan], test_units=[new_test_unit])
@@ -2435,8 +2435,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.save(save_btn='order:save')
         self.info("navigate to active table")
         self.order_page.get_orders_page()
-        self.orders_page.search(duplicated_order_No)
-        self.assertTrue(self.orders_page.is_order_in_table(duplicated_order_No))
+        self.assertTrue(self.orders_page.search(duplicated_order_No))
         duplicated_suborder_data = self.order_page.get_child_table_data()[0]
         if case == 'change':
             self.info("assert that test unit updated to {}, test plan {}".format(
@@ -2451,7 +2450,7 @@ class OrdersTestCases(BaseTest):
 
         self.info("navigate to analysis page")
         self.order_page.navigate_to_analysis_tab()
-        self.analyses_page.search(duplicated_order_No)
+        self.assertTrue(self.analyses_page.search(duplicated_order_No))
         analyses = self.analyses_page.get_the_latest_row_data()
         if case == 'add':
             self.assertIn(new_test_plan, analyses['Test Plans'].replace("'", ""))
@@ -2471,7 +2470,8 @@ class OrdersTestCases(BaseTest):
         self.info('create order with test plan and test unit')
         response, payload = self.orders_api.create_new_order()
         self.assertEqual(response['status'], 1)
-
+        self.info('order created with payload {}'.format(payload))
+        self.info('get valid test plan and test unit to edit suborder data')
         new_test_plan, new_test_unit = TestPlanAPI().get_order_valid_testplan_and_test_unit(
             material_type=payload[0]['materialType']['text'],
             used_test_plan=payload[0]['testPlans'][0]['name'],
