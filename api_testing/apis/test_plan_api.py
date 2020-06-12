@@ -90,11 +90,10 @@ class TestPlanAPIFactory(BaseAPI):
         """
         NOTE: calling this api without adding testunits, will create an in progress testplan, to create a complete testplan
         you will need to pass parameter testunits[testunit_object], and this object is can be formated by the following steps,
-        
+
         testunit = self.test_unit_api.get_testunit_form_data(id=#testunit_id)
         formated_testunit = self.test_unit_page.map_testunit_to_testplan_format(testunit=testunit)
         self.test_plan_api.create_testplan(testunits=[formated_testunit])
-
         param: testplan: {
             'id': testplan id, 'new' in case of new testplan name,
             'text': testplan name text
@@ -240,14 +239,15 @@ class TestPlanAPI(TestPlanAPIFactory):
         else:
             self.info(testplan)
 
-    def get_order_valid_testplan_and_test_unit(self, material_type, article_id, article, used_test_plan, used_test_unit):
+    def get_order_valid_testplan_and_test_unit(self, material_type, article_id, article, used_test_plan,
+                                               used_test_unit):
         article_no = ArticleAPI().get_article_form_data(id=article_id)[0]['article']['No']
         self.info("get new completed test plan with article {} No: {} and material_type {}".format(
             article, article_no, material_type))
         completed_test_plan_list = self.get_completed_testplans_with_material_and_same_article(
             material_type=material_type, article=article, articleNo=article_no)
         completed_test_plans = [testplan for testplan in completed_test_plan_list if
-                                testplan['testPlanName'] != used_test_plan]
+                                testplan['testPlanName'] not in used_test_plan]
         if completed_test_plans:
             new_test_plan_data = random.choice(completed_test_plans)
             new_test_plan = new_test_plan_data['testPlanName']
@@ -260,12 +260,13 @@ class TestPlanAPI(TestPlanAPIFactory):
             new_test_plan = test_plan['testPlanEntity']['name']
             new_test_unit = test_plan['specifications'][0]['name']
             self.info("completed test plan created with name {} and test unit {}".format(new_test_plan, new_test_unit))
-        if new_test_unit == used_test_unit:
+
+        if new_test_unit in used_test_unit:
             api, payload = TestUnitAPI().create_quantitative_testunit()
             if api['status'] == 1:
                 new_test_unit = payload['name']
         return new_test_plan, new_test_unit
- 
+
     def get_testunits_in_testplan_by_No(self, no):
         test_plan_id = self.get_testplan_with_filter(filter_option='number', filter_text=str(no))[0]['id']
         test_units = self.get_testunits_in_testplan(test_plan_id)
