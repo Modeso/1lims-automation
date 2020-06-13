@@ -3,6 +3,7 @@ from api_testing.apis.contacts_api import ContactsAPI
 from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from api_testing.apis.test_plan_api import TestPlanAPI
 from api_testing.apis.test_unit_api import TestUnitAPI
+from api_testing.apis.article_api import ArticleAPI
 from ui_testing.pages.testunit_page import TstUnit
 from api_testing.apis.base_api import api_factory
 import random, json, os
@@ -57,6 +58,10 @@ class OrdersAPIFactory(BaseAPI):
         testplan_form_data = TestPlanAPI()._get_testplan_form_data(id=testplan['id'])[0]
         article = testplan_form_data['testPlan']['selectedArticles'][0]['name']
         article_id =testplan_form_data['testPlan']['selectedArticles'][0]['id']
+        if article == 'all':
+            selected_article = random.choice(ArticleAPI().get_all_articles(limit=10)[0]['articles'])
+            article = selected_article['name']
+            article_id = selected_article['id']
 
         #modify_test_plan_ID
         testplan['id'] = testplan_form_data['testPlan']['testPlanEntity']['id']
@@ -96,7 +101,7 @@ class OrdersAPIFactory(BaseAPI):
                 'articleId': article_id,
                 'shipmentDate': shipment_date,
                 'testDate': test_date,
-                'year': current_year,
+                'year': current_year[2:4],
                 'yearOption': 1
             }]
         payload = self.update_payload(_payload, **kwargs)
@@ -292,6 +297,10 @@ class OrdersAPI(OrdersAPIFactory):
         testplan['id'] = testplan_form_data['testPlan']['testPlanEntity']['id']
         article = testplan_form_data['testPlan']['selectedArticles'][0]['name']
         article_id = testplan_form_data['testPlan']['selectedArticles'][0]['id']
+        if article == 'all':
+            selected_article = random.choice(ArticleAPI().get_all_articles(limit=10)[0]['articles'])
+            article = selected_article['name']
+            article_id = selected_article['id']
         material_type = testplan['materialType']
         material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
         testunit1 = testplan_form_data['testPlan']['specifications'][0]

@@ -2543,14 +2543,3 @@ class OrdersTestCases(BaseTest):
 
         self.info('Assert that the test unit not equal ')
         self.assertNotEqual(testunit_before_edit_row, testunit_after_edit_row)
-
-
-
-
-
-
-
-
-
-
-
