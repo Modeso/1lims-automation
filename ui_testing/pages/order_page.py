@@ -116,7 +116,7 @@ class Order(Orders):
 
     def create_new_order(self, material_type='', article='', contact='', test_plans=[''], test_units=[''],
                          multiple_suborders=0, departments=''):
-        self.base_selenium.LOGGER.info(' Create new order.')
+        self.info(' Create new order.')
         self.click_create_order_button()
         self.set_new_order()
         self.set_contact(contact=contact)
@@ -140,7 +140,7 @@ class Order(Orders):
 
         self.save(save_btn='order:save_btn')
         self.base_selenium.LOGGER.info(' Order created with no : {} '.format(order_no))
-        return self.get_suborder_data()
+        return order_no
 
     def create_existing_order(self, no='', material_type='', article='', contact='', test_units=[],
                               multiple_suborders=0):
@@ -575,6 +575,4 @@ class Order(Orders):
         suborders = self.base_selenium.get_table_rows(element='order:suborder_table')
         suborder_row = suborders[index]
         suborder_data = self.get_suborder_data()
-        return  suborder_data
-
-
+        return suborder_data

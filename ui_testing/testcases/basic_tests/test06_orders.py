@@ -930,18 +930,17 @@ class OrdersTestCases(BaseTest):
         testunit = random.choice(testunits['testUnits'])
 
         self.order_page.get_orders_page()
-        created_order = self.order_page.create_new_order(material_type='r', article='a', contact='a', test_plans=[],
+        created_order_no = self.order_page.create_new_order(material_type='r', article='a', contact='a', test_plans=[],
                                                          test_units=[testunit['name']])
 
         self.order_page.get_orders_page()
         self.order_page.navigate_to_analysis_tab()
         self.base_selenium.LOGGER.info(
             'Assert There is an analysis for this new order.')
-        orders_analyess = self.analyses_page.search(value=created_order['orderNo'])
+        orders_analyess = self.analyses_page.search(value=created_order_no)
         latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
             row=orders_analyess[0])
-        self.assertEqual(
-            created_order['orderNo'].replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
+        self.assertEqual(created_order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
 
         self.analyses_page.open_child_table(source=orders_analyess[0])
         rows_with_childtable = self.analyses_page.result_table(element='general:table_child')
@@ -1617,18 +1616,18 @@ class OrdersTestCases(BaseTest):
 
         # Then go to the order section to create new order with this test unit
         self.order_page.get_orders_page()
-        created_order = self.order_page.create_new_order(material_type='s', article='r', contact='a',
+        created_order_no = self.order_page.create_new_order(material_type='s', article='r', contact='a',
                                                          test_units=test_units_list)
 
         # Go to the analysis section and search by the order number that created
         self.analyses_page.get_analyses_page()
         self.base_selenium.LOGGER.info(
             'Make sure there is analysis for this order number.')
-        orders_analyess = self.analyses_page.search(created_order)
+        orders_analyess = self.analyses_page.search(created_order_no)
         latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
             row=orders_analyess[0])
         self.assertEqual(
-            created_order.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
+            created_order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
 
         # Open the child table tp check the test unit display correct
         self.analyses_page.open_child_table(source=orders_analyess[0])
@@ -1653,11 +1652,11 @@ class OrdersTestCases(BaseTest):
         self.analyses_page.get_analyses_page()
         self.base_selenium.LOGGER.info(
             'Make sure there is analysis for this order number.')
-        orders_analyess = self.analyses_page.search(created_order)
+        orders_analyess = self.analyses_page.search(created_order_no)
         latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
             row=orders_analyess[0])
         self.assertEqual(
-            created_order.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
+            created_order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
 
         # Open the child table to make sure the update reflected successfully
         self.analyses_page.open_child_table(source=orders_analyess[0])
@@ -1688,18 +1687,18 @@ class OrdersTestCases(BaseTest):
 
         # Then go to the order section to create new order with this test unit
         self.order_page.get_orders_page()
-        created_order = self.order_page.create_new_order(material_type='s', article='r', contact='a',
+        created_order_no = self.order_page.create_new_order(material_type='s', article='r', contact='a',
                                                          test_units=test_units_list)
 
         # Go to the analysis section and search by the order number that created
         self.analyses_page.get_analyses_page()
         self.base_selenium.LOGGER.info(
             'Make sure there is analysis for this order number.')
-        orders_analyess = self.analyses_page.search(created_order)
+        orders_analyess = self.analyses_page.search(created_order_no)
         latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
             row=orders_analyess[0])
         self.assertEqual(
-            created_order.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
+            created_order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
 
         # Open the child table tp check the test unit display correct
         self.analyses_page.open_child_table(source=orders_analyess[0])
@@ -1726,11 +1725,11 @@ class OrdersTestCases(BaseTest):
         self.analyses_page.get_analyses_page()
         self.base_selenium.LOGGER.info(
             'Make sure there is analysis for this order number.')
-        orders_analyess = self.analyses_page.search(created_order)
+        orders_analyess = self.analyses_page.search(created_order_no)
         latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
             row=orders_analyess[0])
         self.assertEqual(
-            created_order.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
+            created_order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
 
         # Open the child table to make sure the update reflected successfully
         self.analyses_page.open_child_table(source=orders_analyess[0])
