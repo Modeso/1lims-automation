@@ -569,4 +569,18 @@ class Order(Orders):
             row=suborder_row, table_element='order:suborder_table')
         return suborders_elements
 
+    def match_format_to_sheet_format(self, list):
+        formatted_orders_list = []
+        orders_list =[]
+        for order in list:
+            for key in order:
+                if key in ['', 'Options']:
+                    continue
+                if key in ['Contact Name', 'Test Plans', 'Departments', 'Test Units']:
+                    formatted_orders_list.append(order[key].replace(',\n', ' & '))
+                else:
+                    formatted_orders_list.append(order[key])
+            orders_list.extend({formatted_orders_list})
+            formatted_orders_list = []
 
+        return formatted_orders_list

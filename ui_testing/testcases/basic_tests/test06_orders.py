@@ -2419,16 +2419,30 @@ class OrdersTestCases(BaseTest):
 
         LIMS-8085
         """
-        self.info(' * Download XSLX sheet')
+        self.info('select random order')
+        rows = self.order_page.select_random_ordered_multiple_table_rows()
+        rows_data = rows[0]
+        orders_no = [order['Order No.'] for order in rows_data]
+        order_data_list = []
+        for i in range(0, len(rows_data)):
+            order_dict = rows[0][i]
+            self.base_selenium.scroll()
+            self.order_page.open_child_table(rows[1][i])
+            child_table_data = self.order_page.get_table_data()
+            for sub_order in child_table_data:
+                order_dict.update(sub_order)
+                order_data_list.append(order_dict)
+
+            self.order_page.open_child_table(rows[1][i])
+        formatted_orders = self.order_page.match_format_to_sheet_format(order_data_list)
         self.order_page.download_xslx_sheet()
-        rows_data = self.order_page.get_table_rows_data()
-        for index in range(len(rows_data)):
-            self.info(' * Comparing the order no. {} '.format(index))
-            fixed_row_data = self.fix_data_format(rows_data[index].split('\n'))
+        for index in range(len(formatted_orders)):
+            import ipdb;ipdb.set_trace()
+            self.info('Comparing the order no {} '.format(formatted_orders[index][0]))
             values = self.order_page.sheet.iloc[index].values
-            fixed_sheet_row_data = self.fix_data_format(values)
-            for item in fixed_row_data:
-                self.assertIn(item, fixed_sheet_row_data)
+            self.assertCountEqual(values, formatted_orders[index])
+            for item in formatted_orders[index]:
+                self.assertIn(item, values)
 
 
 
