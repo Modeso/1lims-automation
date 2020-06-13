@@ -1090,7 +1090,7 @@ class OrdersTestCases(BaseTest):
         """
         self.info('create new order')
         api, order_payload = self.orders_api.create_new_order()
-        self.assertEqual(api['status'], 1, api)
+        self.assertEqual(api['status'], 1, order_payload)
         self.info('new order created with order data {}'.format(order_payload))
         self.info('get random completed test plan with different material type')
         test_plan,  test_unit = TestPlanAPI().get_suborder_data_with_different_material_type(
@@ -2551,7 +2551,6 @@ class OrdersTestCases(BaseTest):
 
         self.info('Assert that the test unit not equal ')
         self.assertNotEqual(testunit_before_edit_row, testunit_after_edit_row)
-
 
 
 
