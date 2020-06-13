@@ -64,11 +64,9 @@ class Order(Orders):
         if remove_old:
            self.base_selenium.clear_items_in_drop_down(element='order:contact')
         if contact:
-           self.base_selenium.select_item_from_drop_down(
-            element='order:contact', item_text=contact)
+           self.base_selenium.select_item_from_drop_down(element='order:contact', item_text=contact)
         else:
-           self.base_selenium.select_item_from_drop_down(
-            element='order:contact', avoid_duplicate=True)
+           self.base_selenium.select_item_from_drop_down(element='order:contact', avoid_duplicate=True)
         return self.get_contact()
 
     def get_contact(self):
