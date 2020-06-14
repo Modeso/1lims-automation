@@ -2665,16 +2665,16 @@ class OrdersTestCases(BaseTest):
         self.info('open the order record in the edit mode')
         self.orders_page.get_order_edit_page_by_id(id=order['order']['mainOrderId'])
         testplan_name = self.order_page.get_sub_order_data_first_row()['suborders'][0]['testplans'][0]
-        self.info(' get test plan name ').format(testplan_name)
+        self.info("get test plan name ".format(testplan_name))
         testplans_testunits_names_in_popup = self.order_page.get_testplan_pop_up(one_testplan=True)
-        self.info('get test plan & test unit name from the test plan popup').format(testplans_testunits_names_in_popup)
+        self.info("get test plan & test unit name from the test plan popup".format(testplans_testunits_names_in_popup))
         self.testplan_page.get_test_plans_page()
         self.testplan_page.search(testplan_name)
         testunit_name = self.testplan_page.get_child_table_data()[0]['Test Unit Name']
-        self.info('get test unit name').format(testunit_name)
-        self.info('assert that the test plan in the editmode same as the test plan in the test plan pop up').format(testplan_name, testplans_testunits_names_in_popup)
+        self.info("get test unit name".format(testunit_name))
+        self.info("assert that the test plan in the editmode same as the test plan in the test plan pop up".format(testplan_name, testplans_testunits_names_in_popup))
         self.assertIn(testplan_name, testplans_testunits_names_in_popup)
-        self.info('assert that the test unint in the edit mode same as the test unit in the test unit pop up ').format(testunit_name, testplans_testunits_names_in_popup)
+        self.info("assert that the test unint in the edit mode same as the test unit in the test unit pop up ".format(testunit_name, testplans_testunits_names_in_popup))
         self.assertIn(testunit_name, testplans_testunits_names_in_popup)
 
     def test045_testplans_popup_after_edit_by_add(self):
@@ -2693,9 +2693,9 @@ class OrdersTestCases(BaseTest):
         self.order_page.update_suborder(sub_order_index=0, test_plans=[testplan['testPlanName']])
         self.order_page.save(save_btn='order:save')
         testplan_name = self.order_page.get_sub_order_data_first_row()['suborders'][0]['testplans'][1]
-        self.info('Get the test plan name that I added it in the edit mode').format(testplan_name)
+        self.info("Get the test plan name that I added it in the edit mode".format(testplan_name))
         testplans_testunits_names_in_popup = self.order_page.get_testplan_pop_up(multiple_testplan=True)
-        self.info('assert that the test plan I added in the test plan popup ').formate(testplan_name, testplans_testunits_names_in_popup)
+        self.info("assert that the test plan I added in the test plan popup ".format(testplan_name, testplans_testunits_names_in_popup))
         self.assertIn(testplan_name, testplans_testunits_names_in_popup)
 
     @skip("https://modeso.atlassian.net/browse/LIMSA-127")
@@ -2715,10 +2715,10 @@ class OrdersTestCases(BaseTest):
         self.order_page.update_suborder(sub_order_index=0, remove_old=True, test_plans=[testplan['testPlanName']])
         self.order_page.save(save_btn='order:save')
         testplan_name = self.order_page.get_sub_order_data_first_row()['suborders'][0]['testplans'][0]
-        self.info('Get the test plan name that I added it in the edit mode').format(testplan_name)
+        self.info("Get the test plan name that I added it in the edit mode".format(testplan_name))
         testplans_testunits_names_in_popup = self.order_page.get_testplan_pop_up(one_testplan=True)
-        self.info('assert that the test plan I added in the test plan popup ').format(testplan_name,
-                                                                                       testplans_testunits_names_in_popup)
+        self.info("assert that the test plan I added in the test plan popup ".format(testplan_name,
+                                                                                       testplans_testunits_names_in_popup))
         self.assertIn(testplan_name, testplans_testunits_names_in_popup)
 
 
