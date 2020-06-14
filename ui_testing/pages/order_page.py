@@ -580,4 +580,15 @@ class Order(Orders):
         suborder_data = self.get_suborder_data()
         return  suborder_data
 
+    def upload_attachment(self, file_name, drop_zone_element, remove_current_file=False, save=False):
+        super().upload_file(file_name, drop_zone_element, remove_current_file)
+        if save:
+           self.base_selenium.driver.execute_script("document.querySelector('.dz-details').style.opacity = 'initial';")
+           uploaded_file_name = self.base_selenium.find_element(element='general:uploaded_file_name').text
+           self.base_selenium.click('order:uploader_close_btn')
+           self.save(save_btn='order:save_btn')
+           return uploaded_file_name
+        else:
+            self.base_selenium.click('order:uploader_close_btn')
+            self.cancel(True)
 
