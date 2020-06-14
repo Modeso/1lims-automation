@@ -2679,7 +2679,7 @@ class OrdersTestCases(BaseTest):
         self.info("assert that the upload file same as the file name ".format(upload_file, file_name))
         self.assertEqual(upload_file, file_name)
 
-    # @skip('https://modeso.atlassian.net/browse/LIMS-177')
+    @skip('https://modeso.atlassian.net/browse/LIMS-177')
     def test048_upload_attachment_then_remove(self):
         """
         Orders step 1: Attachment download approach: There is a link under remove link for
