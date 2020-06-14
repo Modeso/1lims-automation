@@ -703,13 +703,12 @@ elements = {
         'confirm_cancel': {'method': 'class_name',
                            'value': 'btn-secondary',
                            'order': 2},
-        'testplan_popup': {'method': 'xpath',
-                           'value': '//i[@class="la la-info"]',
+        'testplan_popup_btn': {'method': 'xpath',
+                           'value': '//span[@class="pull-right collapse-long-words"]',
                            },
-
-        'testplan_popup11': {'method': 'class',
-                           'value': 'la la-info',
-                           },
+        'popup_testplan': {'method': 'class_name',
+                           'value': 'detail-title',
+                             'order':1},
         'analysis': {
             'filter_order_no': {
                 'method': 'id',

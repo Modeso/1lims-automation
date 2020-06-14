@@ -138,7 +138,7 @@ class Order(Orders):
             self.get_suborder_table()
             self.duplicate_from_table_view(number_of_duplicates=multiple_suborders)
 
-        #self.save(save_btn='order:save_btn')
+        self.save(save_btn='order:save_btn')
         self.base_selenium.LOGGER.info(' Order created with no : {} '.format(order_no))
         return self.get_suborder_data()
 
@@ -425,9 +425,10 @@ class Order(Orders):
         for testplan in test_plans:
             if remove_old:
                 self.clear_test_plan()
-                self.sleep_tiny()
+                self.confirm_popup()
+                self.sleep_small()
             self.set_test_plan(test_plan=testplan)
-            self.sleep_tiny()
+            self.sleep_small()
 
         self.info(' Set test unit : {} for {} time(s)'.format(test_units, len(test_units)))
         for testunit in test_units:
@@ -436,7 +437,6 @@ class Order(Orders):
                 self.sleep_small()
             self.set_test_unit(test_unit=testunit)
             self.sleep_small()
-
 
         if shipment_date:
             return self.set_shipment_date(row_id=sub_order_index)
@@ -572,6 +572,25 @@ class Order(Orders):
         suborders = self.base_selenium.get_table_rows(element='order:suborder_table')
         suborder_row = suborders[index]
         suborder_data = self.get_suborder_data()
-        self.base_selenium.click(element='order:testplan_popup')
-        return  suborder_data
+        return suborder_data
+
+    def get_testplan_pop_up(self, sub_order_index=0, one_testplan=False, multiple_testplan=False):
+        suborder_table_rows = self.base_selenium.get_table_rows(
+            element='order:suborder_table')
+        suborder_row = suborder_table_rows[sub_order_index]
+        suborder_row.click()
+        self.base_selenium.click(element='order:testplan_popup_btn')
+        self.sleep_small()
+        if one_testplan == True:
+           element = self.base_selenium.find_element_by_xpath(xpath='//div[@class="col-md-12 border-bottom"]')
+           testplans_testunits_names = element.text
+           return testplans_testunits_names
+        if multiple_testplan == True:
+           element = self.base_selenium.find_element(element='order:popup_testplan')
+           testplans_testunits_names = element.text
+           return testplans_testunits_names
+
+
+
+
 
