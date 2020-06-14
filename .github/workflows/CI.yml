@@ -10,8 +10,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test_cases: ["ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases.test047_upload_attachment",
-                     "ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases.test048_upload_attachment_then_remove"]
+
+        test_cases: ["ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases.test047_upload_attachment ",
+                     "ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases.test048_upload_attachment_then_remove "]
+
 
     steps:
       - uses: actions/checkout@master
@@ -21,4 +23,3 @@ jobs:
         run: |
           export PYTHONPATH='$PYTHONPATH:./'
           script -e -c $'xvfb-run -a ~/.local/bin/nosetests-3.4 -vs --nologcapture --tc-file=config.ini ${{ matrix.test_cases }}'
-
