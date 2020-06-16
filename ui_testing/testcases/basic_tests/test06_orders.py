@@ -2659,3 +2659,18 @@ class OrdersTestCases(BaseTest):
 
         self.info('Assert that the test unit not equal ')
         self.assertNotEqual(testunit_before_edit_row, testunit_after_edit_row)
+
+    @parameterized.expand(['2020', '20'])
+    def test046_search_by_year(self, search_text):
+        """
+        Search: Orders: Make sure that you can search by all the year format
+        ( with year in case year after or before & without year )
+
+        LIMS-7427
+        """
+        self.order_page.filter_by_order_no(search_text)
+        results = self.orders_page.result_table()
+        orders = [item.text.split('\n')[0] for item in results if item.text.split('\n')[0]!='']
+        self.assertTrue(orders)
+        for order in orders:
+            self.assertIn(search_text, order.replace("'", ""))
