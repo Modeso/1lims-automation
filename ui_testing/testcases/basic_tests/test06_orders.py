@@ -723,8 +723,8 @@ class OrdersTestCases(BaseTest):
         New: orders Test plan /test unit validation in edit mode
         LIMS-4826
         """
-        self.base_selenium.LOGGER.info(
-            ' Running test case to check that at least test unit or test plan is mandatory in order')
+        self.base_selenium.LOGGER.info(' Running test case to check that '
+                                       'at least test unit or test plan is mandatory in order')
         # Get random order
         orders, payload = self.orders_api.get_all_orders(limit=20)
         selected_order_record = random.choice(orders['orders'])
@@ -1076,66 +1076,73 @@ class OrdersTestCases(BaseTest):
         results = self.order_page.result_table(element='general:table_child')[0].text
         self.assertIn(suborders_data[0]['Analysis No.'].replace("'", ""), results.replace("'", ""))
 
-    def test027_update_material_type(self):
+    @parameterized.expand(['testPlans', 'testUnit'])
+    def test027_update_material_type(self, case):
         """
-        Apply this on suborder number 5 for example:-
         -When user update the materiel type from table view once I delete it message will appear
-        (All analysis created with this order and test plan will be deleted )
-        -Once you press on OK button, the material type & article & test pan will delete
-        -You can update it by choose another one and choose corresponding article & test plan
-        LIMS-4264
+        (All analysis created with this order and test plan/ test unit will be deleted )
+        -Once you press on OK button, the material type & article & test pan/ test unit will delete
+        -You can update it by choose another one and choose corresponding article & test plan/ test unit
+
+        LIMS-4264 ( order with test plan )
+
+        LIMS-4267 (order with test unit )
         """
-        self.info('get random order')
-        orders, _ = self.orders_api.get_all_orders(limit=50)
-        order = random.choice(orders['orders'])
-        suborders, _ = self.orders_api.get_suborder_by_order_id(order['id'])
-        suborder = suborders['orders'][0]
-        suborder_update_index = len(suborders['orders']) - 1
-
+        self.info('create new order')
+        response, order_payload = self.orders_api.create_new_order()
+        self.assertEqual(response['status'], 1, order_payload)
         self.info('get random completed test plan with different material type')
-        test_plans = TestPlanAPI().get_completed_testplans()
-        # I need to make sure that material type not equal '47d56b4399' due to this open bug
-        # https://modeso.atlassian.net/browse/LIMS-7710
-        test_plans_without_duplicate = [test_plan for test_plan in test_plans if
-                                        test_plan['materialType'] not in
-                                        [suborder['materialType'], '47d56b4399']]
-        test_plan = random.choice(test_plans_without_duplicate)
+        test_plan,  test_unit = self.test_plan_api.get_suborder_data_with_different_material_type(
+            order_payload[0]['materialType']['text'])
+        self.info('update material type of order from {} to {}'.format(
+            order_payload[0]['materialType']['text'], test_plan['materialType']))
 
-        self.info('update material type of order {} with {}'.format(order['orderNo'], test_plan['materialType']))
-        self.orders_page.get_order_edit_page_by_id(order['id'])
-        self.order_page.update_suborder(sub_order_index=suborder_update_index, material_type=test_plan['materialType'])
-        confirm_edit = self.base_selenium.check_element_is_exist(element="general:confirmation_pop_up")
-        confirm_edit_message = self.base_selenium.get_text(element="general:confirmation_pop_up")
-        self.assertTrue(confirm_edit)
-        self.assertIn('All analysis created with this order and test plan will be deleted', confirm_edit_message)
+        self.orders_page.get_order_edit_page_by_id(response['order']['mainOrderId'])
+        suborder_row = self.base_selenium.get_table_rows(element='order:suborder_table')[0]
+        suborder_row.click()
+        self.order_page.set_material_type(test_plan['materialType'])
+        self.order_page.sleep_small()
+        self.assertTrue(self.base_selenium.check_element_is_exist(element="general:confirmation_pop_up"))
         self.info('confirm pop_up')
         self.orders_page.confirm_popup()
-        self.info('assert test plan and articles are empty')
+        self.info('assert article and test plan/ test unit  are empty')
+        self.assertFalse(self.order_page.get_article())
         self.assertFalse(self.order_page.get_test_plan())
-        self.assertEqual(self.order_page.get_article(), 'Search')  # empty article return 'Search'
-        self.info("set article to {} and test plan to {}".format(test_plan['article'][0], test_plan['testPlanName']))
+        self.assertFalse(self.order_page.get_test_unit())
         if test_plan['article'][0] == 'all':
             article = self.order_page.set_article('')
+            self.order_page.sleep_small()
         else:
             self.order_page.set_article(test_plan['article'][0])
             article = test_plan['article'][0]
 
-        self.order_page.set_test_plan(test_plan['testPlanName'])
-        self.info('save the changes then refresh')
-        self.order_page.save(save_btn='order:save_btn')
-        self.base_selenium.refresh()
+        if case == 'testPlans':
+            self.info("set article to {} and test plan to {}".
+                      format(test_plan['article'][0], test_plan['testPlanName']))
+            self.order_page.set_test_plan(test_plan['testPlanName'])
+            self.order_page.sleep_small()
+        else:
+            self.info("set article to {} and test unit to {}".format(test_plan['article'][0],
+                                                                     test_unit['name']))
+            self.order_page.set_test_unit(test_unit['name'])
+            self.order_page.sleep_small()
+
+        self.order_page.save_and_wait(save_btn='order:save_btn')
         self.info('get order data after edit and refresh')
-        order_data_after_refresh = self.order_page.get_suborder_data()
-        suborder_after_refresh = order_data_after_refresh['suborders'][suborder_update_index]
+        suborder_after_refresh = self.orders_api.get_order_by_id(response['order']['mainOrderId'])[0]['orders'][0]
         self.info('navigate to analysis page to make sure analysis corresponding to suborder updated')
         self.order_page.get_orders_page()
         self.order_page.navigate_to_analysis_tab()
-        self.analyses_page.filter_by_analysis_number(suborder_after_refresh['analysis_no'])
-        analyses = self.analyses_page.result_table()[0]
-        self.assertIn(test_plan['materialType'], analyses.text)
-        self.assertIn(article, analyses.text)
-        self.assertIn(test_plan['testPlanName'], analyses.text)
-
+        self.analyses_page.filter_by_analysis_number(suborder_after_refresh['analysisNos'][0]['analysisNo'])
+        analyses = self.analyses_page.get_the_latest_row_data()
+        self.assertEqual(test_plan['materialType'], analyses['Material Type'])
+        self.assertEqual(article.replace(" ",""), analyses['Article Name'].replace(" ",""))
+        if case == 'testPlans':
+            self.assertEqual(test_plan['testPlanName'], analyses['Test Plans'])
+        else:
+            child_table_data = self.analyses_page.get_child_table_data()[0]
+            self.assertEqual(test_unit['name'], child_table_data['Test Unit'])
+        
     # will continue with us & then put the test case number for it
     def test026_update_suborder_article(self):
         self.base_selenium.LOGGER.info('Order created with 4 suborders with the following data')
@@ -2187,7 +2194,7 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(duplicated_suborder_data['Material Type'], suborder_data_before_duplicate[0]['Material Type'])
         self.assertIn(duplicated_suborder_data['Test Units'], test_units)
         self.assertIn(duplicated_suborder_data['Test Plans'], test_plans)
-
+    
     def test037_duplicate_main_order_change_contact(self):
         """
         Duplicate from the main order Approach: Duplicate then change the contact
@@ -2388,8 +2395,117 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(len(found_test_units), 3)
         self.assertCountEqual(test_plans, found_test_plans)
         self.assertCountEqual(test_units, found_test_units)
+        
+    @parameterized.expand(['change', 'add'])
+    def test039_duplicate_main_order_with_testPlan_and_testUnit_edit_both(self, case):
+        """
+        Duplicate from the main order Approach: Duplicate then change the test units & test plans
 
-    def test042_Duplicate_sub_order_with_multiple_testplans_and_testunits_add_approach(self):
+        LIMS-6221
+
+        Duplicate from the main order Approach: Duplicate then update test unit/plan by deleting
+        any test plan & test unit
+
+        LIMS-6841
+
+        Duplicate from the main order Approach: Duplicate by adding test unit & plan
+
+        LIMS-6231
+        """
+        self.info('create order with test plan and test unit')
+        response, payload = self.orders_api.create_new_order()
+        self.assertEqual(response['status'], 1, response)
+        self.info('order created with payload {}'.format(payload))
+        self.info('get valid test plan and test unit to edit suborder data')
+        new_test_plan, new_test_unit = TestPlanAPI().get_order_valid_testplan_and_test_unit(
+            material_type=payload[0]['materialType']['text'],
+            used_test_plan=payload[0]['testPlans'][0]['name'],
+            used_test_unit=payload[0]['testUnits'][0]['name'],
+            article_id=payload[0]['article']['id'], article=payload[0]['article']['text'])
+
+        self.info("duplicate order No {} ".format(payload[0]['orderNo']))
+        self.orders_page.search(payload[0]['orderNo'])
+        self.info("duplicate main order")
+        self.orders_page.duplicate_main_order_from_order_option()
+        self.assertIn("duplicateMainOrder", self.base_selenium.get_url())
+        self.order_page.sleep_medium()
+        duplicated_order_No = self.order_page.get_no()
+        self.info("duplicated order No is {}".format(duplicated_order_No))
+        self.assertNotEqual(duplicated_order_No, payload[0]['orderNo'])
+        if case == 'add':
+            self.info("add test plan {} and test unit {} to duplicated order".format(new_test_plan, new_test_unit))
+            self.order_page.update_suborder(test_plans=[new_test_plan], test_units=[new_test_unit])
+        else:
+            self.info("update test plan to {} and test unit to {}".format(new_test_plan, new_test_unit))
+            self.order_page.update_suborder(test_plans=[new_test_plan], test_units=[new_test_unit], remove_old=True)
+
+        self.order_page.save(save_btn='order:save')
+        self.info("navigate to active table")
+        self.order_page.get_orders_page()
+        self.assertTrue(self.orders_page.search(duplicated_order_No))
+        duplicated_suborder_data = self.order_page.get_child_table_data()[0]
+        if case == 'change':
+            self.info("assert that test unit updated to {}, test plan {}".format(
+                new_test_unit, new_test_plan))
+            self.assertEqual(duplicated_suborder_data['Test Units'], new_test_unit)
+            self.assertEqual(duplicated_suborder_data['Test Plans'], new_test_plan)
+        else:
+            self.info("assert that test unit {}, test plan {} added to duplicated order".format(
+                new_test_unit, new_test_plan))
+            self.assertIn(new_test_unit, duplicated_suborder_data['Test Units'])
+            self.assertIn(new_test_plan, duplicated_suborder_data['Test Plans'])
+
+        self.info("navigate to analysis page")
+        self.order_page.navigate_to_analysis_tab()
+        self.assertTrue(self.analyses_page.search(duplicated_order_No))
+        analyses = self.analyses_page.get_the_latest_row_data()
+        if case == 'add':
+            self.assertIn(new_test_plan, analyses['Test Plans'].replace("'", ""))
+        else:
+            self.assertEqual(new_test_plan, analyses['Test Plans'].replace("'", ""))
+        child_data = self.analyses_page.get_child_table_data()
+        test_units = [test_unit['Test Unit'] for test_unit in child_data]
+        self.assertIn(new_test_unit, test_units)
+
+    def test040_duplicate_sub_order_with_testPlan_and_testUnit_change_both(self):
+        """
+        Duplicate suborder Approach: Duplicate any sub order then change the units & test plans
+        (remove them and put another ones )
+
+        LIMS-6229
+        """
+        self.info('create order with test plan and test unit')
+        response, payload = self.orders_api.create_new_order()
+        self.assertEqual(response['status'], 1)
+        self.info('order created with payload {}'.format(payload))
+        self.info('get valid test plan and test unit to edit suborder data')
+        new_test_plan, new_test_unit = TestPlanAPI().get_order_valid_testplan_and_test_unit(
+            material_type=payload[0]['materialType']['text'],
+            used_test_plan=payload[0]['testPlans'][0]['name'],
+            used_test_unit=payload[0]['testUnits'][0]['name'],
+            article_id=payload[0]['article']['id'], article=payload[0]['article']['text']
+        )
+
+        self.info("duplicate order No {} ".format(payload[0]['orderNo']))
+        self.orders_page.search(payload[0]['orderNo'])
+        self.info("duplicate sub order with one copy only")
+        self.orders_page.open_child_table(source=self.orders_page.result_table()[0])
+        self.orders_page.duplicate_sub_order_from_table_overview()
+        self.info("update test plan to {} and test unit to {}".format(new_test_plan, new_test_unit))
+        self.order_page.update_suborder(test_plans=[new_test_plan], test_units=[new_test_unit], remove_old=True)
+        self.order_page.save(save_btn='order:save')
+
+        self.info("navigate to analysis page")
+        self.order_page.get_orders_page()
+        self.order_page.navigate_to_analysis_tab()
+        self.analyses_page.search(payload[0]['orderNo'])
+        analyses = self.analyses_page.get_the_latest_row_data()
+        self.assertEqual(new_test_plan, analyses['Test Plans'].replace("'", ""))
+        child_data = self.analyses_page.get_child_table_data()
+        test_units = [test_unit['Test Unit'] for test_unit in child_data]
+        self.assertIn(new_test_unit, test_units)
+
+    def test041_Duplicate_sub_order_with_multiple_testplans_and_testunits_add_approach(self):
         """
         Duplicate suborder Approach: Duplicate any sub order then add test unit & test plan
 
@@ -2434,7 +2550,7 @@ class OrdersTestCases(BaseTest):
         self.assertCountEqual(duplicated_suborder_test_units, test_units)
         self.assertCountEqual(duplicated_suborder_test_plans, test_plans)
         
-    def test040_user_can_edit_multiple_columns(self):
+    def test042_user_can_edit_multiple_columns(self):
         """
         user can edit multiple columns at the same time
         LIMS-5221
@@ -2484,7 +2600,7 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(first_test_date, test_date)
 
     #@skip('https://modeso.atlassian.net/browse/LIMS-7722')
-    def test042_duplicate_main_order_with_testPlans_and_testUnits(self):
+    def test043_duplicate_main_order_with_testPlans_and_testUnits(self):
         """
         Duplicate main order Approach: duplicate order with test plan & test units
         LIMS-4353
@@ -2515,7 +2631,7 @@ class OrdersTestCases(BaseTest):
         duplicated_test_units = [testunit['Test Unit'] for testunit in duplicated_suborder_data]
         self.assertCountEqual(test_units, duplicated_test_units)
 
-    def test042_table_with_add_edit_single_row(self):
+    def test044_table_with_add_edit_single_row(self):
         """
         Orders: Table with add: In case I have two suborders and I update the first one
         then press on the second one the first one should updated according to that
