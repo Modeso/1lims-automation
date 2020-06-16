@@ -143,14 +143,13 @@ class Order(Orders):
         self.info(" click on create new order button")
         self.click_create_order_button()
         self.set_new_order()
-        self.sleep_small()
+        self.sleep_tiny()
         for contact in contacts:
             self.set_contact(contact)
             self.sleep_tiny()
         self.set_material_type('Raw Material')
-        self.sleep_small()
+        self.sleep_tiny()
         self.set_article('')
-        self.sleep_small()
         self.set_test_unit('')
 
     def get_department_suggestion_lists(self, open_suborder_table=False):
@@ -170,7 +169,6 @@ class Order(Orders):
             element='order:departments', item_text='', options_element='general:drop_down_div')[0].split('\n')
         departments_only_list = self.base_selenium.get_drop_down_suggestion_list(
             element='order:departments', item_text='')
-
         return suggested_department_list, departments_only_list
 
     def create_existing_order(self, no='', material_type='', article='', contact='', test_units=[],
