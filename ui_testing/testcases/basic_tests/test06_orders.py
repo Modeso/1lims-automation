@@ -2400,12 +2400,18 @@ class OrdersTestCases(BaseTest):
 
         LIMS-5705 'edit mode'
         """
-        self.info(" create order with multiple contacts")
-        self.order_page.create_multiple_contacts_new_order()
-        self.order_page.sleep_small()
+        self.info("get 3 contacts with department contacts")
+        import ipdb;ipdb.set_trace()
+        contact_list = self.contacts_api.get_contacts_with_department()[0:3]
+        contact_names_list = [contact['name'] for contact in contact_list]
+        self.info('selected contacts are {}'.format(contact_names_list))
+        departments_list_with_contacts = self.contacts_api.get_department_contact_list(contact_names_list)
+        self.info('department contacts list {}'.format(departments_list_with_contacts))
+        self.info('create new order with selected contacts')
+        self.order_page.create_multiple_contacts_new_order(contacts=contact_names_list)
         contacts = self.order_page.get_contact()
         self.info('selected contacts are {}'.format(contacts))
-        departments_list_with_contacts = ContactsAPI().get_department_contact_list(contacts)
+        self.assertCountEqual(contacts, contact_names_list)
         if case == 'create':
             suggested_department_list, departments_only_list = self.order_page.get_department_suggestion_lists()
             self.info('suggested department list {}'.format(suggested_department_list))

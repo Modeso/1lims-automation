@@ -139,15 +139,14 @@ class Order(Orders):
         self.save(save_btn='order:save_btn')
         self.info(' Order created with no : {} '.format(order_no))
 
-    def create_multiple_contacts_new_order(self):
+    def create_multiple_contacts_new_order(self, contacts):
         self.info(" click on create new order button")
         self.click_create_order_button()
         self.set_new_order()
         self.sleep_small()
-        self.set_contact('')
-        self.sleep_medium()
-        self.set_contact('')
-        self.sleep_medium()
+        for contact in contacts:
+            self.set_contact(contact)
+            self.sleep_tiny()
         self.set_material_type('Raw Material')
         self.sleep_small()
         self.set_article('')
