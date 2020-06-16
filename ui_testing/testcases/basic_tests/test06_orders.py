@@ -11,7 +11,6 @@ from api_testing.apis.test_unit_api import TestUnitAPI
 from ui_testing.pages.analysis_page import SingleAnalysisPage
 from api_testing.apis.contacts_api import ContactsAPI
 from api_testing.apis.test_plan_api import TestPlanAPI
-from ui_testing.pages.my_profile_page import MyProfile
 from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from ui_testing.pages.contacts_page import Contacts
 from random import randint
@@ -23,7 +22,6 @@ class OrdersTestCases(BaseTest):
         super().setUp()
         self.order_page = Order()
         self.orders_api = OrdersAPI()
-        self.my_profile_page = MyProfile()
         self.orders_page = Orders()
         self.analyses_page = AllAnalysesPage()
         self.article_api = ArticleAPI()
@@ -2668,14 +2666,11 @@ class OrdersTestCases(BaseTest):
         LIMS-8258
         :return:
         """
-        # get random order
         order, payload = self.orders_api.create_new_order()
         self.orders_page.get_order_edit_page_by_id(id=order['order']['mainOrderId'])
         self.base_selenium.click(element='order:attachment_btn')
-        self.info('this is the file name from the assets ')
         file_name = 'logo.png'
-        upload_file = self.order_page.upload_attachment(file_name='logo.png', drop_zone_element='order:uploader_zone', save=True)
-        self.info("upload file then press on the save button it will return the file name ".format(upload_file))
+        upload_file = self.order_page.upload_attachment(file_name='logo.png', drop_zone_element='order:uploader_zone',save=True)
         self.info("assert that the upload file same as the file name ".format(upload_file, file_name))
         self.assertEqual(upload_file, file_name)
 
@@ -2687,21 +2682,18 @@ class OrdersTestCases(BaseTest):
         LIMS-6933
         :return:
         """
-        # get random order
         order, payload = self.orders_api.create_new_order()
         self.orders_page.get_order_edit_page_by_id(id=order['order']['mainOrderId'])
         self.base_selenium.click(element='order:attachment_btn')
-        self.info('this is the file name from the assets ')
         file_name = 'logo.png'
         upload_attachment_then_save = self.order_page.upload_attachment(file_name='logo.png', drop_zone_element='order:uploader_zone', save=True)
-        self.info("upload file to enter to the same record to remove this file ".format(upload_attachment_then_save))
-        self.info("assert that the ")
+        self.info("assert that the upload file same as the file name ".format(upload_attachment_then_save, file_name))
         self.assertEqual(upload_attachment_then_save, file_name)
-        self.info('oprn the same record in the edit mode')
+        self.info('open the same record in the edit mode')
         self.orders_page.get_order_edit_page_by_id(id=order['order']['mainOrderId'])
         self.base_selenium.click(element='order:attachments_btn')
-        after_remove_attachment = self.order_page.upload_attachment(file_name='logo.png',drop_zone_element='order:uploader_zone', remove_current_file=True,save=True)
-        self.info("remove the file and submit the record ".format(after_remove_attachment))
+        self.info("remove the file and submit the record ")
+        after_remove_attachment = self.order_page.upload_attachment(file_name='logo2.png', drop_zone_element='order:uploader_zone', remove_current_file=True,save=True)
         self.info("assert that after I remove the file it will return none should not equal to the file name ".format(after_remove_attachment, file_name))
         self.assertNotEqual(after_remove_attachment, file_name)
 
