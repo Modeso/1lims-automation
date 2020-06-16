@@ -10,8 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test_cases: ["ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases.test043_create_order_with_multiple_contacts_then_add_department",
-                     "ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases.test044_edit_department_of_order_with_multiple_contacts"]
+        test_cases: ["ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases.test043_create_order_with_multiple_contacts_then_add_department ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases.test044_edit_department_of_order_with_multiple_contacts"]
 
 
     steps:
