@@ -146,14 +146,16 @@ class Order(Orders):
         self.info(" click on create new order button")
         self.click_create_order_button()
         self.set_new_order()
-        self.sleep_tiny()
+        self.sleep_small()
         for contact in contacts:
             self.set_contact(contact)
             self.sleep_tiny()
         self.set_material_type('Raw Material')
-        self.sleep_tiny()
+        self.sleep_small()
         self.set_article('')
+        self.sleep_small()
         self.set_test_unit('')
+        self.sleep_small()
 
     def get_department_suggestion_lists(self, open_suborder_table=False, contacts=[]):
         """
