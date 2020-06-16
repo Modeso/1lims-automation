@@ -2635,11 +2635,18 @@ class OrdersTestCases(BaseTest):
         contacts = self.order_page.get_contact()
         self.info('selected contacts are {}'.format(contacts))
         self.assertCountEqual(contacts, contact_names_list)
-        suggested_department_list, departments_only_list = self.order_page.get_department_suggestion_lists()
+        suggested_department_list, departments_only_list = \
+            self.order_page.get_department_suggestion_lists(contacts=contact_names_list)
         self.info('suggested department list {}'.format(suggested_department_list))
         self.info('and it should be {}'.format(departments_list_with_contacts))
-        # I should be able to compare departments_list_with_contacts and suggested_department_list
-        #self.assertCountEqual(departments_list_with_contacts, suggested_department_list)
+        index = 0
+        for item in suggested_department_list:
+            for element in departments_list_with_contacts:
+                if item['contact'] == element['contact']:
+                    self.assertCountEqual(item['departments'], element['departments'])
+                    index = index + 1
+
+        self.assertEqual(index, len(contact_names_list))
         department = random.choice(departments_only_list)
         self.info('set department to {}'.format(department))
         self.order_page.set_departments(department)
@@ -2647,8 +2654,8 @@ class OrdersTestCases(BaseTest):
         self.order_page.save_and_wait(save_btn='order:save')
         order_data = self.order_page.get_suborder_data()
         self.info('assert that new order with multiple contacts created')
-        self.assertEqual(len(order_data['contacts'].split(',\n')), 3)
-        self.inf('assert that department updated')
+        self.assertEqual(len(order_data['contacts']), len(contact_names_list))
+        self.info('assert that department updated')
         self.assertEqual([department], order_data['suborders'][0]['departments'])
 
     def test044_edit_department_of_order_with_multiple_contacts(self):
@@ -2668,14 +2675,20 @@ class OrdersTestCases(BaseTest):
         self.orders_page.get_order_edit_page_by_id(response['order']['mainOrderId'])
         self.order_page.sleep_tiny()
         suggested_department_list, departments_only_list = \
-            self.order_page.get_department_suggestion_lists(open_suborder_table=True)
+            self.order_page.get_department_suggestion_lists(open_suborder_table=True, contacts=contact_names_list)
         self.info('suggested department list {}'.format(suggested_department_list))
         self.info('and it should be {}'.format(departments_list_with_contacts))
-        #self.assertCountEqual(departments_list_with_contacts, suggested_department_list)
+        index = 0
+        for item in suggested_department_list:
+            for element in departments_list_with_contacts:
+                if item['contact'] == element['contact']:
+                    self.assertCountEqual(item['departments'], element['departments'])
+                    index = index + 1
+        self.assertEqual(index, len(contact_names_list))
+
         department = random.choice(departments_only_list)
         self.info('set department to {}'.format(department))
         self.order_page.set_departments(department)
         self.order_page.save_and_wait(save_btn='order:save')
         suborder_data = self.order_page.get_suborder_data()
         self.assertEqual([department], suborder_data['suborders'][0]['departments'])
-

@@ -155,7 +155,7 @@ class Order(Orders):
         self.set_article('')
         self.set_test_unit('')
 
-    def get_department_suggestion_lists(self, open_suborder_table=False):
+    def get_department_suggestion_lists(self, open_suborder_table=False, contacts=[]):
         """
         :param open_suborder_table:
 
@@ -172,7 +172,20 @@ class Order(Orders):
             element='order:departments', item_text='', options_element='general:drop_down_div')[0].split('\n')
         departments_only_list = self.base_selenium.get_drop_down_suggestion_list(
             element='order:departments', item_text='')
-        return suggested_department_list, departments_only_list
+        contact_dict = {'contact': '', 'departments': []}
+        contact_dep_list = []
+        for item in suggested_department_list:
+            if item in contacts:
+                if suggested_department_list.index(item) != 0:
+                    contact_dep_list.append(contact_dict)
+                    contact_dict = {'contact': '', 'departments': []}
+                contact_dict['contact'] = item
+            else:
+                contact_dict['departments'].append(item)
+                if suggested_department_list.index(item) == len(suggested_department_list)-1:
+                    contact_dep_list.append(contact_dict)
+
+        return contact_dep_list, departments_only_list
 
     def create_existing_order(self, no='', material_type='', article='', contact='', test_units=[],
                               multiple_suborders=0):
