@@ -431,9 +431,10 @@ class Order(Orders):
         for testplan in test_plans:
             if remove_old:
                 self.clear_test_plan()
-                self.sleep_tiny()
+                self.confirm_popup()
+                self.sleep_small()
             self.set_test_plan(test_plan=testplan)
-            self.sleep_tiny()
+            self.sleep_small()
 
         self.info(' Set test unit : {} for {} time(s)'.format(test_units, len(test_units)))
         for testunit in test_units:
@@ -442,7 +443,6 @@ class Order(Orders):
                 self.sleep_small()
             self.set_test_unit(test_unit=testunit)
             self.sleep_small()
-
 
         if shipment_date:
             return self.set_shipment_date(row_id=sub_order_index)
@@ -591,4 +591,13 @@ class Order(Orders):
         else:
             self.base_selenium.click('order:uploader_close_btn')
             self.cancel(True)
-
+            
+    def get_testplan_pop_up(self):
+        self.base_selenium.click(element='order:testplan_popup_btn')
+        self.sleep_small()
+        results = []
+        elements = self.base_selenium.find_elements('order:popup_data')
+        for element in elements:
+            test_plan, test_units = element.text.split('\n')[0], element.text.split('\n')[1:]
+            results.append({'test_plan': test_plan, 'test_units': test_units})
+        return results
