@@ -44,7 +44,7 @@ class TstPlan(TestPlans):
 
     def set_test_plan(self, name='', random=False):
         name = self.generate_random_text() if random else name
-        self.base_selenium.set_text_in_drop_down(ng_select_element='test_plan:test_plan', text=name)
+        self.base_selenium.select_item_from_drop_down(element='test_plan:test_plan', item_text=name)
         return name
 
     def search_test_unit_not_set(self, test_unit=''):

@@ -12,6 +12,7 @@ import random, time, os, json
 import pandas as pd
 from loguru import logger
 from contextlib import contextmanager
+from ui_testing.pages.ng_select import NGSelect
 
 
 class BaseSelenium:
@@ -396,87 +397,58 @@ class BaseSelenium:
                 item.click()
                 break
 
+    def ng_select(self, element):
+        """
+        :param element: element refer to ng-select dom item.
+        :return:
+        """
+        method, value, _ = self.get_method_value_order(element=element)
+        return NGSelect(driver=self.driver, ng_select={"method": method, "value": value})
+
     def select_item_from_drop_down(self, element='', element_source='', item_text='', avoid_duplicate=False,
                                    options_element='general:drop_down_options'):
         """
 
         :param element: element refer to ng-select dom item.
-        :param element_source:  dom item.
+        :param element_source:  dom item. (Not covered here)
         :param item_text:
         :param avoid_duplicate:
-        :param options_element:
+        :param options_element: (Not covered here)
         :return:
         """
-        if element:
-            if 'ng-select-disabled' in self.get_attribute(element=element, attribute='class'):
-                self.LOGGER.info(' Drop-down is disabled')
-                return False
+
+        ng_select = self.ng_select(element)
+
+        if element_source:
+            ng_select.ng_select = element_source
 
         if item_text:
-            if element:
-                input_element = self.find_element_in_element(destination_element='general:input', source_element=element)
-            else: # if element_source
-                input_element = self.find_element_in_element(destination_element='general:input',
-                                                             source=element_source)
-            time.sleep(self.TIME_TINY)
-            input_element.send_keys(item_text)
+            return ng_select.select_option_by_text(text=item_text)
+        elif avoid_duplicate:
+            return ng_select.select_unique_random_option()
         else:
-            if element_source:
-                element_source.click()
-            else:
-                self.click(element=element)
-        time.sleep(self.TIME_SMALL)
+            return ng_select.select_random_option()
 
-        items = self.find_elements(element=options_element)
-        if not item_text: #random selection
-            if len(items) == 1 and items[0].text: #if only one item in list
-                    items[0].click()
-                    return True
-            elif len(items) <= 1:
-                self.LOGGER.info(' There is no drop-down options')
-                return False
-
-            if avoid_duplicate:
-                items[random.choice(self._unique_index_list(data=items))].click()
-                return True
-            else:
-                items[random.randint(0, len(items) - 1)].click()
-                return True
-        else:
-            if item_text not in [item.text for item in items]:
-                time.sleep(self.TIME_TINY)
-                items = self.find_elements(element=options_element)
-            for item in items:
-                if item_text in item.text:
-                    item.click()
-                    return True
-            else:
-                self.LOGGER.info(' There is no {} option in the drop-down'.format(item_text))
-                return False
-
-    def is_item_in_drop_down(self, element, item_text, options_element='general:drop_down_options'):
+    def is_item_in_drop_down(self, element, item_text):
         """
-
         :param element: element refer to ng-select dom item.
-        :param element_source:  dom item.
         :param item_text:
-        :param avoid_duplicate:
-        :param options_element:
         :return:
         """
-        if item_text in self.get_drop_down_suggestion_list(element, item_text, options_element):
-            return True
-        else:
-            return False
+        ng_select = self.ng_select(element)
+        return ng_select.is_option_text_existing(text=item_text)
 
-    def _unique_index_list(self, data): # I didnt like this implemenation need to fix it!+
-        result = []
-        data_text = [data_item.text for data_item in data]
-        for text in data_text:
-            _occurrences = [index for index, value in enumerate(data_text) if value == text] # this returns the indexs for each item
-            if len(_occurrences) == 1:
-                result.append(_occurrences[0])
-        return result
+    def get_drop_down_suggestion_list(self, element, item_text):
+        """
+        :param element: element refer to ng-select dom item.
+        :param item_text:
+        :return:
+        """
+        ng_select = self.ng_select(element)
+        if ng_select.is_drop_down_disabled():
+            return []
+
+        return ng_select.get_ng_drop_down_suggest_list(item_text)
 
     def _is_item_a_drop_down(self, item):
         """
@@ -487,27 +459,6 @@ class BaseSelenium:
             return True
         else:
             return False
-
-    def get_drop_down_suggestion_list(self, element, item_text, options_element='general:drop_down_options'):
-        """
-
-        :param element: element refer to ng-select dom item.
-        :param element_source:  dom item.
-        :param item_text:
-        :param avoid_duplicate:
-        :param options_element:
-        :return:
-        """
-        if 'ng-select-disabled' in self.get_attribute(element=element, attribute='class'):
-            self.LOGGER.info('Drop-down is disabled')
-            return False
-
-        input_element = self.find_element_in_element(destination_element='general:input', source_element=element)
-        input_element.send_keys(item_text)
-        time.sleep(self.TIME_SMALL)
-
-        items = self.find_elements(element=options_element)
-        return [item.text for item in items]
 
     def update_item_value(self, item, item_text=''):
         """
@@ -523,12 +474,6 @@ class BaseSelenium:
             input_item = self.find_element_in_element(source=item, destination_element='general:input')
             input_item.clear()
             input_item.send_keys(item_text)
-
-    def set_text_in_drop_down(self, ng_select_element, text, input_element='general:input', confirm_button='general:drop_down_options'):
-        input_field = self.find_element_in_element(destination_element=input_element, source_element=ng_select_element)
-        input_field.send_keys(text)
-        confirm_button = self.find_elements(confirm_button)
-        confirm_button[0].click()
 
     def check_item_in_items(self, element, item_text, options_element='general:drop_down_options'):
         self.click(element=element)
