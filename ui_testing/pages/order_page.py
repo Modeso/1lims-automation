@@ -119,7 +119,7 @@ class Order(Orders):
 
     def create_new_order(self, material_type='', article='', contact='', test_plans=[''], test_units=[''],
                          multiple_suborders=0, departments=''):
-        self.base_selenium.LOGGER.info(' Create new order.')
+        self.info(' Create new order.')
         self.click_create_order_button()
         self.set_new_order()
         self.set_contact(contact=contact)
@@ -143,7 +143,7 @@ class Order(Orders):
 
         self.save(save_btn='order:save_btn')
         self.base_selenium.LOGGER.info(' Order created with no : {} '.format(order_no))
-        return self.get_suborder_data()
+        return order_no
 
     def create_existing_order(self, no='', material_type='', article='', contact='', test_units=[],
                               multiple_suborders=0):
@@ -431,9 +431,10 @@ class Order(Orders):
         for testplan in test_plans:
             if remove_old:
                 self.clear_test_plan()
-                self.sleep_tiny()
+                self.confirm_popup()
+                self.sleep_small()
             self.set_test_plan(test_plan=testplan)
-            self.sleep_tiny()
+            self.sleep_small()
 
         self.info(' Set test unit : {} for {} time(s)'.format(test_units, len(test_units)))
         for testunit in test_units:
@@ -442,7 +443,6 @@ class Order(Orders):
                 self.sleep_small()
             self.set_test_unit(test_unit=testunit)
             self.sleep_small()
-
 
         if shipment_date:
             return self.set_shipment_date(row_id=sub_order_index)
@@ -580,4 +580,25 @@ class Order(Orders):
         suborder_data = self.get_suborder_data()
         return  suborder_data
 
-
+    def upload_attachment(self, file_name, drop_zone_element, remove_current_file=False, save=False):
+        super().upload_file(file_name, drop_zone_element, remove_current_file)
+        if save:
+           self.base_selenium.driver.execute_script("document.querySelector('.dz-details').style.opacity = 'initial';")
+           self.sleep_tiny()
+           uploaded_file_name = self.base_selenium.find_element(element='general:uploaded_file_name').text
+           self.base_selenium.click('order:uploader_close_btn')
+           self.save(save_btn='order:save_btn')
+           return uploaded_file_name
+        else:
+            self.base_selenium.click('order:uploader_close_btn')
+            self.cancel(True)
+            
+    def get_testplan_pop_up(self):
+        self.base_selenium.click(element='order:testplan_popup_btn')
+        self.sleep_small()
+        results = []
+        elements = self.base_selenium.find_elements('order:popup_data')
+        for element in elements:
+            test_plan, test_units = element.text.split('\n')[0], element.text.split('\n')[1:]
+            results.append({'test_plan': test_plan, 'test_units': test_units})
+        return results

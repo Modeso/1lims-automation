@@ -11,6 +11,7 @@ from api_testing.apis.test_unit_api import TestUnitAPI
 from ui_testing.pages.analysis_page import SingleAnalysisPage
 from api_testing.apis.contacts_api import ContactsAPI
 from api_testing.apis.test_plan_api import TestPlanAPI
+from ui_testing.pages.testplan_page import TstPlan
 from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from ui_testing.pages.contacts_page import Contacts
 from random import randint
@@ -22,6 +23,7 @@ class OrdersTestCases(BaseTest):
         super().setUp()
         self.order_page = Order()
         self.orders_api = OrdersAPI()
+        self.testplan_page = TstPlan()
         self.orders_page = Orders()
         self.analyses_page = AllAnalysesPage()
         self.article_api = ArticleAPI()
@@ -464,43 +466,6 @@ class OrdersTestCases(BaseTest):
             self.assertEqual(
                 selected_order_data['Test Plans'], row_data['Test Plans'])
 
-    # will continue with us
-    # @skip("https://modeso.atlassian.net/browse/LIMS-4782")
-    def test013_update_order_number(self):
-        """
-        New: Orders: Table: Update order number Approach: When I update order number all suborders inside it updated it's order number,
-        and also in the analysis section.
-        LIMS-4270
-        """
-        self.base_selenium.LOGGER.info(
-            ' Running test case to check that when order no is updated, all suborders are updated')
-
-        # create order with multiple suborders
-        self.base_selenium.LOGGER.info(
-            ' Create order with 5 sub orders to make sure of the count of the created/ updated orders')
-        order_no_created = self.order_page.create_new_order(material_type='r', article='a', contact='a',
-                                                            test_plans=['a'],
-                                                            test_units=['a'], multiple_suborders=5)
-        self.base_selenium.LOGGER.info(
-            ' + orders_created_with_number : {}'.format(order_no_created))
-        order_no_created = order_no_created.replace("'", '')
-
-        # filter by the created order number and get the count
-        orders_result = self.orders_page.search(order_no_created)
-        self.base_selenium.LOGGER.info(
-            ' + filter_by_order_no : {}'.format(order_no_created))
-        orders_count = self.order_page.get_table_records()
-        self.base_selenium.LOGGER.info(
-            ' + count_of_the_created_orders : {}'.format(orders_count))
-
-        # open the last created order to update its number and checking whether it will affect the rest of the orders or not
-        self.order_page.get_random_x(row=orders_result[0])
-        new_order_no = self.order_page.generate_random_text()
-        self.order_page.set_no(no=new_order_no)
-        self.order_page.save(save_btn='order:save_btn')
-        self.base_selenium.LOGGER.info(
-            ' + order_updated_with_number : {}'.format(new_order_no))
-
     @parameterized.expand(['save_btn', 'cancel'])
     def test014_update_first_order_material_type(self, save):
         """
@@ -930,18 +895,17 @@ class OrdersTestCases(BaseTest):
         testunit = random.choice(testunits['testUnits'])
 
         self.order_page.get_orders_page()
-        created_order = self.order_page.create_new_order(material_type='r', article='a', contact='a', test_plans=[],
+        created_order_no = self.order_page.create_new_order(material_type='r', article='a', contact='a', test_plans=[],
                                                          test_units=[testunit['name']])
 
         self.order_page.get_orders_page()
         self.order_page.navigate_to_analysis_tab()
         self.base_selenium.LOGGER.info(
             'Assert There is an analysis for this new order.')
-        orders_analyess = self.analyses_page.search(value=created_order['orderNo'])
+        orders_analyess = self.analyses_page.search(value=created_order_no)
         latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
             row=orders_analyess[0])
-        self.assertEqual(
-            created_order['orderNo'].replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
+        self.assertEqual(created_order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
 
         self.analyses_page.open_child_table(source=orders_analyess[0])
         rows_with_childtable = self.analyses_page.result_table(element='general:table_child')
@@ -1624,18 +1588,18 @@ class OrdersTestCases(BaseTest):
 
         # Then go to the order section to create new order with this test unit
         self.order_page.get_orders_page()
-        created_order = self.order_page.create_new_order(material_type='s', article='r', contact='a',
+        created_order_no = self.order_page.create_new_order(material_type='s', article='r', contact='a',
                                                          test_units=test_units_list)
 
         # Go to the analysis section and search by the order number that created
         self.analyses_page.get_analyses_page()
         self.base_selenium.LOGGER.info(
             'Make sure there is analysis for this order number.')
-        orders_analyess = self.analyses_page.search(created_order)
+        orders_analyess = self.analyses_page.search(created_order_no)
         latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
             row=orders_analyess[0])
         self.assertEqual(
-            created_order.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
+            created_order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
 
         # Open the child table tp check the test unit display correct
         self.analyses_page.open_child_table(source=orders_analyess[0])
@@ -1660,11 +1624,11 @@ class OrdersTestCases(BaseTest):
         self.analyses_page.get_analyses_page()
         self.base_selenium.LOGGER.info(
             'Make sure there is analysis for this order number.')
-        orders_analyess = self.analyses_page.search(created_order)
+        orders_analyess = self.analyses_page.search(created_order_no)
         latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
             row=orders_analyess[0])
         self.assertEqual(
-            created_order.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
+            created_order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
 
         # Open the child table to make sure the update reflected successfully
         self.analyses_page.open_child_table(source=orders_analyess[0])
@@ -1695,18 +1659,18 @@ class OrdersTestCases(BaseTest):
 
         # Then go to the order section to create new order with this test unit
         self.order_page.get_orders_page()
-        created_order = self.order_page.create_new_order(material_type='s', article='r', contact='a',
+        created_order_no = self.order_page.create_new_order(material_type='s', article='r', contact='a',
                                                          test_units=test_units_list)
 
         # Go to the analysis section and search by the order number that created
         self.analyses_page.get_analyses_page()
         self.base_selenium.LOGGER.info(
             'Make sure there is analysis for this order number.')
-        orders_analyess = self.analyses_page.search(created_order)
+        orders_analyess = self.analyses_page.search(created_order_no)
         latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
             row=orders_analyess[0])
         self.assertEqual(
-            created_order.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
+            created_order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
 
         # Open the child table tp check the test unit display correct
         self.analyses_page.open_child_table(source=orders_analyess[0])
@@ -1733,11 +1697,11 @@ class OrdersTestCases(BaseTest):
         self.analyses_page.get_analyses_page()
         self.base_selenium.LOGGER.info(
             'Make sure there is analysis for this order number.')
-        orders_analyess = self.analyses_page.search(created_order)
+        orders_analyess = self.analyses_page.search(created_order_no)
         latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
             row=orders_analyess[0])
         self.assertEqual(
-            created_order.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
+            created_order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
 
         # Open the child table to make sure the update reflected successfully
         self.analyses_page.open_child_table(source=orders_analyess[0])
@@ -1924,30 +1888,26 @@ class OrdersTestCases(BaseTest):
         LIMS-4270
         """
         self.info('generate new order number to use it for update')
-        new_order_no = self.orders_api.get_auto_generated_order_no()
-        year_value = self.order_page.get_current_year()[2:]
+        new_order_no = str(self.orders_api.get_auto_generated_order_no()[0]['id'])
+        year_value = str(self.order_page.get_current_year()[2:])
         formated_order_no = new_order_no + '-' + year_value
         self.info('newly generated order number = {}'.format(formated_order_no))
-        order = self.orders_api.get_all_orders(limit=50)['orders'][1]
-        self.orders_page.get_order_edit_page_by_id(id=order['id'])
+        response, _ = self.orders_api.get_all_orders(limit=50)
+        order = random.choice(response['orders'])
+        self.orders_page.get_order_edit_page_by_id(id=order['orderId'])
         self.order_page.set_no(no=formated_order_no)
         self.order_page.sleep_small()
-        self.order_page.save(save_btn='order:save_btn', sleep=True)
-
-        self.info('refresh to make sure that data are saved correctly')
-        self.base_selenium.refresh()
+        self.order_page.save_and_wait(save_btn='order:save_btn')
         order_no_after_update = self.order_page.get_no()
-
-        self.info('order no is {}, and it should be {}'.format(order_no_after_update, formated_order_no))
-        self.assertEqual(order_no_after_update.replace("'", ""), formated_order_no)
-
+        self.info('order no is {}, and it should be {}'.format(order_no_after_update, formated_order_no+'20'))
+        self.assertEqual(order_no_after_update.replace("'", ""), formated_order_no+'20')
         self.info('navigate to analysis tab to make sure that order no updated correctly')
-        self.order_page.navigate_to_analysis_tab()
-        analysis_records = self.single_analysis_page.get_all_analysis_records()
-
+        self.orders_page.get_orders_page()
+        self.orders_page.navigate_to_analysis_active_table()
+        self.analyses_page.search(formated_order_no+'20')
+        analysis_record = self.single_analysis_page.get_the_latest_row_data()
         self.info('checking order no of each analysis')
-        for record in analysis_records:
-            self.assertEqual(record['Order No.'], formated_order_no)
+        self.assertEqual(analysis_record['Order No.'], formated_order_no+'20')
 
     def test033_Duplicate_main_order_and_cahange_materiel_type(self):
         """
@@ -2674,3 +2634,117 @@ class OrdersTestCases(BaseTest):
         self.assertTrue(orders)
         for order in orders:
             self.assertIn(search_text, order.replace("'", ""))
+
+    def test047_upload_attachment(self):
+        """
+        I can upload any attachment successfully from the order section
+        LIMS-8258
+        :return:
+        """
+        order, payload = self.orders_api.create_new_order()
+        self.orders_page.get_order_edit_page_by_id(id=order['order']['mainOrderId'])
+        self.base_selenium.click(element='order:attachment_btn')
+        file_name = 'logo.png'
+        upload_file = self.order_page.upload_attachment(file_name='logo.png', drop_zone_element='order:uploader_zone',save=True)
+        self.info("assert that the upload file same as the file name ".format(upload_file, file_name))
+        self.assertEqual(upload_file, file_name)
+
+    @skip('https://modeso.atlassian.net/browse/LIMS-177')
+    def test048_upload_attachment_then_remove(self):
+        """
+        Orders step 1: Attachment download approach: There is a link under remove link for
+        download and you can preview it by clicking on it
+        LIMS-6933
+        :return:
+        """
+        order, payload = self.orders_api.create_new_order()
+        self.orders_page.get_order_edit_page_by_id(id=order['order']['mainOrderId'])
+        self.base_selenium.click(element='order:attachment_btn')
+        file_name = 'logo.png'
+        upload_attachment_then_save = self.order_page.upload_attachment(file_name='logo.png', drop_zone_element='order:uploader_zone', save=True)
+        self.info("assert that the upload file same as the file name ".format(upload_attachment_then_save, file_name))
+        self.assertEqual(upload_attachment_then_save, file_name)
+        self.info('open the same record in the edit mode')
+        self.orders_page.get_order_edit_page_by_id(id=order['order']['mainOrderId'])
+        self.base_selenium.click(element='order:attachments_btn')
+        self.info("remove the file and submit the record ")
+        after_remove_attachment = self.order_page.upload_attachment(file_name='logo2.png', drop_zone_element='order:uploader_zone', remove_current_file=True,save=True)
+        self.info("assert that after I remove the file it will return none should not equal to the file name ".format(after_remove_attachment, file_name))
+        self.assertNotEqual(after_remove_attachment, file_name)
+
+    def test044_testplans_popup(self):
+        """
+        Orders: Test plan pop up Approach: Make sure the test plans
+        & units displayed on the test plans & units fields same as in the test plan pop up
+        LIMS-4796
+        """
+        order, payload = self.orders_api.create_new_order()
+        self.info('open the order record in the edit mode')
+        self.orders_page.get_order_edit_page_by_id(id=order['order']['mainOrderId'])
+        testplan_name = payload[0]['testPlans'][0]['name']
+        self.info("get test plan name ".format(testplan_name))
+        testplans_testunits_names_in_popup = self.order_page.get_testplan_pop_up()
+        self.info("get test plan & test unit name from the test plan popup".format(testplans_testunits_names_in_popup))
+        testunit_no = self.test_plan_api.get_testplan_with_quicksearch(quickSearchText=testplan_name)[0]['number']
+        testunit_name = self.test_plan_api.get_testunits_in_testplan_by_No(no=testunit_no)[0]
+        self.info("get test unit name".format(testunit_name))
+        self.info("assert that the test plan in the editmode same as the test plan in the test plan pop up".format(testplan_name, testplans_testunits_names_in_popup[0]['test_plan']))
+        self.assertEqual(testplan_name, testplans_testunits_names_in_popup[0]['test_plan'])
+        self.info("assert that the test unint in the edit mode same as the test unit in the test unit pop up ".format(testunit_name, testplans_testunits_names_in_popup[0]['test_units'][0]))
+        self.assertEqual(testunit_name, testplans_testunits_names_in_popup[0]['test_units'][0])
+
+    def test045_testplans_popup_after_edit_by_add(self):
+        """
+        Orders: Test plan pop up  Approach: Make sure In case you edit the test plans
+        & add another ones this update should reflect on the test plan pop up
+        LIMS-8256
+        """
+        self.info('Get completed test plan to upade by it with raw material type')
+        testplan = \
+            self.test_plan_api.get_completed_testplans_with_material_and_same_article(material_type='Raw Material', article='', articleNo='')[0]
+        order, payload = self.orders_api.create_new_order(materialTypeId=1)
+        self.info('open the order record in the edit mode')
+        self.orders_page.get_order_edit_page_by_id(id=order['order']['mainOrderId'])
+        self.info('go to update the test plan by adding the completed one')
+        self.order_page.update_suborder(sub_order_index=0, test_plans=[testplan['testPlanName']])
+        self.order_page.save(save_btn='order:save')
+        testplan_name = testplan['testPlanName']
+        self.info("Get the test plan name that I added it in the edit mode".format(testplan_name))
+        testplans_testunits_names_in_popup = self.order_page.get_testplan_pop_up()
+        testunit_no = self.test_plan_api.get_testplan_with_quicksearch(quickSearchText=testplan_name)[0]['number']
+        testunit_name = self.test_plan_api.get_testunits_in_testplan_by_No(no=testunit_no)[0]
+        self.info("assert that the test plan I added in the test plan popup ".format(testplan_name, testplans_testunits_names_in_popup[1]['test_plan']))
+        self.assertEqual(testplan_name, testplans_testunits_names_in_popup[1]['test_plan'])
+        self.info("assert that the test plan I added in the test plan popup ".format(testplan_name, testplans_testunits_names_in_popup[1]['test_units'][0]))
+        self.assertEqual(testunit_name, testplans_testunits_names_in_popup[1]['test_units'][0])
+
+    @skip("https://modeso.atlassian.net/browse/LIMSA-127")
+    def test046_testplans_popup_after_edit_by_replace(self):
+        """
+        Orders: Test plan: Test unit pop up Approach: In case I delete test plan, make sure it
+        deleted from the pop up with it's test units and updated with another one
+        LIMS-4802
+        """
+        self.info('Get completed test plan to upade by it with raw material type')
+        testplan = \
+            self.test_plan_api.get_completed_testplans_with_material_and_same_article(material_type='Raw Material',article='', articleNo='')[0]
+        order, payload = self.orders_api.create_new_order(materialTypeId=1)
+        self.info('open the order record in the edit mode')
+        self.orders_page.get_order_edit_page_by_id(id=order['order']['mainOrderId'])
+        self.info('go to update the test plan by adding the completed one')
+        self.order_page.update_suborder(sub_order_index=0, remove_old=True, test_plans=[testplan['testPlanName']])
+        self.order_page.save(save_btn='order:save')
+        testplan_name = testplan['testPlanName']
+        self.info("Get the test plan name that I added it in the edit mode".format(testplan_name))
+        testplans_testunits_names_in_popup = self.order_page.get_testplan_pop_up()
+        self.info("get test plan & test unit name from the test plan popup".format(testplans_testunits_names_in_popup))
+        testunit_no = self.test_plan_api.get_testplan_with_quicksearch(quickSearchText=testplan_name)[0]['number']
+        testunit_name = self.test_plan_api.get_testunits_in_testplan_by_No(no=testunit_no)[0]
+        self.info("get test unit name".format(testunit_name))
+        self.info("assert that the test plan in the editmode same as the test plan in the test plan pop up".format(
+            testplan_name, testplans_testunits_names_in_popup[0]['test_plan']))
+        self.assertEqual(testplan_name, testplans_testunits_names_in_popup[0]['test_plan'])
+        self.info("assert that the test unint in the edit mode same as the test unit in the test unit pop up ".format(
+            testunit_name, testplans_testunits_names_in_popup[0]['test_units'][0]))
+        self.assertEqual(testunit_name, testplans_testunits_names_in_popup[0]['test_units'][0])
+
