@@ -706,9 +706,9 @@ elements = {
         'testplan_popup_btn': {'method': 'xpath',
                            'value': '//span[@class="pull-right collapse-long-words"]',
                            },
-        'popup_testplan': {'method': 'class_name',
-                           'value': 'detail-title',
-                             'order':1},
+        'popup_data': {'method': 'class_name',
+                           'value': 'border-bottom',
+                             },
         'analysis': {
             'filter_order_no': {
                 'method': 'id',

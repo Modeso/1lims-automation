@@ -577,23 +577,14 @@ class Order(Orders):
         suborder_data = self.get_suborder_data()
         return suborder_data
 
-    def get_testplan_pop_up(self, sub_order_index=0, one_testplan=False, multiple_testplan=False):
-        suborder_table_rows = self.base_selenium.get_table_rows(
-            element='order:suborder_table')
-        suborder_row = suborder_table_rows[sub_order_index]
-        suborder_row.click()
+    def get_testplan_pop_up(self):
         self.base_selenium.click(element='order:testplan_popup_btn')
         self.sleep_small()
-        if one_testplan == True:
-           element = self.base_selenium.find_element_by_xpath(xpath='//div[@class="col-md-12 border-bottom"]')
-           testplans_testunits_names = element.text
-           return testplans_testunits_names
-        if multiple_testplan == True:
-           element = self.base_selenium.find_element(element='order:popup_testplan')
-           testplans_testunits_names = element.text
-           return testplans_testunits_names
-
-
-
+        results = []
+        elements = self.base_selenium.find_elements('order:popup_data')
+        for element in elements:
+            test_plan, test_units = element.text.split('\n')[0], element.text.split('\n')[1:]
+            results.append({'test_plan': test_plan, 'test_units': test_units})
+        return results
 
 
