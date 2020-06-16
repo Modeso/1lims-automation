@@ -260,10 +260,12 @@ class TestPlanAPI(TestPlanAPIFactory):
             new_test_plan = test_plan['testPlanEntity']['name']
             new_test_unit = test_plan['specifications'][0]['name']
             self.info("completed test plan created with name {} and test unit {}".format(new_test_plan, new_test_unit))
+
         if new_test_unit in used_test_unit:
             api, payload = TestUnitAPI().create_quantitative_testunit()
             if api['status'] == 1:
                 new_test_unit = payload['name']
+        
         return new_test_plan, new_test_unit
 
     def get_testunits_in_testplan_by_No(self, no):
@@ -271,3 +273,14 @@ class TestPlanAPI(TestPlanAPIFactory):
         test_units = self.get_testunits_in_testplan(test_plan_id)
         test_units_names = [testunit['name'] for testunit in test_units]
         return test_units_names
+
+    def get_suborder_data_with_different_material_type(self, material_type):
+        test_plans = self.get_completed_testplans(limit=1000)
+        # I need to make sure that material type not equal '47d56b4399' due to this open bug
+        # https://modeso.atlassian.net/browse/LIMS-7710
+        test_plans_without_duplicate = [test_plan for test_plan in test_plans if test_plan['materialType']
+                                        not in [material_type, '47d56b4399']]
+        test_plan = random.choice(test_plans_without_duplicate)
+        test_unit = TestPlanAPI().get_testunits_in_testplan(test_plan['id'])[0]
+
+        return test_plan, test_unit
