@@ -2697,7 +2697,3 @@ class OrdersTestCases(BaseTest):
         self.info("assert that after I remove the file it will return none should not equal to the file name ".format(after_remove_attachment, file_name))
         self.assertNotEqual(after_remove_attachment, file_name)
 
-
-
-
-
