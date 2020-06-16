@@ -163,7 +163,7 @@ class ContactsAPI(ContactsAPIFactory):
         for contact in selected_contacts:
             departments = self.get_departments_in_contact(contact)
             if departments and departments != ['']:
-                departments_list_with_contacts.append(contact)
-                departments_list_with_contacts.extend(departments)
-
+                contact_dict = {'contact': contact,
+                                'departments': departments}
+                departments_list_with_contacts.append(contact_dict)
         return departments_list_with_contacts

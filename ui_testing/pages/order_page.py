@@ -170,6 +170,7 @@ class Order(Orders):
             element='order:departments', item_text='', options_element='general:drop_down_div')[0].split('\n')
         departments_only_list = self.base_selenium.get_drop_down_suggestion_list(
             element='order:departments', item_text='')
+
         return suggested_department_list, departments_only_list
 
     def create_existing_order(self, no='', material_type='', article='', contact='', test_units=[],

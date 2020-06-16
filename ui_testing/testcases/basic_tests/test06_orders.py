@@ -2413,9 +2413,10 @@ class OrdersTestCases(BaseTest):
         self.info('selected contacts are {}'.format(contacts))
         self.assertCountEqual(contacts, contact_names_list)
         if case == 'create':
-            suggested_department_list, departments_only_list = self.order_page.get_department_suggestion_lists()
+            suggested_department_list, departments_only_list = self.order_page.get_department_suggestion_lists(contacts=contacts)
             self.info('suggested department list {}'.format(suggested_department_list))
             self.info('and it should be {}'.format(departments_list_with_contacts))
+            # I should be able to compare departments_list_with_contacts and suggested_department_list
             self.assertCountEqual(departments_list_with_contacts, suggested_department_list)
             department = random.choice(departments_only_list)
             self.info('set department to {}'.format(department))
