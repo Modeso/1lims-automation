@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test_cases: ["ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases.test042_table_with_add_edit_single_row "]
+        test_cases: ["ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases.test008_duplicate_main_order"]
 
 
     steps:
