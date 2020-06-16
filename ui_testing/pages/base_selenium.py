@@ -472,7 +472,7 @@ class BaseSelenium:
     def _unique_index_list(self, data): # I didnt like this implemenation need to fix it!+
         result = []
         data_text = [data_item.text for data_item in data]
-        for text in data_text:  
+        for text in data_text:
             _occurrences = [index for index, value in enumerate(data_text) if value == text] # this returns the indexs for each item
             if len(_occurrences) == 1:
                 result.append(_occurrences[0])
