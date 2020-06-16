@@ -59,9 +59,7 @@ class OrdersAPIFactory(BaseAPI):
         article = testplan_form_data['testPlan']['selectedArticles'][0]['name']
         article_id =testplan_form_data['testPlan']['selectedArticles'][0]['id']
         if article == 'all':
-            selected_article = random.choice(ArticleAPI().get_all_articles(limit=10)[0]['articles'])
-            article = selected_article['name']
-            article_id = selected_article['id']
+            article, article_id = ArticleAPI().get_random_article_articleID()
 
         #modify_test_plan_ID
         testplan['id'] = testplan_form_data['testPlan']['testPlanEntity']['id']
@@ -298,9 +296,7 @@ class OrdersAPI(OrdersAPIFactory):
         article = testplan_form_data['testPlan']['selectedArticles'][0]['name']
         article_id = testplan_form_data['testPlan']['selectedArticles'][0]['id']
         if article == 'all':
-            selected_article = random.choice(ArticleAPI().get_all_articles(limit=10)[0]['articles'])
-            article = selected_article['name']
-            article_id = selected_article['id']
+            article, article_id = ArticleAPI().get_random_article_articleID()
         material_type = testplan['materialType']
         material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
         testunit1 = testplan_form_data['testPlan']['specifications'][0]
