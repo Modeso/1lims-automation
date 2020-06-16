@@ -466,43 +466,6 @@ class OrdersTestCases(BaseTest):
             self.assertEqual(
                 selected_order_data['Test Plans'], row_data['Test Plans'])
 
-    # will continue with us
-    # @skip("https://modeso.atlassian.net/browse/LIMS-4782")
-    def test013_update_order_number(self):
-        """
-        New: Orders: Table: Update order number Approach: When I update order number all suborders inside it updated it's order number,
-        and also in the analysis section.
-        LIMS-4270
-        """
-        self.base_selenium.LOGGER.info(
-            ' Running test case to check that when order no is updated, all suborders are updated')
-
-        # create order with multiple suborders
-        self.base_selenium.LOGGER.info(
-            ' Create order with 5 sub orders to make sure of the count of the created/ updated orders')
-        order_no_created = self.order_page.create_new_order(material_type='r', article='a', contact='a',
-                                                            test_plans=['a'],
-                                                            test_units=['a'], multiple_suborders=5)
-        self.base_selenium.LOGGER.info(
-            ' + orders_created_with_number : {}'.format(order_no_created))
-        order_no_created = order_no_created.replace("'", '')
-
-        # filter by the created order number and get the count
-        orders_result = self.orders_page.search(order_no_created)
-        self.base_selenium.LOGGER.info(
-            ' + filter_by_order_no : {}'.format(order_no_created))
-        orders_count = self.order_page.get_table_records()
-        self.base_selenium.LOGGER.info(
-            ' + count_of_the_created_orders : {}'.format(orders_count))
-
-        # open the last created order to update its number and checking whether it will affect the rest of the orders or not
-        self.order_page.get_random_x(row=orders_result[0])
-        new_order_no = self.order_page.generate_random_text()
-        self.order_page.set_no(no=new_order_no)
-        self.order_page.save(save_btn='order:save_btn')
-        self.base_selenium.LOGGER.info(
-            ' + order_updated_with_number : {}'.format(new_order_no))
-
     @parameterized.expand(['save_btn', 'cancel'])
     def test014_update_first_order_material_type(self, save):
         """
@@ -932,18 +895,17 @@ class OrdersTestCases(BaseTest):
         testunit = random.choice(testunits['testUnits'])
 
         self.order_page.get_orders_page()
-        created_order = self.order_page.create_new_order(material_type='r', article='a', contact='a', test_plans=[],
+        created_order_no = self.order_page.create_new_order(material_type='r', article='a', contact='a', test_plans=[],
                                                          test_units=[testunit['name']])
 
         self.order_page.get_orders_page()
         self.order_page.navigate_to_analysis_tab()
         self.base_selenium.LOGGER.info(
             'Assert There is an analysis for this new order.')
-        orders_analyess = self.analyses_page.search(value=created_order['orderNo'])
+        orders_analyess = self.analyses_page.search(value=created_order_no)
         latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
             row=orders_analyess[0])
-        self.assertEqual(
-            created_order['orderNo'].replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
+        self.assertEqual(created_order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
 
         self.analyses_page.open_child_table(source=orders_analyess[0])
         rows_with_childtable = self.analyses_page.result_table(element='general:table_child')
@@ -1078,66 +1040,73 @@ class OrdersTestCases(BaseTest):
         results = self.order_page.result_table(element='general:table_child')[0].text
         self.assertIn(suborders_data[0]['Analysis No.'].replace("'", ""), results.replace("'", ""))
 
-    def test027_update_material_type(self):
+    @parameterized.expand(['testPlans', 'testUnit'])
+    def test027_update_material_type(self, case):
         """
-        Apply this on suborder number 5 for example:-
         -When user update the materiel type from table view once I delete it message will appear
-        (All analysis created with this order and test plan will be deleted )
-        -Once you press on OK button, the material type & article & test pan will delete
-        -You can update it by choose another one and choose corresponding article & test plan
-        LIMS-4264
+        (All analysis created with this order and test plan/ test unit will be deleted )
+        -Once you press on OK button, the material type & article & test pan/ test unit will delete
+        -You can update it by choose another one and choose corresponding article & test plan/ test unit
+
+        LIMS-4264 ( order with test plan )
+
+        LIMS-4267 (order with test unit )
         """
-        self.info('get random order')
-        orders, _ = self.orders_api.get_all_orders(limit=50)
-        order = random.choice(orders['orders'])
-        suborders, _ = self.orders_api.get_suborder_by_order_id(order['id'])
-        suborder = suborders['orders'][0]
-        suborder_update_index = len(suborders['orders']) - 1
-
+        self.info('create new order')
+        response, order_payload = self.orders_api.create_new_order()
+        self.assertEqual(response['status'], 1, order_payload)
         self.info('get random completed test plan with different material type')
-        test_plans = TestPlanAPI().get_completed_testplans()
-        # I need to make sure that material type not equal '47d56b4399' due to this open bug
-        # https://modeso.atlassian.net/browse/LIMS-7710
-        test_plans_without_duplicate = [test_plan for test_plan in test_plans if
-                                        test_plan['materialType'] not in
-                                        [suborder['materialType'], '47d56b4399']]
-        test_plan = random.choice(test_plans_without_duplicate)
+        test_plan,  test_unit = self.test_plan_api.get_suborder_data_with_different_material_type(
+            order_payload[0]['materialType']['text'])
+        self.info('update material type of order from {} to {}'.format(
+            order_payload[0]['materialType']['text'], test_plan['materialType']))
 
-        self.info('update material type of order {} with {}'.format(order['orderNo'], test_plan['materialType']))
-        self.orders_page.get_order_edit_page_by_id(order['id'])
-        self.order_page.update_suborder(sub_order_index=suborder_update_index, material_type=test_plan['materialType'])
-        confirm_edit = self.base_selenium.check_element_is_exist(element="general:confirmation_pop_up")
-        confirm_edit_message = self.base_selenium.get_text(element="general:confirmation_pop_up")
-        self.assertTrue(confirm_edit)
-        self.assertIn('All analysis created with this order and test plan will be deleted', confirm_edit_message)
+        self.orders_page.get_order_edit_page_by_id(response['order']['mainOrderId'])
+        suborder_row = self.base_selenium.get_table_rows(element='order:suborder_table')[0]
+        suborder_row.click()
+        self.order_page.set_material_type(test_plan['materialType'])
+        self.order_page.sleep_small()
+        self.assertTrue(self.base_selenium.check_element_is_exist(element="general:confirmation_pop_up"))
         self.info('confirm pop_up')
         self.orders_page.confirm_popup()
-        self.info('assert test plan and articles are empty')
+        self.info('assert article and test plan/ test unit  are empty')
+        self.assertFalse(self.order_page.get_article())
         self.assertFalse(self.order_page.get_test_plan())
-        self.assertEqual(self.order_page.get_article(), 'Search')  # empty article return 'Search'
-        self.info("set article to {} and test plan to {}".format(test_plan['article'][0], test_plan['testPlanName']))
+        self.assertFalse(self.order_page.get_test_unit())
         if test_plan['article'][0] == 'all':
             article = self.order_page.set_article('')
+            self.order_page.sleep_small()
         else:
             self.order_page.set_article(test_plan['article'][0])
             article = test_plan['article'][0]
 
-        self.order_page.set_test_plan(test_plan['testPlanName'])
-        self.info('save the changes then refresh')
-        self.order_page.save(save_btn='order:save_btn')
-        self.base_selenium.refresh()
+        if case == 'testPlans':
+            self.info("set article to {} and test plan to {}".
+                      format(test_plan['article'][0], test_plan['testPlanName']))
+            self.order_page.set_test_plan(test_plan['testPlanName'])
+            self.order_page.sleep_small()
+        else:
+            self.info("set article to {} and test unit to {}".format(test_plan['article'][0],
+                                                                     test_unit['name']))
+            self.order_page.set_test_unit(test_unit['name'])
+            self.order_page.sleep_small()
+
+        self.order_page.save_and_wait(save_btn='order:save_btn')
         self.info('get order data after edit and refresh')
-        order_data_after_refresh = self.order_page.get_suborder_data()
-        suborder_after_refresh = order_data_after_refresh['suborders'][suborder_update_index]
+        suborder_after_refresh = self.orders_api.get_order_by_id(response['order']['mainOrderId'])[0]['orders'][0]
         self.info('navigate to analysis page to make sure analysis corresponding to suborder updated')
         self.order_page.get_orders_page()
         self.order_page.navigate_to_analysis_tab()
-        self.analyses_page.filter_by_analysis_number(suborder_after_refresh['analysis_no'])
-        analyses = self.analyses_page.result_table()[0]
-        self.assertIn(test_plan['materialType'], analyses.text)
-        self.assertIn(article, analyses.text)
-        self.assertIn(test_plan['testPlanName'], analyses.text)
-
+        self.analyses_page.filter_by_analysis_number(suborder_after_refresh['analysisNos'][0]['analysisNo'])
+        analyses = self.analyses_page.get_the_latest_row_data()
+        self.assertEqual(test_plan['materialType'], analyses['Material Type'])
+        self.assertEqual(article.replace(" ",""), analyses['Article Name'].replace(" ",""))
+        if case == 'testPlans':
+            self.assertEqual(test_plan['testPlanName'], analyses['Test Plans'])
+        else:
+            child_table_data = self.analyses_page.get_child_table_data()[0]
+            self.assertEqual(test_unit['name'], child_table_data['Test Unit'])
+        
     # will continue with us & then put the test case number for it
     def test026_update_suborder_article(self):
         self.base_selenium.LOGGER.info('Order created with 4 suborders with the following data')
@@ -1619,18 +1588,18 @@ class OrdersTestCases(BaseTest):
 
         # Then go to the order section to create new order with this test unit
         self.order_page.get_orders_page()
-        created_order = self.order_page.create_new_order(material_type='s', article='r', contact='a',
+        created_order_no = self.order_page.create_new_order(material_type='s', article='r', contact='a',
                                                          test_units=test_units_list)
 
         # Go to the analysis section and search by the order number that created
         self.analyses_page.get_analyses_page()
         self.base_selenium.LOGGER.info(
             'Make sure there is analysis for this order number.')
-        orders_analyess = self.analyses_page.search(created_order)
+        orders_analyess = self.analyses_page.search(created_order_no)
         latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
             row=orders_analyess[0])
         self.assertEqual(
-            created_order.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
+            created_order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
 
         # Open the child table tp check the test unit display correct
         self.analyses_page.open_child_table(source=orders_analyess[0])
@@ -1655,11 +1624,11 @@ class OrdersTestCases(BaseTest):
         self.analyses_page.get_analyses_page()
         self.base_selenium.LOGGER.info(
             'Make sure there is analysis for this order number.')
-        orders_analyess = self.analyses_page.search(created_order)
+        orders_analyess = self.analyses_page.search(created_order_no)
         latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
             row=orders_analyess[0])
         self.assertEqual(
-            created_order.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
+            created_order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
 
         # Open the child table to make sure the update reflected successfully
         self.analyses_page.open_child_table(source=orders_analyess[0])
@@ -1690,18 +1659,18 @@ class OrdersTestCases(BaseTest):
 
         # Then go to the order section to create new order with this test unit
         self.order_page.get_orders_page()
-        created_order = self.order_page.create_new_order(material_type='s', article='r', contact='a',
+        created_order_no = self.order_page.create_new_order(material_type='s', article='r', contact='a',
                                                          test_units=test_units_list)
 
         # Go to the analysis section and search by the order number that created
         self.analyses_page.get_analyses_page()
         self.base_selenium.LOGGER.info(
             'Make sure there is analysis for this order number.')
-        orders_analyess = self.analyses_page.search(created_order)
+        orders_analyess = self.analyses_page.search(created_order_no)
         latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
             row=orders_analyess[0])
         self.assertEqual(
-            created_order.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
+            created_order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
 
         # Open the child table tp check the test unit display correct
         self.analyses_page.open_child_table(source=orders_analyess[0])
@@ -1728,11 +1697,11 @@ class OrdersTestCases(BaseTest):
         self.analyses_page.get_analyses_page()
         self.base_selenium.LOGGER.info(
             'Make sure there is analysis for this order number.')
-        orders_analyess = self.analyses_page.search(created_order)
+        orders_analyess = self.analyses_page.search(created_order_no)
         latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
             row=orders_analyess[0])
         self.assertEqual(
-            created_order.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
+            created_order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
 
         # Open the child table to make sure the update reflected successfully
         self.analyses_page.open_child_table(source=orders_analyess[0])
@@ -1919,30 +1888,26 @@ class OrdersTestCases(BaseTest):
         LIMS-4270
         """
         self.info('generate new order number to use it for update')
-        new_order_no = self.orders_api.get_auto_generated_order_no()
-        year_value = self.order_page.get_current_year()[2:]
+        new_order_no = str(self.orders_api.get_auto_generated_order_no()[0]['id'])
+        year_value = str(self.order_page.get_current_year()[2:])
         formated_order_no = new_order_no + '-' + year_value
         self.info('newly generated order number = {}'.format(formated_order_no))
-        order = self.orders_api.get_all_orders(limit=50)['orders'][1]
-        self.orders_page.get_order_edit_page_by_id(id=order['id'])
+        response, _ = self.orders_api.get_all_orders(limit=50)
+        order = random.choice(response['orders'])
+        self.orders_page.get_order_edit_page_by_id(id=order['orderId'])
         self.order_page.set_no(no=formated_order_no)
         self.order_page.sleep_small()
-        self.order_page.save(save_btn='order:save_btn', sleep=True)
-
-        self.info('refresh to make sure that data are saved correctly')
-        self.base_selenium.refresh()
+        self.order_page.save_and_wait(save_btn='order:save_btn')
         order_no_after_update = self.order_page.get_no()
-
-        self.info('order no is {}, and it should be {}'.format(order_no_after_update, formated_order_no))
-        self.assertEqual(order_no_after_update.replace("'", ""), formated_order_no)
-
+        self.info('order no is {}, and it should be {}'.format(order_no_after_update, formated_order_no+'20'))
+        self.assertEqual(order_no_after_update.replace("'", ""), formated_order_no+'20')
         self.info('navigate to analysis tab to make sure that order no updated correctly')
-        self.order_page.navigate_to_analysis_tab()
-        analysis_records = self.single_analysis_page.get_all_analysis_records()
-
+        self.orders_page.get_orders_page()
+        self.orders_page.navigate_to_analysis_active_table()
+        self.analyses_page.search(formated_order_no+'20')
+        analysis_record = self.single_analysis_page.get_the_latest_row_data()
         self.info('checking order no of each analysis')
-        for record in analysis_records:
-            self.assertEqual(record['Order No.'], formated_order_no)
+        self.assertEqual(analysis_record['Order No.'], formated_order_no+'20')
 
     def test033_Duplicate_main_order_and_cahange_materiel_type(self):
         """

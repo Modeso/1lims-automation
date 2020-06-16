@@ -34,7 +34,6 @@ class Order(Orders):
         else:
             self.base_selenium.select_item_from_drop_down(
                 element='order:material_type', avoid_duplicate=True)
-
             self.sleep_tiny()
             return self.get_material_type()
 
@@ -42,7 +41,11 @@ class Order(Orders):
         return self.base_selenium.get_text(element='order:material_type').split('\n')[0]
 
     def get_article(self):
-        return self.base_selenium.get_text(element='order:article').split(' No')[0]
+        article = self.base_selenium.get_text(element='order:article').split(' No')[0]
+        if article == 'Search':
+            return None
+        else:
+            return article
 
     def set_article(self, article=''):
         if article:
@@ -109,14 +112,14 @@ class Order(Orders):
 
     def get_test_unit(self):
         test_units = self.base_selenium.get_text(element='order:test_unit')
-        if test_units:
+        if test_units and test_units != 'Search':
             return test_units.replace("×", "").split("\n")
         else:
             return []
 
     def create_new_order(self, material_type='', article='', contact='', test_plans=[''], test_units=[''],
                          multiple_suborders=0, departments=''):
-        self.base_selenium.LOGGER.info(' Create new order.')
+        self.info(' Create new order.')
         self.click_create_order_button()
         self.set_new_order()
         self.set_contact(contact=contact)
@@ -140,7 +143,7 @@ class Order(Orders):
 
         self.save(save_btn='order:save_btn')
         self.base_selenium.LOGGER.info(' Order created with no : {} '.format(order_no))
-        return self.get_suborder_data()
+        return order_no
 
     def create_existing_order(self, no='', material_type='', article='', contact='', test_units=[],
                               multiple_suborders=0):
@@ -586,5 +589,4 @@ class Order(Orders):
             test_plan, test_units = element.text.split('\n')[0], element.text.split('\n')[1:]
             results.append({'test_plan': test_plan, 'test_units': test_units})
         return results
-
 
