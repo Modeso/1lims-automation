@@ -2413,36 +2413,31 @@ class OrdersTestCases(BaseTest):
         self.assertCountEqual(test_plans, found_test_plans)
         self.assertCountEqual(test_units, found_test_units)
 
-    def test040_download_order_sheet(self):
+    def test040_download_suborder_sheet_for_single_order(self):
         """
         Export order child table
 
-        LIMS-8085
+        LIMS-8085- single order case
         """
         self.info('select random order')
-        rows = self.order_page.select_random_ordered_multiple_table_rows()
-        rows_data = rows[0]
-        orders_no = [order['Order No.'] for order in rows_data]
+        random_row = self.orders_page.get_random_table_row(table_element='general:table')
+        self.orders_page.click_check_box(source=random_row)
+        random_row_data = self.base_selenium.get_row_cells_dict_related_to_header(random_row)
+        self.orders_page.open_child_table(source=random_row)
+        child_table_data = self.order_page.get_table_data()
         order_data_list = []
-        for i in range(0, len(rows_data)):
-            order_dict = rows[0][i]
-            self.base_selenium.scroll()
-            self.order_page.open_child_table(rows[1][i])
-            child_table_data = self.order_page.get_table_data()
-            for sub_order in child_table_data:
-                order_dict.update(sub_order)
-                order_data_list.append(order_dict)
+        order_dict = random_row_data
+        for sub_order in child_table_data:
+            order_dict.update(sub_order)
+            order_data_list.append(order_dict)
 
-            self.order_page.open_child_table(rows[1][i])
         formatted_orders = self.order_page.match_format_to_sheet_format(order_data_list)
         self.order_page.download_xslx_sheet()
         for index in range(len(formatted_orders)):
-            import ipdb;ipdb.set_trace()
             self.info('Comparing the order no {} '.format(formatted_orders[index][0]))
             values = self.order_page.sheet.iloc[index].values
-            self.assertCountEqual(values, formatted_orders[index])
-            for item in formatted_orders[index]:
-                self.assertIn(item, values)
-
-
-
+            fixed_sheet_row_data = self.fix_data_format(values)
+            fixed_order_format = self.fix_data_format(formatted_orders[index])
+            self.assertCountEqual(fixed_sheet_row_data, fixed_order_format)
+            for item in fixed_order_format:
+                self.assertIn(item, fixed_sheet_row_data)

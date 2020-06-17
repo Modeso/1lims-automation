@@ -569,18 +569,20 @@ class Order(Orders):
             row=suborder_row, table_element='order:suborder_table')
         return suborders_elements
 
-    def match_format_to_sheet_format(self, list):
+    def match_format_to_sheet_format(self, list_of_orders=[]):
         formatted_orders_list = []
-        orders_list =[]
-        for order in list:
+        orders_list = []
+        for order in list_of_orders:
             for key in order:
                 if key in ['', 'Options']:
                     continue
                 if key in ['Contact Name', 'Test Plans', 'Departments', 'Test Units']:
-                    formatted_orders_list.append(order[key].replace(',\n', ' & '))
+                    formatted_orders_list.append(order[key].replace(',\n', ' & ').replace("'", ""))
+                elif order[key] == '0':
+                    formatted_orders_list.append(int(order[key]))
                 else:
-                    formatted_orders_list.append(order[key])
-            orders_list.extend({formatted_orders_list})
+                    formatted_orders_list.append(order[key].replace("'", ""))
+            orders_list.append(formatted_orders_list)
             formatted_orders_list = []
 
-        return formatted_orders_list
+        return orders_list
