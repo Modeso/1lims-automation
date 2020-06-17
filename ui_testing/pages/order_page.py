@@ -144,6 +144,7 @@ class Order(Orders):
 
     def create_multiple_contacts_new_order(self, contacts):
         self.info(" click on create new order button")
+        self.base_selenium.scroll()
         self.click_create_order_button()
         self.set_new_order()
         self.sleep_small()
