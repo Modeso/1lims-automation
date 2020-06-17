@@ -6,7 +6,7 @@ from api_testing.apis.test_unit_api import TestUnitAPI
 from api_testing.apis.article_api import ArticleAPI
 from ui_testing.pages.testunit_page import TstUnit
 from api_testing.apis.base_api import api_factory
-import random
+import random, json, os
 
 
 class OrdersAPIFactory(BaseAPI):
@@ -58,6 +58,8 @@ class OrdersAPIFactory(BaseAPI):
         testplan_form_data = TestPlanAPI()._get_testplan_form_data(id=testplan['id'])[0]
         article = testplan_form_data['testPlan']['selectedArticles'][0]['name']
         article_id =testplan_form_data['testPlan']['selectedArticles'][0]['id']
+        if article == 'all':
+            article, article_id = ArticleAPI().get_random_article_articleID()
 
         #modify_test_plan_ID
         testplan['id'] = testplan_form_data['testPlan']['testPlanEntity']['id']
@@ -97,7 +99,7 @@ class OrdersAPIFactory(BaseAPI):
                 'articleId': article_id,
                 'shipmentDate': shipment_date,
                 'testDate': test_date,
-                'year': current_year,
+                'year': current_year[2:4],
                 'yearOption': 1
             }]
         payload = self.update_payload(_payload, **kwargs)
@@ -293,40 +295,14 @@ class OrdersAPI(OrdersAPIFactory):
         testplan['id'] = testplan_form_data['testPlan']['testPlanEntity']['id']
         article = testplan_form_data['testPlan']['selectedArticles'][0]['name']
         article_id = testplan_form_data['testPlan']['selectedArticles'][0]['id']
+        if article == 'all':
+            article, article_id = ArticleAPI().get_random_article_articleID()
         material_type = testplan['materialType']
         material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
         testunit1 = testplan_form_data['testPlan']['specifications'][0]
-
-
-        testunits = TestUnitAPI().list_testunit_by_name_and_material_type(materialtype_id=material_type_id)
-        selected_test_unit_list = []
-        for testunit in testunits[0]['testUnits']:  # make sure test unit have value
-            if testunit['name'] == testunit1['name']: # select test unit != first test unit
-                continue
-            if testunit['typeName'] == 'Quantitative MiBi':
-                if testunit['mibiValue']:
-                    selected_test_unit_list = [testunit]
-                    break
-            elif testunit['typeName'] == 'Quantitative':
-                if testunit['lowerLimit'] and testunit['upperLimit']:
-                    selected_test_unit_list = [testunit]
-                    break
-            elif testunit['typeName'] == 'Qualitative':
-                if testunit['textValue']:
-                    selected_test_unit_list = [testunit]
-                    break
-
-        # in case I have no test units with required material type and has values, create one
-        if not selected_test_unit_list:
-            api, testunit_payload = TestUnitAPI().create_quantitative_testunit()
-            selected_test_unit_list = TestUnitAPI().get_testunit_form_data(id=api['testUnit']['testUnitId'])[0]['testUnit']
-
-        testunit2 = selected_test_unit_list[0]
-
-        if only_test_plans:
-            testunit_list = []
-        else:
-            testunit_list = [testunit1, testunit2]
+        testunit2 = TestUnitAPI().get_test_unit_name_with_value_with_material_type(
+            material_type=material_type, avoid_duplicate=True, duplicated_test_unit=testunit1['name'])
+        testunit_list = [testunit1, testunit2]
 
         testunit_data = TestUnitAPI().get_testunit_form_data(id=testunit2['id'])[0]['testUnit']
         formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
@@ -344,7 +320,7 @@ class OrdersAPI(OrdersAPIFactory):
 
         second_testPlan_data = TestPlanAPI()._get_testplan_form_data(id=testplan2['testPlanDetails']['id'])
         testPlan2 = {
-            'id': int(second_testPlan_data[0]['testPlan']['testPlanEntity']['id']), #article_test_plan_id
+            'id': int(second_testPlan_data[0]['testPlan']['testPlanEntity']['id']),  # article_test_plan_id
             'testPlanName': second_testPlan_data[0]['testPlan']['testPlanEntity']['name'],
             'number': int(second_testPlan_data[0]['testPlan']['number']),
             'version': 1
@@ -397,8 +373,9 @@ class OrdersAPI(OrdersAPIFactory):
         }
         return self.create_new_order(**payload)
 
-
-
-
-
-
+    def set_configuration(self):
+        self.info('set order configuration')
+        config_file = os.path.abspath('api_testing/config/order.json')
+        with open(config_file, "r") as read_file:
+            payload = json.load(read_file)
+        super().set_configuration(payload=payload)
