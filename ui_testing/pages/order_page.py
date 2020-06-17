@@ -34,7 +34,6 @@ class Order(Orders):
         else:
             self.base_selenium.select_item_from_drop_down(
                 element='order:material_type', avoid_duplicate=True)
-
             self.sleep_tiny()
             return self.get_material_type()
 
@@ -42,7 +41,11 @@ class Order(Orders):
         return self.base_selenium.get_text(element='order:material_type').split('\n')[0]
 
     def get_article(self):
-        return self.base_selenium.get_text(element='order:article').split(' No')[0]
+        article = self.base_selenium.get_text(element='order:article').split(' No')[0]
+        if article == 'Search':
+            return None
+        else:
+            return article
 
     def set_article(self, article=''):
         if article:
@@ -96,9 +99,9 @@ class Order(Orders):
         if self.get_test_plan():
             self.base_selenium.clear_items_in_drop_down(element='order:test_plan')
 
-    def clear_test_unit(self):
+    def clear_test_unit(self, confirm=True):
         if self.get_test_unit():
-            self.base_selenium.clear_items_in_drop_down(element='order:test_unit', confirm_popup=True)
+            self.base_selenium.clear_items_in_drop_down(element='order:test_unit', confirm_popup=confirm)
 
     def set_test_unit(self, test_unit=''):
         if test_unit:
@@ -109,14 +112,14 @@ class Order(Orders):
 
     def get_test_unit(self):
         test_units = self.base_selenium.get_text(element='order:test_unit')
-        if test_units:
+        if test_units and test_units != 'Search':
             return test_units.replace("×", "").split("\n")
         else:
             return []
 
     def create_new_order(self, material_type='', article='', contact='', test_plans=[''], test_units=[''],
                          multiple_suborders=0, departments=''):
-        self.base_selenium.LOGGER.info(' Create new order.')
+        self.info(' Create new order.')
         self.click_create_order_button()
         self.set_new_order()
         self.set_contact(contact=contact)
@@ -140,7 +143,7 @@ class Order(Orders):
 
         self.save(save_btn='order:save_btn')
         self.base_selenium.LOGGER.info(' Order created with no : {} '.format(order_no))
-        return self.get_suborder_data()
+        return order_no
 
     def create_existing_order(self, no='', material_type='', article='', contact='', test_units=[],
                               multiple_suborders=0):
@@ -401,9 +404,12 @@ class Order(Orders):
                                              item_text=testunit_name.replace("'", ''))
 
     def update_suborder(self, sub_order_index=0, contacts=False, departments=[], material_type=False, articles=False,
-                        test_plans=[], test_units=[], shipment_date=False, test_date=False, remove_old=False):
+                        test_plans=[], test_units=[], shipment_date=False, test_date=False, remove_old=False,
+                        confirm_pop_up=False):
 
-        suborder_table_rows = self.base_selenium.get_table_rows(element='order:suborder_table')
+        suborder_table_rows = \
+            self.base_selenium.get_table_rows(element='order:suborder_table')
+
         suborder_row = suborder_table_rows[sub_order_index]
         suborder_elements_dict = self.base_selenium.get_row_cells_id_dict_related_to_header(
             row=suborder_row, table_element='order:suborder_table')
@@ -411,11 +417,11 @@ class Order(Orders):
         suborder_row.click()
         self.base_selenium.scroll()
         if material_type:
-            self.base_selenium.LOGGER.info(
-                ' Set material type : {}'.format(material_type))
+            self.info('Set material type : {}'.format(material_type))
             self.set_material_type(material_type=material_type)
             self.sleep_small()
-        if articles or articles == '':
+
+        if articles:
             self.remove_article(testplans=suborder_elements_dict['testPlans'])
             self.info('Set article name : {}'.format(articles))
             self.set_article(article=articles)
@@ -425,14 +431,15 @@ class Order(Orders):
         for testplan in test_plans:
             if remove_old:
                 self.clear_test_plan()
-                self.sleep_tiny()
+                self.confirm_popup()
+                self.sleep_small()
             self.set_test_plan(test_plan=testplan)
-            self.sleep_tiny()
+            self.sleep_small()
 
         self.info(' Set test unit : {} for {} time(s)'.format(test_units, len(test_units)))
         for testunit in test_units:
             if remove_old:
-                self.clear_test_unit()
+                self.clear_test_unit(confirm_pop_up)
                 self.sleep_small()
             self.set_test_unit(test_unit=testunit)
             self.sleep_small()
@@ -567,4 +574,31 @@ class Order(Orders):
             row=suborder_row, table_element='order:suborder_table')
         return suborders_elements
 
+    def get_sub_order_data_first_row(self, index=0):
+        suborders = self.base_selenium.get_table_rows(element='order:suborder_table')
+        suborder_row = suborders[index]
+        suborder_data = self.get_suborder_data()
+        return  suborder_data
 
+    def upload_attachment(self, file_name, drop_zone_element, remove_current_file=False, save=False):
+        super().upload_file(file_name, drop_zone_element, remove_current_file)
+        if save:
+           self.base_selenium.driver.execute_script("document.querySelector('.dz-details').style.opacity = 'initial';")
+           self.sleep_tiny()
+           uploaded_file_name = self.base_selenium.find_element(element='general:uploaded_file_name').text
+           self.base_selenium.click('order:uploader_close_btn')
+           self.save(save_btn='order:save_btn')
+           return uploaded_file_name
+        else:
+            self.base_selenium.click('order:uploader_close_btn')
+            self.cancel(True)
+            
+    def get_testplan_pop_up(self):
+        self.base_selenium.click(element='order:testplan_popup_btn')
+        self.sleep_small()
+        results = []
+        elements = self.base_selenium.find_elements('order:popup_data')
+        for element in elements:
+            test_plan, test_units = element.text.split('\n')[0], element.text.split('\n')[1:]
+            results.append({'test_plan': test_plan, 'test_units': test_units})
+        return results
