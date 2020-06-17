@@ -60,6 +60,13 @@ class BaseTest(TestCase):
 
         return tmp
 
+    def reformat_data(self, data_list):
+        tmp = []
+        for item in data_list:
+            if len(str(item)) > 0:
+                tmp.append(str(item).replace(',', ' &').replace("'", ""))
+        return tmp
+
     def get_active_article_with_tst_plan(self, test_plan_status='complete'):
         self.test_plan = TstPlan()
         self.article_page = Article()

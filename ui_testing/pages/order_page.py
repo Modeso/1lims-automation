@@ -583,8 +583,6 @@ class Order(Orders):
                     continue
                 if key in ['Contact Name', 'Test Plans', 'Departments', 'Test Units']:
                     formatted_orders_list.append(order[key].replace(',\n', ' & ').replace("'", ""))
-                elif order[key] == '0':
-                    formatted_orders_list.append(int(order[key]))
                 else:
                     formatted_orders_list.append(order[key].replace("'", ""))
             orders_list.append(formatted_orders_list)

@@ -2761,18 +2761,19 @@ class OrdersTestCases(BaseTest):
         self.orders_page.open_child_table(source=random_row)
         child_table_data = self.order_page.get_table_data()
         order_data_list = []
-        order_dict = random_row_data
+        order_dict = {}
         for sub_order in child_table_data:
+            order_dict.update(random_row_data)
             order_dict.update(sub_order)
             order_data_list.append(order_dict)
+            order_dict = {}
 
         formatted_orders = self.order_page.match_format_to_sheet_format(order_data_list)
         self.order_page.download_xslx_sheet()
         for index in range(len(formatted_orders)):
             self.info('Comparing the order no {} '.format(formatted_orders[index][0]))
             values = self.order_page.sheet.iloc[index].values
-            fixed_sheet_row_data = self.fix_data_format(values)
-            fixed_order_format = self.fix_data_format(formatted_orders[index])
-            self.assertCountEqual(fixed_sheet_row_data, fixed_order_format)
-            for item in fixed_order_format:
+            fixed_sheet_row_data = self.reformat_data(values)
+            self.assertCountEqual(fixed_sheet_row_data, formatted_orders[index])
+            for item in formatted_orders[index]:
                 self.assertIn(item, fixed_sheet_row_data)
