@@ -97,6 +97,7 @@ class TestPlansTestCases(BaseTest):
         LIMS-3506 Case 1
         """
         self.info('Choosing a random test plan table row')
+        self.test_plan.sleep_small()
         selected_test_plan = self.test_plan.select_random_table_row()
         self.assertTrue(selected_test_plan)
         testplan_number = selected_test_plan['Test Plan No.']
@@ -138,7 +139,7 @@ class TestPlansTestCases(BaseTest):
         LIMS-3506 Case 2
         """
         self.info('Choosing random multiple test plans table rows')
-        self.test_plan.sleep_tiny()
+        self.test_plan.sleep_small()
         rows_data, rows = self.test_plan.select_random_multiple_table_rows()
         self.assertTrue(rows_data)
         testplans_numbers = [row['Test Plan No.'] for row in rows_data]
