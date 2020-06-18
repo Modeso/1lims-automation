@@ -32,10 +32,10 @@ class TestPlansTestCases(BaseTest):
         It deletes the first test unit in the chosen test plan and saves this,
         then refreshes the page and checks if the deletion was done correctly.
         '''
+        self.info("get random completed test plan")
         completed_test_plans = self.test_plan_api.get_completed_testplans(limit=500)
         testplan_name = random.choice(completed_test_plans)['testPlanName']
-
-        # navigate to the chosen testplan edit page
+        self.info("navigate to the chosen testplan {} edit page".format(testplan_name))
         self.test_plan.get_test_plan_edit_page(testplan_name)
 
         # navigate to the testunits selection tab [Test plan create or update step 2] and get the testunits
