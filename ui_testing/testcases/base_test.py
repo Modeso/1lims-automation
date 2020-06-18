@@ -53,6 +53,8 @@ class BaseTest(TestCase):
                     tmp.extend(str(item).split('&'))
                 elif ' ' == str(item)[-1]:
                     tmp.append(item[:-1])
+                elif 'all' == str(item)[-1]:
+                    tmp.append('All')
                 else:
                     tmp.append(str(item).replace(',', '&').replace("'", "").replace(' - ', '-'))
 

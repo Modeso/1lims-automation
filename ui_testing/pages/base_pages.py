@@ -192,6 +192,7 @@ class BasePages:
         self.confirm_popup()
 
     def download_xslx_sheet(self):
+        self.info("Download XSLX sheet")
         self.base_selenium.scroll()
         self.base_selenium.click(element='general:right_menu')
         self.sheet = self.base_selenium.download_excel_file(element='general:xslx')

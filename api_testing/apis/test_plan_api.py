@@ -183,7 +183,8 @@ class TestPlanAPI(TestPlanAPIFactory):
         return inprogress_test_plans
 
     def get_testplans_with_status(self, status):
-        all_test_plans = self.get_all_test_plans_json()
+        response, _ = self.get_all_test_plans()
+        all_test_plans = response['testPlans']
         test_plans = [test_plan for test_plan in all_test_plans if test_plan['status'] == status]
         return test_plans
 

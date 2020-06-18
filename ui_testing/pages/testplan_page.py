@@ -64,10 +64,9 @@ class TstPlan(TestPlans):
     def set_test_unit(self, test_unit='', **kwargs):
         self.base_selenium.click('test_plan:next')
         self.base_selenium.click('test_plan:add_new_item')
-        self.sleep_small()
-        self.base_selenium.select_item_from_drop_down(element='test_plan:test_unit', item_text=test_unit)
-        self.sleep_small()
-        self.base_selenium.click('test_plan:check_btn')
+        self.sleep_tiny()
+        self.base_selenium.select_item_from_drop_down(element='test_plan:test_unit',
+                                                      item_text=test_unit, avoid_duplicate=True)
         if 'upper' in kwargs:
             self.info(' set upper : {}'.format(kwargs['upper']))
             elems = self.base_selenium.find_elements('general:col_6')
@@ -80,6 +79,9 @@ class TstPlan(TestPlans):
             lower = self.base_selenium.find_element_in_element(source=elems[5], destination_element='general:input')
             lower.clear()
             lower.send_keys(kwargs['lower'])
+        self.sleep_small()
+        self.base_selenium.click('test_plan:check_btn')
+        self.sleep_tiny()
 
     def get_testunit_in_testplan_title_multiple_line_properties(self):
         dom_element = self.base_selenium.find_element(element='test_plan:testunit_title')
@@ -201,19 +203,15 @@ class TstPlan(TestPlans):
         self.wait_until_page_is_loaded()
 
     def delete_all_testunits(self):
-        testunits_still_available = 1
-        while testunits_still_available:
-            try:
-                self.base_selenium.click(element='test_plan:remove_testunit')
-            except:
-                testunits_still_available = 0
-
-    '''
-    Changes the fields in the testplan after choosing the duplicate option on
-    a specific testplan
-    '''
+        rows = self.base_selenium.get_table_rows(element='test_plan:testunits_table')
+        for row in rows:
+            self.base_selenium.click(element='test_plan:row_delete_button')
 
     def duplicate_testplan(self, change=[]):
+        """
+        Changes the fields in the testplan after choosing the duplicate option on
+        a specific testplan
+        """
         for c in change:
             self.info('Changing the {} field'.format(c))
             if c == 'name':
@@ -221,7 +219,8 @@ class TstPlan(TestPlans):
                 self.set_test_plan(name=duplicated_test_plan_name)
 
         no = self.get_no()
-        self.save(sleep=True)
+        self.save(save_btn='test_plan:save_btn')
+        self.wait_until_page_is_loaded()
         return no
 
     def get_testunit_category_iterations(self, testplan_name, testunit_name):
