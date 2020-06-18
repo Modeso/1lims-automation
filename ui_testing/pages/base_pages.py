@@ -141,6 +141,7 @@ class BasePages:
             if not row_text:
                 continue
             self.click_check_box(source=row)
+            self.sleep_tiny()
             return self.base_selenium.get_row_cells_dict_related_to_header(row)
 
     def click_check_box(self, source):
@@ -164,7 +165,7 @@ class BasePages:
         self.base_selenium.scroll()
         self.base_selenium.click(element='general:right_menu')
         self.base_selenium.click(element='general:archived')
-        self.sleep_small()
+        self.sleep_tiny()
 
     def get_active_items(self):
         self.base_selenium.scroll()
@@ -177,6 +178,8 @@ class BasePages:
         self.base_selenium.click(element='general:right_menu')
         self.base_selenium.click(element='general:restore')
         self.confirm_popup()
+        self.sleep_tiny()
+
 
     def delete_selected_item(self, confirm_pop_up=True):
         self.base_selenium.scroll()
@@ -190,6 +193,7 @@ class BasePages:
         self.base_selenium.click(element='general:right_menu')
         self.base_selenium.click(element='general:archive')
         self.confirm_popup()
+        self.sleep_tiny()
 
     def download_xslx_sheet(self):
         self.info("Download XSLX sheet")

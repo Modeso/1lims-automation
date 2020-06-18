@@ -98,6 +98,7 @@ class TestPlansTestCases(BaseTest):
         """
         self.info('Choosing a random test plan table row')
         selected_test_plan = self.test_plan.select_random_table_row(element='test_plans:test_plans_table')
+        self.assertTrue(selected_test_plan, selected_test_plan)
         self.info('Archive the selected item and navigating to the archived items table')
         self.test_plan.archive_selected_items()
         self.test_plan.get_archived_items()
@@ -122,7 +123,6 @@ class TestPlansTestCases(BaseTest):
         self.test_plan.click_check_box(source=row)
         self.info('Restoring the selected item then navigating to the active items table')
         self.test_plan.restore_selected_items()
-        self.test_plan.sleep_tiny()
         self.test_plan.get_active_items()
         self.test_plan.filter_by_testplan_number(filter_text=testplan_number)
         restored_row = self.test_plan.result_table()
@@ -138,7 +138,7 @@ class TestPlansTestCases(BaseTest):
         """
         self.info('Choosing random multiple test plans table rows')
         rows, _ = self.test_plan.select_random_multiple_table_rows(element='test_plans:test_plans_table')
-        self.assertTrue(rows)
+        self.assertTrue(rows, rows)
         testplans_numbers = []
         for row in rows[0]:
             testplans_numbers.append(row['Test Plan No.'])
@@ -164,7 +164,7 @@ class TestPlansTestCases(BaseTest):
         self.test_plan.get_archived_items()
         self.info('Choosing random multiple testplans table rows')
         rows, _ = self.test_plan.select_random_multiple_table_rows(element='test_plans:test_plans_table')
-        self.assertTrue(rows)
+        self.assertTrue(rows, rows)
         testplans_numbers = []
         for row in rows[0]:
             testplans_numbers.append(row['Test Plan No.'])
