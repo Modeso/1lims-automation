@@ -97,7 +97,6 @@ class TestPlansTestCases(BaseTest):
         LIMS-3506 Case 1
         """
         self.info('Choosing a random test plan table row')
-        self.test_plan.sleep_tiny()
         selected_test_plan = self.test_plan.select_random_table_row(element='test_plans:test_plans_table')
         self.assertTrue(selected_test_plan, selected_test_plan)
         testplan_number = selected_test_plan['Test Plan No.']
@@ -105,9 +104,9 @@ class TestPlansTestCases(BaseTest):
         self.test_plan.archive_selected_items()
         self.test_plan.get_archived_items()
         archived_row = self.test_plan.search(testplan_number)
-        self.info('Checking if test plan number: {} is archived correctly'.format(selected_test_plan['Test Plan No.']))
+        self.info('Checking if test plan number: {} is archived correctly'.format(testplan_number))
         self.assertIn(selected_test_plan['Test Plan Name'], archived_row[0].text)
-        self.info('Test plan number: {} is archived correctly'.format(selected_test_plan['Test Plan No.']))
+        self.info('Test plan number: {} is archived correctly'.format(testplan_number))
 
     def test004_restore_test_plan_one_record(self):
         """
@@ -118,20 +117,18 @@ class TestPlansTestCases(BaseTest):
         self.info("Navigate to archived test plan table")
         self.test_plan.get_archived_items()
         self.info('Choosing a random testplan table row')
-        self.test_plan.sleep_small()
-        row = self.test_plan.get_random_table_row('test_plans:test_plans_table')
-        row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=row)
-        self.assertTrue(row_data, row_data)
-        testplan_number = row_data['Test Plan No.']
+        self.test_plan.sleep_tiny()
+        selected_test_plan = self.test_plan.select_random_table_row(element='test_plans:test_plans_table')
+        self.assertTrue(selected_test_plan, selected_test_plan)
+        testplan_number = selected_test_plan['Test Plan No.']
         self.info('select Testplan number: {} to be restored'.format(testplan_number))
-        self.test_plan.click_check_box(source=row)
         self.info('Restoring the selected item then navigating to the active items table')
         self.test_plan.restore_selected_items()
         self.test_plan.get_active_items()
         self.test_plan.filter_by_testplan_number(filter_text=testplan_number)
         restored_row = self.test_plan.result_table()
         self.info('Checking if testplan number: {} is restored correctly'.format(testplan_number))
-        self.assertIn(row_data['Test Plan Name'], restored_row[0].text)
+        self.assertIn(selected_test_plan['Test Plan Name'], restored_row[0].text)
         self.info('Testplan number: {} is restored correctly'.format(testplan_number))
 
     def test005_archive_test_plan_multiple_records(self):

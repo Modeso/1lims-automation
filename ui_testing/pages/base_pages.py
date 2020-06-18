@@ -117,7 +117,7 @@ class BasePages:
         count = 0
         self.info(' No. of selected rows {} '.format(no_of_rows))
         while count < no_of_rows:
-            row = rows[randint(0, len(rows) - 1)]
+            row = rows[randint(0, len(rows) - 2)]
             row_text = row.text
             if not row_text:
                 continue
@@ -134,12 +134,11 @@ class BasePages:
         self.info("select random row")
         rows = self.base_selenium.get_table_rows(element=element)
         for _ in range(5):
-            row_index = randint(0, len(rows) - 1)
+            row_index = randint(0, len(rows) - 2)
             row = rows[row_index]
             row_text = row.text
             if not row_text:
                 continue
-            self.sleep_tiny()
             self.click_check_box(source=row)
             return self.base_selenium.get_row_cells_dict_related_to_header(row)
 
