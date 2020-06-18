@@ -25,70 +25,70 @@ class TestPlansTestCases(BaseTest):
         self.set_authorization(auth=self.article_api.AUTHORIZATION_RESPONSE)
         self.test_plan.get_test_plans_page()
 
-    def test001_test_plan_delete_testunit(self):
-        """
-        Testing deleting a test unit from test-plan create or update step two
-        It deletes the first test unit in the chosen test plan and saves this,
-        then refreshes the page and checks if the deletion was done correctly.
-
-        LIMS-3504
-        """
-        self.info("get random completed test plan")
-        random_completed_test_plan = random.choice(self.test_plan_api.get_completed_testplans())
-        self.info("navigate to the test-plan No. {} edit page".format(random_completed_test_plan['number']))
-        self.test_plan.get_test_plan_edit_page_by_id(random_completed_test_plan['id'])
-        self.info("navigate to the testunits selection tab")
-        self.test_plan.navigate_to_testunits_selection_page()
-        old_testunits = self.test_plan.get_all_testunits_in_testplan()
-        deleted_test_unit = (old_testunits[0])[0]
-        self.info("delete the first testunit with name {}".format(deleted_test_unit))
-        self.test_plan.delete_the_first_testunit_from_the_tableview()
-        self.info("save the changes and refresh to make sure test unit deleted")
-        self.test_plan.save_and_confirm_popup()
-        self.test_plan.navigate_to_testunits_selection_page()
-        all_testunits = self.test_plan.get_all_testunits_in_testplan()
-        self.info('Checking if the changes were saved successfully')
-        deleted_test_unit_found = self.test_plan.check_if_deleted_testunit_is_available(
-            all_testunits=all_testunits, deleted_test_unit=deleted_test_unit)
-        self.assertFalse(deleted_test_unit_found)
-
-    @parameterized.expand(['InProgress', 'Completed'])
-    def test002_test_plan_edit_status(self, status):
-        """
-        Creation Approach: when the status converted from completed to completed, new version created
-        when the status converted from In-Progress to completed, no new version created
-
-        LIMS-3502
-        LIMS-3501
-        """
-        testplan = random.choice(self.test_plan_api.get_testplans_with_status(status=status))
-        self.info('Navigate to edit page of test plan: {} with version: {}'.
-                  format(testplan['testPlanName'], testplan['version']))
-        self.test_plan.get_test_plan_edit_page_by_id(testplan['id'])
-        self.info('Going to step 2 to add test unit to this test plan')
-        self.info("select test unit of same material type of test plan and has values to complete test plan")
-        test_unit = TestUnitAPI().get_test_unit_name_with_value_with_material_type(
-            material_type=testplan['materialType'])
-        self.test_plan.sleep_tiny()
-        self.test_plan.set_test_unit(test_unit=test_unit['name'])
-        if status == 'InProgress':
-            self.info('Saving and completing the test plan')
-            self.test_plan.save(save_btn='test_plan:save_and_complete', sleep=True)
-        else:
-            self.info('Saving and confirm pop up')
-            self.test_plan.save_and_confirm_popup()
-
-        self.info("go back to the active table and get test plan to check its version and status")
-        self.test_plan.get_test_plans_page()
-        new_test_plan_version, test_plan_row_data_status = \
-            self.test_plan.get_testplan_version_and_status(search_text=testplan['testPlanName'])
-
-        if status == 'InProgress':
-            self.assertEqual(int(new_test_plan_version), testplan['version'])
-        else:
-            self.assertGreater(int(new_test_plan_version), int(testplan['version']))
-
-        self.assertEqual(test_plan_row_data_status, 'Completed')
+    # def test001_test_plan_delete_testunit(self):
+    #     """
+    #     Testing deleting a test unit from test-plan create or update step two
+    #     It deletes the first test unit in the chosen test plan and saves this,
+    #     then refreshes the page and checks if the deletion was done correctly.
+    #
+    #     LIMS-3504
+    #     """
+    #     self.info("get random completed test plan")
+    #     random_completed_test_plan = random.choice(self.test_plan_api.get_completed_testplans())
+    #     self.info("navigate to the test-plan No. {} edit page".format(random_completed_test_plan['number']))
+    #     self.test_plan.get_test_plan_edit_page_by_id(random_completed_test_plan['id'])
+    #     self.info("navigate to the testunits selection tab")
+    #     self.test_plan.navigate_to_testunits_selection_page()
+    #     old_testunits = self.test_plan.get_all_testunits_in_testplan()
+    #     deleted_test_unit = (old_testunits[0])[0]
+    #     self.info("delete the first testunit with name {}".format(deleted_test_unit))
+    #     self.test_plan.delete_the_first_testunit_from_the_tableview()
+    #     self.info("save the changes and refresh to make sure test unit deleted")
+    #     self.test_plan.save_and_confirm_popup()
+    #     self.test_plan.navigate_to_testunits_selection_page()
+    #     all_testunits = self.test_plan.get_all_testunits_in_testplan()
+    #     self.info('Checking if the changes were saved successfully')
+    #     deleted_test_unit_found = self.test_plan.check_if_deleted_testunit_is_available(
+    #         all_testunits=all_testunits, deleted_test_unit=deleted_test_unit)
+    #     self.assertFalse(deleted_test_unit_found)
+    #
+    # @parameterized.expand(['InProgress', 'Completed'])
+    # def test002_test_plan_edit_status(self, status):
+    #     """
+    #     Creation Approach: when the status converted from completed to completed, new version created
+    #     when the status converted from In-Progress to completed, no new version created
+    #
+    #     LIMS-3502
+    #     LIMS-3501
+    #     """
+    #     testplan = random.choice(self.test_plan_api.get_testplans_with_status(status=status))
+    #     self.info('Navigate to edit page of test plan: {} with version: {}'.
+    #               format(testplan['testPlanName'], testplan['version']))
+    #     self.test_plan.get_test_plan_edit_page_by_id(testplan['id'])
+    #     self.info('Going to step 2 to add test unit to this test plan')
+    #     self.info("select test unit of same material type of test plan and has values to complete test plan")
+    #     test_unit = TestUnitAPI().get_test_unit_name_with_value_with_material_type(
+    #         material_type=testplan['materialType'])
+    #     self.test_plan.sleep_tiny()
+    #     self.test_plan.set_test_unit(test_unit=test_unit['name'])
+    #     if status == 'InProgress':
+    #         self.info('Saving and completing the test plan')
+    #         self.test_plan.save(save_btn='test_plan:save_and_complete', sleep=True)
+    #     else:
+    #         self.info('Saving and confirm pop up')
+    #         self.test_plan.save_and_confirm_popup()
+    #
+    #     self.info("go back to the active table and get test plan to check its version and status")
+    #     self.test_plan.get_test_plans_page()
+    #     new_test_plan_version, test_plan_row_data_status = \
+    #         self.test_plan.get_testplan_version_and_status(search_text=testplan['testPlanName'])
+    #
+    #     if status == 'InProgress':
+    #         self.assertEqual(int(new_test_plan_version), testplan['version'])
+    #     else:
+    #         self.assertGreater(int(new_test_plan_version), int(testplan['version']))
+    #
+    #     self.assertEqual(test_plan_row_data_status, 'Completed')
 
     def test003_archive_test_plan_one_record(self):
         """
@@ -118,7 +118,7 @@ class TestPlansTestCases(BaseTest):
         self.info("Navigate to archived test plan table")
         self.test_plan.get_archived_items()
         self.info('Choosing a random testplan table row')
-        self.test_plan.sleep_tiny()
+        self.test_plan.sleep_small()
         row = self.test_plan.get_random_table_row('test_plans:test_plans_table')
         row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=row)
         self.assertTrue(row_data, row_data)
@@ -235,63 +235,63 @@ class TestPlansTestCases(BaseTest):
                 if item != '' and item != '-':
                     self.assertIn(item, fixed_sheet_row_data)
 
-    def test009_test_plan_duplicate(self):
-        """
-        Duplicate a test plan
-
-        LIMS-3679
-        """
-        self.info('Choosing a random testplan table row')
-        testPlan = random.choice(self.test_plan_api.get_completed_testplans())
-        testunits = self.test_plan_api.get_testunits_in_testplan(id=testPlan['id'])
-        self.info("select test plan {}".format(testPlan['testPlanName']))
-        row = self.test_plan.search(testPlan['testPlanName'])
-        self.test_plan.click_check_box(source=row[0])
-        self.info('Duplicating testplan number: {}'.format(testPlan['number']))
-        self.test_plan.duplicate_selected_item()
-        duplicated_test_plan_number = self.test_plan.duplicate_testplan(change=['name'])
-        self.info('testplan duplicated with number: {}'.format(duplicated_test_plan_number))
-        self.info('get duplicated test plan data and child table data')
-        duplicated_testplan_data, duplicated_testplan_childtable_data = \
-            self.test_plan.get_specific_testplan_data_and_childtable_data(
-                filter_by='number', filter_text=duplicated_test_plan_number)
-        duplicated_test_units = []
-        for testunit in duplicated_testplan_childtable_data:
-            duplicated_test_units.append(testunit['Test Unit Name'])
-
-        self.info('Asserting that the data is duplicated correctly')
-        self.assertEqual(testPlan['materialType'], duplicated_testplan_data['Material Type'])
-        self.assertEqual(testPlan['article'][0], duplicated_testplan_data['Article Name'])
-        self.assertEqual(testPlan['articleNo'][0], duplicated_testplan_data['Article No.'])
-        for testunit in testunits:
-            self.assertIn(testunit['name'], duplicated_test_units)
-
-    def test010_test_plan_completed_to_inprogress(self):
-        """
-        When the testplan status is converted from completed to in progress a new version is created
-
-        LIMS-3503
-        """
-        self.info('get random completed test plan')
-        completed_testplan = random.choice(self.test_plan_api.get_completed_testplans())
-        self.assertTrue(completed_testplan)
-        self.info('Navigating to edit page of testplan: {} with version: {}'.
-                  format(completed_testplan['testPlanName'], completed_testplan['version']))
-        self.test_plan.get_test_plan_edit_page_by_id(completed_testplan['id'])
-        self.info('Going to step 2 to remove all the test units from it')
-        self.test_plan.navigate_to_testunits_selection_page()
-        self.test_plan.delete_all_testunits()
-        self.test_plan.save_and_confirm_popup()
-
-        self.info("go back to active table")
-        self.test_plan.get_test_plans_page()
-
-        self.info('Getting the currently changed testplan to check its status and version')
-        inprogress_testplan_version, testplan_row_data_status = \
-            self.test_plan.get_testplan_version_and_status(search_text=completed_testplan['testPlanName'])
-
-        self.assertEqual(completed_testplan['version'] + 1, int(inprogress_testplan_version))
-        self.assertEqual(testplan_row_data_status, 'In Progress')
+    # def test009_test_plan_duplicate(self):
+    #     """
+    #     Duplicate a test plan
+    #
+    #     LIMS-3679
+    #     """
+    #     self.info('Choosing a random testplan table row')
+    #     testPlan = random.choice(self.test_plan_api.get_completed_testplans())
+    #     testunits = self.test_plan_api.get_testunits_in_testplan(id=testPlan['id'])
+    #     self.info("select test plan {}".format(testPlan['testPlanName']))
+    #     row = self.test_plan.search(testPlan['testPlanName'])
+    #     self.test_plan.click_check_box(source=row[0])
+    #     self.info('Duplicating testplan number: {}'.format(testPlan['number']))
+    #     self.test_plan.duplicate_selected_item()
+    #     duplicated_test_plan_number = self.test_plan.duplicate_testplan(change=['name'])
+    #     self.info('testplan duplicated with number: {}'.format(duplicated_test_plan_number))
+    #     self.info('get duplicated test plan data and child table data')
+    #     duplicated_testplan_data, duplicated_testplan_childtable_data = \
+    #         self.test_plan.get_specific_testplan_data_and_childtable_data(
+    #             filter_by='number', filter_text=duplicated_test_plan_number)
+    #     duplicated_test_units = []
+    #     for testunit in duplicated_testplan_childtable_data:
+    #         duplicated_test_units.append(testunit['Test Unit Name'])
+    #
+    #     self.info('Asserting that the data is duplicated correctly')
+    #     self.assertEqual(testPlan['materialType'], duplicated_testplan_data['Material Type'])
+    #     self.assertEqual(testPlan['article'][0], duplicated_testplan_data['Article Name'])
+    #     self.assertEqual(testPlan['articleNo'][0], duplicated_testplan_data['Article No.'])
+    #     for testunit in testunits:
+    #         self.assertIn(testunit['name'], duplicated_test_units)
+    #
+    # def test010_test_plan_completed_to_inprogress(self):
+    #     """
+    #     When the testplan status is converted from completed to in progress a new version is created
+    #
+    #     LIMS-3503
+    #     """
+    #     self.info('get random completed test plan')
+    #     completed_testplan = random.choice(self.test_plan_api.get_completed_testplans())
+    #     self.assertTrue(completed_testplan)
+    #     self.info('Navigating to edit page of testplan: {} with version: {}'.
+    #               format(completed_testplan['testPlanName'], completed_testplan['version']))
+    #     self.test_plan.get_test_plan_edit_page_by_id(completed_testplan['id'])
+    #     self.info('Going to step 2 to remove all the test units from it')
+    #     self.test_plan.navigate_to_testunits_selection_page()
+    #     self.test_plan.delete_all_testunits()
+    #     self.test_plan.save_and_confirm_popup()
+    #
+    #     self.info("go back to active table")
+    #     self.test_plan.get_test_plans_page()
+    #
+    #     self.info('Getting the currently changed testplan to check its status and version')
+    #     inprogress_testplan_version, testplan_row_data_status = \
+    #         self.test_plan.get_testplan_version_and_status(search_text=completed_testplan['testPlanName'])
+    #
+    #     self.assertEqual(completed_testplan['version'] + 1, int(inprogress_testplan_version))
+    #     self.assertEqual(testplan_row_data_status, 'In Progress')
 
     # @parameterized.expand(['same', 'all'])
     # def test011_create_testplans_same_name_article_materialtype(self, same):
