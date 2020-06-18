@@ -100,10 +100,11 @@ class TestPlansTestCases(BaseTest):
         self.test_plan.sleep_tiny()
         selected_test_plan = self.test_plan.select_random_table_row(element='test_plans:test_plans_table')
         self.assertTrue(selected_test_plan, selected_test_plan)
+        testplan_number = selected_test_plan['Test Plan No.']
         self.info('Archive the selected item and navigating to the archived items table')
         self.test_plan.archive_selected_items()
         self.test_plan.get_archived_items()
-        archived_row = self.test_plan.search(selected_test_plan['Test Plan No.'])
+        archived_row = self.test_plan.search(testplan_number)
         self.info('Checking if test plan number: {} is archived correctly'.format(selected_test_plan['Test Plan No.']))
         self.assertIn(selected_test_plan['Test Plan Name'], archived_row[0].text)
         self.info('Test plan number: {} is archived correctly'.format(selected_test_plan['Test Plan No.']))
@@ -143,10 +144,7 @@ class TestPlansTestCases(BaseTest):
         self.test_plan.sleep_tiny()
         rows, _ = self.test_plan.select_random_multiple_table_rows(element='test_plans:test_plans_table')
         self.assertTrue(rows, rows)
-        testplans_numbers = []
-        for row in rows[0]:
-            testplans_numbers.append(row['Test Plan No.'])
-
+        testplans_numbers = [row['Test Plan No.'] for row in rows[0]]
         self.info('Testplan numbers: {} will be archived'.format(testplans_numbers))
         self.info('Archiving the selected items and navigating to the archived items table')
         self.test_plan.archive_selected_items()
@@ -170,9 +168,7 @@ class TestPlansTestCases(BaseTest):
         self.test_plan.sleep_tiny()
         rows, _ = self.test_plan.select_random_multiple_table_rows(element='test_plans:test_plans_table')
         self.assertTrue(rows, rows)
-        testplans_numbers = []
-        for row in rows[0]:
-            testplans_numbers.append(row['Test Plan No.'])
+        testplans_numbers = [row['Test Plan No.'] for row in rows[0]]
         self.info('Restore Testplans with numbers: {}'.format(testplans_numbers))
         self.test_plan.restore_selected_items()
         self.test_plan.sleep_small()
