@@ -137,7 +137,8 @@ class TestPlansTestCases(BaseTest):
         LIMS-3506 Case 2
         """
         self.info('Choosing random multiple test plans table rows')
-        rows = self.test_plan.select_random_multiple_table_rows(element='test_plans:test_plans_table')
+        rows, _ = self.test_plan.select_random_multiple_table_rows(element='test_plans:test_plans_table')
+        self.assertTrue(rows)
         testplans_numbers = []
         for row in rows[0]:
             testplans_numbers.append(row['Test Plan No.'])
@@ -162,7 +163,8 @@ class TestPlansTestCases(BaseTest):
         self.info("Navigate to archived test plan table")
         self.test_plan.get_archived_items()
         self.info('Choosing random multiple testplans table rows')
-        rows = self.test_plan.select_random_multiple_table_rows(element='test_plans:test_plans_table')
+        rows, _ = self.test_plan.select_random_multiple_table_rows(element='test_plans:test_plans_table')
+        self.assertTrue(rows)
         testplans_numbers = []
         for row in rows[0]:
             testplans_numbers.append(row['Test Plan No.'])
