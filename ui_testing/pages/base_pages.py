@@ -140,8 +140,8 @@ class BasePages:
             row_text = row.text
             if not row_text:
                 continue
-            self.click_check_box(source=row)
             self.sleep_tiny()
+            self.click_check_box(source=row)
             return self.base_selenium.get_row_cells_dict_related_to_header(row)
 
     def click_check_box(self, source):

@@ -97,6 +97,7 @@ class TestPlansTestCases(BaseTest):
         LIMS-3506 Case 1
         """
         self.info('Choosing a random test plan table row')
+        self.test_plan.sleep_tiny()
         selected_test_plan = self.test_plan.select_random_table_row(element='test_plans:test_plans_table')
         self.assertTrue(selected_test_plan, selected_test_plan)
         self.info('Archive the selected item and navigating to the archived items table')
@@ -114,10 +115,12 @@ class TestPlansTestCases(BaseTest):
          LIMS-3506 Case 1
         """
         self.info("Navigate to archived test plan table")
+        self.test_plan.sleep_tiny()
         self.test_plan.get_archived_items()
         self.info('Choosing a random testplan table row')
         row = self.test_plan.get_random_table_row('test_plans:test_plans_table')
         row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=row)
+        self.assertTrue(row_data, row_data)
         testplan_number = row_data['Test Plan No.']
         self.info('select Testplan number: {} to be restored'.format(testplan_number))
         self.test_plan.click_check_box(source=row)
@@ -137,6 +140,7 @@ class TestPlansTestCases(BaseTest):
         LIMS-3506 Case 2
         """
         self.info('Choosing random multiple test plans table rows')
+        self.test_plan.sleep_tiny()
         rows, _ = self.test_plan.select_random_multiple_table_rows(element='test_plans:test_plans_table')
         self.assertTrue(rows, rows)
         testplans_numbers = []
@@ -161,6 +165,7 @@ class TestPlansTestCases(BaseTest):
         LIMS-3506 Case 2
         """
         self.info("Navigate to archived test plan table")
+        self.test_plan.sleep_tiny()
         self.test_plan.get_archived_items()
         self.info('Choosing random multiple testplans table rows')
         rows, _ = self.test_plan.select_random_multiple_table_rows(element='test_plans:test_plans_table')
