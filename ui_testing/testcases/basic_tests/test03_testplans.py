@@ -3,6 +3,7 @@ from ui_testing.pages.articles_page import Articles
 from ui_testing.pages.testplan_page import TstPlan
 from ui_testing.pages.testunit_page import TstUnit
 from ui_testing.pages.base_pages import BasePages
+from ui_testing.pages.login_page import Login
 from ui_testing.pages.order_page import Order
 from api_testing.apis.test_plan_api import TestPlanAPI
 from ui_testing.pages.header_page import Header
@@ -18,15 +19,9 @@ class TestPlansTestCases(BaseTest):
     def setUp(self):
         super().setUp()
         self.test_plan = TstPlan()
-        self.articles_page = Articles()
-        self.test_unit_page = TstUnit()
-        self.order_page = Order()
         self.base_page = BasePages()
         self.test_plan_api = TestPlanAPI()
-        self.users_api = UsersAPI()
-        self.test_unit_api = TestUnitAPI()
         self.article_api = ArticleAPI()
-
         self.set_authorization(auth=self.article_api.AUTHORIZATION_RESPONSE)
         self.test_plan.get_test_plans_page()
 
@@ -137,29 +132,29 @@ class TestPlansTestCases(BaseTest):
 
         self.test_plan.get_archived_items()
 
-        self.base_selenium.LOGGER.info('Choosing a random testplan table row')
+        self.info('Choosing a random testplan table row')
         row = self.test_plan.get_random_table_row('test_plans:test_plans_table')
         row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=row)
         testplan_number = row_data['Test Plan No.']
         self.test_plan.sleep_small()
 
         # restore and navigate to active table
-        self.base_selenium.LOGGER.info('Testplan number: {} will be restored'.format(testplan_number))
+        self.info('Testplan number: {} will be restored'.format(testplan_number))
 
-        self.base_selenium.LOGGER.info('Selecting the row')
+        self.info('Selecting the row')
         self.test_plan.click_check_box(source=row)
         self.test_plan.sleep_small()
 
-        self.base_selenium.LOGGER.info('Restoring the selected item and navigating to the active items table')
+        self.info('Restoring the selected item and navigating to the active items table')
         self.test_plan.restore_selected_items()
         self.test_plan.get_active_items()
 
         self.test_plan.open_filter_menu()
         self.test_plan.filter_by_testplan_number(testplan_number)
         restored_row = self.test_plan.result_table()
-        self.base_selenium.LOGGER.info('Checking if testplan number: {} is restored correctly'.format(testplan_number))
+        self.info('Checking if testplan number: {} is restored correctly'.format(testplan_number))
         self.assertIn(row_data['Test Plan Name'], restored_row[0].text)
-        self.base_selenium.LOGGER.info('Testplan number: {} is restored correctly'.format(testplan_number))
+        self.info('Testplan number: {} is restored correctly'.format(testplan_number))
 
     def test005_archive_test_plan_multiple_records(self):
         '''
@@ -167,7 +162,7 @@ class TestPlansTestCases(BaseTest):
         Archive and restore multiple records
         '''
 
-        self.base_selenium.LOGGER.info('Choosing random multiple testplans table rows')
+        self.info('Choosing random multiple testplans table rows')
         rows = self.test_plan.select_random_multiple_table_rows(element='test_plans:test_plans_table')
         testplan_rows = rows[0]
         testplans_numbers = []
@@ -176,11 +171,11 @@ class TestPlansTestCases(BaseTest):
         self.test_plan.sleep_small()
 
         # archive and navigate to archived table
-        self.base_selenium.LOGGER.info('Testplan numbers: {} will be archived'.format(testplans_numbers))
-        self.base_selenium.LOGGER.info('Archiving the selected items and navigating to the archived items table')
+        self.info('Testplan numbers: {} will be archived'.format(testplans_numbers))
+        self.info('Archiving the selected items and navigating to the archived items table')
         self.test_plan.archive_selected_items()
 
-        self.base_selenium.LOGGER.info(
+        self.info(
             'Checking if testplan numbers: {} are archived correctly'.format(testplans_numbers))
 
         self.test_plan.get_archived_items()
@@ -191,7 +186,7 @@ class TestPlansTestCases(BaseTest):
 
         self.test_plan.sleep_small()
 
-        self.base_selenium.LOGGER.info('Testplan numbers: {} are archived correctly'.format(testplans_numbers))
+        self.info('Testplan numbers: {} are archived correctly'.format(testplans_numbers))
 
     def test006_restore_test_plan_multiple_records(self):
         '''
@@ -200,7 +195,7 @@ class TestPlansTestCases(BaseTest):
         '''
         self.test_plan.get_archived_items()
 
-        self.base_selenium.LOGGER.info('Choosing random multiple testplans table rows')
+        self.info('Choosing random multiple testplans table rows')
         rows = self.test_plan.select_random_multiple_table_rows(element='test_plans:test_plans_table')
         testplan_rows = rows[0]
         testplans_numbers = []
@@ -209,9 +204,9 @@ class TestPlansTestCases(BaseTest):
         self.test_plan.sleep_small()
 
         # archive and navigate to archived table
-        self.base_selenium.LOGGER.info('Testplan numbers: {} will be restored'.format(testplans_numbers))
+        self.info('Testplan numbers: {} will be restored'.format(testplans_numbers))
         self.test_plan.restore_selected_items()
-        self.base_selenium.LOGGER.info(
+        self.info(
             'Checking if testplan numbers: {} are restored correctly'.format(testplans_numbers))
         self.test_plan.get_active_items()
 
@@ -219,7 +214,7 @@ class TestPlansTestCases(BaseTest):
 
         self.assertIsNotNone(restored_rows)
         self.assertEqual(len(restored_rows), len(testplans_numbers))
-        self.base_selenium.LOGGER.info('Testplan numbers: {} are restored correctly'.format(testplans_numbers))
+        self.info('Testplan numbers: {} are restored correctly'.format(testplans_numbers))
 
     @skip('https://modeso.atlassian.net/browse/LIMS-6403')
     def test007_exporting_test_plan_one_record(self):
@@ -227,22 +222,22 @@ class TestPlansTestCases(BaseTest):
         LIMS-3508 Case 1
         Exporting one record
         '''
-        self.base_selenium.LOGGER.info('Choosing a random testplan table row')
+        self.info('Choosing a random testplan table row')
         row = self.test_plan.get_random_table_row('test_plans:test_plans_table')
         row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=row)
         testplan_number = row_data['Test Plan No.']
         self.test_plan.sleep_small()
 
-        self.base_selenium.LOGGER.info('Testplan number: {} will be exported'.format(testplan_number))
+        self.info('Testplan number: {} will be exported'.format(testplan_number))
 
-        self.base_selenium.LOGGER.info('Selecting the row')
+        self.info('Selecting the row')
         self.test_plan.click_check_box(source=row)
         self.test_plan.sleep_small()
 
         self.test_plan.download_xslx_sheet()
 
         row_data_list = list(row_data.values())
-        self.base_selenium.LOGGER.info('Comparing the testplan no. {} '.format(testplan_number))
+        self.info('Comparing the testplan no. {} '.format(testplan_number))
         values = self.test_plan.sheet.iloc[0].values
         fixed_sheet_row_data = self.fix_data_format(values)
         for item in row_data_list:
@@ -255,7 +250,7 @@ class TestPlansTestCases(BaseTest):
         LIMS-3508 Case 2
         Exporting multiple records
         '''
-        self.base_selenium.LOGGER.info('Choosing random multiple testplans table rows')
+        self.info('Choosing random multiple testplans table rows')
         rows = self.test_plan.select_random_multiple_table_rows(element='test_plans:test_plans_table')
         testplan_rows = rows[0]
         testplans_numbers = []
@@ -263,7 +258,7 @@ class TestPlansTestCases(BaseTest):
             testplans_numbers.append(row['Test Plan No.'])
         self.test_plan.sleep_small()
 
-        self.base_selenium.LOGGER.info('Testplans numbers: {} will be exported'.format(testplans_numbers))
+        self.info('Testplans numbers: {} will be exported'.format(testplans_numbers))
 
         self.test_plan.download_xslx_sheet()
 
@@ -271,7 +266,7 @@ class TestPlansTestCases(BaseTest):
         for row_data in testplan_rows:
             row_data_list.append(list(row_data.values()))
 
-        self.base_selenium.LOGGER.info('Comparing the testplan no. {} '.format(testplans_numbers))
+        self.info('Comparing the testplan no. {} '.format(testplans_numbers))
         row_data_list = sorted(row_data_list, key=lambda x: x[1], reverse=True)
 
         for index in range(len(row_data_list)):
@@ -290,9 +285,9 @@ class TestPlansTestCases(BaseTest):
         LIMS-3679
         """
         # get the maximum number given to the latest testplan
-        #latest_testplan_number = self.test_plan.get_the_latest_row_data()['Test Plan No.'].replace("'", "")
-        #duplicated_test_plan_number = int(latest_testplan_number) + 1
-        #self.info('The duplicated testplan should have the number: {}'.format(duplicated_test_plan_number))
+        # latest_testplan_number = self.test_plan.get_the_latest_row_data()['Test Plan No.'].replace("'", "")
+        # duplicated_test_plan_number = int(latest_testplan_number) + 1
+        # self.info('The duplicated testplan should have the number: {}'.format(duplicated_test_plan_number))
 
         self.info('Choosing a random testplan table row')
         testPlan = random.choice(self.test_plan_api.get_completed_testplans())
@@ -326,21 +321,21 @@ class TestPlansTestCases(BaseTest):
         LIMS-3503
         When the testplan status is converted from completed to in progress a new version is created
         '''
-        self.base_selenium.LOGGER.info('Searching for test plans with Completed status')
+        self.info('Searching for test plans with Completed status')
         completed_testplans = self.test_plan_api.get_completed_testplans(limit=500)
 
         if completed_testplans is not None:
-            self.base_selenium.LOGGER.info('Getting the first testplan')
+            self.info('Getting the first testplan')
             completed_testplan = completed_testplans[0]
             old_completed_testplan_name = completed_testplan['testPlanName']
             old_completed_testplan_version = completed_testplan['version']
-            self.base_selenium.LOGGER.info(
+            self.info(
                 'Navigating to edit page of testplan: {} with version: {}'.format(old_completed_testplan_name,
                                                                                   old_completed_testplan_version))
             self.test_plan.get_test_plan_edit_page(name=old_completed_testplan_name)
 
             # go to step 2 and remove all the testunits
-            self.base_selenium.LOGGER.info('Going to step 2 to remove all the testunits from it')
+            self.info('Going to step 2 to remove all the testunits from it')
             self.test_plan.navigate_to_testunits_selection_page()
             self.test_plan.delete_all_testunits()
             self.test_plan.save_and_confirm_popup()
@@ -349,7 +344,7 @@ class TestPlansTestCases(BaseTest):
             self.test_plan.get_test_plans_page()
 
             # get the testplan to check its version
-            self.base_selenium.LOGGER.info('Getting the currently changed testplan to check its status and version')
+            self.info('Getting the currently changed testplan to check its status and version')
             inprogress_testplan_version, testplan_row_data_status = self.test_plan.get_testplan_version_and_status(
                 search_text=old_completed_testplan_name)
 
@@ -402,17 +397,17 @@ class TestPlansTestCases(BaseTest):
 
         testplan_name = self.test_plan.create_new_test_plan(material_type=first_testplan['materialType'],
                                                             article=(first_testplan['article'])[0])
-        self.base_selenium.LOGGER.info(
+        self.info(
             'New testplan is created successfully with name: {}, article name: {} and material type: {}'.format(
                 testplan_name, (first_testplan['article'])[0], first_testplan['materialType']))
 
-        self.base_selenium.LOGGER.info(
+        self.info(
             'Attempting to create another testplan with the same name as the previously created one, but with different material type and article name')
 
         # create another testplan with the same name, but with the second article's data
         self.test_plan.create_new_test_plan(name=testplan_name, material_type=second_testplan['materialType'],
                                             article=(second_testplan['article'])[0])
-        self.base_selenium.LOGGER.info(
+        self.info(
             'New testplan is created successfully with name: {}, article name: {} and material type: {}'.format(
                 testplan_name, (second_testplan['article'])[0], second_testplan['materialType']))
 
@@ -432,11 +427,11 @@ class TestPlansTestCases(BaseTest):
 
         testplan_name = self.test_plan.create_new_test_plan(material_type=testplan['materialType'],
                                                             article=(testplan['article'])[0])
-        self.base_selenium.LOGGER.info(
+        self.info(
             'New testplan is created successfully with name: {}, article name: {} and material type: {}'.format(
                 testplan_name, (testplan['article'])[0], testplan['materialType']))
 
-        self.base_selenium.LOGGER.info(
+        self.info(
             'Attempting to create another testplan with the same name & material type as the previously created one,'
             ' and all articles')
 
@@ -444,11 +439,11 @@ class TestPlansTestCases(BaseTest):
         self.test_plan.create_new_test_plan(name=testplan_name, material_type=testplan['materialType'],
                                             article='All')
 
-        self.base_selenium.LOGGER.info(
+        self.info(
             'Waiting for the error message to make sure that validation forbids the creation of two testplans having the same name, material type and article')
         validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
 
-        self.base_selenium.LOGGER.info(
+        self.info(
             'Assert the error message to make sure that validation forbids the creation of two testplans having the same name, material type one of any article and the other for all articles? {}'.format(
                 validation_result))
         self.assertTrue(validation_result)
@@ -465,13 +460,14 @@ class TestPlansTestCases(BaseTest):
         testplan_materialtype = test_plan_dict['Material Type']
 
         # create a new order with this testplan
+        self.order_page = Order()
         self.order_page.get_orders_page()
         self.order_page.create_new_order(material_type=testplan_materialtype, article=testplan_article,
                                          test_plans=[testplan_name])
 
         # delete testplan
         self.test_plan.get_test_plans_page()
-        self.base_selenium.LOGGER.info('Testplan number: {} will be archived'.format(testplan_name))
+        self.info('Testplan number: {} will be archived'.format(testplan_name))
         testplan_deleted = self.test_plan.delete_selected_item_from_active_table_and_from_archived_table(
             item_name=testplan_name)
 
@@ -498,10 +494,12 @@ class TestPlansTestCases(BaseTest):
         testplan_article = (testplan_data['article'])[0]
 
         # archive this testplan
-        self.base_selenium.LOGGER.info('Archiving test plan: {}'.format(testplan_name))
+        self.info('Archiving test plan: {}'.format(testplan_name))
         self.test_plan.archive_selected_items()
 
         # go to order's section
+        self.order_page = Order()
+
         self.order_page.get_orders_page()
 
         # create a new order with material type and article same as the saved ones
@@ -519,6 +517,8 @@ class TestPlansTestCases(BaseTest):
         Create a testunit with sub/super scripts, use this testunit to create a testplan
         and check the sub/super scripts in the card view
         '''
+        self.test_unit_page = TstUnit()
+
         testunit_name = self.generate_random_string()
         self.test_unit_page.get_test_units_page()
 
@@ -561,7 +561,7 @@ class TestPlansTestCases(BaseTest):
         self.test_plan.filter_by_testplan_number(random_testplan['number'])
         testplan_found = self.test_plan.result_table()
         self.assertIn(str(random_testplan['number']), (testplan_found[0].text).replace("'", ""))
-        self.base_selenium.LOGGER.info('Filtering by number was done successfully')
+        self.info('Filtering by number was done successfully')
 
     def test018_filter_by_testplan_name(self):
         '''
@@ -575,7 +575,7 @@ class TestPlansTestCases(BaseTest):
         testplans_found = self.test_plan.filter_by_element_and_get_results('Testplan Name',
                                                                            'test_plans:testplan_name_filter',
                                                                            random_testplan['testPlanName'], 'drop_down')
-        self.base_selenium.LOGGER.info('Checking if the results were filtered successfully')
+        self.info('Checking if the results were filtered successfully')
         results_found = True
         while results_found:
             for tp in testplans_found:
@@ -588,10 +588,10 @@ class TestPlansTestCases(BaseTest):
             else:
                 results_found = False
 
-        self.base_selenium.LOGGER.info('Filtering by name was done successfully')
+        self.info('Filtering by name was done successfully')
 
     @parameterized.expand(['Completed', 'In Progress'])
-    def test019_filter_by_testplan_status(self,status):
+    def test019_filter_by_testplan_status(self, status):
         '''
         LIMS-6474
         User can filter with status
@@ -634,12 +634,12 @@ class TestPlansTestCases(BaseTest):
         random_user_email = self.header_page.generate_random_email()
         random_user_password = self.generate_random_string()
         self.info('Calling the users api to create a new user with username: {}'.format(random_user_name))
-        self.users_api.create_new_user(username=random_user_name, email=random_user_email,
+        UsersAPI().create_new_user(username=random_user_name, email=random_user_email,
                                        password=random_user_password)
 
         self.header_page.click_on_header_button()
         self.base_selenium.click('header:logout')
-        self.login_page.login(username=random_user_name, password=random_user_password)
+        Login().login(username=random_user_name, password=random_user_password)
         self.base_selenium.wait_until_page_url_has(text='dashboard')
         self.test_plan.get_test_plans_page()
 
@@ -713,7 +713,7 @@ class TestPlansTestCases(BaseTest):
         self.assertEqual(testplan_name, search_data['Test Plan Name'])
         # Navigate to articles page
         self.info('navigate to articles page')
-        self.articles_page.get_articles_page()
+        Articles().get_articles_page()
         self.assertEqual(self.base_selenium.get_url(), '{}articles'.format(self.base_selenium.url))
 
     def test024_hide_all_table_configurations(self):
@@ -721,7 +721,7 @@ class TestPlansTestCases(BaseTest):
         Table configuration: Make sure that you can't hide all the fields from the table configuration
         LIMS-6288
         """
-        assert (self.test_unit_page.deselect_all_configurations(), False)
+        assert (TstUnit().deselect_all_configurations(), False)
 
     def test026_test_unit_update_version_in_testplan(self):
         """
@@ -730,7 +730,7 @@ class TestPlansTestCases(BaseTest):
         ,when  go to test plan to add the same test unit , I found category & iteration updated
         """
         # select random test unit to create the test plan with it
-        testunits, payload = self.test_unit_api.get_all_test_units(limited=20, filter='{"materialTypes":"all"}')
+        testunits, payload = TestUnitAPI().get_all_test_units(limited=20, filter='{"materialTypes":"all"}')
         testunit = random.choice(testunits['testUnits'])
         self.info('A random test unit is chosen, its name: {}, category: {} and number of iterations: {}'.format(
             testunit['name'], testunit['categoryName'], testunit['iterations']))
@@ -741,12 +741,13 @@ class TestPlansTestCases(BaseTest):
             payload1['testPlan']['text']))
 
         # go to testplan edit to get the number of iterations and testunit category
-        first_testplan_testunit_category, first_testplan_testunit_iteration =self.test_plan.get_testunit_category_iterations(
+        first_testplan_testunit_category, first_testplan_testunit_iteration = self.test_plan.get_testunit_category_iterations(
             payload1['testPlan']['text'], testunit['name'])
 
         # go to testunits active table and search for this testunit-
+        self.test_unit_page = TstUnit()
         self.test_unit_page.get_test_units_page()
-        self.base_selenium.LOGGER.info(
+        self.info(
             'Navigating to test unit {} edit page'.format(testunit['name']))
         self.test_unit_page.search(value=testunit['name'])
         self.test_unit_page.open_edit_page(row=self.test_unit_page.result_table()[0])
@@ -762,7 +763,7 @@ class TestPlansTestCases(BaseTest):
         # go back to test plans active table
         self.test_plan.get_test_plans_page()
 
-         #create new testplan with this testunit after creating the new version
+        # create new testplan with this testunit after creating the new version
         second_testplan_name, payload2 = self.test_plan_api.create_testplan()
         self.info('Second test plan create with name: {}'.format(
             payload2['testPlan']['text']))
@@ -772,17 +773,17 @@ class TestPlansTestCases(BaseTest):
         second_testplan_testunit_category, second_testplan_testunit_iteration = self.test_plan.get_testunit_category_iterations(
             payload2['testPlan']['text'], testunit['name'])
 
-        self.base_selenium.LOGGER.info(
+        self.info(
             'Asserting that the category of the testunit in the first testplan is not equal the category of the testunit in the second testplan')
         self.assertNotEqual(first_testplan_testunit_category,
-                        second_testplan_testunit_category)
-        self.base_selenium.LOGGER.info(
+                            second_testplan_testunit_category)
+        self.info(
             'Asserting that the iterations of the testunit in the first testplan is not equal the iterations of the testunit in the second testplan')
         self.assertNotEqual(first_testplan_testunit_iteration,
-                        second_testplan_testunit_iteration)
-        self.base_selenium.LOGGER.info(
+                            second_testplan_testunit_iteration)
+        self.info(
             'Asserting that the category of the testunit in the second testplan is the same as the updated category')
         self.assertEqual(second_testplan_testunit_category, new_category)
-        self.base_selenium.LOGGER.info(
+        self.info(
             'Asserting that the iterations of the testunit in the second testplan is the same as the updated iterations')
         self.assertEqual(second_testplan_testunit_iteration, new_iteration)
