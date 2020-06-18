@@ -117,6 +117,7 @@ class BasePages:
         count = 0
         self.info(' No. of selected rows {} '.format(no_of_rows))
         while count < no_of_rows:
+            self.base_selenium.scroll()
             row = rows[randint(0, len(rows) - 2)]
             row_text = row.text
             if not row_text:

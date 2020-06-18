@@ -97,8 +97,8 @@ class TestPlansTestCases(BaseTest):
         LIMS-3506 Case 1
         """
         self.info('Choosing a random test plan table row')
-        selected_test_plan = self.test_plan.select_random_table_row(element='test_plans:test_plans_table')
-        self.assertTrue(selected_test_plan, selected_test_plan)
+        selected_test_plan = self.test_plan.select_random_table_row()
+        self.assertTrue(selected_test_plan)
         testplan_number = selected_test_plan['Test Plan No.']
         self.info('Archive the selected item and navigating to the archived items table')
         self.test_plan.archive_selected_items()
@@ -118,8 +118,8 @@ class TestPlansTestCases(BaseTest):
         self.test_plan.get_archived_items()
         self.info('Choosing a random testplan table row')
         self.test_plan.sleep_tiny()
-        selected_test_plan = self.test_plan.select_random_table_row(element='test_plans:test_plans_table')
-        self.assertTrue(selected_test_plan, selected_test_plan)
+        selected_test_plan = self.test_plan.select_random_table_row()
+        self.assertTrue(selected_test_plan)
         testplan_number = selected_test_plan['Test Plan No.']
         self.info('select Testplan number: {} to be restored'.format(testplan_number))
         self.info('Restoring the selected item then navigating to the active items table')
@@ -139,9 +139,9 @@ class TestPlansTestCases(BaseTest):
         """
         self.info('Choosing random multiple test plans table rows')
         self.test_plan.sleep_tiny()
-        rows, _ = self.test_plan.select_random_multiple_table_rows(element='test_plans:test_plans_table')
-        self.assertTrue(rows, rows)
-        testplans_numbers = [row['Test Plan No.'] for row in rows[0]]
+        rows_data, rows = self.test_plan.select_random_multiple_table_rows()
+        self.assertTrue(rows_data)
+        testplans_numbers = [row['Test Plan No.'] for row in rows_data]
         self.info('Testplan numbers: {} will be archived'.format(testplans_numbers))
         self.info('Archiving the selected items and navigating to the archived items table')
         self.test_plan.archive_selected_items()
@@ -163,9 +163,9 @@ class TestPlansTestCases(BaseTest):
         self.test_plan.get_archived_items()
         self.info('Choosing random multiple testplans table rows')
         self.test_plan.sleep_tiny()
-        rows, _ = self.test_plan.select_random_multiple_table_rows(element='test_plans:test_plans_table')
-        self.assertTrue(rows, rows)
-        testplans_numbers = [row['Test Plan No.'] for row in rows[0]]
+        rows_data, rows = self.test_plan.select_random_multiple_table_rows()
+        self.assertTrue(rows_data)
+        testplans_numbers = [row['Test Plan No.'] for row in rows_data]
         self.info('Restore Testplans with numbers: {}'.format(testplans_numbers))
         self.test_plan.restore_selected_items()
         self.test_plan.sleep_small()

@@ -264,8 +264,6 @@ elements = {
                         'order': -1},
     },
     'test_plans': {
-        'test_plans_table': {'method': 'id',
-                             'value': 'table'},
         'test_plans_edit_button': {'method': 'tag_name',
                                    'value': 'a',
                                    'order': 1},
