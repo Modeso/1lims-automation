@@ -150,8 +150,8 @@ class TstPlan(TestPlans):
 
     def navigate_to_testunits_selection_page(self):
         self.info('Navigating to testplan create/update step 2')
+        self.sleep_tiny()
         self.base_selenium.click(element='test_plan:testunits_selection')
-        self.sleep_small()
 
     def get_all_testunits_in_testplan(self):
         # returns all testunits in testplan 
@@ -170,7 +170,7 @@ class TstPlan(TestPlans):
     def delete_the_first_testunit_from_the_tableview(self):
         self.info('Deleting the first testunit from the testunits table')
         self.base_selenium.click(element='test_plan:row_delete_button')
-        self.sleep_medium()
+        self.sleep_tiny()
 
     def check_if_deleted_testunit_is_available(self, all_testunits, deleted_test_unit):
         deleted_test_unit_found = 0
@@ -190,6 +190,15 @@ class TstPlan(TestPlans):
         self.info('Accepting the changes made')
         self.base_selenium.click(element='test_plan:ok')
         self.sleep_small()
+
+    def save_confirm_popup_and_wait(self):
+        self.save(save_btn='test_plan:save_btn', sleep=True)
+        # press 'Ok' on the popup
+        self.info('Accepting the changes made')
+        self.base_selenium.click(element='test_plan:ok')
+        self.sleep_small()
+        self.base_selenium.refresh()
+        self.wait_until_page_is_loaded()
 
     def delete_all_testunits(self):
         testunits_still_available = 1
