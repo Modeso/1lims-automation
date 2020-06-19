@@ -96,6 +96,7 @@ class TestPlansTestCases(BaseTest):
 
         LIMS-3506 Case 1
         """
+        self.info(self.base_selenium.get_url())
         self.info('choosing a random test plan table row')
         selected_test_plan = self.test_plan.select_random_table_row()
         self.assertTrue(selected_test_plan)
