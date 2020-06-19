@@ -98,7 +98,10 @@ class TestPlansTestCases(BaseTest):
         """
         table = self.base_selenium.find_element('general:table')
         thead = table.find_elements_by_tag_name('thead')
+        self.info(len(thead))
         self.info(thead[0].text)
+        self.info('>>>>>>>')
+        self.info(self.base_selenium.driver.find_element_by_id('testPlanName').text)
 
 
         self.info('choosing a random test plan table row')
