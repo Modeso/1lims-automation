@@ -31,7 +31,8 @@ class BaseTest(TestCase):
             if error:
                 screen_shot = f"./screenshots/screenshot_{method._testMethodName}_.png"
                 self.info(f"saved error screen shot : {screen_shot}")
-                self.base_selenium.driver.get_screenshot_as_file(f"./screenshots/screenshot_{method._testMethodName}_.png")
+                self.base_selenium.driver.get_screenshot_as_file(
+                    f"./screenshots/screenshot_{method._testMethodName}_.png")
         except:
             pass
 

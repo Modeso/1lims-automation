@@ -96,10 +96,10 @@ class TestPlansTestCases(BaseTest):
 
         LIMS-3506 Case 1
         """
-        self.info('Choosing a random test plan table row')
-        self.test_plan.sleep_small()
+        self.info('choosing a random test plan table row')
         selected_test_plan = self.test_plan.select_random_table_row()
         self.assertTrue(selected_test_plan)
+        self.info(f'selected_test_plan : {selected_test_plan}')
         testplan_number = selected_test_plan['Test Plan No.']
         self.info('Archive the selected item and navigating to the archived items table')
         self.test_plan.archive_selected_items()
