@@ -282,6 +282,6 @@ class TestPlanAPI(TestPlanAPIFactory):
         test_plans_without_duplicate = [test_plan for test_plan in test_plans if test_plan['materialType']
                                         not in [material_type, '47d56b4399']]
         test_plan = random.choice(test_plans_without_duplicate)
-        test_unit = TestPlanAPI().get_testunits_in_testplan(test_plan['id'])[0]
+        test_unit = self.get_testunits_in_testplan(test_plan['id'])[0]
 
         return test_plan, test_unit

@@ -114,7 +114,7 @@ class TstPlan(TestPlans):
         category_label_test_unit = self.base_selenium.find_element('test_plan:category-label')
         return category_label_test_unit.get_attribute('textContent')
 
-    def create_new_test_plan(self, name='', material_type='', article='', test_unit='', **kwargs):
+    def create_new_test_plan(self, name='', material_type='', article='', test_unit='', save=True, **kwargs):
         self.info(' Create new test plan')
         self.test_plan_name = name or self.generate_random_text()
         self.material_type = material_type
@@ -139,9 +139,10 @@ class TstPlan(TestPlans):
             self.info('With {} test unit'.format(test_unit))
             self.set_test_unit(test_unit=test_unit, **kwargs)
             self.sleep_tiny()
-            self.save(save_btn='test_plan:save_and_complete')
+            if save:
+                self.save(save_btn='test_plan:save_and_complete')
         else:
-            self.save()
+            self.save(save_btn='test_plan:save_btn', sleep=True)
 
         self.info(' Test plan name : {}'.format(self.test_plan_name))
         return self.test_plan_name

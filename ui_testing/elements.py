@@ -327,7 +327,6 @@ elements = {
     'test_plan': {
         'no': {'method': 'id',
                'value': 'numberfield'},
-
         'test_plan': {'method': 'id',
                       'value': 'testPlan'},
         'material_type': {'method': 'id',
