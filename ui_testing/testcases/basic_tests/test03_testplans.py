@@ -96,8 +96,11 @@ class TestPlansTestCases(BaseTest):
 
         LIMS-3506 Case 1
         """
-        import time; time.sleep(20)
-        self.info(self.base_selenium.get_url())
+        table = self.base_selenium.find_element('general:table')
+        thead = table.find_elements_by_tag_name('thead')
+        self.info(thead.text)
+
+
         self.info('choosing a random test plan table row')
         selected_test_plan = self.test_plan.select_random_table_row()
         self.assertTrue(selected_test_plan)
