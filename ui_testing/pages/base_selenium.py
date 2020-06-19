@@ -659,6 +659,7 @@ class BaseSelenium:
         cells_dict = {}
         headers = self.get_table_head_elements(element=table_element)
         headers_text = [header.text for header in headers]
+        self.LOGGER.info(f'header text: {headers_text}')
         row_cells = self.get_row_cells(row=row)
         row_text = [cell.text for cell in row_cells]
         if len(row_text) > 1:
