@@ -2215,7 +2215,7 @@ class OrdersTestCases(BaseTest):
             self.info('Comparing the order no {} '.format(formatted_orders[index][0]))
             values = self.order_page.sheet.iloc[index].values
             fixed_sheet_row_data = self.reformat_data(values)
-            self.assertCountEqual(fixed_sheet_row_data, formatted_orders[index])
+            self.assertCountEqual(fixed_sheet_row_data, formatted_orders[index],
+                                  f"{str(fixed_sheet_row_data)} : {str(formatted_orders[index])}")
             for item in formatted_orders[index]:
                 self.assertIn(item, fixed_sheet_row_data)
-
