@@ -753,6 +753,11 @@ class TestPlansTestCases(BaseTest):
         Limits of quantification should be viewed in the testplan's child table
 
         LIMS-4179
+
+        New: Test plan: Limits of quantification Approach: In case I update the limits
+        of quantification this will trigger new version in the active table & version table
+
+        LIMS-4426
         """
         self.info("Create new quantitative testunit with quantification limits")
         self.test_unit_api = TestUnitAPI()
@@ -783,3 +788,6 @@ class TestPlansTestCases(BaseTest):
             test_plan['testPlanEntity']['name'])
         self.info('Asserting the limits of quantification viewed correctly')
         self.assertIn(testunit_display_new_quantification_limit, testplan_childtable_data[0].values())
+        test_plan_data = self.test_plan.get_the_latest_row_data()
+        self.info('Asserting that new version created')
+        self.assertEqual(test_plan_data['Version'], 2)
