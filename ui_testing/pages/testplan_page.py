@@ -1,7 +1,4 @@
-from selenium.webdriver.common.keys import Keys
-
 from ui_testing.pages.testplans_page import TestPlans
-from selenium.common.exceptions import NoSuchElementException
 
 
 class TstPlan(TestPlans):

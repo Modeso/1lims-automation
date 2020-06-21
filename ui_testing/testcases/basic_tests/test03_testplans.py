@@ -2,7 +2,6 @@ from ui_testing.testcases.base_test import BaseTest
 from ui_testing.pages.articles_page import Articles
 from ui_testing.pages.testplan_page import TstPlan
 from ui_testing.pages.testunit_page import TstUnit
-from ui_testing.pages.base_pages import BasePages
 from ui_testing.pages.login_page import Login
 from ui_testing.pages.order_page import Order
 from api_testing.apis.test_plan_api import TestPlanAPI
@@ -20,7 +19,6 @@ class TestPlansTestCases(BaseTest):
     def setUp(self):
         super().setUp()
         self.test_plan = TstPlan()
-        self.base_page = BasePages()
         self.test_plan_api = TestPlanAPI()
         self.article_api = ArticleAPI()
         self.set_authorization(auth=self.article_api.AUTHORIZATION_RESPONSE)
@@ -450,7 +448,7 @@ class TestPlansTestCases(BaseTest):
             for tp in testplans_found:
                 if len(tp.text) > 0:
                     self.assertIn(str(random_testplan['testPlanName']), tp.text)
-            if self.base_page.is_next_page_button_enabled():
+            if self.test_plan.is_next_page_button_enabled():
                 self.base_selenium.click('general:next_page')
                 self.test_plan.sleep_small()
                 testplans_found = self.test_plan.result_table()
@@ -484,7 +482,7 @@ class TestPlansTestCases(BaseTest):
                     else:
                         self.assertNotIn('In Progress', tp.text)
 
-            if self.base_page.is_next_page_button_enabled():
+            if self.test_plan.is_next_page_button_enabled():
                 self.info('Navigating to the next page')
                 self.base_selenium.click('general:next_page')
                 self.test_plan.sleep_tiny()
@@ -500,17 +498,12 @@ class TestPlansTestCases(BaseTest):
 
         LIMS-6475
         """
-        self.header_page = Header()
-        random_user_name = self.generate_random_string()
-        random_user_email = self.header_page.generate_random_email()
-        random_user_password = self.generate_random_string()
-        self.info('Calling the users api to create a new user with username: {}'.format(random_user_name))
-        UsersAPI().create_new_user(username=random_user_name, email=random_user_email,
-                                   password=random_user_password)
-
-        self.header_page.click_on_header_button()
-        self.base_selenium.click('header:logout')
-        Login().login(username=random_user_name, password=random_user_password)
+        self.login_page = Login()
+        self.info('Calling the users api to create a new user with username')
+        response, payload = UsersAPI().create_new_user()
+        self.assertEqual(response['status'], 1, payload)
+        self.login_page.logout()
+        self.login_page.login(username=payload['username'], password=payload['password'])
         self.base_selenium.wait_until_page_url_has(text='dashboard')
         self.test_plan.get_test_plans_page()
 
@@ -518,12 +511,12 @@ class TestPlansTestCases(BaseTest):
 
         self.info('New testplan is created successfully with name: {}'.format(testplan_name))
 
-        self.base_page.set_all_configure_table_columns_to_specific_value(value=True)
+        self.test_plan.set_all_configure_table_columns_to_specific_value(value=True)
 
         testplan_found = self.test_plan.filter_by_element_and_get_results(
-            'Changed By', 'test_plans:testplan_changed_by_filter', random_user_name, 'drop_down')
+            'Changed By', 'test_plans:testplan_changed_by_filter', payload['username'], 'drop_down')
         self.assertEqual(len(testplan_found), 2)
-        self.assertIn(random_user_name, testplan_found[0].text)
+        self.assertIn(payload['username'], testplan_found[0].text)
         self.assertIn(testplan_name, testplan_found[0].text)
 
     @parameterized.expand(['ok', 'cancel'])
@@ -554,14 +547,16 @@ class TestPlansTestCases(BaseTest):
         """
         Edit: Overview Approach: Make sure after I press on
         the overview button, it redirects me to the active table
+
         LIMS-6202
         """
-        self.info(" open edit pae of random test plan")
-        self.test_plan.get_random_test_plans()
+        testplan = random.choice(self.test_plan_api.get_all_test_plans_json())
+        self.info('Navigate to edit page of test plan: {} '.format(testplan['testPlanName']))
+        self.test_plan.get_test_plan_edit_page_by_id(testplan['id'])
         testplans_url = self.base_selenium.get_url()
         self.info('testplans_url : {}'.format(testplans_url))
         self.info('click on Overview, it will redirect you to test plans page')
-        self.base_page.click_overview()
+        self.test_plan.click_overview()
         self.test_plan.sleep_tiny()
         self.assertEqual(self.base_selenium.get_url(), '{}testPlans'.format(self.base_selenium.url))
         self.info('clicking on Overview confirmed')
@@ -592,69 +587,65 @@ class TestPlansTestCases(BaseTest):
         Table configuration: Make sure that you can't hide all the fields from the table configuration
         LIMS-6288
         """
-        assert (TstUnit().deselect_all_configurations(), False)
+        assert (self.test_plan.deselect_all_configurations(), False)
 
     def test024_test_unit_update_version_in_testplan(self):
         """
+        Test plan: Test unit Approach: In case I update category & iteration of
+        test unit that used in test plan with new version, when  go to test plan
+        to add the same test unit , I found category & iteration updated
+
         LIMS-3703
-        Test plan: Test unit Approach: In case I update category & iteration of test unit that used in test plan with new version
-        ,when  go to test plan to add the same test unit , I found category & iteration updated
         """
-        # select random test unit to create the test plan with it
+        self.test_unit_page = TstUnit()
+        self.info("select random test unit to create the test plan with it")
         testunits, payload = TestUnitAPI().get_all_test_units(limited=20, filter='{"materialTypes":"all"}')
         testunit = random.choice(testunits['testUnits'])
         self.info('A random test unit is chosen, its name: {}, category: {} and number of iterations: {}'.format(
             testunit['name'], testunit['categoryName'], testunit['iterations']))
 
-        # create the first testplan
+        self.info("create the first testplan")
         first_testplan_name, payload1 = self.test_plan_api.create_testplan()
-        self.info('First test plan create with name: {}'.format(
-            payload1['testPlan']['text']))
+        self.info('First test plan create with name: {}'.format(payload1['testPlan']['text']))
 
-        # go to testplan edit to get the number of iterations and testunit category
-        first_testplan_testunit_category, first_testplan_testunit_iteration = self.test_plan.get_testunit_category_iterations(
-            payload1['testPlan']['text'], testunit['name'])
+        self.info("go to testplan edit to get the number of iterations and test unit category")
+        first_testplan_testunit_category, first_testplan_testunit_iteration =\
+            self.test_plan.get_testunit_category_iterations(payload1['testPlan']['text'], testunit['name'])
 
-        # go to testunits active table and search for this testunit-
-        self.test_unit_page = TstUnit()
+        self.info("go to test units' active table and search for this test unit")
         self.test_unit_page.get_test_units_page()
-        self.info(
-            'Navigating to test unit {} edit page'.format(testunit['name']))
+        self.info('Navigating to test unit {} edit page'.format(testunit['name']))
         self.test_unit_page.search(value=testunit['name'])
         self.test_unit_page.open_edit_page(row=self.test_unit_page.result_table()[0])
 
         new_iteration = str(int(first_testplan_testunit_iteration) + 1)
-        # update the iteration and category
+        self.info("update the iteration and category")
         new_category = self.test_unit_page.set_category('')
         self.test_unit_page.set_testunit_iteration(new_iteration)
-
-        # press save and complete to create a new version
+        self.info("press save and complete to create a new version")
         self.test_unit_page.save_and_create_new_version()
 
-        # go back to test plans active table
+        self.info(" go back to test plans active table")
         self.test_plan.get_test_plans_page()
 
-        # create new testplan with this testunit after creating the new version
+        self.info(" create new testplan with this testunit after creating the new version")
         second_testplan_name, payload2 = self.test_plan_api.create_testplan()
-        self.info('Second test plan create with name: {}'.format(
-            payload2['testPlan']['text']))
+        self.info('Second test plan create with name: {}'.format(payload2['testPlan']['text']))
 
-        # check the iteration and category to be the same as the new version
-        # go to testplan edit to get the number of iterations and testunit category
-        second_testplan_testunit_category, second_testplan_testunit_iteration = self.test_plan.get_testunit_category_iterations(
-            payload2['testPlan']['text'], testunit['name'])
+        self.info("check the iteration and category to be the same as the new version")
+        self.info("go to testplan edit to get the number of iterations and testunit category")
+        second_testplan_testunit_category, second_testplan_testunit_iteration = \
+            self.test_plan.get_testunit_category_iterations(payload2['testPlan']['text'], testunit['name'])
 
-        self.info(
-            'Asserting that the category of the testunit in the first testplan is not equal the category of the testunit in the second testplan')
-        self.assertNotEqual(first_testplan_testunit_category,
-                            second_testplan_testunit_category)
-        self.info(
-            'Asserting that the iterations of the testunit in the first testplan is not equal the iterations of the testunit in the second testplan')
-        self.assertNotEqual(first_testplan_testunit_iteration,
-                            second_testplan_testunit_iteration)
-        self.info(
-            'Asserting that the category of the testunit in the second testplan is the same as the updated category')
+        self.info('Asserting that the category of the test unit in the first testplan is not '
+                  'equal the category of the test unit in the second testplan')
+        self.assertNotEqual(first_testplan_testunit_category, second_testplan_testunit_category)
+        self.info('Asserting that the iterations of the test unit in the first testplan is not '
+                  'equal the iterations of the test unit in the second testplan')
+        self.assertNotEqual(first_testplan_testunit_iteration, second_testplan_testunit_iteration)
+        self.info('Asserting that the category of the test unit in the second testplan is the '
+                  'same as the updated category')
         self.assertEqual(second_testplan_testunit_category, new_category)
-        self.info(
-            'Asserting that the iterations of the testunit in the second testplan is the same as the updated iterations')
+        self.info('Asserting that the iterations of the test unit in the second testplan is the '
+                  'same as the updated iterations')
         self.assertEqual(second_testplan_testunit_iteration, new_iteration)

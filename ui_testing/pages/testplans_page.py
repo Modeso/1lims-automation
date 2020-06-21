@@ -1,5 +1,4 @@
 from ui_testing.pages.base_pages import BasePages
-from random import randint
 
 
 class TestPlans(BasePages):
