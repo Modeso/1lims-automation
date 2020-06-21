@@ -88,33 +88,33 @@ class TestPlansTestCases(BaseTest):
 
         self.assertEqual(test_plan_row_data_status, 'Completed')
 
-    # def test003_archive_test_plan_one_record(self):
-    #     """
-    #     Archive one record
-    #
-    #     LIMS-3506 Case 1
-    #     """
-    #     table = self.base_selenium.find_element('general:table')
-    #     thead = table.find_elements_by_tag_name('thead')
-    #     self.info(len(thead))
-    #     self.info(thead[0].text)
-    #     self.info('>>>>>>>')
-    #     self.info(self.base_selenium.driver.find_element_by_id('testPlanName').text)
-    #
-    #
-    #     self.info('choosing a random test plan table row')
-    #     selected_test_plan = self.test_plan.select_random_table_row()
-    #     self.assertTrue(selected_test_plan)
-    #     self.info(f'selected_test_plan : {selected_test_plan}')
-    #     testplan_number = selected_test_plan['Test Plan No.']
-    #     self.info('Archive the selected item and navigating to the archived items table')
-    #     self.test_plan.archive_selected_items()
-    #     self.test_plan.get_archived_items()
-    #     archived_row = self.test_plan.search(testplan_number)
-    #     self.info('Checking if test plan number: {} is archived correctly'.format(testplan_number))
-    #     self.assertIn(selected_test_plan['Test Plan Name'], archived_row[0].text)
-    #     self.info('Test plan number: {} is archived correctly'.format(testplan_number))
-    #
+    def test003_archive_test_plan_one_record(self):
+        """
+        Archive one record
+
+        LIMS-3506 Case 1
+        """
+        table = self.base_selenium.find_element('general:table')
+        thead = table.find_elements_by_tag_name('thead')
+        self.info(len(thead))
+        self.info(thead[0].text)
+        self.info('>>>>>>>')
+        self.info(self.base_selenium.driver.find_element_by_id('testPlanName').text)
+
+
+        self.info('choosing a random test plan table row')
+        selected_test_plan = self.test_plan.select_random_table_row()
+        self.assertTrue(selected_test_plan)
+        self.info(f'selected_test_plan : {selected_test_plan}')
+        testplan_number = selected_test_plan['Test Plan No.']
+        self.info('Archive the selected item and navigating to the archived items table')
+        self.test_plan.archive_selected_items()
+        self.test_plan.get_archived_items()
+        archived_row = self.test_plan.search(testplan_number)
+        self.info('Checking if test plan number: {} is archived correctly'.format(testplan_number))
+        self.assertIn(selected_test_plan['Test Plan Name'], archived_row[0].text)
+        self.info('Test plan number: {} is archived correctly'.format(testplan_number))
+
     # def test004_restore_test_plan_one_record(self):
     #     """
     #      Restore one record
