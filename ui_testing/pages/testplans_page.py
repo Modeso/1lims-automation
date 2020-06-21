@@ -29,7 +29,7 @@ class TestPlans(BasePages):
         test_plan = self.search(value=name)[0]
         self.sleep_small()
         self.open_edit_page_by_css_selector(row=test_plan, css_selector='')
-        self.sleep_small()
+        self.wait_until_page_is_loaded()
 
     def get_testunits_in_testplans(self, test_plan_name=''):
         self.info('Search by testplan name {}'.format(test_plan_name))
@@ -91,3 +91,8 @@ class TestPlans(BasePages):
         results_found = self.result_table()
         self.open_filter_menu() # close filter menu
         return results_found
+
+    def search_and_get_childtable_data_for_testplan(self, testplan_name):
+        self.search(testplan_name)
+        self.info('Saving the child data of the main testplan')
+        return self.get_child_table_data()

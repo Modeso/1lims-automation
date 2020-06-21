@@ -232,8 +232,9 @@ class TestPlanAPI(TestPlanAPIFactory):
         testunit_data = TestUnitAPI().get_testunit_form_data(id=test_unit['id'])[0]['testUnit']
         formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
 
-        testplan, _ = self.create_testplan(
-            testUnits=[formated_testunit], selectedArticles=[formatted_article], materialType=formatted_material)
+        testplan, payload = self.create_testplan(testUnits=[formated_testunit],
+                                                 selectedArticles=[formatted_article],
+                                                 materialType=formatted_material)
 
         if testplan['status'] == 1:
             return (self.get_testplan_form_data(id=testplan['testPlanDetails']['id']))
@@ -285,3 +286,22 @@ class TestPlanAPI(TestPlanAPIFactory):
         test_unit = self.get_testunits_in_testplan(test_plan['id'])[0]
 
         return test_plan, test_unit
+
+    def create_testplan_from_test_unit_id(self, test_unit_id):
+        testunit_data = TestUnitAPI().get_testunit_form_data(id=test_unit_id)[0]['testUnit']
+        if testunit_data['materialTypesObject'][0]['name'] == 'All':
+            response, _ = GeneralUtilitiesAPI().list_all_material_types()
+            formatted_material = random.choice(response['materialTypes'])
+        else:
+            formatted_material = testunit_data['materialTypesObject'][0]
+
+        formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
+        formatted_article = ArticleAPI().get_formatted_article_with_formatted_material_type(formatted_material)
+        testplan, payload = self.create_testplan(testUnits=[formated_testunit],
+                                                 selectedArticles=[formatted_article],
+                                                 materialType=formatted_material)
+        if testplan['status'] == 1:
+            return (self.get_testplan_form_data(id=testplan['testPlanDetails']['id']))
+        else:
+            self.info(testplan)
+

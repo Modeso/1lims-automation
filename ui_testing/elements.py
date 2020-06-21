@@ -285,6 +285,10 @@ elements = {
             'method': 'id',
             'value': 'lastModifiedUserfield'
         },
+        'testplan_created_on_filter': {
+            'method': 'id',
+            'value': 'start_createdAt'
+        },
         'testplan_status_filter': {
             'method': 'id',
             'value': 'statusfield'
@@ -400,12 +404,12 @@ elements = {
         'testunit_unit': {'method': 'id',
                           'value': 'testunit_unit'},
         'testunit_quantification_upper_limit': {
-            'method': 'id',
-            'value': 'quantification_upper_limit'
+            'method': 'xpath',
+            'value': ' //input[@placeholder="Upper Limit"]'
         },
         'testunit_quantification_lower_limit': {
-            'method': 'id',
-            'value': 'quantification_lower_limit'
+            'method': 'xpath',
+            'value': ' //input[@placeholder="Lower Limit"]'
         },
         'add_testunit_error_msg': {
             'method': 'xpath',

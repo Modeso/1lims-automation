@@ -9,9 +9,12 @@ from api_testing.apis.orders_api import OrdersAPI
 from api_testing.apis.users_api import UsersAPI
 from api_testing.apis.test_unit_api import TestUnitAPI
 from api_testing.apis.article_api import ArticleAPI
+from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from unittest import skip
 from parameterized import parameterized
 import random
+import datetime
+
 
 
 class TestPlansTestCases(BaseTest):
@@ -442,7 +445,12 @@ class TestPlansTestCases(BaseTest):
         testplans_found = self.test_plan.filter_by_element_and_get_results(
             'Testplan Name', 'test_plans:testplan_name_filter', random_testplan['testPlanName'], 'drop_down')
         self.info('Checking if the results were filtered successfully')
-        results_found = True
+        if len(testplans_found):
+            results_found = True
+        else:
+            self.info("filter failed or no elements with this test plan name!")
+            results_found = False
+
         while results_found:
             for tp in testplans_found:
                 if len(tp.text) > 0:
@@ -470,7 +478,8 @@ class TestPlansTestCases(BaseTest):
         if len(testplans_found):
             results_found = True
         else:
-            self.info("filter failed or no elements with this status!")
+            self.info("filter failed or no elements with this test plan name!")
+            results_found = False
 
         while results_found:
             for tp in testplans_found:
@@ -484,7 +493,7 @@ class TestPlansTestCases(BaseTest):
             if self.test_plan.is_next_page_button_enabled():
                 self.info('Navigating to the next page')
                 self.base_selenium.click('general:next_page')
-                self.test_plan.sleep_tiny()
+                self.test_plan.sleep_small()
                 testplans_found = self.test_plan.result_table()
             else:
                 results_found = False
@@ -518,8 +527,97 @@ class TestPlansTestCases(BaseTest):
         self.assertIn(payload['username'], testplan_found[0].text)
         self.assertIn(testplan_name, testplan_found[0].text)
 
+    def test020_filter_by_testplan_material_type(self):
+        """
+        User can filter with material type field
+
+        LIMS-6471
+        """
+        random_testplan = random.choice(self.test_plan_api.get_all_test_plans_json())
+        testplans_found = self.test_plan.filter_by_element_and_get_results(
+            'Material Type', 'test_plans:testplan_material_type_filter',
+            random_testplan['materialType'], 'drop_down')
+        self.info('Checking if the results were filtered successfully')
+        if len(testplans_found):
+            results_found = True
+        else:
+            self.info("filter failed or no elements with this test plan name!")
+            results_found = False
+
+        while results_found:
+            for tp in testplans_found:
+                if len(tp.text) > 0:
+                    self.assertIn(str(random_testplan['materialType']), tp.text)
+            if self.test_plan.is_next_page_button_enabled():
+                self.base_selenium.click('general:next_page')
+                self.info('Navigating to the next page')
+                self.test_plan.sleep_small()
+                testplans_found = self.test_plan.result_table()
+            else:
+                results_found = False
+
+        self.info('Filtering by material type was done successfully')
+
+    def test021_filter_by_testplan_article(self):
+        """
+        User can filter with article field
+
+        LIMS-6472
+        """
+        random_testplan = random.choice(self.test_plan_api.get_all_test_plans_json())
+        if random_testplan['article'][0] == 'all':
+            testplans_found = self.test_plan.filter_by_element_and_get_results(
+                'Article', 'test_plans:testplan_article_filter', 'All', 'drop_down')
+        else:
+            testplans_found = self.test_plan.filter_by_element_and_get_results(
+                'Article', 'test_plans:testplan_article_filter', random_testplan['article'][0], 'drop_down')
+
+        self.info('Checking if the results were filtered successfully')
+        if len(testplans_found):
+            results_found = True
+        else:
+            self.info("filter failed or no elements with this test plan name!")
+            results_found = False
+
+        while results_found:
+            for tp in testplans_found:
+                if len(tp.text) > 0:
+                    self.assertIn(str(random_testplan['article'][0]), tp.text)
+            if self.test_plan.is_next_page_button_enabled():
+                self.base_selenium.click('general:next_page')
+                self.info('Navigating to the next page')
+                self.test_plan.sleep_small()
+                testplans_found = self.test_plan.result_table()
+            else:
+                results_found = False
+        self.info('Filtering by article was done successfully')
+
+    #@skip('https://modeso.atlassian.net/browse/LIMS-6505')
+    def test022_filter_by_testplan_created_on(self):
+        """
+        User can filter with created on field
+
+        LIMS-6476
+        """
+        random_testplan = random.choice(self.test_plan_api.get_all_test_plans_json())
+        date = datetime.datetime.strptime(random_testplan['createdAt'], "%Y-%m-%dT%H:%M:%S.%fZ")
+        date_formatted = datetime.datetime.strftime(date, '%d.%m.%Y')
+
+        testplans_found = self.test_plan.filter_by_element_and_get_results(
+            'Created On', 'test_plans:testplan_created_on_filter', date_formatted, 'date')
+        while self.test_plan.is_next_page_button_enabled():
+            self.base_selenium.click('general:next_page')
+            self.info('Navigating to the next page')
+            self.test_plan.sleep_small()
+            testplans_found.extend(self.test_plan.result_table())
+        self.info('Checking if the results were filtered successfully')
+        for tp in testplans_found:
+            if tp.text:
+                self.assertIn(date_formatted, tp.text)
+        self.info('Filtering by created on date was done successfully')
+
     @parameterized.expand(['ok', 'cancel'])
-    def test020_create_approach_overview_button(self, ok):
+    def test023_create_approach_overview_button(self, ok):
         """
         Master data: Create: Overview button Approach: Make sure
         after I press on the overview button, it redirects me to the active table
@@ -542,7 +640,7 @@ class TestPlansTestCases(BaseTest):
             self.assertEqual(self.base_selenium.get_url(), '{}testPlans/add'.format(self.base_selenium.url))
             self.info('clicking on Overview cancelled')
 
-    def test021_edit_approach_overview_button(self):
+    def test024_edit_approach_overview_button(self):
         """
         Edit: Overview Approach: Make sure after I press on
         the overview button, it redirects me to the active table
@@ -560,7 +658,7 @@ class TestPlansTestCases(BaseTest):
         self.assertEqual(self.base_selenium.get_url(), '{}testPlans'.format(self.base_selenium.url))
         self.info('clicking on Overview confirmed')
 
-    def test022_testplans_search_then_navigate(self):
+    def test025_testplans_search_then_navigate(self):
         """
         Search Approach: Make sure that you can search then navigate to any other page
 
@@ -581,14 +679,15 @@ class TestPlansTestCases(BaseTest):
         Articles().get_articles_page()
         self.assertEqual(self.base_selenium.get_url(), '{}articles'.format(self.base_selenium.url))
 
-    def test023_hide_all_table_configurations(self):
+    def test026_hide_all_table_configurations(self):
         """
         Table configuration: Make sure that you can't hide all the fields from the table configuration
+
         LIMS-6288
         """
         assert (self.test_plan.deselect_all_configurations(), False)
 
-    def test024_test_unit_update_version_in_testplan(self):
+    def test027_test_unit_update_version_in_testplan(self):
         """
         Test plan: Test unit Approach: In case I update category & iteration of
         test unit that used in test plan with new version, when  go to test plan
@@ -648,3 +747,39 @@ class TestPlansTestCases(BaseTest):
         self.info('Asserting that the iterations of the test unit in the second testplan is the '
                   'same as the updated iterations')
         self.assertEqual(second_testplan_testunit_iteration, new_iteration)
+
+    def test028_childtable_limits_of_quantification(self):
+        """
+        Limits of quantification should be viewed in the testplan's child table
+
+        LIMS-4179
+        """
+        self.info("Create new quantitative testunit with quantification limits")
+        self.test_unit_api = TestUnitAPI()
+        oldUpperLimit = self.generate_random_number(lower=50, upper=100)
+        oldLowerLimit = self.generate_random_number(lower=1, upper=49)
+        tu_response, tu_payload = self.test_unit_api.create_quantitative_testunit(
+            quantificationUpperLimit=oldUpperLimit, quantificationLowerLimit=oldLowerLimit,
+            useQuantification=True, useSpec=False)
+        self.assertEqual(tu_response['status'], 1, tu_payload)
+        testunit_display_old_quantification_limit = '{}-{}'.format(
+            tu_payload['quantificationLowerLimit'], tu_payload['quantificationUpperLimit'])
+
+        test_plan = self.test_plan_api.create_testplan_from_test_unit_id(tu_response['testUnit']['testUnitId'])
+        self.assertTrue(test_plan, "failed to create test plan")
+        testplan_childtable_data = self.test_plan.search_and_get_childtable_data_for_testplan(
+            test_plan['testPlanEntity']['name'])
+        self.info('Asserting the limits of quantification viewed correctly')
+        self.assertIn(testunit_display_old_quantification_limit, testplan_childtable_data[0].values())
+
+        new_quantification_lower_limit, new_quantification_upper_limit = \
+            self.test_plan.update_upper_lower_limits_of_testunit(test_plan['id'])
+
+        testunit_display_new_quantification_limit = '{}-{}'.format(
+            new_quantification_lower_limit, new_quantification_upper_limit)
+
+        self.test_plan.get_test_plans_page()
+        testplan_childtable_data = self.test_plan.search_and_get_childtable_data_for_testplan(
+            test_plan['testPlanEntity']['name'])
+        self.info('Asserting the limits of quantification viewed correctly')
+        self.assertIn(testunit_display_new_quantification_limit, testplan_childtable_data[0].values())

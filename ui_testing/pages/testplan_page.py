@@ -247,10 +247,16 @@ class TstPlan(TestPlans):
 
         return old_testunits_searchable_from_testplans
 
-    def update_upper_lower_limits_of_testunit(self, old_upper, old_lower):
-        self.base_selenium.set_text('test_plan:testunit_quantification_upper_limit', str(old_upper + 5))
-        self.base_selenium.set_text('test_plan:testunit_quantification_lower_limit', str(old_lower + 5))
+    def update_upper_lower_limits_of_testunit(self, id):
+        self.get_test_plan_edit_page_by_id(id)
+        self.navigate_to_testunits_selection_page()
+        new_upper = self.generate_random_number(lower=50, upper=100)
+        new_lower = self.generate_random_number(lower=1, upper=49)
+        self.base_selenium.set_text('test_plan:testunit_quantification_upper_limit', str(new_upper))
+        self.base_selenium.set_text('test_plan:testunit_quantification_lower_limit', str(new_lower))
         self.sleep_small()
+        self.save_and_confirm_popup()
+        return new_lower, new_upper
 
     def get_testunit_quantification_limit(self, testunits, testunit_display_name):
         for testunit in testunits:
