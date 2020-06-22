@@ -143,11 +143,10 @@ class Order(Orders):
         self.info(' Order created with no : {} '.format(order_no))
 
     def create_multiple_contacts_new_order(self, contacts):
-        self.info(" click on create new order button")
-        self.base_selenium.scroll()
         self.click_create_order_button()
-        self.set_new_order()
         self.sleep_small()
+        self.set_new_order()
+        self.sleep_tiny()
         for contact in contacts:
             self.set_contact(contact)
             self.sleep_tiny()

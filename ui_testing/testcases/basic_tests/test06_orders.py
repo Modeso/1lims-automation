@@ -2203,7 +2203,6 @@ class OrdersTestCases(BaseTest):
         departments_list_with_contacts = self.contacts_api.get_department_contact_list(contact_names_list)
         self.info('department contacts list {}'.format(departments_list_with_contacts))
         self.info('create new order with selected contacts')
-        self.order_page.sleep_tiny()
         self.order_page.create_multiple_contacts_new_order(contacts=contact_names_list)
         self.order_page.sleep_tiny()
         contacts = self.order_page.get_contact()
