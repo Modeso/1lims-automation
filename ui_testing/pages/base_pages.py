@@ -87,9 +87,15 @@ class BasePages:
                                                             destination_element='general:filter')
         filter.click()
 
+    def close_filter_menu(self):
+        filter = self.base_selenium.find_element_in_element(source_element='general:menu_filter_view',
+                                                            destination_element='general:filter')
+        filter.click()
+
     def filter_by(self, filter_element, filter_text, field_type='drop_down'):
         if field_type == 'drop_down':
-            self.base_selenium.select_item_from_drop_down(element=filter_element, item_text=filter_text)
+            self.base_selenium.select_item_from_drop_down(element=filter_element,
+                                                          item_text=filter_text, avoid_duplicate=True)
         else:
             self.base_selenium.set_text(element=filter_element, value=filter_text)
 
@@ -228,7 +234,7 @@ class BasePages:
         return '{:02d}.{:02d}.{}'.format(randint(1, 30), randint(1, 12), 2019)
 
     def filter(self, field_name, element, filter_text, type):
-        self.base_selenium.LOGGER.info(' Filter by {} : {}'.format(field_name, filter_text))
+        self.info(' Filter by {} : {}'.format(field_name, filter_text))
         self.filter_by(filter_element=element, filter_text=filter_text, field_type=type)
         self.filter_apply()
 

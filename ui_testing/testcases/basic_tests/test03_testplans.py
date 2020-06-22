@@ -335,7 +335,7 @@ class TestPlansTestCases(BaseTest):
         """
         self.info(" get random test plan with article != 'all")
         testplans = self.test_plan_api.get_all_test_plans_json()
-        self.assertTrue(testplans)
+        self.assertTrue(testplans, "can't get random test plan")
         testplans_list = [testplan for testplan in testplans if testplan['article'] != ['all']]
         self.assertTrue(testplans_list, 'No test plans with article != all')
         first_testplan = random.choice(testplans_list)
@@ -437,6 +437,7 @@ class TestPlansTestCases(BaseTest):
         LIMS-6470
         """
         random_testplan = random.choice(self.test_plan_api.get_all_test_plans_json())
+        self.assertTrue(random_testplan, "can't select random test plan !")
         testplans_found = self.test_plan.filter_by_element_and_get_results(
             'Testplan Name', 'test_plans:testplan_name_filter', random_testplan['testPlanName'], 'drop_down')
         self.info('Checking if the results were filtered successfully')
@@ -565,7 +566,7 @@ class TestPlansTestCases(BaseTest):
                 'Article', 'test_plans:testplan_article_filter', 'All', 'drop_down')
         else:
             testplans_found = self.test_plan.filter_by_element_and_get_results(
-                'Article', 'test_plans:testplan_article_filter', random_testplan['article'][0], 'drop_down')
+                'Article', 'test_plans:testplan_article_filter', random_testplan['articleNo'][0], 'drop_down')
 
         self.info('Checking if the results were filtered successfully')
         if len(testplans_found):
@@ -578,10 +579,11 @@ class TestPlansTestCases(BaseTest):
             for tp in testplans_found:
                 if len(tp.text) > 0:
                     self.assertIn(str(random_testplan['article'][0]), tp.text)
+
             if self.test_plan.is_next_page_button_enabled():
                 self.base_selenium.click('general:next_page')
                 self.info('Navigating to the next page')
-                self.test_plan.sleep_small()
+                self.test_plan.sleep_tiny()
                 testplans_found = self.test_plan.result_table()
             else:
                 results_found = False

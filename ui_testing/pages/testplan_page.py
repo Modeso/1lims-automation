@@ -9,11 +9,11 @@ class TstPlan(TestPlans):
         self.base_selenium.set_text(element="test_plan:no", value=no)
 
     def get_article(self):
-        articles = self.base_selenium.get_text(element="test_plan:article").split('\n')
+        articles = self.base_selenium.get_text(element="test_plan:article").split(' No')
         article_list = []
         for article in articles:
             if "×" in article:
-                article_list.append(article.replace("× ", ""))
+                article_list.append(article.replace("×", ""))
         return article_list
 
     def set_article(self, article='', random=False):
@@ -132,6 +132,7 @@ class TstPlan(TestPlans):
             self.set_article(article=article)
         else:
             self.article = self.set_article(random=True)
+        self.sleep_tiny()
 
         if test_unit:
             self.info('With {} test unit'.format(test_unit))
@@ -140,7 +141,8 @@ class TstPlan(TestPlans):
             if save:
                 self.save(save_btn='test_plan:save_and_complete')
         else:
-            self.save(save_btn='test_plan:save_btn', sleep=True)
+            self.save(save_btn='test_plan:save_btn')
+            self.wait_until_page_is_loaded()
 
         self.info(' Test plan name : {}'.format(self.test_plan_name))
         return self.test_plan_name

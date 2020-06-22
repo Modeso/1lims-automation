@@ -88,8 +88,9 @@ class TestPlans(BasePages):
     def filter_by_element_and_get_results(self, fieldName, element, filter_text, fieldType):
         self.open_filter_menu()
         self.filter(fieldName, element, filter_text, fieldType)
+        self.sleep_tiny()
         results_found = self.result_table()
-        self.open_filter_menu() # close filter menu
+        self.close_filter_menu()
         return results_found
 
     def search_and_get_childtable_data_for_testplan(self, testplan_name):
