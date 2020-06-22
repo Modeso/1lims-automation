@@ -11,6 +11,11 @@ class TstUnit(TstUnits):
         self.base_selenium.LOGGER.info('Get testunit method')
         return self.base_selenium.get_value(element='test_unit:method').split('\n')[0]
 
+    def get_test_unit_edit_page_by_id(self, id):
+        url_text = "{}testUnits/edit/" + str(id)
+        self.base_selenium.get(url=url_text.format(self.base_selenium.url))
+        self.wait_until_page_is_loaded()
+
     def click_create_new_testunit(self):
         self.base_selenium.LOGGER.info('Click Create New Test Unit')
         self.base_selenium.click(element='test_units:new_testunit')

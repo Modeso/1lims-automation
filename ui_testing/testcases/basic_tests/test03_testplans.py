@@ -9,7 +9,6 @@ from api_testing.apis.orders_api import OrdersAPI
 from api_testing.apis.users_api import UsersAPI
 from api_testing.apis.test_unit_api import TestUnitAPI
 from api_testing.apis.article_api import ArticleAPI
-from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from unittest import skip
 from parameterized import parameterized
 import random
@@ -40,6 +39,7 @@ class TestPlansTestCases(BaseTest):
         self.test_plan.get_test_plan_edit_page_by_id(random_completed_test_plan['id'])
         self.info("navigate to the testunits selection tab")
         self.test_plan.navigate_to_testunits_selection_page()
+        self.test_plan.sleep_tiny()
         old_testunits = self.test_plan.get_all_testunits_in_testplan()
         deleted_test_unit = (old_testunits[0])[0]
         self.info("delete the first testunit with name {}".format(deleted_test_unit))
@@ -91,100 +91,92 @@ class TestPlansTestCases(BaseTest):
 
         self.assertEqual(test_plan_row_data_status, 'Completed')
 
-    # def test003_archive_test_plan_one_record(self):
-    #     """
-    #     Archive one record
-    #
-    #     LIMS-3506 Case 1
-    #     """
-    #     table = self.base_selenium.find_element('general:table')
-    #     thead = table.find_elements_by_tag_name('thead')
-    #     self.info(len(thead))
-    #     self.info(thead[0].text)
-    #     self.info('>>>>>>>')
-    #     self.info(self.base_selenium.driver.find_element_by_id('testPlanName').text)
-    #
-    #
-    #     self.info('choosing a random test plan table row')
-    #     selected_test_plan = self.test_plan.select_random_table_row()
-    #     self.assertTrue(selected_test_plan)
-    #     self.info(f'selected_test_plan : {selected_test_plan}')
-    #     testplan_number = selected_test_plan['Test Plan No.']
-    #     self.info('Archive the selected item and navigating to the archived items table')
-    #     self.test_plan.archive_selected_items()
-    #     self.test_plan.get_archived_items()
-    #     archived_row = self.test_plan.search(testplan_number)
-    #     self.info('Checking if test plan number: {} is archived correctly'.format(testplan_number))
-    #     self.assertIn(selected_test_plan['Test Plan Name'], archived_row[0].text)
-    #     self.info('Test plan number: {} is archived correctly'.format(testplan_number))
-    #
-    # def test004_restore_test_plan_one_record(self):
-    #     """
-    #      Restore one record
-    #
-    #      LIMS-3506 Case 1
-    #     """
-    #     self.info("Navigate to archived test plan table")
-    #     self.test_plan.get_archived_items()
-    #     self.info('Choosing a random testplan table row')
-    #     self.test_plan.sleep_tiny()
-    #     selected_test_plan = self.test_plan.select_random_table_row()
-    #     self.assertTrue(selected_test_plan)
-    #     testplan_number = selected_test_plan['Test Plan No.']
-    #     self.info('select Testplan number: {} to be restored'.format(testplan_number))
-    #     self.info('Restoring the selected item then navigating to the active items table')
-    #     self.test_plan.restore_selected_items()
-    #     self.test_plan.get_active_items()
-    #     self.test_plan.filter_by_testplan_number(filter_text=testplan_number)
-    #     restored_row = self.test_plan.result_table()
-    #     self.info('Checking if testplan number: {} is restored correctly'.format(testplan_number))
-    #     self.assertIn(selected_test_plan['Test Plan Name'], restored_row[0].text)
-    #     self.info('Testplan number: {} is restored correctly'.format(testplan_number))
-    #
-    # def test005_archive_test_plan_multiple_records(self):
-    #     """
-    #     Archive multiple records
-    #
-    #     LIMS-3506 Case 2
-    #     """
-    #     self.info('Choosing random multiple test plans table rows')
-    #     self.test_plan.sleep_small()
-    #     rows_data, rows = self.test_plan.select_random_multiple_table_rows()
-    #     self.assertTrue(rows_data)
-    #     testplans_numbers = [row['Test Plan No.'] for row in rows_data]
-    #     self.info('Testplan numbers: {} will be archived'.format(testplans_numbers))
-    #     self.info('Archiving the selected items and navigating to the archived items table')
-    #     self.test_plan.archive_selected_items()
-    #     self.test_plan.sleep_small()
-    #     self.info('Checking if testplans are archived correctly')
-    #     self.test_plan.get_archived_items()
-    #     archived_rows = self.test_plan.filter_multiple_rows_by_testplans_numbers(testplans_numbers)
-    #     self.assertIsNotNone(archived_rows)
-    #     self.assertEqual(len(archived_rows), len(testplans_numbers))
-    #     self.info('Testplan numbers: {} are archived correctly'.format(testplans_numbers))
-    #
-    # def test006_restore_test_plan_multiple_records(self):
-    #     """
-    #     Rstore multiple records
-    #
-    #     LIMS-3506 Case 2
-    #     """
-    #     self.info("Navigate to archived test plan table")
-    #     self.test_plan.get_archived_items()
-    #     self.info('Choosing random multiple testplans table rows')
-    #     self.test_plan.sleep_tiny()
-    #     rows_data, rows = self.test_plan.select_random_multiple_table_rows()
-    #     self.assertTrue(rows_data)
-    #     testplans_numbers = [row['Test Plan No.'] for row in rows_data]
-    #     self.info('Restore Testplans with numbers: {}'.format(testplans_numbers))
-    #     self.test_plan.restore_selected_items()
-    #     self.test_plan.sleep_small()
-    #     self.info('Navigate to active table and make sure testplans restored')
-    #     self.test_plan.get_active_items()
-    #     restored_rows = self.test_plan.filter_multiple_rows_by_testplans_numbers(testplans_numbers)
-    #     self.assertIsNotNone(restored_rows)
-    #     self.assertEqual(len(restored_rows), len(testplans_numbers))
-    #     self.info('Testplan numbers: {} are restored correctly'.format(testplans_numbers))
+    def test003_archive_test_plan_one_record(self):
+        """
+        Archive one record
+
+        LIMS-3506 Case 1
+        """
+        self.info('choosing a random test plan table row')
+        selected_test_plan = self.test_plan.select_random_table_row()
+        self.assertTrue(selected_test_plan)
+        self.info(f'selected_test_plan : {selected_test_plan}')
+        testplan_number = selected_test_plan['Test Plan No.']
+        self.info('Archive the selected item and navigating to the archived items table')
+        self.test_plan.archive_selected_items()
+        self.test_plan.get_archived_items()
+        archived_row = self.test_plan.search(testplan_number)
+        self.info('Checking if test plan number: {} is archived correctly'.format(testplan_number))
+        self.assertIn(selected_test_plan['Test Plan Name'], archived_row[0].text)
+        self.info('Test plan number: {} is archived correctly'.format(testplan_number))
+
+    def test004_restore_test_plan_one_record(self):
+        """
+         Restore one record
+
+         LIMS-3506 Case 1
+        """
+        self.info("Navigate to archived test plan table")
+        self.test_plan.get_archived_items()
+        self.info('Choosing a random testplan table row')
+        self.test_plan.sleep_tiny()
+        selected_test_plan = self.test_plan.select_random_table_row()
+        self.assertTrue(selected_test_plan)
+        testplan_number = selected_test_plan['Test Plan No.']
+        self.info('select Testplan number: {} to be restored'.format(testplan_number))
+        self.info('Restoring the selected item then navigating to the active items table')
+        self.test_plan.restore_selected_items()
+        self.test_plan.get_active_items()
+        self.test_plan.filter_by_testplan_number(filter_text=testplan_number)
+        restored_row = self.test_plan.result_table()
+        self.info('Checking if testplan number: {} is restored correctly'.format(testplan_number))
+        self.assertIn(selected_test_plan['Test Plan Name'], restored_row[0].text)
+        self.info('Testplan number: {} is restored correctly'.format(testplan_number))
+
+    def test005_archive_test_plan_multiple_records(self):
+        """
+        Archive multiple records
+
+        LIMS-3506 Case 2
+        """
+        self.info('Choosing random multiple test plans table rows')
+        self.test_plan.sleep_small()
+        rows_data, rows = self.test_plan.select_random_multiple_table_rows()
+        self.assertTrue(rows_data)
+        testplans_numbers = [row['Test Plan No.'] for row in rows_data]
+        self.info('Testplan numbers: {} will be archived'.format(testplans_numbers))
+        self.info('Archiving the selected items and navigating to the archived items table')
+        self.test_plan.archive_selected_items()
+        self.test_plan.sleep_small()
+        self.info('Checking if testplans are archived correctly')
+        self.test_plan.get_archived_items()
+        archived_rows = self.test_plan.filter_multiple_rows_by_testplans_numbers(testplans_numbers)
+        self.assertIsNotNone(archived_rows)
+        self.assertEqual(len(archived_rows), len(testplans_numbers))
+        self.info('Testplan numbers: {} are archived correctly'.format(testplans_numbers))
+
+    def test006_restore_test_plan_multiple_records(self):
+        """
+        Rstore multiple records
+
+        LIMS-3506 Case 2
+        """
+        self.info("Navigate to archived test plan table")
+        self.test_plan.get_archived_items()
+        self.info('Choosing random multiple testplans table rows')
+        self.test_plan.sleep_tiny()
+        rows_data, rows = self.test_plan.select_random_multiple_table_rows()
+        self.assertTrue(rows_data)
+        testplans_numbers = [row['Test Plan No.'] for row in rows_data]
+        self.info('Restore Testplans with numbers: {}'.format(testplans_numbers))
+        self.test_plan.restore_selected_items()
+        self.test_plan.sleep_small()
+        self.info('Navigate to active table and make sure testplans restored')
+        self.test_plan.get_active_items()
+        restored_rows = self.test_plan.filter_multiple_rows_by_testplans_numbers(testplans_numbers)
+        self.assertIsNotNone(restored_rows)
+        self.assertEqual(len(restored_rows), len(testplans_numbers))
+        self.info('Testplan numbers: {} are restored correctly'.format(testplans_numbers))
 
     #@skip('https://modeso.atlassian.net/browse/LIMS-6403')
     @skip('https://modeso.atlassian.net/browse/LIMSA-180')
@@ -313,9 +305,10 @@ class TestPlansTestCases(BaseTest):
         and the other one all
         """
         self.info(" get random test plan with article != 'all")
-        testplans = self.test_plan_api.get_all_test_plans_json(limit=10)
+        testplans = self.test_plan_api.get_all_test_plans_json()
         self.assertTrue(testplans)
         testplans_list = [testplan for testplan in testplans if testplan['article'] != ['all']]
+        self.assertTrue(testplans_list, 'No test plans with article != all')
         first_testplan = random.choice(testplans_list)
         self.info("selected random test plan {}".format(first_testplan))
         self.info("create another testplan with the same data")
@@ -340,9 +333,10 @@ class TestPlansTestCases(BaseTest):
         LIMS-3498
         """
         self.info(" get random test plan with article != 'all")
-        testplans = self.test_plan_api.get_all_test_plans_json(limit=10)
+        testplans = self.test_plan_api.get_all_test_plans_json()
         self.assertTrue(testplans)
         testplans_list = [testplan for testplan in testplans if testplan['article'] != ['all']]
+        self.assertTrue(testplans_list, 'No test plans with article != all')
         first_testplan = random.choice(testplans_list)
         self.info("selected random test plan {}".format(first_testplan))
         self.info('Create another testplan with the same name, but with different material type and article name')
@@ -605,15 +599,24 @@ class TestPlansTestCases(BaseTest):
 
         testplans_found = self.test_plan.filter_by_element_and_get_results(
             'Created On', 'test_plans:testplan_created_on_filter', date_formatted, 'date')
-        while self.test_plan.is_next_page_button_enabled():
-            self.base_selenium.click('general:next_page')
-            self.info('Navigating to the next page')
-            self.test_plan.sleep_small()
-            testplans_found.extend(self.test_plan.result_table())
         self.info('Checking if the results were filtered successfully')
-        for tp in testplans_found:
-            if tp.text:
-                self.assertIn(date_formatted, tp.text)
+        if len(testplans_found):
+            results_found = True
+        else:
+            self.info("filter failed or no elements with this test plan name!")
+            results_found = False
+
+        while results_found:
+            for tp in testplans_found:
+                if len(tp.text) > 0:
+                    self.assertIn(date_formatted, tp.text)
+            if self.test_plan.is_next_page_button_enabled():
+                self.base_selenium.click('general:next_page')
+                self.info('Navigating to the next page')
+                self.test_plan.sleep_small()
+                testplans_found = self.test_plan.result_table()
+            else:
+                results_found = False
         self.info('Filtering by created on date was done successfully')
 
     @parameterized.expand(['ok', 'cancel'])
@@ -713,9 +716,7 @@ class TestPlansTestCases(BaseTest):
         self.info("go to test units' active table and search for this test unit")
         self.test_unit_page.get_test_units_page()
         self.info('Navigating to test unit {} edit page'.format(testunit['name']))
-        self.test_unit_page.search(value=testunit['name'])
-        self.test_unit_page.open_edit_page(row=self.test_unit_page.result_table()[0])
-
+        self.test_unit_page.get_test_unit_edit_page_by_id(testunit['id'])
         new_iteration = str(int(first_testplan_testunit_iteration) + 1)
         self.info("update the iteration and category")
         new_category = self.test_unit_page.set_category('')
@@ -725,7 +726,6 @@ class TestPlansTestCases(BaseTest):
 
         self.info(" go back to test plans active table")
         self.test_plan.get_test_plans_page()
-
         self.info(" create new testplan with this testunit after creating the new version")
         second_testplan_name, payload2 = self.test_plan_api.create_testplan()
         self.info('Second test plan create with name: {}'.format(payload2['testPlan']['text']))
@@ -790,4 +790,4 @@ class TestPlansTestCases(BaseTest):
         self.assertIn(testunit_display_new_quantification_limit, testplan_childtable_data[0].values())
         test_plan_data = self.test_plan.get_the_latest_row_data()
         self.info('Asserting that new version created')
-        self.assertEqual(test_plan_data['Version'], 2)
+        self.assertEqual(test_plan_data['Version'], '2')

@@ -59,7 +59,7 @@ class TstPlan(TestPlans):
         return is_option_exist
 
     def set_test_unit(self, test_unit='', **kwargs):
-        self.base_selenium.click('test_plan:next')
+        self.navigate_to_testunits_selection_page()
         self.base_selenium.click('test_plan:add_new_item')
         self.sleep_tiny()
         self.base_selenium.select_item_from_drop_down(element='test_plan:test_unit',
@@ -215,6 +215,7 @@ class TstPlan(TestPlans):
             if c == 'name':
                 duplicated_test_plan_name = self.generate_random_text()
                 self.set_test_plan(name=duplicated_test_plan_name)
+                self.sleep_tiny()
 
         no = self.get_no()
         self.save(save_btn='test_plan:save_btn')
@@ -223,7 +224,6 @@ class TstPlan(TestPlans):
 
     def get_testunit_category_iterations(self, testplan_name, testunit_name):
         self.get_test_plan_edit_page(testplan_name)
-        # self.navigate_to_testunits_selection_page()
         self.set_test_unit(testunit_name)
         testunit_category = self.base_selenium.get_text(element='test_plan:test_unit_category')
         testunit_iteration = self.base_selenium.get_value(element='test_plan:test_unit_iteration')
