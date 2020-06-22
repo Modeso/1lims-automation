@@ -2197,6 +2197,7 @@ class OrdersTestCases(BaseTest):
         """
         self.info("get 3 contacts with department contacts")
         contact_list = random.choices(self.contacts_api.get_contacts_with_department(), k=3)
+        self.assertTrue(contact_list, "Can't get 3 contacts with departments")
         contact_names_list = [contact['name'] for contact in contact_list]
         self.info('selected contacts are {}'.format(contact_names_list))
         departments_list_with_contacts = self.contacts_api.get_department_contact_list(contact_names_list)
@@ -2227,7 +2228,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.save_and_wait(save_btn='order:save')
         order_data = self.order_page.get_suborder_data()
         self.info('assert that new order with multiple contacts created')
-        self.assertEqual(len(order_data['contacts']), len(contact_names_list))
+        self.assertCountEqual(order_data['contacts'], contact_names_list)
         self.info('assert that department updated')
         self.assertEqual([department], order_data['suborders'][0]['departments'])
 
