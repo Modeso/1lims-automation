@@ -153,6 +153,7 @@ class TstPlan(TestPlans):
 
     def navigate_to_testunits_selection_page(self):
         self.info('Navigating to testplan create/update step 2')
+        self.sleep_tiny()
         self.base_selenium.click(element='test_plan:testunits_selection')
         self.sleep_tiny()
 

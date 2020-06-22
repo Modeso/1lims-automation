@@ -37,11 +37,10 @@ class TestPlansTestCases(BaseTest):
         random_completed_test_plan = random.choice(self.test_plan_api.get_completed_testplans())
         self.info("navigate to the test-plan No. {} edit page".format(random_completed_test_plan['number']))
         self.test_plan.get_test_plan_edit_page_by_id(random_completed_test_plan['id'])
-        self.info("navigate to the testunits selection tab")
         old_testunits = self.test_plan.get_all_testunits_in_testplan()
-        self.assertTrue(old_testunits, "Ther'sno test units in this test plan")
+        self.assertTrue(old_testunits, "There's no test units in this test plan")
         deleted_test_unit = (old_testunits[0])[0]
-        self.info("delete the first testunit with name {}".format(deleted_test_unit))
+        self.info("delete the first test unit with name {}".format(deleted_test_unit))
         self.test_plan.delete_the_first_testunit_from_the_tableview()
         self.info("save the changes and refresh to make sure test unit deleted")
         self.test_plan.save_and_confirm_popup()
