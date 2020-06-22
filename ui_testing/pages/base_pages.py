@@ -536,6 +536,7 @@ class BasePages:
     def wait_until_page_is_loaded(self):
         self.base_selenium.LOGGER.info('wait until page is loaded')
         self.base_selenium.wait_until_element_is_not_displayed('general:loading')
+        self.sleep_tiny()
 
     def get_table_info_data(self):
         self.base_selenium.LOGGER.info('get table information')

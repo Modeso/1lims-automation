@@ -153,11 +153,12 @@ class TstPlan(TestPlans):
 
     def navigate_to_testunits_selection_page(self):
         self.info('Navigating to testplan create/update step 2')
-        self.sleep_tiny()
         self.base_selenium.click(element='test_plan:testunits_selection')
+        self.sleep_tiny()
 
     def get_all_testunits_in_testplan(self):
-        # returns all testunits in testplan 
+        # returns all testunits in testplan
+        self.navigate_to_testunits_selection_page()
         testunits = []
         self.info('Getting the testunits data')
         rows = self.base_selenium.get_table_rows(element='test_plan:testunits_table')
