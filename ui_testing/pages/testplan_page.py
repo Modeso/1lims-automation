@@ -60,6 +60,7 @@ class TstPlan(TestPlans):
 
     def set_test_unit(self, test_unit='', **kwargs):
         self.navigate_to_testunits_selection_page()
+        self.sleep_tiny()
         self.base_selenium.click('test_plan:add_new_item')
         self.sleep_tiny()
         self.base_selenium.select_item_from_drop_down(element='test_plan:test_unit',

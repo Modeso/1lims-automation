@@ -267,18 +267,19 @@ class TestPlansTestCases(BaseTest):
 
     def test010_test_plan_completed_to_inprogress(self):
         """
-        When the testplan status is converted from completed to in progress a new version is created
+        When the test plan status is converted from completed to in progress a new version is created
 
         LIMS-3503
         """
         self.info('get random completed test plan')
         completed_testplan = random.choice(self.test_plan_api.get_completed_testplans())
-        self.assertTrue(completed_testplan)
+        self.assertTrue(completed_testplan, "There's no completed test plans!")
         self.info('Navigating to edit page of testplan: {} with version: {}'.
                   format(completed_testplan['testPlanName'], completed_testplan['version']))
         self.test_plan.get_test_plan_edit_page_by_id(completed_testplan['id'])
         self.info('Going to step 2 to remove all the test units from it')
         self.test_plan.navigate_to_testunits_selection_page()
+        self.test_plan.sleep_tiny()
         self.test_plan.delete_all_testunits()
         self.test_plan.save_and_confirm_popup()
 
@@ -487,7 +488,7 @@ class TestPlansTestCases(BaseTest):
             if self.test_plan.is_next_page_button_enabled():
                 self.info('Navigating to the next page')
                 self.base_selenium.click('general:next_page')
-                self.test_plan.sleep_small()
+                self.test_plan.sleep_tiny()
                 testplans_found = self.test_plan.result_table()
             else:
                 results_found = False
