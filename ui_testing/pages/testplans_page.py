@@ -105,3 +105,30 @@ class TestPlans(BasePages):
         self.search(testplan_name)
         self.info('Saving the child data of the main testplan')
         return self.get_child_table_data()
+
+    def delete_selected_item_from_active_table_and_from_archived_table(self, item_name):
+        self.apply_filter_scenario(filter_element='test_plans:testplan_name_filter', filter_text=item_name)
+        self.close_filter_menu()
+        self.sleep_small()
+        row = self.result_table()
+        self.info('Selecting the row')
+        self.click_check_box(source=row[0])
+        self.sleep_tiny()
+        self.info('Archiving the selected row')
+        self.archive_selected_items()
+        self.info('Navigating to the Archived table')
+        self.get_archived_items()
+        self.apply_filter_scenario(filter_element='test_plans:testplan_name_filter', filter_text=item_name)
+        self.close_filter_menu()
+        archived_row = self.result_table()
+        self.sleep_small()
+        self.info('Selecting the row')
+        self.click_check_box(source=archived_row[0])
+        self.sleep_tiny()
+        self.info('Attempting to delete item: {}'.format(item_name))
+        self.delete_selected_item()
+
+        if self.base_selenium.check_element_is_exist(element='general:cant_delete_message'):
+            self.base_selenium.click(element='general:confirm_pop')
+            return False
+        return True

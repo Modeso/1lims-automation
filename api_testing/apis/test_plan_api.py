@@ -305,3 +305,5 @@ class TestPlanAPI(TestPlanAPIFactory):
         else:
             self.info(testplan)
 
+    def get_test_plan_No(self, id):
+        test_plan = self.get_testplan_form_data(id)

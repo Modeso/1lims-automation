@@ -310,13 +310,13 @@ class TestPlansTestCases(BaseTest):
         self.info("selected random test plan {}".format(first_testplan))
         self.info("create another testplan with the same data")
         if "same" == same:
-            article_name = first_testplan['article'][0]
+            article_no = first_testplan['articleNo'][0]
         else:
-            article_name = 'All'
+            article_no = 'All'
 
         self.test_plan.create_new_test_plan(name=first_testplan['testPlanName'],
                                             material_type=first_testplan['materialType'],
-                                            article=article_name)
+                                            article=article_no)
         self.info('Waiting for the error message')
         validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
         self.info('Assert the error message')
@@ -352,18 +352,18 @@ class TestPlansTestCases(BaseTest):
 
     def test013_delete_used_testplan(self):
         """
-        If a testplan is used, it can't be deleted
+        If a test plan is used, it can't be deleted
 
         LIMS-3509
         """
-        self.info("get random order with test plan")
-        random_order, suborders, index = OrdersAPI().get_order_with_field_name(field='testPlans', no_of_field=1)
-        self.info("selected order no {} has testplan name {}".format(suborders[index]['orderNo'],
-                                                                     suborders[index]['testPlans'][0]))
-        self.info('Testplan name: {} will be archived'.format(suborders[index]['testPlans'][0]))
-        testplan_deleted = \
-            self.test_plan.delete_selected_item_from_active_table_and_from_archived_table(
-                item_name=suborders[index]['testPlans'][0])
+        self.info("create order with test plan")
+        response, payolad = OrdersAPI().create_new_order()
+        self.assertEqual(response['status'], 1, payolad)
+        self.info("created order no {} has testplan name {}".format(payolad[0]['orderNo'],
+                                                                    payolad[0]['testPlans'][0]['name']))
+        self.info('Testplan name: {} will be archived'.format(payolad[0]['testPlans'][0]['name']))
+        testplan_deleted = self.test_plan.delete_selected_item_from_active_table_and_from_archived_table(
+            item_name=payolad[0]['testPlans'][0]['name'])
 
         self.info("check for the error popup that this testplan is used and can't be deleted")
         self.assertFalse(testplan_deleted)
@@ -519,7 +519,7 @@ class TestPlansTestCases(BaseTest):
         for tp_text in testplans_found_text:
             self.assertIn(str(random_testplan['article'][0]), tp_text)
 
-    @skip('')
+    @skip('https://modeso.atlassian.net/browse/LIMSA-183')
     def test022_filter_by_testplan_created_on(self):
         """
         User can filter with created on field
