@@ -112,7 +112,14 @@ class TstUnit(TstUnits):
             return self.get_material_type()
 
     def get_material_type(self):
-        return self.base_selenium.get_text(element='test_unit:material_type_by_id').split('\n')
+        items = self.base_selenium.get_text(element='test_unit:material_type_by_id').split('\n')
+        material_types = []
+        for item in items:
+            if '×' in item:
+                material_types.append(item.replace('×', ''))
+            else:
+                material_types.append(item)
+        return material_types
 
     def set_category(self, category=''):
         self.base_selenium.LOGGER.info(
@@ -582,6 +589,47 @@ class TstUnit(TstUnits):
             return testunit_formated
 
     def open_test_unit_edit_page_by_id(self, id):
+        self.info("open edit page of test unit with id {}".format(id))
         url_str = "{}testUnits/edit/" + str(id)
         test_units_url = url_str.format(self.base_selenium.url)
         self.base_selenium.get(url=test_units_url)
+
+    def update_test_unit(self, id):
+        test_unit = {}
+        self.open_test_unit_edit_page_by_id(id)
+        test_unit['number'] = self.generate_random_number(upper=100000)
+        test_unit['name'] = self.generate_random_string()
+        test_unit['method'] = self.generate_random_string()
+        test_unit['categoryName'] = self.generate_random_string()
+        test_unit['iterations'] = self.generate_random_number(upper=4)
+        self.info('Set the new testunit number to be: {}'.format(test_unit['number']))
+        self.set_testunit_number(number=test_unit['number'])
+        self.info('Set the new testunit name to be: {}'.format(test_unit['name']))
+        self.set_testunit_name(name=test_unit['name'])
+        self.info('Set new material type')
+        self.set_material_type()
+        test_unit['materialTypes'] = self.get_material_type()
+        self.info('Set the new category to be: {}'.format(test_unit['categoryName']))
+        self.set_category(category=test_unit['categoryName'])
+        self.info('Set the new testunit iteartions to be: {}'.format(test_unit['iterations']))
+        self.set_testunit_iteration(iteration=test_unit['iterations'])
+
+        self.info('Set the method to be: {}'.format(test_unit['method']))
+        self.set_method(method=test_unit['method'])
+
+        self.info('pressing save and create new version')
+        self.save_and_create_new_version(confirm=True)
+        return test_unit
+    
+    def refresh_and_get_updated_data(self):
+        test_unit = {}
+        self.info('Refresh to make sure that the new data are saved')
+        self.base_selenium.refresh()
+        self.info('Getting testunit data after refresh')
+        test_unit['number'] = self.get_testunit_number()
+        test_unit['name'] = self.get_testunit_name()
+        test_unit['method'] = self.get_method()
+        test_unit['categoryName'] = self.get_category()
+        test_unit['iterations'] = self.get_testunit_iteration()
+        test_unit['materialTypes'] = self.get_material_type()
+        return test_unit

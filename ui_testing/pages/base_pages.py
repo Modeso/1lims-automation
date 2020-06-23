@@ -293,6 +293,12 @@ class BasePages:
     def generate_random_website(self):
         return "www." + str(uuid4()).replace("-", "")[:10] + "." + str(uuid4()).replace("-", "")[:3]
 
+    def generate_random_string(self):
+        return str(uuid4()).replace("-", "")[:10]
+
+    def generate_random_number(self, lower=1, upper=100000):
+        return randint(lower, upper)
+
     def open_configuration(self):
         self.base_selenium.click(element='general:right_menu')
         self.base_selenium.click(element='general:configurations')

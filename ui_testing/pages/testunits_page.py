@@ -24,6 +24,7 @@ class TstUnits(BasePages):
         self.base_selenium.click(element='test_units:right_menu')
         self.base_selenium.click(element='test_units:archive')
         self.confirm_popup()
+        self.sleep_small()
     
     def get_versions_table(self):
         self.base_selenium.scroll()
@@ -73,6 +74,7 @@ class TstUnits(BasePages):
         self.base_selenium.click(element='test_units:right_menu')
         self.base_selenium.click(element='test_units:restore')
         self.confirm_popup()
+        self.sleep_small()
 
     def get_active_test_units(self):
         self.base_selenium.scroll()
@@ -188,4 +190,10 @@ class TstUnits(BasePages):
     def get_last_test_unit_row(self):
         rows = self.result_table()
         return rows[0]
+
+    def filter_and_get_result(self, test_unit_no):
+        self.apply_filter_scenario(filter_element='test_units:testunit_number_filter',
+                                   filter_text=test_unit_no, field_type='text')
+        testunit_records = self.result_table()
+        return self.base_selenium.get_row_cells_dict_related_to_header(row=testunit_records[0])
 

@@ -269,6 +269,14 @@ class TestUnitAPI(TestUnitAPIFactory):
         testunits = response['testUnits']
         return testunits
 
+    def get_testunit_with_quicksearch(self, quickSearchText, **kwargs):
+        filter_text = '{"quickSearch":"' + quickSearchText + '","columns":["number","name"]}'
+        response, _ = self.get_all_test_units(filter=filter_text, **kwargs)
+        if response['count'] >= 1:
+            return response['testUnits']
+        else:
+            return None
+
     def get_test_unit_with_spec_or_quan_only(self, spec_or_quan):
         response, _ = self.get_all_test_units(filter='{"typeName":2}')
         testunits = response['testUnits']
@@ -349,3 +357,8 @@ class TestUnitAPI(TestUnitAPIFactory):
                 testunits_with_values.append(testunit)
 
         return testunits_with_values
+
+    def get_unit_format(self, test_unit_no):
+        test_unit = self.get_testunit_with_quicksearch(test_unit_no.replace("'", ""))
+        if test_unit:
+            return test_unit[0]['unit']

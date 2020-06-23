@@ -329,7 +329,9 @@ elements = {
         'qualitative_value': {'method': 'id',
                               'value': 'textValueArrayfield'},
         'testunit_name_filter': {'method': 'id',
-                                 'value': 'namefield'}
+                                 'value': 'namefield'},
+        'testunit_number_filter': {'method': 'id',
+                                 'value': 'numberfield'}
     },
 
     'test_plan': {
