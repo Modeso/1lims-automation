@@ -118,11 +118,10 @@ class TstUnit(TstUnits):
         self.base_selenium.LOGGER.info(
             'Set category to be "{}", if it is empty, then it will be random'.format(category))
         if category:
-            self.base_selenium.select_item_from_drop_down(
-                element='test_unit:category', item_text=category)
+            self.base_selenium.select_item_from_drop_down(element='test_unit:category', item_text=category)
         else:
-            self.base_selenium.select_item_from_drop_down(
-                element='test_unit:category')
+            self.base_selenium.select_item_from_drop_down(element='test_unit:category', avoid_duplicate=True)
+            self.sleep_small()
             return self.get_category()
 
     def get_category(self):

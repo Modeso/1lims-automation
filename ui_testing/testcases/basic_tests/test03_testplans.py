@@ -607,6 +607,7 @@ class TestPlansTestCases(BaseTest):
         """
         assert (self.test_plan.deselect_all_configurations(), False)
 
+    @skip("https://modeso.atlassian.net/browse/LIMSA-184")
     def test027_test_unit_update_version_in_testplan(self):
         """
         Test plan: Test unit Approach: In case I update category & iteration of
@@ -617,8 +618,8 @@ class TestPlansTestCases(BaseTest):
         """
         self.test_unit_page = TstUnit()
         self.info("select random test unit to create the test plan with it")
-        testunits, payload = TestUnitAPI().get_all_test_units(limited=20, filter='{"materialTypes":"all"}')
-        testunit = random.choice(testunits['testUnits'])
+        testunit = random.choice(TestUnitAPI().get_testplan_valid_test_unit())
+
         self.info('A random test unit is chosen, its name: {}, category: {} and number of iterations: {}'.format(
             testunit['name'], testunit['categoryName'], testunit['iterations']))
 
@@ -634,9 +635,11 @@ class TestPlansTestCases(BaseTest):
         self.test_unit_page.get_test_units_page()
         self.info('Navigating to test unit {} edit page'.format(testunit['name']))
         self.test_unit_page.get_test_unit_edit_page_by_id(testunit['id'])
+        self.test_unit_page.sleep_small()
         new_iteration = str(int(first_testplan_testunit_iteration) + 1)
-        self.info("update the iteration and category")
-        new_category = self.test_unit_page.set_category('')
+        new_category = self.generate_random_string()
+        self.info("update the iteration to {} and category to {}".format(new_iteration, new_category))
+        self.test_unit_page.set_category(new_category)
         self.test_unit_page.set_testunit_iteration(new_iteration)
         self.info("press save and complete to create a new version")
         self.test_unit_page.save_and_create_new_version()
@@ -644,21 +647,21 @@ class TestPlansTestCases(BaseTest):
         self.info(" go back to test plans active table")
         self.test_plan.get_test_plans_page()
         self.info(" create new testplan with this testunit after creating the new version")
-        second_testplan_name, payload2 = self.test_plan_api.create_testplan()
-        self.info('Second test plan create with name: {}'.format(payload2['testPlan']['text']))
+        response, payload2 = self.test_plan_api.create_testplan()
+        self.assertEqual(response["status"], 1)
+        second_testplan_name = payload2['testPlan']['text']
+        self.info('Second test plan create with name: {}'.format(second_testplan_name))
 
         self.info("check the iteration and category to be the same as the new version")
         self.info("go to testplan edit to get the number of iterations and testunit category")
         second_testplan_testunit_category, second_testplan_testunit_iteration = \
-            self.test_plan.get_testunit_category_iterations(payload2['testPlan']['text'], testunit['name'])
+            self.test_plan.get_testunit_category_iterations(second_testplan_name, testunit['name'])
 
-        self.info('Asserting that the category of the test unit in the first testplan is not '
-                  'equal the category of the test unit in the second testplan')
-        self.assertNotEqual(first_testplan_testunit_category, second_testplan_testunit_category)
-        self.info('Asserting that the iterations of the test unit in the first testplan is not '
-                  'equal the iterations of the test unit in the second testplan')
+        self.info('Asserting that the category of the test unit in the first test plan is not updated')
+        self.assertNotEqual(first_testplan_testunit_category, new_category)
+        self.info('Asserting that the iterations of the test unit in the first test plan is not updated')
         self.assertNotEqual(first_testplan_testunit_iteration, second_testplan_testunit_iteration)
-        self.info('Asserting that the category of the test unit in the second testplan is the '
+        self.info('Asserting that the category of the test unit in the second new_iteration is the '
                   'same as the updated category')
         self.assertEqual(second_testplan_testunit_category, new_category)
         self.info('Asserting that the iterations of the test unit in the second testplan is the '
