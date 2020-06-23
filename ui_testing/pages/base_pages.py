@@ -36,19 +36,19 @@ class BasePages:
         self.base_selenium.clear_element_text(element=element)
 
     def sleep_tiny(self):
-        self.info('wait up to 0.5 sec')
+        self.base_selenium.LOGGER.debug('wait up to 0.5 sec')
         self.base_selenium.wait_until_page_load_resources(expected_counter=5)
 
     def sleep_small(self):
-        self.info('wait up to 1 sec')
+        self.base_selenium.LOGGER.debug('wait up to 1 sec')
         self.base_selenium.wait_until_page_load_resources(expected_counter=10)
 
     def sleep_medium(self):
-        self.info('wait up to 2 sec')
+        self.base_selenium.LOGGER.debug('wait up to 2 sec')
         self.base_selenium.wait_until_page_load_resources(expected_counter=20)
 
     def sleep_large(self):
-        self.info('wait up to 4 sec')
+        self.base_selenium.LOGGER.debug('wait up to 4 sec')
         self.base_selenium.wait_until_page_load_resources(expected_counter=40)
 
     def save(self, sleep=True, save_btn='general:save', logger_msg='save the changes'):
@@ -280,11 +280,9 @@ class BasePages:
 
         return child_table_data
 
-    def info(self, message):
-        if message[0] != " ":
-            message = " {}".format(message)
-        message = message.lower()
-        self.base_selenium.LOGGER.info(message)
+    @property
+    def info(self):
+        return self.base_selenium.LOGGER.info
 
     def generate_random_email(self):
         name = str(uuid4()).replace("-", "")[:10]

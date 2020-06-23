@@ -93,6 +93,14 @@ class TestPlans(BasePages):
         self.close_filter_menu()
         return results_found
 
+    def filter_by_element_and_get_text(self, fieldName, element, filter_text, fieldType):
+        testplans_found = self.filter_by_element_and_get_results(fieldName, element, filter_text, fieldType)
+        testplans_found_text = [tp.text for tp in testplans_found]
+        self.base_selenium.click_by_script('general:last_page')
+        self.sleep_tiny()
+        testplans_found_text.extend([tp.text for tp in self.result_table()])
+        return filter(None, testplans_found_text)
+
     def search_and_get_childtable_data_for_testplan(self, testplan_name):
         self.search(testplan_name)
         self.info('Saving the child data of the main testplan')

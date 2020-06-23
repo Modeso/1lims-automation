@@ -148,6 +148,10 @@ elements = {
             'method': 'id',
             'value': 'table_next'
         },
+        'last_page': {
+            'method': 'id',
+            'value': 'table_last'
+        },
         'file_input_field': {'method': 'css_selector', 'value':'[type="file"]'},
         'file_upload_success_flag': {'method': 'class_name', 'value': 'dz-complete', 'order': 0},
         'files_upload_success_flags': {'method': 'class_name', 'value': 'dz-complete', 'order': -1},

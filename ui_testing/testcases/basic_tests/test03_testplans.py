@@ -15,14 +15,12 @@ import random
 import datetime
 
 
-
 class TestPlansTestCases(BaseTest):
     def setUp(self):
         super().setUp()
         self.test_plan = TstPlan()
         self.test_plan_api = TestPlanAPI()
         self.article_api = ArticleAPI()
-        self.set_authorization(auth=self.article_api.AUTHORIZATION_RESPONSE)
         self.test_plan.get_test_plans_page()
 
     def test001_test_plan_delete_testunit(self):
@@ -118,6 +116,7 @@ class TestPlansTestCases(BaseTest):
         self.info('Choosing a random testplan table row')
         self.test_plan.sleep_tiny()
         selected_test_plan = self.test_plan.select_random_table_row()
+        self.info(f"selected_test_plan : {selected_test_plan}")
         self.assertTrue(selected_test_plan)
         testplan_number = selected_test_plan['Test Plan No.']
         self.info('select Testplan number: {} to be restored'.format(testplan_number))
@@ -175,7 +174,7 @@ class TestPlansTestCases(BaseTest):
         self.assertEqual(len(restored_rows), len(testplans_numbers))
         self.info('Testplan numbers: {} are restored correctly'.format(testplans_numbers))
 
-    #@skip('https://modeso.atlassian.net/browse/LIMS-6403')
+    # @skip('https://modeso.atlassian.net/browse/LIMS-6403')
     @skip('https://modeso.atlassian.net/browse/LIMSA-180')
     def test007_exporting_test_plan_one_record(self):
         """
@@ -199,7 +198,7 @@ class TestPlansTestCases(BaseTest):
         fixed_row_data_list = self.fix_data_format(row_data_list)
         self.assertCountEqual(fixed_sheet_row_data, fixed_row_data_list)
 
-    #@skip('https://modeso.atlassian.net/browse/LIMS-6403')
+    # @skip('https://modeso.atlassian.net/browse/LIMS-6403')
     @skip('https://modeso.atlassian.net/browse/LIMSA-180')
     def test008_exporting_test_plan_multiple_records(self):
         """
@@ -336,17 +335,21 @@ class TestPlansTestCases(BaseTest):
         testplans_list = [testplan for testplan in testplans if testplan['article'] != ['all']]
         self.assertTrue(testplans_list, 'No test plans with article != all')
         first_testplan = random.choice(testplans_list)
-        self.info("selected random test plan {}".format(first_testplan))
+        self.info("selected random test plan ID : {}".format(first_testplan['id']))
+        for testplan in testplans:
+            if testplan['materialType'] != first_testplan['materialType']:
+                second_testplan_data = testplan
+                break
         self.info('Create another testplan with the same name, but with different material type and article name')
-        second_testplan_name = self.test_plan.create_new_test_plan(name=first_testplan['testPlanName'])
+        second_testplan_name = self.test_plan.create_new_test_plan(name=first_testplan['testPlanName'],
+                                                                   material_type=second_testplan_data['materialType'])
         self.info('New testplan is created successfully with name: {}, article name: {} and material type: {}'.format(
-                second_testplan_name, self.test_plan.article, self.test_plan.material_type))
+            second_testplan_name, self.test_plan.article, self.test_plan.material_type))
 
         self.assertEqual(first_testplan['testPlanName'], second_testplan_name)
         data = self.test_plan.search(second_testplan_name)
         self.assertGreaterEqual(len(data), 2)
 
-    #@skip('https://modeso.atlassian.net/browse/LIMS-6405')
     def test013_delete_used_testplan(self):
         """
         If a testplan is used, it can't be deleted
@@ -435,27 +438,11 @@ class TestPlansTestCases(BaseTest):
         """
         random_testplan = random.choice(self.test_plan_api.get_all_test_plans_json())
         self.assertTrue(random_testplan, "can't select random test plan !")
-        testplans_found = self.test_plan.filter_by_element_and_get_results(
+        testplans_found_text = self.test_plan.filter_by_element_and_get_text(
             'Testplan Name', 'test_plans:testplan_name_filter', random_testplan['testPlanName'], 'drop_down')
-        self.info('Checking if the results were filtered successfully')
-        if len(testplans_found):
-            results_found = True
-        else:
-            self.info("filter failed or no elements with this test plan name!")
-            results_found = False
 
-        while results_found:
-            for tp in testplans_found:
-                if len(tp.text) > 0:
-                    self.assertIn(str(random_testplan['testPlanName']), tp.text)
-            if self.test_plan.is_next_page_button_enabled():
-                self.base_selenium.click('general:next_page')
-                self.test_plan.sleep_small()
-                testplans_found = self.test_plan.result_table()
-            else:
-                results_found = False
-
-        self.info('Filtering by name was done successfully')
+        for tp_text in testplans_found_text:
+            self.assertIn(str(random_testplan['testPlanName']), tp_text)
 
     @parameterized.expand(['Completed', 'In Progress'])
     def test018_filter_by_testplan_status(self, status):
@@ -464,34 +451,15 @@ class TestPlansTestCases(BaseTest):
 
         LIMS-6474
         """
-        testplans_found = \
-            self.test_plan.filter_by_element_and_get_results('Status', 'test_plans:testplan_status_filter',
-                                                             status, 'drop_down')
-
-        if len(testplans_found):
-            results_found = True
-        else:
-            self.info("filter failed or no elements with this test plan name!")
-            results_found = False
-
-        while results_found:
-            for tp in testplans_found:
-                if len(tp.text) > 0:
-                    self.assertIn(status, tp.text)
-                    if status == "In Progress":
-                        self.assertNotIn('Completed', tp.text)
-                    else:
-                        self.assertNotIn('In Progress', tp.text)
-
-            if self.test_plan.is_next_page_button_enabled():
-                self.info('Navigating to the next page')
-                self.base_selenium.click('general:next_page')
-                self.test_plan.sleep_tiny()
-                testplans_found = self.test_plan.result_table()
+        testplans_found_text = \
+            self.test_plan.filter_by_element_and_get_text('Status', 'test_plans:testplan_status_filter',
+                                                          status, 'drop_down')
+        for tp_text in testplans_found_text:
+            self.assertIn(status, tp_text)
+            if status == "In Progress":
+                self.assertNotIn('Completed', tp_text)
             else:
-                results_found = False
-
-        self.info('Filtering by status was done successfully')
+                self.assertNotIn('In Progress', tp_text)
 
     def test019_filter_by_testplan_changed_by(self):
         """
@@ -527,29 +495,12 @@ class TestPlansTestCases(BaseTest):
         LIMS-6471
         """
         random_testplan = random.choice(self.test_plan_api.get_all_test_plans_json())
-        testplans_found = self.test_plan.filter_by_element_and_get_results(
+        testplans_found_text = self.test_plan.filter_by_element_and_get_text(
             'Material Type', 'test_plans:testplan_material_type_filter',
             random_testplan['materialType'], 'drop_down')
-        self.info('Checking if the results were filtered successfully')
-        if len(testplans_found):
-            results_found = True
-        else:
-            self.info("filter failed or no elements with this test plan name!")
-            results_found = False
 
-        while results_found:
-            for tp in testplans_found:
-                if len(tp.text) > 0:
-                    self.assertIn(str(random_testplan['materialType']), tp.text)
-            if self.test_plan.is_next_page_button_enabled():
-                self.base_selenium.click('general:next_page')
-                self.info('Navigating to the next page')
-                self.test_plan.sleep_small()
-                testplans_found = self.test_plan.result_table()
-            else:
-                results_found = False
-
-        self.info('Filtering by material type was done successfully')
+        for tp_text in testplans_found_text:
+            self.assertIn(str(random_testplan['materialType']), tp_text)
 
     def test021_filter_by_testplan_article(self):
         """
@@ -559,34 +510,16 @@ class TestPlansTestCases(BaseTest):
         """
         random_testplan = random.choice(self.test_plan_api.get_all_test_plans_json())
         if random_testplan['article'][0] == 'all':
-            testplans_found = self.test_plan.filter_by_element_and_get_results(
+            testplans_found_text = self.test_plan.filter_by_element_and_get_text(
                 'Article', 'test_plans:testplan_article_filter', 'All', 'drop_down')
         else:
-            testplans_found = self.test_plan.filter_by_element_and_get_results(
+            testplans_found_text = self.test_plan.filter_by_element_and_get_text(
                 'Article', 'test_plans:testplan_article_filter', random_testplan['articleNo'][0], 'drop_down')
 
-        self.info('Checking if the results were filtered successfully')
-        if len(testplans_found):
-            results_found = True
-        else:
-            self.info("filter failed or no elements with this test plan name!")
-            results_found = False
+        for tp_text in testplans_found_text:
+            self.assertIn(str(random_testplan['article'][0]), tp_text)
 
-        while results_found:
-            for tp in testplans_found:
-                if len(tp.text) > 0:
-                    self.assertIn(str(random_testplan['article'][0]), tp.text)
-
-            if self.test_plan.is_next_page_button_enabled():
-                self.base_selenium.click('general:next_page')
-                self.info('Navigating to the next page')
-                self.test_plan.sleep_tiny()
-                testplans_found = self.test_plan.result_table()
-            else:
-                results_found = False
-        self.info('Filtering by article was done successfully')
-
-    #@skip('https://modeso.atlassian.net/browse/LIMS-6505')
+    @skip('')
     def test022_filter_by_testplan_created_on(self):
         """
         User can filter with created on field
@@ -597,27 +530,11 @@ class TestPlansTestCases(BaseTest):
         date = datetime.datetime.strptime(random_testplan['createdAt'], "%Y-%m-%dT%H:%M:%S.%fZ")
         date_formatted = datetime.datetime.strftime(date, '%d.%m.%Y')
 
-        testplans_found = self.test_plan.filter_by_element_and_get_results(
+        testplans_found_text = self.test_plan.filter_by_element_and_get_text(
             'Created On', 'test_plans:testplan_created_on_filter', date_formatted, 'date')
-        self.info('Checking if the results were filtered successfully')
-        if len(testplans_found):
-            results_found = True
-        else:
-            self.info("filter failed or no elements with this test plan name!")
-            results_found = False
 
-        while results_found:
-            for tp in testplans_found:
-                if len(tp.text) > 0:
-                    self.assertIn(date_formatted, tp.text)
-            if self.test_plan.is_next_page_button_enabled():
-                self.base_selenium.click('general:next_page')
-                self.info('Navigating to the next page')
-                self.test_plan.sleep_small()
-                testplans_found = self.test_plan.result_table()
-            else:
-                results_found = False
-        self.info('Filtering by created on date was done successfully')
+        for tp_text in testplans_found_text:
+            self.assertIn(date_formatted, tp_text)
 
     @parameterized.expand(['ok', 'cancel'])
     def test023_create_approach_overview_button(self, ok):
@@ -710,7 +627,7 @@ class TestPlansTestCases(BaseTest):
         self.info('First test plan create with name: {}'.format(payload1['testPlan']['text']))
 
         self.info("go to testplan edit to get the number of iterations and test unit category")
-        first_testplan_testunit_category, first_testplan_testunit_iteration =\
+        first_testplan_testunit_category, first_testplan_testunit_iteration = \
             self.test_plan.get_testunit_category_iterations(payload1['testPlan']['text'], testunit['name'])
 
         self.info("go to test units' active table and search for this test unit")
