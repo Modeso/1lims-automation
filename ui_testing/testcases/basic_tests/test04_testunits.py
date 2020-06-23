@@ -2,7 +2,6 @@ from ui_testing.testcases.base_test import BaseTest
 from ui_testing.pages.articles_page import Articles
 from ui_testing.pages.testplan_page import TstPlan
 from ui_testing.pages.testunit_page import TstUnit
-from ui_testing.pages.base_pages import BasePages
 from api_testing.apis.test_unit_api import TestUnitAPI
 from api_testing.apis.article_api import ArticleAPI
 from api_testing.apis.test_plan_api import TestPlanAPI
@@ -16,13 +15,9 @@ class TestUnitsTestCases(BaseTest):
     def setUp(self):
         super().setUp()
         self.test_unit_page = TstUnit()
-        self.articles_page = Articles()
         self.test_plan = TstPlan()
-        self.base_page = BasePages()
         self.article_api = ArticleAPI()
-        self.test_plan_api = TestPlanAPI()
         self.test_unit_api = TestUnitAPI()
-        self.general_utilities_api = GeneralUtilitiesAPI()
         self.set_authorization(auth=self.article_api.AUTHORIZATION_RESPONSE)
         self.test_unit_page.get_test_units_page()
 
@@ -908,14 +903,14 @@ class TestUnitsTestCases(BaseTest):
         self.base_selenium.click(element='test_units:new_testunit')
         self.test_unit_page.sleep_tiny()
         # click on Overview, this will display an alert to the user
-        self.base_page.click_overview()
+        self.test_unit_page.click_overview()
         # switch to the alert
         if 'ok' == ok:
-            self.base_page.confirm_overview_pop_up()
+            self.test_unit_page.confirm_overview_pop_up()
             self.assertEqual(self.base_selenium.get_url(), 'https://automation.1lims.com/testUnits')
             self.base_selenium.LOGGER.info(' + clicking on Overview confirmed')
         else:
-            self.base_page.cancel_overview_pop_up()
+            self.test_unit_page.cancel_overview_pop_up()
             self.assertEqual(self.base_selenium.get_url(), 'https://automation.1lims.com/testUnits/add')
             self.base_selenium.LOGGER.info('clicking on Overview cancelled')
 
@@ -930,7 +925,7 @@ class TestUnitsTestCases(BaseTest):
         self.base_selenium.LOGGER.info('test_units_url: {}'.format(test_units_url))
         # click on Overview, it will redirect you to testunits' page
         self.base_selenium.LOGGER.info('click on Overview')
-        self.base_page.click_overview()
+        self.test_unit_page.click_overview()
         self.test_unit_page.sleep_tiny()
         self.assertEqual(self.base_selenium.get_url(), '{}testUnits'.format(self.base_selenium.url))
         self.base_selenium.LOGGER.info('clicking on Overview confirmed')
@@ -1067,7 +1062,7 @@ class TestUnitsTestCases(BaseTest):
         active_article_request = self.article_api.get_all_articles()[0]['articles']
         active_article = active_article_request[0]
 
-        all_materialtypes = self.general_utilities_api.list_all_material_types()['materialTypes']
+        all_materialtypes = GeneralUtilitiesAPI().list_all_material_types()['materialTypes']
 
         article_materialtype = list(filter(lambda x: x['name'] == active_article['materialType'], all_materialtypes))[0]
         article_object = [{
@@ -1085,7 +1080,7 @@ class TestUnitsTestCases(BaseTest):
         }
 
         self.base_selenium.LOGGER.info('Create new testPlan to use the newly created testunit')
-        testplan_data = self.test_plan_api.create_testplan(testUnits=[testunit_testplan_formated],
+        testplan_data = TestPlanAPI().create_testplan(testUnits=[testunit_testplan_formated],
                                                            testPlan=testplan_name, selectedArticles=article_object,
                                                            materialType=article_materialtype,
                                                            number=random_testplan_number)
@@ -1546,7 +1541,7 @@ class TestUnitsTestCases(BaseTest):
         self.assertEqual(testunit_name, search_data['Test Unit Name'])
         # Navigate to articles page
         self.info('navigate to articles page')
-        self.articles_page.get_articles_page()
+        Articles().get_articles_page()
         self.assertEqual(self.base_selenium.get_url(), '{}articles'.format(self.base_selenium.url))
 
     def test043_hide_all_table_configurations(self):
