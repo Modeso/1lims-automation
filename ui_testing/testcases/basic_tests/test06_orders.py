@@ -2189,7 +2189,7 @@ class OrdersTestCases(BaseTest):
             testunit_name, testplans_testunits_names_in_popup[0]['test_units'][0]))
         self.assertEqual(testunit_name, testplans_testunits_names_in_popup[0]['test_units'][0])
 
-    def test047_create_order_with_multiple_contacts_then_add_department(self):
+    def test063_create_order_with_multiple_contacts_then_add_department(self):
         """
         User should be able to choose more than one contact from drop down menu upon creating a new order
 
@@ -2231,7 +2231,7 @@ class OrdersTestCases(BaseTest):
         self.info('assert that department updated')
         self.assertEqual([department], order_data['suborders'][0]['departments'])
 
-    def test048_edit_department_of_order_with_multiple_contacts(self):
+    def test064_edit_department_of_order_with_multiple_contacts(self):
         """
         In case I select multiple contacts the departments should be updated according to that
 
@@ -2266,3 +2266,33 @@ class OrdersTestCases(BaseTest):
         suborder_data = self.order_page.get_suborder_data()
         self.assertEqual([department], suborder_data['suborders'][0]['departments'])
 
+    def test065_download_suborder_sheet_for_single_order(self):
+        """
+        Export order child table
+
+        LIMS-8085- single order case
+        """
+        self.info('select random order')
+        random_row = self.orders_page.get_random_table_row(table_element='general:table')
+        self.orders_page.click_check_box(source=random_row)
+        random_row_data = self.base_selenium.get_row_cells_dict_related_to_header(random_row)
+        self.orders_page.open_child_table(source=random_row)
+        child_table_data = self.order_page.get_table_data()
+        order_data_list = []
+        order_dict = {}
+        for sub_order in child_table_data:
+            order_dict.update(random_row_data)
+            order_dict.update(sub_order)
+            order_data_list.append(order_dict)
+            order_dict = {}
+
+        formatted_orders = self.order_page.match_format_to_sheet_format(order_data_list)
+        self.order_page.download_xslx_sheet()
+        for index in range(len(formatted_orders)):
+            self.info('Comparing the order no {} '.format(formatted_orders[index][0]))
+            values = self.order_page.sheet.iloc[index].values
+            fixed_sheet_row_data = self.reformat_data(values)
+            self.assertCountEqual(fixed_sheet_row_data, formatted_orders[index],
+                                  f"{str(fixed_sheet_row_data)} : {str(formatted_orders[index])}")
+            for item in formatted_orders[index]:
+                self.assertIn(item, fixed_sheet_row_data)
