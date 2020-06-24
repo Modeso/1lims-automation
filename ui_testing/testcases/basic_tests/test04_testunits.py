@@ -129,8 +129,8 @@ class TestUnitsTestCases(BaseTest):
         self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
         self.info('Waiting for error message to make sure that validation forbids adding - in the upper limit')
         validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
-        self.info('+ Assert error msg which indicates that it does not allow to add - in upper limit has appeared? {}'
-            .format(validation_result))
+        self.info('+ Assert error msg which indicates that it does not allow to add - in upper limit has appeared? {}'.
+                  format(validation_result))
         self.assertEqual(validation_result, True)
 
     def test006_search_by_archived_testunit(self):
@@ -155,32 +155,33 @@ class TestUnitsTestCases(BaseTest):
         self.assertFalse(self.base_selenium.is_item_in_drop_down(
             element='test_plan:test_unit', item_text=archived_test_unit['name']))
 
+    @skip('https://modeso.atlassian.net/browse/LIMSA-185')
     @parameterized.expand(['spec', 'quan'])
     def test007_allow_unit_field_to_be_optional(self, specification_type):
         """
         Make sure the unit field of the specification or limit of quantification is an optional field.
+
         LIMS-4161
         """
         new_random_name = self.generate_random_string()
         new_random_method = self.generate_random_string()
-        new_random_iteration = self.generate_random_number(lower=1, upper=4)
-        new_random_upper_limit = self.generate_random_number(lower=500, upper=1000)
-
-        self.info('Create new testunit with the randomly generated data')
+        new_random_upper_limit = self.generate_random_number(lower=50, upper=100)
+        new_random_category = self.generate_random_string()
+        self.info('Create new test unit with the randomly generated data')
         self.test_unit_page.create_new_testunit(name=new_random_name, testunit_type='Quantitative',
-                                                iteration=new_random_iteration, method=new_random_method,
+                                                category=new_random_category, method=new_random_method,
                                                 spec_or_quan=specification_type, upper_limit=new_random_upper_limit)
 
         self.test_unit_page.sleep_tiny()
         self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
 
-        self.info(
-            'Search by testunit name: {}, to make sure that testunit created successfully'.format(new_random_name))
-        test_unit = self.test_unit_page.search(value=new_random_name)[0]
-        self.test_unit_page.open_edit_page(test_unit)
-
-        self.info(
-            'Getting values of the unit field and upper limit to make sure that values saved correctly')
+        self.info('Search by testunit name: {}, to make sure that testunit created successfully'.
+                  format(new_random_name))
+        self.test_unit_page.apply_filter_scenario(filter_element='test_units:testunit_name_filter',
+                                                  filter_text=new_random_name, field_type='text')
+        test_unit_found = self.test_unit_page.get_the_latest_row_data()
+        self.test_unit_page.open_edit_page(test_unit_found['name']) # update it
+        self.info('Getting values of the unit field and upper limit to make sure that values saved correctly')
         if specification_type == 'spec':
             unit_value = self.test_unit_page.get_spec_unit()
             upper_limit_value = self.test_unit_page.get_spec_upper_limit()
@@ -190,10 +191,10 @@ class TestUnitsTestCases(BaseTest):
 
         self.info('+ Assert unit value after save is: {}, and should be empty'.format(unit_value))
         self.assertEqual(unit_value, '')
-
         self.info('Checking with upper limit to make sure that data saved normally')
         self.assertEqual(upper_limit_value, str(new_random_upper_limit))
 
+    @skip('https://modeso.atlassian.net/browse/LIMSA-185')
     @parameterized.expand(['spec', 'quan'])
     def test008_force_use_to_choose_specification_or_limit_of_quantification(self, specification_type):
         """
@@ -206,10 +207,13 @@ class TestUnitsTestCases(BaseTest):
         new_random_method = self.generate_random_string()
         new_random_iteration = self.generate_random_number(lower=1, upper=4)
         new_random_upper_limit = self.generate_random_number(lower=500, upper=1000)
+        new_random_category = self.generate_random_string()
+
 
         self.info('Create new testunit with the randomly generated data')
         self.test_unit_page.create_new_testunit(name=new_random_name, testunit_type='Quantitative',
-                                                iteration=new_random_iteration, method=new_random_method)
+                                                iteration=new_random_iteration, method=new_random_method,
+                                                category=new_random_category)
         self.test_unit_page.sleep_tiny()
         self.info('Create new testunit with the random data')
         self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
@@ -232,7 +236,7 @@ class TestUnitsTestCases(BaseTest):
 
         self.test_unit_page.sleep_tiny()
         self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
-
+        self.test_units_page.get_test_units_page()
         self.info(
             'Search by testunit name: {}, to make sure that testunit created successfully'.format(new_random_name))
         self.test_unit_page.search(value=new_random_name)
@@ -244,6 +248,7 @@ class TestUnitsTestCases(BaseTest):
             '+ Assert testunit records count is: {}, and it should be {}'.format(testunits_count, 1))
         self.assertEqual(testunits_count, 1)
 
+    @skip('https://modeso.atlassian.net/browse/LIMSA-185')
     @parameterized.expand(['Qualitative', 'Quantitative MiBi'])
     def test009_qualitative_value_should_be_mandatory_field(self, testunit_type):
 
@@ -254,10 +259,11 @@ class TestUnitsTestCases(BaseTest):
         """
         new_random_name = self.generate_random_string()
         new_random_method = self.generate_random_string()
+        new_random_category = self.generate_random_string()
 
         self.info('Create new testunit with Quantitative MiBi and random generated data')
         self.test_unit_page.create_new_testunit(name=new_random_name, testunit_type=testunit_type,
-                                                method=new_random_method)
+                                                method=new_random_method, category=new_random_category)
 
         self.test_unit_page.sleep_tiny()
         self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
@@ -268,45 +274,33 @@ class TestUnitsTestCases(BaseTest):
         self.info('Assert error msg')
         self.assertEqual(validation_result, True)
 
-    @parameterized.expand(['Qualitative', 'Quantitative MiBi'])
-    def test010_material_type_approach(self, testunit_type):
+    def test010_material_type_approach(self):
         """"
         In case I created test unit with 4 materiel type, when I go to test plan I should found that each test unit
-         displayed according to it's materiel type.
+        displayed according to it's materiel type.
 
-         LIMS-3683
-
+        LIMS-3683
         """
-
-        new_random_name = self.generate_random_string()
-        new_random_method = self.generate_random_string()
-
-        self.info('Create new testunit with {} and random generated data'.format(testunit_type))
-        if testunit_type == 'Qualitative':
-            self.test_unit_page.create_qualitative_testunit(name=new_random_name, method=new_random_method)
-        else:
-            new_random_upper_limit = self.generate_random_number(lower=500, upper=1000)
-            self.test_unit_page.create_quantitative_mibi_testunit(name=new_random_name, method=new_random_method,
-                                                                  upper_limit=new_random_upper_limit)
-
-        self.info('Set random n material type')
-        for _ in range(3):
-            self.test_unit_page.set_material_type()
-
-        material_types = [material_type.replace('×', '') for material_type in self.test_unit_page.get_material_type()]
-
-        self.test_unit_page.sleep_tiny()
-        self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
-
-        test_units = self.test_unit_api.get_all_test_units().json()['testUnits']
-
-        for test_unit in test_units:
-            if test_unit['name'] == new_random_name:
-                for material_type in material_types:
-                    self.assertIn(material_type, test_unit['materialTypes'])
+        self.info('create new test unit with 4 material type')
+        testunit = self.test_unit_api.create_test_unit_with_multiple_material_types()
+        self.info('created test unit data {}'.format(testunit))
+        self.info('Navigate to test plan page')
+        self.test_plan.get_test_plans_page()
+        self.info('create new test plan')
+        test_plan_name = self.test_plan.create_new_test_plan(save=False,
+                                                             material_type=testunit['selectedMaterialTypes'][0]['name'])
+        for i in range(0, len(testunit['selectedMaterialTypes'])-1):
+            self.test_plan.set_test_unit(testunit['name'])
+            test_unit_data = self.test_plan.result_table('test_plan:testunits_table')[0].text
+            self.assertIn(testunit['name'], test_unit_data)
+            if i+1 < len(testunit['selectedMaterialTypes']):
+                self.base_selenium.click('test_plan:back_button')
+                self.test_plan.set_material_type(testunit['selectedMaterialTypes'][i+1]['name'])
+                self.test_plan.set_article(random=True)
+            else:
                 break
-        else:
-            self.fail('Material type is not there')
+
+        self.info("test unit displayed according to materiel type.")
 
     @parameterized.expand(['True', 'False'])
     def test011_create_test_unit_with_random_category(self, random):

@@ -362,3 +362,22 @@ class TestUnitAPI(TestUnitAPIFactory):
         test_unit = self.get_testunit_with_quicksearch(test_unit_no.replace("'", ""))
         if test_unit:
             return test_unit[0]['unit']
+
+    def create_test_unit_with_multiple_material_types(self, type='Qualitative'):
+        response, _ = GeneralUtilitiesAPI().list_all_material_types()
+        material_type = random.choices(response['materialTypes'], k=4)
+        if type == 'Quantitative MiBi':
+            api, payload = self.create_mibi_testunit(selectedMaterialTypes=material_type)
+        elif type == 'Quantitative':
+            api, payload = self.create_quantitative_testunit(selectedMaterialTypes=material_type)
+        elif type == 'Qualitative':
+            api, payload = self.create_qualitative_testunit(selectedMaterialTypes=material_type)
+
+        test_unit_dict = {'id': api['testUnit']['testUnitId']}
+        test_unit_dict.update(payload)
+        if api['status'] == 1:
+            return test_unit_dict
+        else:
+            return None
+
+

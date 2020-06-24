@@ -140,7 +140,8 @@ class TstPlan(TestPlans):
             self.sleep_tiny()
             if save:
                 self.save(save_btn='test_plan:save_and_complete')
-        else:
+
+        if save:
             self.save(save_btn='test_plan:save_btn')
             self.wait_until_page_is_loaded()
 
@@ -154,6 +155,7 @@ class TstPlan(TestPlans):
     def navigate_to_testunits_selection_page(self):
         self.info('Navigating to testplan create/update step 2')
         self.sleep_tiny()
+        self.base_selenium.scroll()
         self.base_selenium.click(element='test_plan:testunits_selection')
         self.sleep_tiny()
 
