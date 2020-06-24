@@ -302,6 +302,8 @@ class TestUnitsTestCases(BaseTest):
 
         self.info("test unit displayed according to materiel type.")
 
+    @skip("https://modeso.atlassian.net/browse/LIMSA-184")
+    @skip("https://modeso.atlassian.net/browse/LIMSA-185")
     @parameterized.expand(['True', 'False'])
     def test011_create_test_unit_with_random_category(self, random):
         """
@@ -332,6 +334,7 @@ class TestUnitsTestCases(BaseTest):
         else:
             self.assertTrue(category)
 
+    @skip("https://modeso.atlassian.net/browse/LIMSA-185")
     @parameterized.expand([('upper', 'spec'),
                            ('upper', 'quan'),
                            ('lower', 'spec'),
@@ -376,6 +379,7 @@ class TestUnitsTestCases(BaseTest):
             self.info('Check that >= is existing in specifications')
             self.assertIn('>=', specifications) if 'spec' in spec_or_quan else self.assertIn('>=', quantification_limit)
 
+    @skip("https://modeso.atlassian.net/browse/LIMSA-185")
     @parameterized.expand([('upper'), ('lower')])
     def test013_limits_of_quantification_approach(self, limit):
         """
@@ -415,6 +419,7 @@ class TestUnitsTestCases(BaseTest):
         self.info('Check that N/A is existing in Quantification')
         self.assertIn('N/A', quantifications_limit)
 
+    @skip("https://modeso.atlassian.net/browse/LIMSA-185")
     def test014_quantitative_mibi_type_allow_upper_limit_the_concentration_to_be_mandatory_fields(self):
         """
             Test unit: Specification Approach: In quantitative MiBi type allow upper
@@ -453,6 +458,7 @@ class TestUnitsTestCases(BaseTest):
         self.info('Assert error msg')
         self.assertEqual(validation_result, True)
 
+    @skip("https://modeso.atlassian.net/browse/LIMSA-185")
     def test015_specification_limit_of_quantification_approach(self):
         """
         New: Test unit: Specification/limit of quantification Approach: Allow user to select those both options
@@ -509,6 +515,7 @@ class TestUnitsTestCases(BaseTest):
             self.info('Assert that {}_limit is not active'.format(limit))
             self.assertNotIn('ng-valid', class_attr)
 
+    @skip("https://modeso.atlassian.net/browse/LIMSA-185")
     @parameterized.expand([('quan'), ('spec')])
     def test017_create_quantative_with_limits_of_quantative_only_and_specification_only(self, limits_type):
         """
@@ -554,6 +561,7 @@ class TestUnitsTestCases(BaseTest):
                     continue
                 self.assertIn(item, fixed_sheet_row_data)
 
+    @skip("https://modeso.atlassian.net/browse/LIMSA-185")
     def test019_specification_limit_of_quantification_approach_can_be_minus(self):
         """
         New: Test unit: Quantitative: Specification Approach User can enter (-) in upper/lower limit
@@ -582,6 +590,7 @@ class TestUnitsTestCases(BaseTest):
         self.info('Assert upper and lower limits are in specifications with N/A values')
         self.assertEqual("N/A", specifications)
 
+    @skip("https://modeso.atlassian.net/browse/LIMSA-185")
     def test020_change_quantification_limits_not_effect_test_plan(self):
         """
         New: Test units/effect on test plan: Limits of quantification Approach: In case I
