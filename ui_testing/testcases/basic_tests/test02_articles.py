@@ -2,7 +2,9 @@ from ui_testing.testcases.base_test import BaseTest
 from ui_testing.pages.article_page import Article
 from ui_testing.pages.testplan_page import TstPlan
 from ui_testing.pages.order_page import Order
+from ui_testing.pages.orders_page import Orders
 from api_testing.apis.article_api import ArticleAPI
+from api_testing.apis.orders_api import OrdersAPI
 from parameterized import parameterized
 from unittest import skip
 import random, re
@@ -14,6 +16,8 @@ class ArticlesTestCases(BaseTest):
         self.article_page = Article()
         self.article_api = ArticleAPI()
         self.test_plan = TstPlan()
+        self.orders_page = Orders()
+        self.order_api = OrdersAPI()
         self.order_page = Order()
         self.set_authorization(auth=self.article_api.AUTHORIZATION_RESPONSE)
 
@@ -94,8 +98,10 @@ class ArticlesTestCases(BaseTest):
         new_unit = self.generate_random_string()
         self.article_page.set_unit(new_unit)
         if 'save' == save:
+            self.article_page.sleep_medium()
             self.article_page.save()
         else:
+            self.article_page.sleep_medium()
             self.article_page.cancel(force=True)
 
         self.base_selenium.get(url=article_url, sleep=self.base_selenium.TIME_MEDIUM)
@@ -127,6 +133,7 @@ class ArticlesTestCases(BaseTest):
         if 'save' == save:
             self.article_page.save()
         else:
+            self.article_page.sleep_medium()
             self.article_page.cancel(force=True)
 
         self.base_selenium.get(
@@ -159,8 +166,10 @@ class ArticlesTestCases(BaseTest):
         self.article_page.set_name(new_name)
 
         if 'save' == save:
+            self.article_page.sleep_medium()
             self.article_page.save()
         else:
+            self.article_page.sleep_medium()
             self.article_page.cancel(force=True)
 
         self.base_selenium.get(
@@ -193,8 +202,10 @@ class ArticlesTestCases(BaseTest):
         new_comment = self.generate_random_string()
         self.article_page.set_comment(new_comment)
         if 'save' == save:
+            self.article_page.sleep_medium()
             self.article_page.save()
         else:
+            self.article_page.sleep_medium()
             self.article_page.cancel(force=True)
 
         self.base_selenium.get(
@@ -210,41 +221,6 @@ class ArticlesTestCases(BaseTest):
                 'Assert {} (current_comment) == {} (article_comment)'.format(current_comment, article_comment))
             self.assertEqual(current_comment, article_comment)
 
-    @parameterized.expand(['save', 'cancel'])
-    def test005_cancel_button_edit_material_type(self, save):
-        """
-        New: Article: Save/Cancel button: After I edit material_type
-        then press on cancel button,a pop up will appear that the
-        data will not saved
-
-        LIMS-3586
-        LIMS-3576
-        """
-        article_id = random.choice(self.article_api.get_articles_with_no_testplans())["id"]
-        # open edit page
-        a = "{}articles/edit/" + str(article_id)
-        edit_page_url = a.format(self.base_selenium.url)
-        self.base_selenium.get(url=edit_page_url)
-        current_material_type = self.article_page.get_material_type()
-        new_material_type = self.article_page.set_material_type(random=True)
-
-        if 'save' == save:
-            self.article_page.save()
-        else:
-            self.article_page.cancel(force=True)
-
-        self.base_selenium.get(url=edit_page_url, sleep=5)
-        article_material = self.article_page.get_material_type()
-        if 'save' == save:
-            self.info('Assert {} (new_material_type) == {} (article_material_type)'.format(
-                new_material_type, article_material))
-            self.assertEqual(new_material_type, article_material)
-            self.assertNotEqual(current_material_type, article_material)  # make sure that material type edited right
-        else:
-            self.info('Assert {} (current_material_type) == {} (article_material_type)'.format(
-                current_material_type, article_material))
-            self.assertEqual(current_material_type, article_material)
-
     def test006_archived_articles_shoudnt_dispaly_in_test_plan(self):
         """
         New: Article: In case I archived any article this article shouldn't display in the test plan module when
@@ -252,38 +228,39 @@ class ArticlesTestCases(BaseTest):
 
         LIMS-3668
         """
-        self.article_page.create_new_article(material_type='Raw Material')
+        article_created, payload = self.article_api.create_article()
         self.base_selenium.LOGGER.info(' Archive the article.')
-        self.article_page.archive_article(name=self.article_page.article_name)
+        self.article_api.archive_articles(ids=[str(article_created['article']['id'])])
         self.test_plan.get_test_plans_page()
         self.base_selenium.LOGGER.info(
             'Create test plan with the same material type.')
         self.test_plan.click_create_test_plan_button()
         self.test_plan.set_material_type(
-            material_type=self.article_page.article_material_type)
+            material_type=payload['materialType']['text'])
         self.article_page.sleep_tiny()
         self.base_selenium.LOGGER.info(
             'Assert article is not existing in the list.')
         self.assertFalse(self.test_plan.is_article_existing(
-            article=self.article_page.article_name))
+            article=article_created['article']['name']))
 
-    @skip('refactor order page')
     def test007_archived_articles_shoudnt_dispaly_in_order(self):
         """
         New: Article: Archived any article this article shouldn't display in the order module
 
         LIMS-3668
         """
-        self.article_page.create_new_article(material_type='Raw Material')
-        self.article_page.archive_article(name=self.article_page.article_name)
-        self.order_page.get_orders_page()
-        self.order_page.click_create_order_button()
-        self.order_page.set_new_order()
-        self.order_page.set_material_type(
-            material_type=self.article_page.article_material_type)
-        self.article_page.sleep_tiny()
+        article_created = self.article_api.create_article(materialTypeId=1)
+        self.article_api.list_articles_by_materialtype(name=article_created[0]['article']['name'])
+        self.article_api.archive_articles(ids=[str(article_created[0]['article']['id'])])
+        orders, payload = self.order_api.get_all_orders(limit=20)
+        random_order = random.choice(orders['orders'])
+        self.base_selenium.LOGGER.info(
+            '{}'.format(random_order['orderNo']))
+        self.orders_page.get_order_edit_page_by_id(random_order['id'])
+        self.order_page.set_material_type_of_first_suborder(material_type='Raw Material', sub_order_index=0)
+        self.order_page.set_article(article=article_created[0]['article']['name'])
         self.assertFalse(self.order_page.is_article_existing(
-            article=self.article_page.article_name))
+            article=article_created[0]['article']['name']))
 
     def test008_created_article_appear_in_test_plan(self):
         """
@@ -291,14 +268,14 @@ class ArticlesTestCases(BaseTest):
 
         LIMS-3581
         """
-        self.article_page.create_new_article(material_type='Raw Material')
+        article_created, payload = self.article_api.create_article()
         self.test_plan.get_test_plans_page()
         self.test_plan.click_create_test_plan_button()
         self.test_plan.set_material_type(
-            material_type=self.article_page.article_material_type)
+            material_type=payload['materialType']['text'])
         self.article_page.sleep_tiny()
         self.assertTrue(self.test_plan.is_article_existing(
-            article=self.article_page.article_name))
+            article=article_created['article']['name']))
 
     def test009_create_article_with_test_plan_search_by_test_plan(self):
         """
@@ -306,10 +283,10 @@ class ArticlesTestCases(BaseTest):
 
         LIMS-3583
         """
-        self.article_page.create_new_article(material_type='Raw Material')
+        article_created, payload = self.article_api.create_article()
         self.test_plan.get_test_plans_page()
-        self.test_plan.create_new_test_plan(material_type=self.article_page.article_material_type,
-                                            article=self.article_page.article_name)
+        self.test_plan.create_new_test_plan(material_type=payload['materialType']['text'],
+                                            article=article_created['article']['name'])
         self.article_page.get_articles_page()
         self.article_page.sleep_small()
         article = self.article_page.search(value=self.test_plan.test_plan_name)[0]
@@ -320,10 +297,10 @@ class ArticlesTestCases(BaseTest):
 
         self.test_plan.clear_article()
         self.test_plan.set_article(article='All')
-        self.test_plan.save()
+        self.test_plan.save(save_btn='test_plan:save_btn')
         self.article_page.get_articles_page()
-        article = self.article_page.search(self.article_page.article_name)[0]
-        self.assertNotIn(self.test_plan.test_plan_name, article.text)
+        article = self.article_page.search(value=article_created['article']['name'])
+        self.assertNotIn(self.test_plan.test_plan_name, article)
 
     def test010_create_article_with_test_plan_filter_by_test_plan(self):
         """
@@ -427,6 +404,7 @@ class ArticlesTestCases(BaseTest):
         LIMS-3597
         """
         self.article_page.create_new_article(sleep=False, material_type='Raw Material')
+        self.article_page.sleep_medium()
         self.assertEqual(self.base_selenium.get_text(element='articles:alert_confirmation'),
                          'Successfully created')
 
@@ -823,3 +801,10 @@ class ArticlesTestCases(BaseTest):
         LIMS-6288
         """
         self.assertFalse(self.article_page.deselect_all_configurations())
+
+    #articles, payload = self.article_api.get_all_articles(limit=20)
+    #article = random.choice(articles['articles'])
+    #print(article)
+    #self.base_selenium.LOGGER.info(
+     #   '{}'.format(article['No']))
+    #self.article_page.get_article_edit_page_by_id(article['id'])
