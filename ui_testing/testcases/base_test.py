@@ -66,6 +66,8 @@ class BaseTest(TestCase):
                 elif '&' in str(item):
                     tmp.extend(str(item).split('&'))
                 elif ',' in str(item):
+                    tmp.extend(str(item).split(','))
+                elif ', ' in str(item):
                     tmp.extend(str(item).split(', '))
                 elif ' ' == str(item)[-1]:
                     tmp.append(item[:-1])

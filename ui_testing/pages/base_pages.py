@@ -105,6 +105,7 @@ class BasePages:
 
     def apply_filter_scenario(self, filter_element, filter_text, field_type='drop_down'):
         self.open_filter_menu()
+        self.sleep_tiny()
         self.base_selenium.wait_element(element=filter_element)
         self.filter_by(filter_element=filter_element, filter_text=filter_text, field_type=field_type)
         self.filter_apply()
@@ -132,6 +133,7 @@ class BasePages:
                 continue
             count = count + 1
             self.click_check_box(source=row)
+            self.sleep_tiny()
             _selected_rows_text.append(row_text)
             selected_rows.append(row)
             selected_rows_data.append(self.base_selenium.get_row_cells_dict_related_to_header(row=row))

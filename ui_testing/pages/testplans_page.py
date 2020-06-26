@@ -15,6 +15,7 @@ class TestPlans(BasePages):
         url_text = "{}testPlans/edit/" + str(id)
         self.base_selenium.get(url=url_text.format(self.base_selenium.url))
         self.wait_until_page_is_loaded()
+        self.sleep_small()
 
     def get_random_test_plans(self):
         row = self.get_random_table_row('test_plans:test_plans_table')

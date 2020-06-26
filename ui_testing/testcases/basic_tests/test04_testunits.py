@@ -36,12 +36,13 @@ class TestUnitsTestCases(BaseTest):
             if re.findall(r'\d{1,}.\d{1,}.\d{4}', row_data[column]) \
                     or row_data[column] == '-' or not (row_data[column]) or row_data[column] == 'N/A':
                 continue
-            self.info(' + search for {} : {}'.format(column, row_data[column]))
+            self.info('search for {} : {}'.format(column, row_data[column]))
             if column == 'Unit':
                 unit_format = self.test_unit_api.get_unit_format(row_data['Test Unit No.'])
                 search_results = self.test_unit_page.search(unit_format)
             else:
-                search_results = self.test_unit_page.search(row_data[column].replace('-', '_'))
+                search_results = self.test_unit_page.search(
+                    row_data[column].replace('-', '_').replace("<= ", '').replace(">= ", ''))
             self.assertGreater(len(search_results), 1, " * There is no search results for it, Report a bug.")
             for search_result in search_results:
                 search_data = self.base_selenium.get_row_cells_dict_related_to_header(search_result)
@@ -88,7 +89,8 @@ class TestUnitsTestCases(BaseTest):
 
     def test004_check_version_after_update(self):
         """
-        After I update any field then press on save , new version created in the active table.
+        Test unit: Version Approach: After I update any field then press on save and
+        create new version , new version created in the active table.
 
         LIMS-3676
 
@@ -105,10 +107,10 @@ class TestUnitsTestCases(BaseTest):
         test_unit_after_update = self.test_unit_page.refresh_and_get_updated_data()
         self.assertEqual(update_data, test_unit_after_update)
         self.test_units_page.get_test_units_page()
-        first_testunit_data = self.test_units_page.filter_and_get_result(random_test_unit['number'])
-        new_version = first_testunit_data['Version']
-        self.info('+ Assert testunit version is: {}, new version: {}'.format(random_test_unit['version'], new_version))
-        self.assertNotEqual(random_test_unit['version'], new_version)
+        first_testunit_data = self.test_units_page.filter_and_get_result(text=test_unit_after_update['number'])
+        self.info('+ Assert testunit version is: {}, new version: {}'.
+                  format(random_test_unit['version'], first_testunit_data['Version']))
+        self.assertEqual(str(random_test_unit['version']+1), first_testunit_data['Version'])
 
     def test005_quantative_mibi_not_entering_dash_in_upper_limit(self):
         """
@@ -118,14 +120,11 @@ class TestUnitsTestCases(BaseTest):
         """
         new_random_name = self.generate_random_string()
         new_random_method = self.generate_random_string()
-        new_random_category = self.generate_random_string()
         self.info('Create new test unit with Quantitative MiBi and random generated data')
         self.test_unit_page.create_new_testunit(name=new_random_name, testunit_type='Quantitative MiBi',
-                                                method=new_random_method, upper_limit='-',
-                                                category=new_random_category)
+                                                method=new_random_method, upper_limit='-')
 
-        self.test_unit_page.sleep_tiny()
-        self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
+        self.test_unit_page.save()
         self.info('Waiting for error message to make sure that validation forbids adding - in the upper limit')
         validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
         self.info('+ Assert error msg which indicates that it does not allow to add - in upper limit has appeared? {}'.
@@ -146,8 +145,8 @@ class TestUnitsTestCases(BaseTest):
         self.info('get random In Progrees test plan')
         test_plan = random.choice(TestPlanAPI().get_inprogress_testplans())
         self.assertTrue(test_plan, 'No test plan selected')
+        self.info('Navigate to test plan edit page')
         self.test_plan.get_test_plan_edit_page_by_id(test_plan['id'])
-        self.test_plan.sleep_small()
         self.base_selenium.click('test_plan:next')
         self.base_selenium.click('test_plan:add_new_item')
         self.info('Assert that archived test unit is not existing')
@@ -157,7 +156,8 @@ class TestUnitsTestCases(BaseTest):
     @parameterized.expand(['spec', 'quan'])
     def test007_allow_unit_field_to_be_optional(self, specification_type):
         """
-        Make sure the unit field of the specification or limit of quantification is an optional field.
+        Test unit: Limit of quantification Approach: Allow unit field to be optional field
+        in case I select specification or limit of quantification.
 
         LIMS-4161
         """
@@ -165,18 +165,16 @@ class TestUnitsTestCases(BaseTest):
         new_random_method = self.generate_random_string()
         new_random_upper_limit = self.generate_random_number(lower=50, upper=100)
         self.info('Create new test unit with name {}'.format(new_random_name))
-        self.test_unit_page.create_new_testunit(name=new_random_name, testunit_type='Quantitative',
-                                                method=new_random_method,
-                                                spec_or_quan=specification_type, upper_limit=new_random_upper_limit)
+        test_unit_no = self.test_unit_page.create_new_testunit(name=new_random_name,
+                                                               testunit_type='Quantitative',
+                                                               method=new_random_method,
+                                                               spec_or_quan=specification_type,
+                                                               upper_limit=new_random_upper_limit)
 
-        self.test_unit_page.sleep_tiny()
-        self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
-        self.test_unit_page.wait_until_page_is_loaded()
-        self.info('Search by test unit name: {}, to make sure that testunit created successfully'.
-                  format(new_random_name))
-        self.test_unit_page.apply_filter_scenario(filter_element='test_units:testunit_name_filter',
-                                                  filter_text=new_random_name, field_type='text')
-        test_unit_found = self.test_unit_page.get_the_latest_row_data()
+        self.test_unit_page.save_and_wait()
+        self.info('filter by test unit number: {}, to make sure that test unit created successfully'.
+                  format(test_unit_no))
+        test_unit_found = self.test_units_page.filter_and_get_latest_row_data(test_unit_no)
         self.info('Checking with upper limit to make sure that data saved normally')
         if specification_type == 'spec':
             self.assertEqual('<= '+str(new_random_upper_limit), test_unit_found['Specifications'])
@@ -192,20 +190,20 @@ class TestUnitsTestCases(BaseTest):
 
         LIMS-4158
         """
-        self.info('Prepare random data for the new testunit')
+        self.info('Prepare random data for the new test unit')
         new_random_name = self.generate_random_string()
         new_random_method = self.generate_random_string()
         new_random_upper_limit = self.generate_random_number(lower=500, upper=1000)
-        self.info('Create new testunit with the randomly generated data')
-        self.test_unit_page.create_new_testunit(name=new_random_name, testunit_type='Quantitative',
-                                                method=new_random_method)
-        self.test_unit_page.sleep_tiny()
-        self.info('Create new testunit with the random data')
-        self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
+        self.info('Create new test unit with the randomly generated data')
+        test_unit_no = self.test_unit_page.create_new_testunit(name=new_random_name,
+                                                               testunit_type='Quantitative',
+                                                               method=new_random_method)
+        self.info('Create new test unit with the random data')
+        self.test_unit_page.save(sleep=False)
         self.info('Waiting for error message to make sure that validation forbids adding - in the upper limit')
         validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
-        self.info('Checking that a validation message actually appeared which means that '
-                  'user can not create testunit without choosing specification of limit of quantification')
+        self.info('Checking that a validation message actually appeared which means that user can not'
+                  'create test unit without choosing specification of limit of quantification')
         self.assertEqual(validation_result, True)
         self.test_unit_page.sleep_tiny()
         self.info('Set the testunit to be: {}'.format(specification_type))
@@ -215,13 +213,10 @@ class TestUnitsTestCases(BaseTest):
         elif specification_type == 'quan':
             self.test_unit_page.set_quan_upper_limit(value=new_random_upper_limit)
 
-        self.test_unit_page.sleep_tiny()
-        self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
-        self.test_unit_page.wait_until_page_is_loaded()
-        self.info('filter by testunit name: {}, to make sure that testunit created successfully'.
-                  format(new_random_name))
-        test_unit_found = self.test_unit_page.filter_and_get_result(
-            element='test_units:testunit_name_filter', text=new_random_name)
+        self.test_unit_page.save_and_wait()
+        self.info('filter by test unit number: {}, to make sure that test unit created successfully'.
+                  format(test_unit_no))
+        test_unit_found = self.test_units_page.filter_and_get_latest_row_data(test_unit_no)
         self.assertTrue(test_unit_found)
         self.info('Checking with upper limit to make sure that data saved normally')
         if specification_type == 'spec':
@@ -264,8 +259,8 @@ class TestUnitsTestCases(BaseTest):
         self.info('Navigate to test plan page')
         self.test_plan.get_test_plans_page()
         self.info('create new test plan')
-        test_plan_name = self.test_plan.create_new_test_plan(save=False,
-                                                             material_type=testunit['selectedMaterialTypes'][0]['name'])
+        self.test_plan.create_new_test_plan(material_type=testunit['selectedMaterialTypes'][0]['name'], save=False)
+
         for i in range(0, len(testunit['selectedMaterialTypes'])-1):
             self.test_plan.set_test_unit(testunit['name'])
             test_unit_data = self.test_plan.result_table('test_plan:testunits_table')[0].text
@@ -294,19 +289,19 @@ class TestUnitsTestCases(BaseTest):
         else:
             self.info("Create new test unit with random category")
             new_random_category = ''
-        self.test_unit_page.create_qualitative_testunit(name=new_random_name, method=new_random_method,
-                                                        category=new_random_category)
-        self.test_unit_page.sleep_tiny()
-        self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new test unit')
-        self.test_unit_page.wait_until_page_is_loaded()
-        self.info('get created test unit row in active table')
-        created_test_unit_data = self.test_unit_page.filter_and_get_result(
-            element='test_units:testunit_name_filter', text=new_random_name)
-        self.info('Assert category : {}'.format(created_test_unit_data['Category']))
+        test_unit_no = self.test_unit_page.create_qualitative_testunit(name=new_random_name,
+                                                                       method=new_random_method,
+                                                                       category=new_random_category)
+        self.test_unit_page.save_and_wait()
+        self.info('filter by test unit number: {}, to make sure that test unit created successfully'.
+                  format(test_unit_no))
+        test_unit_found = self.test_units_page.filter_and_get_latest_row_data(test_unit_no)
+        self.assertTrue(test_unit_found)
+        self.info('Assert category : {}'.format(test_unit_found['Category']))
         if random == 'True':
-            self.assertEqual(new_random_category, created_test_unit_data['Category'])
+            self.assertEqual(new_random_category, test_unit_found['Category'])
         else:
-            self.assertTrue(created_test_unit_data['Category'])
+            self.assertTrue(test_unit_found['Category'])
 
     @parameterized.expand([('upper', 'spec'),
                            ('upper', 'quan'),
@@ -316,7 +311,7 @@ class TestUnitsTestCases(BaseTest):
     def test012_create_test_unit_with_one_limit_only(self, limit, spec_or_quan):
         """
         New: Test unit: Specification Approach: In case I entered the upper limit or the lower limit only,
-         the specification should display <=or >= according to that in the table view.
+        the specification should display <=or >= according to that in the table view.
 
         LIMS-3681
         LIMS-4415
@@ -328,35 +323,33 @@ class TestUnitsTestCases(BaseTest):
         self.info('Create new test unit with qualitative and random generated data')
         if limit == "upper":
             self.info('Create with upper limit : {} & {} '.format(new_random_limit, spec_or_quan))
-            self.test_unit_page.create_quantitative_testunit(name=new_random_name, method=new_random_method,
-                                                             upper_limit=new_random_limit, spec_or_quan=spec_or_quan)
+            test_unit_no = self.test_unit_page.create_quantitative_testunit(
+                name=new_random_name, method=new_random_method, upper_limit=new_random_limit, spec_or_quan=spec_or_quan)
         else:
             self.info('Create with lower limit : {} & {} '.format(new_random_limit, spec_or_quan))
-            self.test_unit_page.create_quantitative_testunit(name=new_random_name, method=new_random_method,
-                                                             lower_limit=new_random_limit, spec_or_quan=spec_or_quan)
+            test_unit_no = self.test_unit_page.create_quantitative_testunit(
+                name=new_random_name, method=new_random_method, lower_limit=new_random_limit, spec_or_quan=spec_or_quan)
 
         self.test_unit_page.sleep_tiny()
-        self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
-        self.test_unit_page.wait_until_page_is_loaded()
-        self.info('Get the test unit of it')
-        test_unit = self.test_unit_page.search(new_random_name)[0]
-        test_unit_data = self.base_selenium.get_row_cells_dict_related_to_header(row=test_unit)
-        specifications = test_unit_data['Specifications']
-        quantification_limit = test_unit_data['Quantification Limit']
+        self.test_unit_page.save_and_wait()
+        self.info('filter by test unit number: {}, to make sure that test unit created successfully'.
+                  format(test_unit_no))
+        test_unit_found = self.test_units_page.filter_and_get_latest_row_data(test_unit_no)
 
         if limit == "upper":
             self.info('Check that <= is existing in {}'.format(spec_or_quan))
-            self.assertIn('<=', specifications) if 'spec' in spec_or_quan else self.assertIn('<=', quantification_limit)
+            self.assertIn('<=', test_unit_found['Specifications']) if 'spec' in spec_or_quan \
+                else self.assertIn('<=', test_unit_found['Quantification Limit'])
         else:
             self.info('Check that >= is existing in specifications')
-            self.assertIn('>=', specifications) if 'spec' in spec_or_quan else self.assertIn('>=', quantification_limit)
+            self.assertIn('>=', test_unit_found['Specifications']) if 'spec' in spec_or_quan \
+                else self.assertIn('>=', test_unit_found['Quantification Limit'])
 
     @parameterized.expand(['upper', 'lower'])
     def test013_limits_of_quantification_approach(self, limit):
         """
         New: Test units : Limits of quantification Approach: In case I didn't enter empty values in the upper/lower
         limits of the specification of limits of quantification, it should display N/A in the active table
-
 
         LIMS:4427
         """
@@ -367,48 +360,41 @@ class TestUnitsTestCases(BaseTest):
         self.info('Create new testunit with qualitative and random generated data')
         if limit == "upper":
             self.info('Create with upper limit : {} & {} '.format(new_random_limit, spec_or_quan))
-            self.test_unit_page.create_quantitative_testunit(name=new_random_name, method=new_random_method,
-                                                             upper_limit=new_random_limit, spec_or_quan=spec_or_quan)
+            test_unit_no = self.test_unit_page.create_quantitative_testunit(
+                name=new_random_name, method=new_random_method, upper_limit=new_random_limit, spec_or_quan=spec_or_quan)
         else:
             self.info('Create with lower limit : {} & {} '.format(new_random_limit, spec_or_quan))
-            self.test_unit_page.create_quantitative_testunit(name=new_random_name, method=new_random_method,
-                                                             lower_limit=new_random_limit, spec_or_quan=spec_or_quan)
+            test_unit_no = self.test_unit_page.create_quantitative_testunit(
+                name=new_random_name, method=new_random_method, lower_limit=new_random_limit, spec_or_quan=spec_or_quan)
 
         self.test_unit_page.sleep_tiny()
-        self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
-        self.test_unit_page.wait_until_page_is_loaded()
-        self.info('Get the test unit of it')
-        test_unit = self.test_unit_page.search(new_random_name)[0]
-
-        quantifications_limit = self.base_selenium.get_row_cells_dict_related_to_header(row=test_unit)[
-            'Quantification Limit']
-        self.info('Check that N/A is existing in Quantification')
-        self.assertIn('N/A', quantifications_limit)
+        self.test_unit_page.save_and_wait()
+        self.info('filter by test unit number: {}, to make sure that test unit created successfully'.
+                  format(test_unit_no))
+        test_unit_found = self.test_units_page.filter_and_get_latest_row_data(test_unit_no)
+        self.assertIn('N/A', test_unit_found['Quantification Limit'])
 
     def test014_quantitative_mibi_type_allow_upper_limit_the_concentration_to_be_mandatory_fields(self):
         """
-            Test unit: Specification Approach: In quantitative MiBi type allow upper
-             limit & the concentration to be mandatory fields
+        Test unit: Specification Approach: In quantitative MiBi type allow upper
+        limit & the concentration to be mandatory fields
 
         LIMS-3769
         LIMS-5287
-        :return:
         """
         new_random_name = self.generate_random_string()
         new_random_method = self.generate_random_string()
         new_random_limit = self.generate_random_number(lower=500, upper=1000)
 
-        self.info('Create new testunit with qualitative and random generated data')
+        self.info('Create new Quantitative MiBi test unit')
         self.info('Create with upper limit : {}'.format(new_random_limit))
-        self.test_unit_page.create_quantitative_mibi_testunit(name=new_random_name, method=new_random_method,
-                                                              upper_limit=new_random_limit)
+        test_unit_no = self.test_unit_page.create_quantitative_mibi_testunit(
+            name=new_random_name, method=new_random_method, upper_limit=new_random_limit)
 
         self.test_unit_page.sleep_tiny()
-        self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
-        self.test_unit_page.wait_until_page_is_loaded()
+        self.test_unit_page.save_and_wait()
         self.info('Get the test unit of it')
-        test_unit = self.test_unit_page.search(new_random_name)[0]
-        self.test_unit_page.open_edit_page(test_unit)
+        self.test_units_page.filter_and_get_edit_page(test_unit_no)
 
         self.test_unit_page.clear_spec_upper_limit()
         self.test_unit_page.clear_cons()
@@ -427,9 +413,7 @@ class TestUnitsTestCases(BaseTest):
         ( specification & limit of quantification ) at the same time ( create test unit with both selection )
 
         LIMS-4159
-        :return:
         """
-
         new_random_name = self.generate_random_string()
         new_random_method = self.generate_random_string()
         new_random_upper_limit = self.generate_random_number(lower=500, upper=1000)
@@ -437,36 +421,31 @@ class TestUnitsTestCases(BaseTest):
         spec_or_quan = 'spec_quan'
 
         self.info('Create new testunit with qualitative and random generated data')
-        self.test_unit_page.create_quantitative_testunit(name=new_random_name, method=new_random_method,
-                                                         upper_limit=new_random_upper_limit,
-                                                         lower_limit=new_random_lower_limit,
-                                                         spec_or_quan=spec_or_quan)
+        test_unit_no = self.test_unit_page.create_quantitative_testunit(
+            name=new_random_name, method=new_random_method, upper_limit=new_random_upper_limit,
+            lower_limit=new_random_lower_limit, spec_or_quan=spec_or_quan)
         self.test_unit_page.sleep_tiny()
-        self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
-        self.test_unit_page.wait_until_page_is_loaded()
-        self.info('Get the test unit of it')
-        test_unit = self.test_unit_page.search(new_random_name)[0]
-        test_unit_data = self.base_selenium.get_row_cells_dict_related_to_header(row=test_unit)
-        specifications = test_unit_data['Specifications']
-        quantification_limit = test_unit_data['Quantification Limit']
-
+        self.test_unit_page.save_and_wait()
+        self.info('filter by test unit number: {}, to make sure that test unit created successfully'.
+                  format(test_unit_no))
+        test_unit_found = self.test_units_page.filter_and_get_latest_row_data(test_unit_no)
         self.info('Assert upper and lower limits are in specifications')
-        self.assertEqual("{}-{}".format(new_random_lower_limit, new_random_upper_limit), specifications)
+        self.assertEqual("{}-{}".format(new_random_lower_limit, new_random_upper_limit),
+                         test_unit_found['Specifications'])
 
         self.info('Assert upper and lower limits are in quantification_limit')
-        self.assertEqual("{}-{}".format(new_random_lower_limit, new_random_upper_limit), quantification_limit)
+        self.assertEqual("{}-{}".format(new_random_lower_limit, new_random_upper_limit),
+                         test_unit_found['Quantification Limit'])
 
     def test016_fields_of_the_specification_limits_of_quant_should_be_disabled_if_the_checkbox_is_not_selected(self):
         """
-        The fields of the specification & limits of quantification should be  disabled if the checkbox is not selected
+        The fields of the specification & limits of quantification should be disabled if the checkbox is not selected
 
         LIMS-4418
-        :return:
         """
         new_random_name = self.generate_random_string()
         new_random_method = self.generate_random_string()
-
-        self.info('Create new testunit with qualitative and random generated data')
+        self.info('Create new Qualitative testunit with random generated data')
         self.test_unit_page.create_quantitative_testunit(name=new_random_name,
                                                          method=new_random_method, spec_or_quan="")
         self.info('Assert that all limits fields are not active')
@@ -475,7 +454,7 @@ class TestUnitsTestCases(BaseTest):
             self.info('Assert that {}_limit is not active'.format(limit))
             self.assertNotIn('ng-valid', class_attr)
 
-    @parameterized.expand([('quan'), ('spec')])
+    @parameterized.expand(['quan', 'spec'])
     def test017_create_quantative_with_limits_of_quantative_only_and_specification_only(self, limits_type):
         """
         New:Test unit: Create Approach: User can create test unit with limits of quantification type only &
@@ -488,19 +467,18 @@ class TestUnitsTestCases(BaseTest):
         new_name = self.generate_random_string()
         new_method = self.generate_random_string()
         new_random_limit = self.generate_random_number()
-        self.test_unit_page.create_quantitative_testunit(name=new_name, material_type='', category='',
-                                                         upper_limit=new_random_limit, lower_limit=new_random_limit,
-                                                         spec_or_quan=limits_type, method=new_method)
+        test_unit_no = self.test_unit_page.create_quantitative_testunit(
+            name=new_name, upper_limit=new_random_limit, lower_limit=new_random_limit,
+            spec_or_quan=limits_type, method=new_method)
         self.test_unit_page.sleep_tiny()
-        self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
+        self.test_unit_page.save_and_wait()
         self.info('Get the test unit of it')
-        test_unit = self.test_unit_page.search(new_name)[0]
-        self.test_unit_page.open_edit_page(test_unit)
-        testunit_name = self.test_unit_page.get_testunit_name()
-        self.info('Assert test unit name : {}'.format(testunit_name))
-        self.assertEqual(new_name, testunit_name)
+        self.info('filter by test unit number: {}, to make sure that test unit created successfully'.
+                  format(test_unit_no))
+        test_unit_found = self.test_units_page.filter_and_get_latest_row_data(test_unit_no)
+        self.assertEqual(new_name, test_unit_found['Test Unit Name'])
 
-    def test019_download_test_units_sheet(self):
+    def test018_download_test_units_sheet(self):
         """
         I can download all the data in the table view in the excel sheet
 
@@ -533,19 +511,17 @@ class TestUnitsTestCases(BaseTest):
         spec_or_quan = 'spec_quan'
 
         self.info('Create new testunit with qualitative and random generated data')
-        self.test_unit_page.create_quantitative_testunit(name=new_random_name, method=new_random_method,
-                                                         upper_limit="-", lower_limit="-",
-                                                         spec_or_quan=spec_or_quan)
+        test_unit_no = self.test_unit_page.create_quantitative_testunit(
+            name=new_random_name, method=new_random_method, upper_limit="-",
+            lower_limit="-", spec_or_quan=spec_or_quan)
         self.test_unit_page.sleep_tiny()
-        self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
-        self.test_unit_page.wait_until_page_is_loaded()
+        self.test_unit_page.save_and_wait()
         self.info('Get the test unit of it')
-        test_unit = self.test_unit_page.search(new_random_name)[0]
-        test_unit_data = self.base_selenium.get_row_cells_dict_related_to_header(row=test_unit)
-        specifications = test_unit_data['Specifications']
-
+        self.info('filter by test unit number: {}, to make sure that test unit created successfully'.
+                  format(test_unit_no))
+        test_unit_found = self.test_units_page.filter_and_get_latest_row_data(test_unit_no)
         self.info('Assert upper and lower limits are in specifications with N/A values')
-        self.assertEqual("N/A", specifications)
+        self.assertEqual("N/A", test_unit_found['Specifications'])
 
     def test020_change_quantification_limits_not_effect_test_plan(self):
         """
@@ -554,40 +530,29 @@ class TestUnitsTestCases(BaseTest):
 
         LIMS-4420
         """
-        active_articles_with_material_types = self.article_api.get_active_articles_with_material_type()
-        material_type = next(iter(active_articles_with_material_types))
-        article = active_articles_with_material_types[material_type][0]
-        test_unit_new_name = self.generate_random_string()
-        new_method = self.generate_random_string()
-        new_random_limit = self.generate_random_number()
+        self.info("Create new quantitative testunit with quantification limits")
+        self.test_unit_api = TestUnitAPI()
+        oldUpperLimit = self.generate_random_number(lower=50, upper=100)
+        oldLowerLimit = self.generate_random_number(lower=1, upper=49)
+        tu_response, tu_payload = self.test_unit_api.create_quantitative_testunit(
+            quantificationUpperLimit=oldUpperLimit, quantificationLowerLimit=oldLowerLimit,
+            useQuantification=True, useSpec=False)
+        self.assertEqual(tu_response['status'], 1, tu_payload)
+        testunit_display_old_quantification_limit = '{}-{}'.format(
+            tu_payload['quantificationLowerLimit'], tu_payload['quantificationUpperLimit'])
 
-        self.test_unit_page.create_quantitative_testunit(
-            name=test_unit_new_name, material_type=material_type,
-            upper_limit=new_random_limit, lower_limit=new_random_limit,
-            spec_or_quan='quan', method=new_method)
-
-        self.test_unit_page.save(save_btn='general:save_form', logger_msg='save new testunit')
-
-        self.test_plan.get_test_plans_page()
-        testplan = self.test_plan.create_new_test_plan(
-            name=test_unit_new_name, material_type=material_type,
-            test_unit=test_unit_new_name, article=article)
-
+        test_plan = TestPlanAPI().create_testplan_from_test_unit_id(tu_response['testUnit']['testUnitId'])
+        self.assertTrue(test_plan, "failed to create test plan")
         self.info('change upper limits of the test unit')
-        self.test_unit_page.get_test_units_page()
-        test_unit = self.test_unit_page.search(test_unit_new_name)[0]
-        self.test_unit_page.open_edit_page(test_unit)
-        self.test_unit_page.set_quan_upper_limit('10000')
-        self.test_unit_page.set_quan_lower_limit('10000')
-        self.test_unit_page.save(save_btn='general:save_form', logger_msg='save the changes')
-
+        self.test_unit_page.open_test_unit_edit_page_by_id(tu_response['testUnit']['testUnitId'])
+        self.test_unit_page.set_quan_upper_limit('1000')
+        self.test_unit_page.set_quan_lower_limit('100')
+        self.test_unit_page.save_and_wait()
         self.test_plan.get_test_plans_page()
-        row = self.test_plan.search(testplan)[0]
-        self.test_plan.open_edit_page(row)
-        upper, lower = self.test_plan.get_test_unit_limits()
+        self.test_plan.filter_by_testplan_number(test_plan['number'])
+        child_table_data = self.test_plan.get_child_table_data()[0]
         self.info('assert that limits have not changed')
-        self.assertEqual(upper.replace("'", ""), str(new_random_limit))
-        self.assertEqual(lower.replace("'", ""), str(new_random_limit))
+        self.assertEqual(child_table_data['Quantification Limit'], testunit_display_old_quantification_limit)
 
     # def test021_create_multi_test_units_with_same_name(self):
     #     """

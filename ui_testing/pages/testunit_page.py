@@ -1,4 +1,5 @@
 from ui_testing.pages.testunits_page import TstUnits
+from api_testing.apis.test_unit_api import TestUnitAPI
 
 
 class TstUnit(TstUnits):
@@ -45,6 +46,9 @@ class TstUnit(TstUnits):
 
         self.set_testunit_iteration(iteration=iteration)
         self.set_method(method=method)
+        self.sleep_tiny()
+        testunit_number = self.get_testunit_number()
+        return testunit_number
 
     def create_qualitative_testunit(self, name='', material_type='', category='', value='', unit='', iteration=1,
                                     method=''):
@@ -58,6 +62,9 @@ class TstUnit(TstUnits):
         self.base_selenium.set_text(element='test_unit:spec_unit', value=unit)
         self.set_testunit_iteration(iteration=iteration)
         self.set_method(method=method)
+        self.sleep_tiny()
+        testunit_number = self.get_testunit_number()
+        return testunit_number
 
     def create_quantitative_mibi_testunit(self, name='', material_type='', category='', upper_limit='',
                                           selected_cons='', iteration='1', method=''):
@@ -71,6 +78,9 @@ class TstUnit(TstUnits):
         self.set_selected_concs(selected_cons=selected_cons)
         self.set_testunit_iteration(iteration=iteration)
         self.set_method(method=method)
+        self.sleep_tiny()
+        testunit_number = self.get_testunit_number()
+        return testunit_number
 
     def create_quantitative_testunit(self, name='', material_type='', category='', unit='', iteration='1',
                                     method='', upper_limit='', lower_limit='', spec_or_quan='spec'):
@@ -99,6 +109,9 @@ class TstUnit(TstUnits):
         self.base_selenium.set_text(element='test_unit:spec_unit', value=unit)
         self.set_testunit_iteration(iteration=iteration)
         self.set_method(method=method)
+        self.sleep_tiny()
+        testunit_number = self.get_testunit_number()
+        return testunit_number
 
     def set_material_type(self, material_type=''):
         self.info(
@@ -160,13 +173,12 @@ class TstUnit(TstUnits):
         return self.base_selenium.get_value(element='test_unit:iteration').split('\n')[0]
 
     def save_and_create_new_version(self, confirm=True):
-        self.save(save_btn='general:save_and_complete', logger_msg='Save And Create New Version')
+        self.save(save_btn='general:save_and_complete')
         self.sleep_tiny()
         self.confirm_popup(force=confirm)
-        self.sleep_tiny()
 
     def save_and_return_overview(self):
-        self.save(save_btn='general:save_form', logger_msg='Save And update the current version')
+        self.save(save_btn='general:save')
         self.sleep_small()
         self.click_overview()
         self.sleep_small()
@@ -182,6 +194,7 @@ class TstUnit(TstUnits):
 
     def use_specification_or_quantification(self, type_to_use='spec'):
         self.info('Check to use {}'.format(type_to_use))
+        self.sleep_tiny()
         if type_to_use == 'spec':
             spec = self.base_selenium.find_element_in_element(destination_element='general:span',
                                                               source_element='test_unit:use_specification')
@@ -512,7 +525,7 @@ class TstUnit(TstUnits):
         self.sleep_tiny()
         self.set_quan_upper_limit(value=upper_limit)
         self.sleep_tiny()
-        self.save(save_btn='general:save_form', logger_msg='Save testunit', sleep=True)
+        self.save()
 
     def switch_from_quan_to_spec(self, lower_limit, upper_limit):
         self.sleep_tiny()
@@ -523,7 +536,7 @@ class TstUnit(TstUnits):
         self.sleep_tiny()
         self.set_spec_upper_limit(value=upper_limit)
         self.sleep_tiny()
-        self.save(save_btn='general:save_form', logger_msg='Save testunit', sleep=True)
+        self.save()
 
     def map_testunit_to_testplan_format(self, testunit, order=0):
         testunit_formated = {}
@@ -593,15 +606,17 @@ class TstUnit(TstUnits):
         url_str = "{}testUnits/edit/" + str(id)
         test_units_url = url_str.format(self.base_selenium.url)
         self.base_selenium.get(url=test_units_url)
+        self.wait_until_page_is_loaded()
 
     def update_test_unit(self, id):
         test_unit = {}
         self.open_test_unit_edit_page_by_id(id)
-        test_unit['number'] = self.generate_random_number(upper=100000)
+        self.sleep_medium()
+        test_unit['number'] = str(TestUnitAPI().get_auto_generated_testunit_no()[0]['id'])
         test_unit['name'] = self.generate_random_string()
         test_unit['method'] = self.generate_random_string()
         test_unit['categoryName'] = self.generate_random_string()
-        test_unit['iterations'] = self.generate_random_number(upper=4)
+        test_unit['iterations'] = str(self.generate_random_number(upper=4))
         self.set_testunit_number(number=test_unit['number'])
         self.set_testunit_name(name=test_unit['name'])
         self.set_material_type()
@@ -619,6 +634,7 @@ class TstUnit(TstUnits):
         self.info('Refresh to make sure that the new data are saved')
         self.base_selenium.refresh()
         self.base_selenium.scroll()
+        self.sleep_medium()
         self.info('Getting testunit data after refresh')
         test_unit['number'] = self.get_testunit_number()
         test_unit['name'] = self.get_testunit_name()
@@ -627,3 +643,10 @@ class TstUnit(TstUnits):
         test_unit['iterations'] = self.get_testunit_iteration()
         test_unit['materialTypes'] = self.get_material_type()
         return test_unit
+
+    def save_and_wait(self, sleep=True):
+        self.info('save the changes')
+        self.sleep_tiny()
+        self.base_selenium.click(element='general:save')
+        self.sleep_medium()
+        self.wait_until_page_is_loaded()

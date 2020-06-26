@@ -11,8 +11,8 @@ class TestUnitAPIFactory(BaseAPI):
         _payload = {"sort_value": "number",
                     "limit": 1000,
                     "start": 0,
-                "sort_order": "DESC",
-                "filter": "{}",
+                    "sort_order": "DESC",
+                    "filter": "{}",
                     "deleted": "0"
                     }
         #for key in kwargs:
@@ -39,6 +39,11 @@ class TestUnitAPIFactory(BaseAPI):
         :return:
         """
         api = '{}{}{}'.format(self.url, self.END_POINTS['test_unit_api']['form_data'], str(id))
+        return api, {}
+
+    @api_factory('get')
+    def get_auto_generated_testunit_no(self):
+        api = '{}{}'.format(self.url, self.END_POINTS['test_unit_api']['get_auto_generated_number'])
         return api, {}
 
     @api_factory('put')
@@ -182,7 +187,7 @@ class TestUnitAPIFactory(BaseAPI):
 
     @api_factory('post')
     def create_quantitative_testunit(self, **kwargs):
-        random_category =self.generate_random_string()
+        random_category = self.generate_random_string()
         _payload = {
             'name': self.generate_random_string(),
             'number': self.generate_random_number(),
