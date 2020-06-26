@@ -4,11 +4,11 @@ from ui_testing.pages.testunits_page import TstUnits
 class TstUnit(TstUnits):
     
     def set_method(self, method=''):
-        self.base_selenium.LOGGER.info('Set testunit method to be: {}'.format(method))
+        self.info('Set testunit method to be: {}'.format(method))
         self.base_selenium.set_text(element='test_unit:method', value=method)
 
     def get_method(self):
-        self.base_selenium.LOGGER.info('Get testunit method')
+        self.info('Get testunit method')
         return self.base_selenium.get_value(element='test_unit:method').split('\n')[0]
 
     def get_test_unit_edit_page_by_id(self, id):
@@ -17,9 +17,9 @@ class TstUnit(TstUnits):
         self.wait_until_page_is_loaded()
 
     def click_create_new_testunit(self):
-        self.base_selenium.LOGGER.info('Click Create New Test Unit')
+        self.info('Click Create New Test Unit')
         self.base_selenium.click(element='test_units:new_testunit')
-        self.sleep_tiny()
+        self.sleep_medium()
 
     def create_new_testunit(self, name='', material_type='', category='', testunit_type='', spec_or_quan='',
                             upper_limit='', lower_limit='', unit='', iteration=1, method='', selected_cons=''):
@@ -48,7 +48,7 @@ class TstUnit(TstUnits):
 
     def create_qualitative_testunit(self, name='', material_type='', category='', value='', unit='', iteration=1,
                                     method=''):
-        self.base_selenium.LOGGER.info('create_qualitative_testunit')
+        self.info('create qualitative test unit')
         self.click_create_new_testunit()
         self.set_testunit_name(name=name)
         self.set_material_type(material_type=material_type)
@@ -61,7 +61,7 @@ class TstUnit(TstUnits):
 
     def create_quantitative_mibi_testunit(self, name='', material_type='', category='', upper_limit='',
                                           selected_cons='', iteration='1', method=''):
-        self.base_selenium.LOGGER.info('create_quantitative_mibi_testunit')
+        self.info('create_quantitative_mibi_testunit')
         self.click_create_new_testunit()
         self.set_testunit_name(name=name)
         self.set_material_type(material_type=material_type)
@@ -74,7 +74,7 @@ class TstUnit(TstUnits):
 
     def create_quantitative_testunit(self, name='', material_type='', category='', unit='', iteration='1',
                                     method='', upper_limit='', lower_limit='', spec_or_quan='spec'):
-        self.base_selenium.LOGGER.info('create_quantitative_testunit')
+        self.info('create_quantitative_testunit')
         self.click_create_new_testunit()
         self.set_testunit_name(name=name)
         self.set_material_type(material_type=material_type)
@@ -101,7 +101,7 @@ class TstUnit(TstUnits):
         self.set_method(method=method)
 
     def set_material_type(self, material_type=''):
-        self.base_selenium.LOGGER.info(
+        self.info(
             'Set material type to be "{}", if it is empty, then it will be random'.format(material_type))
         if material_type:
             self.base_selenium.select_item_from_drop_down(
@@ -122,41 +122,41 @@ class TstUnit(TstUnits):
         return material_types
 
     def set_category(self, category=''):
-        self.base_selenium.LOGGER.info(
+        self.info(
             'Set category to be "{}", if it is empty, then it will be random'.format(category))
         if category:
             self.base_selenium.select_item_from_drop_down(element='test_unit:category', item_text=category)
         else:
-            self.base_selenium.select_item_from_drop_down(element='test_unit:category', avoid_duplicate=True)
+            self.base_selenium.select_item_from_drop_down(element='test_unit:category')
             self.sleep_small()
             return self.get_category()
 
     def get_category(self):
-        self.base_selenium.LOGGER.info('Get Testunit category')
+        self.info('Get Testunit category')
         return self.base_selenium.get_text(element='test_unit:category').split('\n')[0]
 
     def set_testunit_name(self, name=''):
-        self.base_selenium.LOGGER.info('Set testunit name to be: {}'.format(name))
+        self.info('Set testunit name to be: {}'.format(name))
         self.base_selenium.set_text(element='test_unit:testunit_name', value=name)
 
     def get_testunit_name(self):
-        self.base_selenium.LOGGER.info('Get Testunit name')
+        self.info('Get Testunit name')
         return self.base_selenium.get_value(element='test_unit:testunit_name').split('\n')[0]
 
     def set_testunit_number(self, number=''):
-        self.base_selenium.LOGGER.info('Set testunit number to be: {}'.format(number))
+        self.info('Set testunit number to be: {}'.format(number))
         self.base_selenium.set_text(element='test_unit:testunit_number', value=number)
 
     def get_testunit_number(self):
-        self.base_selenium.LOGGER.info('Get testunit number')
+        self.info('Get testunit number')
         return self.base_selenium.get_value(element='test_unit:testunit_number').split('\n')[0].replace("'", "")
 
     def set_testunit_iteration(self, iteration=''):
-        self.base_selenium.LOGGER.info('Set testunit iterations to be: {}'.format(iteration))
+        self.info('Set testunit iterations to be: {}'.format(iteration))
         self.base_selenium.set_text(element='test_unit:iteration', value=iteration)
 
     def get_testunit_iteration(self):
-        self.base_selenium.LOGGER.info('Get testunit iterations')
+        self.info('Get testunit iterations')
         return self.base_selenium.get_value(element='test_unit:iteration').split('\n')[0]
 
     def save_and_create_new_version(self, confirm=True):
@@ -172,7 +172,7 @@ class TstUnit(TstUnits):
         self.sleep_small()
 
     def set_testunit_type(self, testunit_type=''):
-        self.base_selenium.LOGGER.info('Set testunit type to be {}'.format(testunit_type))
+        self.info('Set testunit type to be {}'.format(testunit_type))
         if testunit_type:
             self.base_selenium.select_item_from_drop_down(
                 element='test_unit:type', item_text=testunit_type)
@@ -199,12 +199,12 @@ class TstUnit(TstUnits):
             quan.click()
 
     def set_spec_upper_limit(self, value=''):
-        self.base_selenium.LOGGER.info('Set specification upper limit to be {}'.format(value))
+        self.info('Set specification upper limit to be {}'.format(value))
         self.sleep_tiny()
         self.base_selenium.set_text(element='test_unit:spec_upper_limit', value=value)
 
     def clear_spec_upper_limit(self):
-        self.base_selenium.LOGGER.info('Clear specification upper limit')
+        self.info('Clear specification upper limit')
         self.base_selenium.clear_text(element='test_unit:spec_upper_limit')
 
     def set_spec_lower_limit(self, value=''):
@@ -212,7 +212,7 @@ class TstUnit(TstUnits):
         self.base_selenium.set_text(element='test_unit:spec_lower_limit', value=value)
 
     def set_spec_unit(self, value=''):
-        self.base_selenium.LOGGER.info('Set specification unit to be {}'.format(value))
+        self.info('Set specification unit to be {}'.format(value))
         self.base_selenium.set_text(element='test_unit:spec_unit', value=value)
 
     def set_quan_upper_limit(self, value=''):
@@ -252,15 +252,15 @@ class TstUnit(TstUnits):
         return self.base_selenium.get_value(element='test_unit:quan_lower_limit').split('\n')[0]
 
     def get_quan_unit(self):
-        self.base_selenium.LOGGER.info('Get testunit qunatification unit')
+        self.info('Get testunit qunatification unit')
         return self.base_selenium.get_value(element='test_unit:quan_unit').split('\n')[0]
 
     def set_selected_concs(self, selected_cons=''):
-        self.base_selenium.LOGGER.info('Set selected cons : {}'.format(selected_cons))
+        self.info('Set selected cons : {}'.format(selected_cons))
         self.base_selenium.select_item_from_drop_down(element='test_unit:selected_cons', item_text=selected_cons)
 
     def clear_cons(self):
-        self.base_selenium.LOGGER.info('Clear selected concentrations')
+        self.info('Clear selected concentrations')
         self.base_selenium.clear_items_in_drop_down(element='test_unit:selected_cons')
 
     def set_qualitative_value(self, value=''):
@@ -273,77 +273,77 @@ class TstUnit(TstUnits):
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:use_specification')
         
         if element_exist:
-            self.base_selenium.LOGGER.info('checkbox for specification does exist')
+            self.info('checkbox for specification does exist')
         else:
-            self.base_selenium.LOGGER.info('checkbox for specification is not shown, report a BUG')
+            self.info('checkbox for specification is not shown, report a BUG')
             return False
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:spec_upper_limit')
         if element_exist :
-            self.base_selenium.LOGGER.info('upper limit for specification does exist')
+            self.info('upper limit for specification does exist')
         else:
-            self.base_selenium.LOGGER.info('upper limit for specification is not shown, report a BUG')
+            self.info('upper limit for specification is not shown, report a BUG')
             return False
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:spec_lower_limit')
         if element_exist :
-            self.base_selenium.LOGGER.info('lower limit for specification does exist')
+            self.info('lower limit for specification does exist')
         else:
-            self.base_selenium.LOGGER.info('lower limit for specification is not shown, report a BUG')
+            self.info('lower limit for specification is not shown, report a BUG')
             return False
         
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:spec_unit')
         if element_exist :
-            self.base_selenium.LOGGER.info('unit for specification does exist')
+            self.info('unit for specification does exist')
         else:
-            self.base_selenium.LOGGER.info('unit for specification is not shown, report a BUG')
+            self.info('unit for specification is not shown, report a BUG')
             return False
         
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:use_quantification')
         if element_exist :
-            self.base_selenium.LOGGER.info('checkbox for quantification does exist')
+            self.info('checkbox for quantification does exist')
         else:
-            self.base_selenium.LOGGER.info('checkbox for quantification is not shown, report a BUG')
+            self.info('checkbox for quantification is not shown, report a BUG')
             return False
         
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:quan_upper_limit')
         if element_exist :
-            self.base_selenium.LOGGER.info('upper limit for quantification does exist')
+            self.info('upper limit for quantification does exist')
         else:
-            self.base_selenium.LOGGER.info('upper limit for quantification is not shown, report a BUG')
+            self.info('upper limit for quantification is not shown, report a BUG')
             return False
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:quan_lower_limit')
         if element_exist :
-            self.base_selenium.LOGGER.info('lower limit for quantification does exist')
+            self.info('lower limit for quantification does exist')
         else:
-            self.base_selenium.LOGGER.info('lower limit for quantification is not shown, report a BUG')
+            self.info('lower limit for quantification is not shown, report a BUG')
             return False
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:quan_unit')
         if element_exist :
-            self.base_selenium.LOGGER.info('unit for quantification does exist')
+            self.info('unit for quantification does exist')
         else:
-            self.base_selenium.LOGGER.info('unit for quantification is not shown, report a BUG')
+            self.info('unit for quantification is not shown, report a BUG')
             return False
 
         # ------------------------------------------------------------------------------------------------
-        self.base_selenium.LOGGER.info('checking for fields that does not suppoe to be shown in quantitative')
+        self.info('checking for fields that does not suppoe to be shown in quantitative')
         # ------------------------------------------------------------------------------------------------
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:selected_cons')
         if element_exist :
-            self.base_selenium.LOGGER.info('Concentration field for quantitative mibi is shown, report a BUG')
+            self.info('Concentration field for quantitative mibi is shown, report a BUG')
             return False
         else:
-            self.base_selenium.LOGGER.info('Concentration field for quantitative mibi does not exist')
+            self.info('Concentration field for quantitative mibi does not exist')
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:qualitative_value')
         if element_exist :
-            self.base_selenium.LOGGER.info('Qualitative value is not shown, report a BUG')
+            self.info('Qualitative value is not shown, report a BUG')
             return False
         else:
-            self.base_selenium.LOGGER.info('Qualitative value does exist')
+            self.info('Qualitative value does exist')
 
             
         return True
@@ -351,140 +351,140 @@ class TstUnit(TstUnits):
     def check_for_qualitative_fields(self):
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:spec_unit')
         if element_exist :
-            self.base_selenium.LOGGER.info('checkbox for specification does exist')
+            self.info('checkbox for specification does exist')
         else:
-            self.base_selenium.LOGGER.info('unit field for specification is not shown, report a BUG')
+            self.info('unit field for specification is not shown, report a BUG')
             return False
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:qualitative_value')
         if element_exist :
-            self.base_selenium.LOGGER.info('Qualitative value does exist')
+            self.info('Qualitative value does exist')
         else:
-            self.base_selenium.LOGGER.info('Qualitative value is not shown, report a BUG')
+            self.info('Qualitative value is not shown, report a BUG')
             return False
         
         # ------------------------------------------------------------------------------------------------
-        self.base_selenium.LOGGER.info('checking for fields that does not suppoe to be shown in qualitative')
+        self.info('checking for fields that does not suppoe to be shown in qualitative')
         # ------------------------------------------------------------------------------------------------
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:use_specification')
         if element_exist:
-            self.base_selenium.LOGGER.info('checkbox for specification is shown, report a BUG')
+            self.info('checkbox for specification is shown, report a BUG')
             return False
         else:
-            self.base_selenium.LOGGER.info('checkbox for specification does not exist')
+            self.info('checkbox for specification does not exist')
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:spec_upper_limit')
         if element_exist :
-            self.base_selenium.LOGGER.info('upper limit for specification is shown, report a BUG')
+            self.info('upper limit for specification is shown, report a BUG')
             return False
         else:
-            self.base_selenium.LOGGER.info('upper limit for specification does not exist')
+            self.info('upper limit for specification does not exist')
         
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:use_quantification')
         if element_exist :
-            self.base_selenium.LOGGER.info('checkbox for quantification is shown, report a BUG')
+            self.info('checkbox for quantification is shown, report a BUG')
             return False
         else:
-            self.base_selenium.LOGGER.info('checkbox for quantification does not exist')
+            self.info('checkbox for quantification does not exist')
         
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:quan_upper_limit')
         if element_exist :
-            self.base_selenium.LOGGER.info('upper limit for quantification is shown, report a BUG')
+            self.info('upper limit for quantification is shown, report a BUG')
             return False
         else:
-            self.base_selenium.LOGGER.info('upper limit for quantification does not exist')
+            self.info('upper limit for quantification does not exist')
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:quan_lower_limit')
         if element_exist :
-            self.base_selenium.LOGGER.info('lower limit for quantification is shown, report a BUG')
+            self.info('lower limit for quantification is shown, report a BUG')
             return False
         else:
-            self.base_selenium.LOGGER.info('lower limit for quantification does not exist')
+            self.info('lower limit for quantification does not exist')
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:quan_unit')
         if element_exist :
-            self.base_selenium.LOGGER.info('unit for quantification is shown, report a BUG')
+            self.info('unit for quantification is shown, report a BUG')
             return False
         else:
-            self.base_selenium.LOGGER.info('unit for quantification does not exist')
+            self.info('unit for quantification does not exist')
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:selected_cons')
         if element_exist :
-            self.base_selenium.LOGGER.info('Concentration field for quantitative mibi is shown, report a BUG')
+            self.info('Concentration field for quantitative mibi is shown, report a BUG')
             return False
         else:
-            self.base_selenium.LOGGER.info('Concentration field for quantitative mibi does not exist')
+            self.info('Concentration field for quantitative mibi does not exist')
 
         return True
 
     def check_for_quantitative_mibi_fields(self):
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:spec_upper_limit')
         if element_exist :
-            self.base_selenium.LOGGER.info('upper limit field for quantative mibi does exist')
+            self.info('upper limit field for quantative mibi does exist')
         else:
-            self.base_selenium.LOGGER.info('upper limit field for quantitative mibi is not shown, report a BUG')
+            self.info('upper limit field for quantitative mibi is not shown, report a BUG')
             return False
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:spec_unit')
         if element_exist :
-            self.base_selenium.LOGGER.info('Unit field for quantitative mibi does exist')
+            self.info('Unit field for quantitative mibi does exist')
         else:
-            self.base_selenium.LOGGER.info('Unit field for quantitative mibi is not shown, report a BUG')
+            self.info('Unit field for quantitative mibi is not shown, report a BUG')
             return False
         
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:selected_cons')
         if element_exist :
-            self.base_selenium.LOGGER.info('Concentration field for quantitative mibi does exist')
+            self.info('Concentration field for quantitative mibi does exist')
         else:
-            self.base_selenium.LOGGER.info('Concentration field for quantitative mibi is not shown, report a BUG')
+            self.info('Concentration field for quantitative mibi is not shown, report a BUG')
             return False
 
         # ------------------------------------------------------------------------------------------------
-        self.base_selenium.LOGGER.info('checking for fields that does not suppoe to be shown in quantitative mibi')
+        self.info('checking for fields that does not suppoe to be shown in quantitative mibi')
         # ------------------------------------------------------------------------------------------------
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:use_specification')
         if element_exist:
-            self.base_selenium.LOGGER.info('checkbox for specification is shown, report a BUG')
+            self.info('checkbox for specification is shown, report a BUG')
             return False
         else:
-            self.base_selenium.LOGGER.info('checkbox for specification does not exist')
+            self.info('checkbox for specification does not exist')
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:spec_lower_limit')
         if element_exist :
-            self.base_selenium.LOGGER.info('lower limit for specification is shown, report a BUG')
+            self.info('lower limit for specification is shown, report a BUG')
             return False
         else:
-            self.base_selenium.LOGGER.info('lower limit for specification does not exist')
+            self.info('lower limit for specification does not exist')
         
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:use_quantification')
         if element_exist :
-            self.base_selenium.LOGGER.info('checkbox for quantification is shown, report a BUG')
+            self.info('checkbox for quantification is shown, report a BUG')
             return False
         else:
-            self.base_selenium.LOGGER.info('checkbox for quantification does not exist')
+            self.info('checkbox for quantification does not exist')
         
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:quan_upper_limit')
         if element_exist :
-            self.base_selenium.LOGGER.info('upper limit for quantification is shown, report a BUG')
+            self.info('upper limit for quantification is shown, report a BUG')
             return False
         else:
-            self.base_selenium.LOGGER.info('upper limit for quantification does not exist')
+            self.info('upper limit for quantification does not exist')
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:quan_lower_limit')
         if element_exist :
-            self.base_selenium.LOGGER.info('lower limit for quantification is shown, report a BUG')
+            self.info('lower limit for quantification is shown, report a BUG')
             return False
         else:
-            self.base_selenium.LOGGER.info('lower limit for quantification does not exist')
+            self.info('lower limit for quantification does not exist')
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:quan_unit')
         if element_exist :
-            self.base_selenium.LOGGER.info('unit for quantification is shown, report a BUG')
+            self.info('unit for quantification is shown, report a BUG')
             return False
         else:
-            self.base_selenium.LOGGER.info('unit for quantification does not exist')
+            self.info('unit for quantification does not exist')
 
         return True
 
@@ -494,8 +494,8 @@ class TstUnit(TstUnits):
 
         quantification_checkbox_value = self.base_selenium.find_element(element='test_unit:quantification_checkbox').is_selected()
 
-        self.base_selenium.LOGGER.info(specification_checkbox_value)
-        self.base_selenium.LOGGER.info(quantification_checkbox_value)
+        self.info(specification_checkbox_value)
+        self.info(quantification_checkbox_value)
         if specification_checkbox_value and quantification_checkbox_value:
             return 'spec_quan'
         elif specification_checkbox_value:
@@ -602,21 +602,14 @@ class TstUnit(TstUnits):
         test_unit['method'] = self.generate_random_string()
         test_unit['categoryName'] = self.generate_random_string()
         test_unit['iterations'] = self.generate_random_number(upper=4)
-        self.info('Set the new testunit number to be: {}'.format(test_unit['number']))
         self.set_testunit_number(number=test_unit['number'])
-        self.info('Set the new testunit name to be: {}'.format(test_unit['name']))
         self.set_testunit_name(name=test_unit['name'])
-        self.info('Set new material type')
         self.set_material_type()
         test_unit['materialTypes'] = self.get_material_type()
-        self.info('Set the new category to be: {}'.format(test_unit['categoryName']))
         self.set_category(category=test_unit['categoryName'])
-        self.info('Set the new testunit iteartions to be: {}'.format(test_unit['iterations']))
         self.set_testunit_iteration(iteration=test_unit['iterations'])
-
-        self.info('Set the method to be: {}'.format(test_unit['method']))
         self.set_method(method=test_unit['method'])
-
+        self.sleep_tiny()
         self.info('pressing save and create new version')
         self.save_and_create_new_version(confirm=True)
         return test_unit
@@ -625,6 +618,7 @@ class TstUnit(TstUnits):
         test_unit = {}
         self.info('Refresh to make sure that the new data are saved')
         self.base_selenium.refresh()
+        self.base_selenium.scroll()
         self.info('Getting testunit data after refresh')
         test_unit['number'] = self.get_testunit_number()
         test_unit['name'] = self.get_testunit_name()

@@ -86,7 +86,6 @@ class TestUnitsTestCases(BaseTest):
             self.info(' + {} Test Unit is restored'.format(test_unit))
             self.assertTrue(self.test_unit_page.is_test_unit_in_table(value=test_unit))
 
-    @skip("https://modeso.atlassian.net/browse/LIMSA-184")
     def test004_check_version_after_update(self):
         """
         After I update any field then press on save , new version created in the active table.
@@ -155,7 +154,6 @@ class TestUnitsTestCases(BaseTest):
         self.assertFalse(self.base_selenium.is_item_in_drop_down(
             element='test_plan:test_unit', item_text=archived_test_unit['name']))
 
-    @skip('https://modeso.atlassian.net/browse/LIMSA-185')
     @parameterized.expand(['spec', 'quan'])
     def test007_allow_unit_field_to_be_optional(self, specification_type):
         """
@@ -166,35 +164,27 @@ class TestUnitsTestCases(BaseTest):
         new_random_name = self.generate_random_string()
         new_random_method = self.generate_random_string()
         new_random_upper_limit = self.generate_random_number(lower=50, upper=100)
-        new_random_category = self.generate_random_string()
-        self.info('Create new test unit with the randomly generated data')
+        self.info('Create new test unit with name {}'.format(new_random_name))
         self.test_unit_page.create_new_testunit(name=new_random_name, testunit_type='Quantitative',
-                                                category=new_random_category, method=new_random_method,
+                                                method=new_random_method,
                                                 spec_or_quan=specification_type, upper_limit=new_random_upper_limit)
 
         self.test_unit_page.sleep_tiny()
         self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
-
-        self.info('Search by testunit name: {}, to make sure that testunit created successfully'.
+        self.test_unit_page.wait_until_page_is_loaded()
+        self.info('Search by test unit name: {}, to make sure that testunit created successfully'.
                   format(new_random_name))
         self.test_unit_page.apply_filter_scenario(filter_element='test_units:testunit_name_filter',
                                                   filter_text=new_random_name, field_type='text')
         test_unit_found = self.test_unit_page.get_the_latest_row_data()
-        self.test_unit_page.open_edit_page(test_unit_found['name']) # update it
-        self.info('Getting values of the unit field and upper limit to make sure that values saved correctly')
-        if specification_type == 'spec':
-            unit_value = self.test_unit_page.get_spec_unit()
-            upper_limit_value = self.test_unit_page.get_spec_upper_limit()
-        else:
-            unit_value = self.test_unit_page.get_quan_unit()
-            upper_limit_value = self.test_unit_page.get_quan_upper_limit()
-
-        self.info('+ Assert unit value after save is: {}, and should be empty'.format(unit_value))
-        self.assertEqual(unit_value, '')
         self.info('Checking with upper limit to make sure that data saved normally')
-        self.assertEqual(upper_limit_value, str(new_random_upper_limit))
+        if specification_type == 'spec':
+            self.assertEqual('<= '+str(new_random_upper_limit), test_unit_found['Specifications'])
+        else:
+            self.assertEqual('<= '+str(new_random_upper_limit), test_unit_found['Quantification Limit'])
+            self.info('+ Assert unit value after save is: {}, and should be empty'.format(test_unit_found['Unit']))
+            self.assertEqual(test_unit_found['Quantification Limit Unit'], '-')
 
-    @skip('https://modeso.atlassian.net/browse/LIMSA-185')
     @parameterized.expand(['spec', 'quan'])
     def test008_force_use_to_choose_specification_or_limit_of_quantification(self, specification_type):
         """
@@ -205,30 +195,21 @@ class TestUnitsTestCases(BaseTest):
         self.info('Prepare random data for the new testunit')
         new_random_name = self.generate_random_string()
         new_random_method = self.generate_random_string()
-        new_random_iteration = self.generate_random_number(lower=1, upper=4)
         new_random_upper_limit = self.generate_random_number(lower=500, upper=1000)
-        new_random_category = self.generate_random_string()
-
-
         self.info('Create new testunit with the randomly generated data')
         self.test_unit_page.create_new_testunit(name=new_random_name, testunit_type='Quantitative',
-                                                iteration=new_random_iteration, method=new_random_method,
-                                                category=new_random_category)
+                                                method=new_random_method)
         self.test_unit_page.sleep_tiny()
         self.info('Create new testunit with the random data')
         self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
-
-        self.info(
-            'Waiting for error message to make sure that validation forbids adding - in the upper limit')
+        self.info('Waiting for error message to make sure that validation forbids adding - in the upper limit')
         validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
-
-        self.info(
-            'Checking that a validation message actually appeared which means that user can not create testunit without choosing specification of limit of quantification')
+        self.info('Checking that a validation message actually appeared which means that '
+                  'user can not create testunit without choosing specification of limit of quantification')
         self.assertEqual(validation_result, True)
-
+        self.test_unit_page.sleep_tiny()
         self.info('Set the testunit to be: {}'.format(specification_type))
         self.test_unit_page.use_specification_or_quantification(type_to_use=specification_type)
-
         if specification_type == 'spec':
             self.test_unit_page.set_spec_upper_limit(value=new_random_upper_limit)
         elif specification_type == 'quan':
@@ -236,22 +217,20 @@ class TestUnitsTestCases(BaseTest):
 
         self.test_unit_page.sleep_tiny()
         self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
-        self.test_units_page.get_test_units_page()
-        self.info(
-            'Search by testunit name: {}, to make sure that testunit created successfully'.format(new_random_name))
-        self.test_unit_page.search(value=new_random_name)
+        self.test_unit_page.wait_until_page_is_loaded()
+        self.info('filter by testunit name: {}, to make sure that testunit created successfully'.
+                  format(new_random_name))
+        test_unit_found = self.test_unit_page.filter_and_get_result(
+            element='test_units:testunit_name_filter', text=new_random_name)
+        self.assertTrue(test_unit_found)
+        self.info('Checking with upper limit to make sure that data saved normally')
+        if specification_type == 'spec':
+            self.assertEqual('<= ' + str(new_random_upper_limit), test_unit_found['Specifications'])
+        else:
+            self.assertEqual('<= ' + str(new_random_upper_limit), test_unit_found['Quantification Limit'])
 
-        self.info('Getting records count')
-        testunits_count = self.test_unit_page.get_table_records()
-
-        self.info(
-            '+ Assert testunit records count is: {}, and it should be {}'.format(testunits_count, 1))
-        self.assertEqual(testunits_count, 1)
-
-    @skip('https://modeso.atlassian.net/browse/LIMSA-185')
     @parameterized.expand(['Qualitative', 'Quantitative MiBi'])
     def test009_qualitative_value_should_be_mandatory_field(self, testunit_type):
-
         """
         The qualitative value should be mandatory field in the qualitative type
 
@@ -259,11 +238,9 @@ class TestUnitsTestCases(BaseTest):
         """
         new_random_name = self.generate_random_string()
         new_random_method = self.generate_random_string()
-        new_random_category = self.generate_random_string()
-
-        self.info('Create new testunit with Quantitative MiBi and random generated data')
+        self.info('Create new test unit with Quantitative MiBi and random generated data')
         self.test_unit_page.create_new_testunit(name=new_random_name, testunit_type=testunit_type,
-                                                method=new_random_method, category=new_random_category)
+                                                method=new_random_method)
 
         self.test_unit_page.sleep_tiny()
         self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
@@ -276,8 +253,8 @@ class TestUnitsTestCases(BaseTest):
 
     def test010_material_type_approach(self):
         """"
-        In case I created test unit with 4 materiel type, when I go to test plan I should found that each test unit
-        displayed according to it's materiel type.
+        In case I created test unit with 4 materiel type, when I go to test plan,
+        I should found that each test unit displayed according to it's materiel type.
 
         LIMS-3683
         """
@@ -302,39 +279,35 @@ class TestUnitsTestCases(BaseTest):
 
         self.info("test unit displayed according to materiel type.")
 
-    @skip("https://modeso.atlassian.net/browse/LIMSA-184")
-    @skip("https://modeso.atlassian.net/browse/LIMSA-185")
     @parameterized.expand(['True', 'False'])
-    def test011_create_test_unit_with_random_category(self, random):
+    def test011_create_test_unit_with_random_category(self, select_from_drop_down):
         """
-        User can create test unit with an random category
+        Test unit: Category Approach: I can select from the drop down list or create new category
 
         LIMS-3682
         """
-        self.info("Create new test unit with random:{} category".format(random))
         new_random_name = self.generate_random_string()
         new_random_method = self.generate_random_string()
-        if random == 'True':
+        if select_from_drop_down == 'False':
             new_random_category = self.generate_random_string()
+            self.info("Create new test unit with category {}".format(new_random_category))
         else:
+            self.info("Create new test unit with random category")
             new_random_category = ''
         self.test_unit_page.create_qualitative_testunit(name=new_random_name, method=new_random_method,
                                                         category=new_random_category)
         self.test_unit_page.sleep_tiny()
-        self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
-
-        self.info('Get the category of it')
-        row = self.test_unit_page.search(new_random_name)[0]
-        self.test_unit_page.open_edit_page_by_css_selector(row)
-
-        category = self.test_unit_page.get_category()
-        self.info('Assert category : {}'.format(category))
+        self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new test unit')
+        self.test_unit_page.wait_until_page_is_loaded()
+        self.info('get created test unit row in active table')
+        created_test_unit_data = self.test_unit_page.filter_and_get_result(
+            element='test_units:testunit_name_filter', text=new_random_name)
+        self.info('Assert category : {}'.format(created_test_unit_data['Category']))
         if random == 'True':
-            self.assertEqual(new_random_category, category)
+            self.assertEqual(new_random_category, created_test_unit_data['Category'])
         else:
-            self.assertTrue(category)
+            self.assertTrue(created_test_unit_data['Category'])
 
-    @skip("https://modeso.atlassian.net/browse/LIMSA-185")
     @parameterized.expand([('upper', 'spec'),
                            ('upper', 'quan'),
                            ('lower', 'spec'),
@@ -347,13 +320,12 @@ class TestUnitsTestCases(BaseTest):
 
         LIMS-3681
         LIMS-4415
-        :return:
         """
         new_random_name = self.generate_random_string()
         new_random_method = self.generate_random_string()
         new_random_limit = self.generate_random_number(lower=500, upper=1000)
 
-        self.info('Create new testunit with qualitative and random generated data')
+        self.info('Create new test unit with qualitative and random generated data')
         if limit == "upper":
             self.info('Create with upper limit : {} & {} '.format(new_random_limit, spec_or_quan))
             self.test_unit_page.create_quantitative_testunit(name=new_random_name, method=new_random_method,
@@ -365,7 +337,7 @@ class TestUnitsTestCases(BaseTest):
 
         self.test_unit_page.sleep_tiny()
         self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
-
+        self.test_unit_page.wait_until_page_is_loaded()
         self.info('Get the test unit of it')
         test_unit = self.test_unit_page.search(new_random_name)[0]
         test_unit_data = self.base_selenium.get_row_cells_dict_related_to_header(row=test_unit)
@@ -379,8 +351,7 @@ class TestUnitsTestCases(BaseTest):
             self.info('Check that >= is existing in specifications')
             self.assertIn('>=', specifications) if 'spec' in spec_or_quan else self.assertIn('>=', quantification_limit)
 
-    @skip("https://modeso.atlassian.net/browse/LIMSA-185")
-    @parameterized.expand([('upper'), ('lower')])
+    @parameterized.expand(['upper', 'lower'])
     def test013_limits_of_quantification_approach(self, limit):
         """
         New: Test units : Limits of quantification Approach: In case I didn't enter empty values in the upper/lower
@@ -388,29 +359,24 @@ class TestUnitsTestCases(BaseTest):
 
 
         LIMS:4427
-        :return:
         """
         new_random_name = self.generate_random_string()
         new_random_method = self.generate_random_string()
-        new_random_category = self.generate_random_string()
         new_random_limit = self.generate_random_number(lower=500, upper=1000)
         spec_or_quan = 'spec'
-
         self.info('Create new testunit with qualitative and random generated data')
         if limit == "upper":
             self.info('Create with upper limit : {} & {} '.format(new_random_limit, spec_or_quan))
             self.test_unit_page.create_quantitative_testunit(name=new_random_name, method=new_random_method,
-                                                             upper_limit=new_random_limit, spec_or_quan=spec_or_quan,
-                                                             category=new_random_category)
+                                                             upper_limit=new_random_limit, spec_or_quan=spec_or_quan)
         else:
             self.info('Create with lower limit : {} & {} '.format(new_random_limit, spec_or_quan))
             self.test_unit_page.create_quantitative_testunit(name=new_random_name, method=new_random_method,
-                                                             lower_limit=new_random_limit, spec_or_quan=spec_or_quan,
-                                                             category=new_random_category)
+                                                             lower_limit=new_random_limit, spec_or_quan=spec_or_quan)
 
         self.test_unit_page.sleep_tiny()
         self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
-
+        self.test_unit_page.wait_until_page_is_loaded()
         self.info('Get the test unit of it')
         test_unit = self.test_unit_page.search(new_random_name)[0]
 
@@ -419,7 +385,6 @@ class TestUnitsTestCases(BaseTest):
         self.info('Check that N/A is existing in Quantification')
         self.assertIn('N/A', quantifications_limit)
 
-    @skip("https://modeso.atlassian.net/browse/LIMSA-185")
     def test014_quantitative_mibi_type_allow_upper_limit_the_concentration_to_be_mandatory_fields(self):
         """
             Test unit: Specification Approach: In quantitative MiBi type allow upper
@@ -431,18 +396,16 @@ class TestUnitsTestCases(BaseTest):
         """
         new_random_name = self.generate_random_string()
         new_random_method = self.generate_random_string()
-        new_random_category = self.generate_random_string()
         new_random_limit = self.generate_random_number(lower=500, upper=1000)
 
         self.info('Create new testunit with qualitative and random generated data')
         self.info('Create with upper limit : {}'.format(new_random_limit))
         self.test_unit_page.create_quantitative_mibi_testunit(name=new_random_name, method=new_random_method,
-                                                              upper_limit=new_random_limit,
-                                                              category=new_random_category)
+                                                              upper_limit=new_random_limit)
 
         self.test_unit_page.sleep_tiny()
         self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
-
+        self.test_unit_page.wait_until_page_is_loaded()
         self.info('Get the test unit of it')
         test_unit = self.test_unit_page.search(new_random_name)[0]
         self.test_unit_page.open_edit_page(test_unit)
@@ -458,7 +421,6 @@ class TestUnitsTestCases(BaseTest):
         self.info('Assert error msg')
         self.assertEqual(validation_result, True)
 
-    @skip("https://modeso.atlassian.net/browse/LIMSA-185")
     def test015_specification_limit_of_quantification_approach(self):
         """
         New: Test unit: Specification/limit of quantification Approach: Allow user to select those both options
@@ -470,7 +432,6 @@ class TestUnitsTestCases(BaseTest):
 
         new_random_name = self.generate_random_string()
         new_random_method = self.generate_random_string()
-        new_random_category = self.generate_random_string()
         new_random_upper_limit = self.generate_random_number(lower=500, upper=1000)
         new_random_lower_limit = self.generate_random_number(lower=1, upper=500)
         spec_or_quan = 'spec_quan'
@@ -479,10 +440,10 @@ class TestUnitsTestCases(BaseTest):
         self.test_unit_page.create_quantitative_testunit(name=new_random_name, method=new_random_method,
                                                          upper_limit=new_random_upper_limit,
                                                          lower_limit=new_random_lower_limit,
-                                                         spec_or_quan=spec_or_quan, category=new_random_category)
+                                                         spec_or_quan=spec_or_quan)
         self.test_unit_page.sleep_tiny()
         self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
-
+        self.test_unit_page.wait_until_page_is_loaded()
         self.info('Get the test unit of it')
         test_unit = self.test_unit_page.search(new_random_name)[0]
         test_unit_data = self.base_selenium.get_row_cells_dict_related_to_header(row=test_unit)
@@ -504,18 +465,16 @@ class TestUnitsTestCases(BaseTest):
         """
         new_random_name = self.generate_random_string()
         new_random_method = self.generate_random_string()
-        new_random_category = self.generate_random_string()
 
         self.info('Create new testunit with qualitative and random generated data')
-        self.test_unit_page.create_quantitative_testunit(name=new_random_name, method=new_random_method,
-                                                         category=new_random_category, spec_or_quan="")
+        self.test_unit_page.create_quantitative_testunit(name=new_random_name,
+                                                         method=new_random_method, spec_or_quan="")
         self.info('Assert that all limits fields are not active')
         for limit in ['quan_upper', 'quan_lower', 'spec_upper', 'spec_lower']:
             class_attr = self.base_selenium.get_attribute('test_unit:{}_limit'.format(limit), 'class')
             self.info('Assert that {}_limit is not active'.format(limit))
             self.assertNotIn('ng-valid', class_attr)
 
-    @skip("https://modeso.atlassian.net/browse/LIMSA-185")
     @parameterized.expand([('quan'), ('spec')])
     def test017_create_quantative_with_limits_of_quantative_only_and_specification_only(self, limits_type):
         """
@@ -532,7 +491,7 @@ class TestUnitsTestCases(BaseTest):
         self.test_unit_page.create_quantitative_testunit(name=new_name, material_type='', category='',
                                                          upper_limit=new_random_limit, lower_limit=new_random_limit,
                                                          spec_or_quan=limits_type, method=new_method)
-
+        self.test_unit_page.sleep_tiny()
         self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
         self.info('Get the test unit of it')
         test_unit = self.test_unit_page.search(new_name)[0]
@@ -561,7 +520,6 @@ class TestUnitsTestCases(BaseTest):
                     continue
                 self.assertIn(item, fixed_sheet_row_data)
 
-    @skip("https://modeso.atlassian.net/browse/LIMSA-185")
     def test019_specification_limit_of_quantification_approach_can_be_minus(self):
         """
         New: Test unit: Quantitative: Specification Approach User can enter (-) in upper/lower limit
@@ -590,7 +548,6 @@ class TestUnitsTestCases(BaseTest):
         self.info('Assert upper and lower limits are in specifications with N/A values')
         self.assertEqual("N/A", specifications)
 
-    @skip("https://modeso.atlassian.net/browse/LIMSA-185")
     def test020_change_quantification_limits_not_effect_test_plan(self):
         """
         New: Test units/effect on test plan: Limits of quantification Approach: In case I
@@ -1563,24 +1520,21 @@ class TestUnitsTestCases(BaseTest):
         for record in table_records:
             row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=record)
             self.assertIn(str(data_to_filter_with), row_data[header_name].replace("'",""))
-            
-            
+
     def test045_filter_by_testunit_material_type_returns_only_correct_results(self):
         """
         New:  Test units: Filter Approach: Make sure you can filter by material type
 
         LIMS-6433
         """
-
         data_to_filter_with = self.test_unit_api.get_first_record_with_data_in_attribute(attribute='materialTypes')
         self.assertNotEqual(data_to_filter_with, False)
         self.info('filter with {}'.format(data_to_filter_with[0]))
-        self.test_unit_page.apply_filter_scenario(filter_element='test_unit:filter_material_type', filter_text=data_to_filter_with[0])
+        self.test_unit_page.apply_filter_scenario(filter_element='test_unit:filter_material_type',
+                                                  filter_text=data_to_filter_with[0])
         table_records = self.test_unit_page.result_table()
         del table_records[-1]
         for record in table_records:
             row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=record)
             testunit_material_types = row_data['Material Type'].split(', ')[0]
-            self.assertEqual(testunit_material_types.replace("'",""), str(data_to_filter_with[0]))
-
-        
+            self.assertEqual(testunit_material_types.replace("'", ""), str(data_to_filter_with[0]))

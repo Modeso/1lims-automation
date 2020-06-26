@@ -191,9 +191,22 @@ class TstUnits(BasePages):
         rows = self.result_table()
         return rows[0]
 
-    def filter_and_get_result(self, test_unit_no):
-        self.apply_filter_scenario(filter_element='test_units:testunit_number_filter',
-                                   filter_text=test_unit_no, field_type='text')
+    def filter_and_get_result(self, element='test_units:testunit_number_filter', text=''):
+        self.apply_filter_scenario(filter_element=element,
+                                   filter_text=text, field_type='text')
         testunit_records = self.result_table()
+        if not testunit_records:
+            self.info("Test unit is not in active table")
+
         return self.base_selenium.get_row_cells_dict_related_to_header(row=testunit_records[0])
+
+    def filter_and_get_edit_page(self, test_unit_name):
+        self.apply_filter_scenario(filter_element='test_units:testunit_name_filter',
+                                   filter_text=test_unit_name, field_type='text')
+        row = self.result_table()[0]
+        self.open_edit_page_by_css_selector(row)
+
+
+
+
 
