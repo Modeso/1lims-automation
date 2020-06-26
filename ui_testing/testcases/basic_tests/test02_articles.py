@@ -429,10 +429,10 @@ class ArticlesTestCases(BaseTest):
     def test015_create_full_options_article(self):
         """
         New: Articles: Creation Approach: I can create new article successfully
-
         LIMS-3575
         """
         self.article_page.create_new_article(full_options=True, material_type='Raw Material')
+        self.article_page.get_articles_page()
         article_text = self.article_page.search(value=self.article_page.article_name)[0].text
         self.assertIn(self.article_page.article_unit, article_text)
         self.assertIn(self.article_page.article_comment, article_text)
