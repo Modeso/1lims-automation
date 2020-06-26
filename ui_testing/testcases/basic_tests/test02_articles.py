@@ -304,7 +304,7 @@ class ArticlesTestCases(BaseTest):
                                             article=article_created['article']['name'])
         self.article_page.get_articles_page()
         self.article_page.sleep_small()
-        article = self.article_page.search(value=self.test_plan.test_plan_name)[0]
+        article = self.article_page.search(value=self.test_plan_page.test_plan_name)[0]
         self.assertIn(self.test_plan_page.test_plan_name, article.text)
 
         self.test_plan_page.get_test_plans_page()
