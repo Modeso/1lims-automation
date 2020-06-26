@@ -15,5 +15,4 @@ script:
   - if [ "$TRAVIS_PULL_REQUEST" != "false" ]; then export TESTS=''; fi
   - cd $TRAVIS_BUILD_DIR && export PYTHONPATH='./'
   - export LOGURU_LEVEL='INFO'
-  - xvfb-run -a nosetests -vs --nologcapture --tc-file=config.ini ui_testing/testcases/basic_tests/test04_testunits.py:TestUnitsTestCases
   - docker run -t --shm-size=2g -v $TRAVIS_BUILD_DIR:/1lims-automation selenium:lims bash -c "./run.sh"
