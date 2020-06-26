@@ -536,6 +536,7 @@ class ArticlesTestCases(BaseTest):
                          '{}articles'.format(self.base_selenium.url))
         self.article_page.info('clicking on Overview confirmed')
 
+    @skip('we will skip it until we decide that we will implement the configuration or no')
     def test021_user_archive_optional_config_fields(self):
         """
             LIMS-4123
@@ -557,6 +558,7 @@ class ArticlesTestCases(BaseTest):
         self.assertFalse(self.article_page.is_field_active('comment'))
         self.assertFalse(self.article_page.is_field_active('related article'))
 
+    @skip('we will skip it until we decide that we will implement the configuration or no')
     def test022_user_restore_optional_config_fields(self):
         """
             LIMS-4123
@@ -578,6 +580,7 @@ class ArticlesTestCases(BaseTest):
         self.assertFalse(self.article_page.is_field_restore('comment'))
         self.assertFalse(self.article_page.is_field_restore('related article'))
 
+    @skip('we will skip it until we decide that we will implement the configuration or no')
     def test023_archive_optional_config_fields_does_not_effect_table(self):
         """
             LIMS-4123
@@ -601,6 +604,7 @@ class ArticlesTestCases(BaseTest):
         self.info(' assert unit field existance in the table')
         self.assertIn('Unit', article_headers_text)
 
+    @skip('we will skip it until we decide that we will implement the configuration or no')
     @parameterized.expand(['edit', 'create'])
     def test024_archive_optional_config_fields_effect_(self, page):
         """
@@ -611,8 +615,6 @@ class ArticlesTestCases(BaseTest):
              - archive options using api
              - assert all fields have been not displayed from the create/edit page
         """
-        self.info('restore all option fields via ui')
-        self.article_page.restore_optional_fields()
         self.info('archive all option fields via api')
         self.article_api.archive_all_optional_fields()
 
@@ -632,6 +634,7 @@ class ArticlesTestCases(BaseTest):
         self.info(' assert related article field is not existing in article page')
         self.assertTrue(self.base_selenium.check_element_is_not_exist('article:related_article'))
 
+    @skip('we will skip it until we decide that we will implement the configuration or no')
     @parameterized.expand(['edit', 'create'])
     def test025_restore_optional_config_fields_effect_(self, page):
         """

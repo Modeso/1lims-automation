@@ -218,18 +218,22 @@ elements = {
         'unit_field_options': {'method': 'xpath', 'value': '//*[@id="5_field"]//a'},
         'unit_field_archive': {'method': 'xpath', 'value': '//*[@id="5_field"]//li[1]/a'},
         'unit_field_restore': {'method': 'xpath', 'value': '//*[@id="5_field"]//li[2]/a'},
+#//div[@id='5_field']//a[@id='staticFields_menu_options']
 
         'comment_field_options': {'method': 'xpath', 'value': '//*[@id="7_field"]//a'},
         'comment_field_archive': {'method': 'xpath', 'value': '//*[@id="7_field"]//li[1]/a'},
         'comment_field_restore': {'method': 'xpath', 'value': '//*[@id="7_field"]//li[2]/a'},
 
-        'related_article_field_options': {'method': 'xpath', 'value': '//*[@id="18_field"]//a'},
-        'related_article_field_archive': {'method': 'xpath', 'value': '//*[@id="18_field"]//li[1]/a'},
-        'related_article_field_restore': {'method': 'xpath', 'value': '//*[@id="18_field"]//li[2]/a'},
+        'related_article_field_options': {'method': 'xpath', 'value': '//*[@id="12_field"]//a'},
+        'related_article_field_archive': {'method': 'xpath', 'value': '//*[@id="12_field"]//li[1]/a'},
+        'related_article_field_restore': {'method': 'xpath', 'value': '//*[@id="12_field"]//li[2]/a'},
+
+
     },
     'article': {
         'unit': {'method': 'id',
                  'value': 'unitfield'},
+
         'material_type': {'method': 'id',
                           'value': 'materialType'},
         'material_type_options': {'method': 'class_name',
