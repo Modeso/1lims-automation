@@ -789,4 +789,3 @@ class ArticlesTestCases(BaseTest):
         assert (self.article_page.deselect_all_configurations(), False)
 
 
-
