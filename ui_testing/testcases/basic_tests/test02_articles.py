@@ -292,6 +292,7 @@ class ArticlesTestCases(BaseTest):
         self.assertTrue(self.test_plan_page.is_article_existing(
             article=article_created['article']['name']))
 
+    @skip('https://modeso.atlassian.net/browse/LIMSA-189')
     def test008_create_article_with_test_plan_search_by_test_plan(self):
         """
         In case I create test plan with the article that I created, this test plan should display in the table view
