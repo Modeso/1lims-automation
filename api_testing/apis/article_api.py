@@ -128,7 +128,8 @@ class ArticleAPI(ArticleAPIFactory):
 
     def get_articles_with_testplans(self, **kwargs):
         response = self.get_all_articles(**kwargs)
-        all_articles = response.json()['articles']
+        all_articles = response[0]['articles']
+
         articles = [article for article in all_articles if len(article['testPlanNames']) >= 1]
         return articles
 
