@@ -702,6 +702,7 @@ class ArticlesTestCases(BaseTest):
             filter_name), filter_text=article[filter_name], field_type=field_type)
         self.assertIn(article[filter_name], result_article.text)
 
+    @skip('https://modeso.atlassian.net/browse/LIMSA-190')
     @parameterized.expand(['name', 'number', 'unit', 'created_at', 'material_type', 'changed_by', 'test_plan'])
     def test027_filter_article_by_any_default_filter(self, filter_name):
         """
@@ -776,8 +777,6 @@ class ArticlesTestCases(BaseTest):
         self.article_page.info('navigate to test plans page')
         self.test_plan_page.get_test_plans_page()
         self.assertEqual(self.base_selenium.get_url(), '{}testPlans'.format(self.base_selenium.url))
-
-
 
     def test029_hide_all_table_configurations(self):
         """
