@@ -729,6 +729,7 @@ class ArticlesTestCases(BaseTest):
         # create new article with full options
         article = self.article_page.create_new_article(
             material_type=material_type, full_options=full_options)
+        self.article_page.get_articles_page()
 
         # create corresponding test plan
         if filter_name == 'test_plan':
@@ -748,7 +749,7 @@ class ArticlesTestCases(BaseTest):
         self.article_page.filter_by(
             filter_element='article:filter_{}'.format(filter_name), filter_text=article[filter_name],
             field_type=field_type)
-        self.article_page.sleep_medium()
+        self.article_page.sleep_large()
         result_article = self.article_page.result_table()[0]
         self.assertIn(article[filter_name], result_article.text)
 
