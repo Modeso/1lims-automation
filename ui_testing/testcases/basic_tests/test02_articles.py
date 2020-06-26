@@ -702,8 +702,9 @@ class ArticlesTestCases(BaseTest):
             filter_name), filter_text=article[filter_name], field_type=field_type)
         self.assertIn(article[filter_name], result_article.text)
 
-    @skip('https://modeso.atlassian.net/browse/LIMSA-190')
+    
     @parameterized.expand(['name', 'number', 'unit', 'created_at', 'material_type', 'changed_by', 'test_plan'])
+    @skip('https://modeso.atlassian.net/browse/LIMSA-190')
     def test027_filter_article_by_any_default_filter(self, filter_name):
         """
         New: Article: Filter Approach: I can filter by any static field & and also from the default filter.
