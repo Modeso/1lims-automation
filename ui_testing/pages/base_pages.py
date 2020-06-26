@@ -424,6 +424,7 @@ class BasePages:
 
     def click_overview(self):
         # click on Overview, this will display an alert to the user
+        self.base_selenium.scroll()
         self.base_selenium.LOGGER.info('click on Overview')
         self.base_selenium.click_by_script(element='general:overview')
         self.sleep_tiny()

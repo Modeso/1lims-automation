@@ -212,6 +212,19 @@ class TstUnits(BasePages):
         self.open_edit_page_by_css_selector(row)
         self.wait_until_page_is_loaded()
 
+    def filter_and_get_version(self, test_unit_number):
+        self.apply_filter_scenario(filter_element='test_units:testunit_number_filter',
+                                   filter_text=test_unit_number, field_type='text')
+        self.sleep_tiny()
+        test_unit_data = self.get_the_latest_row_data()
+        row = self.base_selenium.get_table_rows(element='general:table')[0]
+        self.click_check_box(row)
+        self.sleep_tiny()
+        self.info('Open Versions for the selected test unit')
+        self.get_versions_of_selected_test_units()
+        self.sleep_tiny()
+        version_data = self.get_the_latest_row_data()
+        return test_unit_data, version_data
 
 
 
