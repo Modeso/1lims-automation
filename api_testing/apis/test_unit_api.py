@@ -1,7 +1,7 @@
 from api_testing.apis.base_api import BaseAPI
 from api_testing.apis.base_api import api_factory
 from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
-import random
+import random, json, os
 
 
 class TestUnitAPIFactory(BaseAPI):
@@ -393,5 +393,12 @@ class TestUnitAPI(TestUnitAPIFactory):
             return test_unit_dict
         else:
             return None
+
+    def set_configuration(self):
+        self.info('set test unit configuration')
+        config_file = os.path.abspath('api_testing/config/testUnit.json')
+        with open(config_file, "r") as read_file:
+            payload = json.load(read_file)
+        super().set_configuration(payload=payload)
 
 

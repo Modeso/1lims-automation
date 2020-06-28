@@ -50,10 +50,9 @@ class TstPlan(TestPlans):
         self.base_selenium.click('test_plan:next')
         self.sleep_tiny()
         self.base_selenium.click('test_plan:add_new_item')
-        self.sleep_tiny()
-        is_option_exist = self.base_selenium.select_item_from_drop_down(element='test_plan:test_units',
+        self.sleep_small()
+        is_option_exist = self.base_selenium.select_item_from_drop_down(element='test_plan:test_unit',
                                                                         item_text=test_unit)
-        self.sleep_tiny()
         self.base_selenium.click(element='test_plan:cancel_add_testunit')
         self.base_selenium.click(element='test_plan:back_button')
         return is_option_exist
@@ -82,7 +81,7 @@ class TstPlan(TestPlans):
         self.sleep_tiny()
 
     def get_testunit_in_testplan_title_multiple_line_properties(self):
-        dom_element = self.base_selenium.find_element(element='test_plan:testunit_title')
+        dom_element = self.base_selenium.find_element(element='test_plan:test_units')
         multiple_line_properties = dict()
         multiple_line_properties['textOverflow'] = self.base_selenium.driver.execute_script('return '
                                                                                             'window'

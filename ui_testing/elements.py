@@ -331,7 +331,16 @@ elements = {
         'testunit_name_filter': {'method': 'id',
                                  'value': 'namefield'},
         'testunit_number_filter': {'method': 'id',
-                                 'value': 'numberfield'}
+                                 'value': 'numberfield'},
+        'filter_material_type': {'method': 'id',
+                                 'value': 'materialTypesfield'},
+        'filter_created_at': {'method': 'id', 'value': 'start_createdAt'},
+        'method_filter': {'method': 'id', 'value': 'methodfield'},
+        'filter_changed_by': {'method': 'id', 'value': 'lastModifiedUserfield'},
+        'filter_unit': {'method': 'id', 'value': 'unitfield'},
+        'filter_category': {'method': 'id', 'value': 'categoryNamefield'},
+        'filter_Type': {'method': 'id', 'value': 'typeNamefield'},
+        'archive_config_error': {'method': 'xpath', 'value': "//span[@class='m-form__help error-display']"}
     },
 
     'test_plan': {
@@ -392,9 +401,8 @@ elements = {
         'ok': {'method': 'class_name',
                'value': 'swal2-confirm',
                'order': 0},
-        'cancel_add_testunit': {'method': 'class_name',
-                                'value': 'btn-secondary',
-                                'order': 1},
+        'cancel_add_testunit': {'method': 'xpath',
+                                'value': "//i[@class='flaticon-close']"},
         'back_button': {'method': 'id',
                         'value': 'back_btn'},
         'testunit_title': {'method': 'css_selector',

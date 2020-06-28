@@ -7,6 +7,8 @@ from api_testing.apis.test_unit_api import TestUnitAPI
 from api_testing.apis.article_api import ArticleAPI
 from api_testing.apis.test_plan_api import TestPlanAPI
 from ui_testing.pages.order_page import Order
+from ui_testing.pages.login_page import Login
+from api_testing.apis.users_api import UsersAPI
 from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from unittest import skip
 from parameterized import parameterized
@@ -22,6 +24,7 @@ class TestUnitsTestCases(BaseTest):
         self.article_api = ArticleAPI()
         self.test_unit_api = TestUnitAPI()
         self.set_authorization(auth=self.article_api.AUTHORIZATION_RESPONSE)
+        self.test_unit_api.set_configuration()
         self.test_unit_page.get_test_units_page()
 
     # @skip('https://modeso.atlassian.net/browse/LIMS-5237')
@@ -896,46 +899,39 @@ class TestUnitsTestCases(BaseTest):
 
         self.assertFalse(test_unit_suggetion_list)
 
-    @skip('waiting for API deleting')
-    def test034_archive_quantifications_limit_field(self):
+    def test034_can_not_archive_quantifications_limit_field(self):
         """
         New: Test unit: Configuration: Limit of quantification Approach: Display the new fields in the configuration section
         ( Upper limit & lower limit & unit of  limit of quantification ) and I can archive them.
         User can archive the quantification limits field from the configuration section
-        "Archive-allowed"
+
         LIMS-4164
         """
         self.test_unit_page.open_configurations()
         self.assertTrue(self.test_unit_page.archive_quantification_limit_field())
-        self.assertFalse(
-            self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
-        self.test_unit_page.get_archived_fields_tab()
-        self.assertTrue(self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
-        self.test_unit_page.get_test_units_page()
-        self.test_unit_page.click_create_new_testunit()
-        self.test_unit_page.set_testunit_type(testunit_type='Quantitative')
-        self.assertFalse(self.base_selenium.check_element_is_exist(element='test_unit:use_quantification'))
+        validation_result = self.base_selenium.wait_element(element='test_units:archive_config_error')
+        self.assertTrue(validation_result)
 
-    @skip('waiting for API deleting')
-    def test035_restore_quantifications_limit_field(self):
-        """
-        New: Test unit: Configuration: Limit of quantification Approach: Display the new fields in the configuration section
-        ( Upper limit & lower limit & unit of  limit of quantification ) and I can archive them.
-        User can archive the quantification limits field from the configuration section
-        "Restore"
-        LIMS-4164
-        """
-        self.test_unit_page.open_configurations()
-        self.test_unit_page.get_archived_fields_tab()
-        self.assertTrue(self.test_unit_page.restore_quantification_limit_field())
-        self.assertFalse(
-            self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
-        self.test_unit_page.get_active_fields_tab()
-        self.assertTrue(self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
-        self.test_unit_page.get_test_units_page()
-        self.test_unit_page.click_create_new_testunit()
-        self.test_unit_page.set_testunit_type(testunit_type='Quantitative')
-        self.assertTrue(self.base_selenium.check_element_is_exist(element='test_unit:use_quantification'))
+    # @skip('waiting for API deleting')
+    # def test035_restore_quantifications_limit_field(self):
+    #     """
+    #     New: Test unit: Configuration: Limit of quantification Approach: Display the new fields in the configuration section
+    #     ( Upper limit & lower limit & unit of  limit of quantification ) and I can archive them.
+    #     User can archive the quantification limits field from the configuration section
+    #     "Restore"
+    #     LIMS-4164
+    #     """
+    #     self.test_unit_page.open_configurations()
+    #     self.test_unit_page.get_archived_fields_tab()
+    #     self.assertTrue(self.test_unit_page.restore_quantification_limit_field())
+    #     self.assertFalse(
+    #         self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
+    #     self.test_unit_page.get_active_fields_tab()
+    #     self.assertTrue(self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
+    #     self.test_unit_page.get_test_units_page()
+    #     self.test_unit_page.click_create_new_testunit()
+    #     self.test_unit_page.set_testunit_type(testunit_type='Quantitative')
+    #     self.assertTrue(self.base_selenium.check_element_is_exist(element='test_unit:use_quantification'))
 
     def test036_test_unit_name_is_mandatory(self):
         """
@@ -948,19 +944,101 @@ class TestUnitsTestCases(BaseTest):
         self.test_unit_page.open_testunit_name_configurations_options()
         self.assertTrue(self.test_unit_page.check_all_options_of_search_view_menu())
 
-    # @parameterized.expand(['name', 'method', 'type', 'number'])
-    # def test037_test_unit_name_allow_user_to_search_with_selected_options_testplan(self, search_view_option):
+    @parameterized.expand(['name', 'method', 'type', 'number'])
+    def test037_test_unit_name_allow_user_to_search_with_selected_options_testplan(self, search_view_option):
+        """
+        New: Test Unit: Configuration: Test unit Name Approach: Allow user to search with
+        (name, number, type, method) in the drop down list of the test plan for.
+
+        LIMS- 6422
+        """
+        self.test_unit_page.open_configurations()
+        self.test_unit_page.open_testunit_name_configurations_options()
+        old_values = self.test_unit_page.select_option_to_view_search_with(view_search_options=[search_view_option])
+        self.info('Create new testunit with qualitative and random generated data')
+        response, payload = self.test_unit_api.create_qualitative_testunit()
+        self.assertEqual(response['status'], 1, payload)
+        self.info('new testunit created with number  {}'.format(payload['number']))
+        self.info('get random In Progrees test plan')
+        test_plan = random.choice(TestPlanAPI().get_inprogress_testplans())
+        self.assertTrue(test_plan, 'No test plan selected')
+        self.info('Navigate to test plan edit page')
+        self.test_plan.get_test_plan_edit_page_by_id(test_plan['id'])
+        is_name_exist = self.test_plan.search_test_unit_not_set(test_unit=payload['name'])
+        is_number_exist = self.test_plan.search_test_unit_not_set(test_unit=str(payload['number']))
+        is_type_exist = self.test_plan.search_test_unit_not_set(test_unit='Qualitative')
+        is_method_exist = self.test_plan.search_test_unit_not_set(test_unit=payload['method'])
+
+        if search_view_option == 'name':
+            self.assertTrue(is_name_exist)
+            self.assertFalse(is_number_exist)
+            self.assertFalse(is_type_exist)
+            self.assertFalse(is_method_exist)
+        elif search_view_option == 'type':
+            self.assertFalse(is_name_exist)
+            self.assertFalse(is_number_exist)
+            self.assertTrue(is_type_exist)
+            self.assertFalse(is_method_exist)
+        elif search_view_option == 'method':
+            self.assertFalse(is_name_exist)
+            self.assertFalse(is_number_exist)
+            self.assertFalse(is_type_exist)
+            self.assertTrue(is_method_exist)
+        elif search_view_option == 'number':
+            self.assertFalse(is_name_exist)
+            self.assertTrue(is_number_exist)
+            self.assertFalse(is_type_exist)
+            self.assertFalse(is_method_exist)
+
+    def test038_test_unit_name_search_default_options_name_type_in_testplan(self):
+        """
+        New: Test unit: Configuration: Test units field Approach: Allow name & type
+        to display by default in the test plan form In case I select them from the
+        test unit configuration
+
+        LIMS-6423
+        """
+        self.test_unit_page.open_configurations()
+        self.test_unit_page.open_testunit_name_configurations_options()
+        self.test_unit_page.deselect_all_options_to_view_search_with()
+
+        self.info('Create new testunit with qualitative and random generated data')
+        response, payload = self.test_unit_api.create_qualitative_testunit()
+        self.assertEqual(response['status'], 1, payload)
+        self.info('new testunit created with number  {}'.format(payload['number']))
+        self.info('get random In Progrees test plan')
+        test_plan = random.choice(TestPlanAPI().get_inprogress_testplans())
+        self.assertTrue(test_plan, 'No test plan selected')
+        self.info('Navigate to test plan edit page')
+        self.test_plan.get_test_plan_edit_page_by_id(test_plan['id'])
+        self.test_plan.sleep_small()
+        is_name_exist = self.test_plan.search_test_unit_not_set(test_unit=payload['name'])
+        is_number_exist = self.test_plan.search_test_unit_not_set(test_unit=str(payload['number']))
+        is_type_exist = self.test_plan.search_test_unit_not_set(test_unit='Qualitative')
+        is_method_exist = self.test_plan.search_test_unit_not_set(test_unit=payload['method'])
+        self.assertTrue(is_name_exist)
+        self.assertFalse(is_number_exist)
+        self.assertFalse(is_type_exist)
+        self.assertFalse(is_method_exist)
+
+    # def test039_test_unit_name_view_method_option_multiple_line_in_testplan(self):
     #     """
-    #     New: Test Unit: Configuration: Test unit Name Approach: Allow user to search with
-    #     (name, number, type, method) in the drop down list of the test plan for.
+    #     New: Test Unit: Configuration: Test unit Name Approach: In case you select
+    #     the method to display and you entered long text in it, the method should
+    #     display into multiple lines (test plan)
     #
-    #     LIMS- 6422
+    #     LIMS-6424
     #     """
+    #
+    #     self.info('Generate random data for update')
+    #     new_random_method = self.generate_random_string() + self.generate_random_string() + \
+    #                         self.generate_random_string()
+    #
     #     self.test_unit_page.open_configurations()
     #     self.test_unit_page.open_testunit_name_configurations_options()
-    #     old_values = self.test_unit_page.select_option_to_view_search_with(view_search_options=[search_view_option])
+    #     self.test_unit_page.select_option_to_view_search_with(view_search_options=['method'])
     #     self.info('Create new testunit with qualitative and random generated data')
-    #     response, payload = self.test_unit_api.create_qualitative_testunit()
+    #     response, payload = self.test_unit_api.create_qualitative_testunit(method=new_random_method)
     #     self.assertEqual(response['status'], 1, payload)
     #     self.info('new testunit created with number  {}'.format(payload['number']))
     #     self.info('get random In Progrees test plan')
@@ -968,344 +1046,216 @@ class TestUnitsTestCases(BaseTest):
     #     self.assertTrue(test_plan, 'No test plan selected')
     #     self.info('Navigate to test plan edit page')
     #     self.test_plan.get_test_plan_edit_page_by_id(test_plan['id'])
-    #     import ipdb;ipdb.set_trace()
-    #     is_name_exist = self.test_plan.search_test_unit_not_set(test_unit=payload['name'])
-    #     is_number_exist = self.test_plan.search_test_unit_not_set(test_unit=payload['number'])
-    #     is_type_exist = self.test_plan.search_test_unit_not_set(test_unit='Qualitative')
-    #     is_method_exist = self.test_plan.search_test_unit_not_set(test_unit=payload['method'])
-    #
-    #     self.info('Get testunits page')
-    #     self.test_unit_page.get_test_units_page()
-    #     self.test_unit_page.open_configurations()
-    #     self.test_unit_page.open_testunit_name_configurations_options()
-    #     old_values = old_values.split('\n×')
-    #
-    #     self.test_unit_page.select_option_to_view_search_with(view_search_options=old_values)
-    #
-    #     if search_view_option == 'name':
-    #         self.assertTrue(is_name_exist)
-    #         self.assertFalse(is_number_exist)
-    #         self.assertFalse(is_type_exist)
-    #         self.assertFalse(is_method_exist)
-    #     elif search_view_option == 'type':
-    #         self.assertFalse(is_name_exist)
-    #         self.assertFalse(is_number_exist)
-    #         self.assertTrue(is_type_exist)
-    #         self.assertFalse(is_method_exist)
-    #     elif search_view_option == 'method':
-    #         self.assertFalse(is_name_exist)
-    #         self.assertFalse(is_number_exist)
-    #         self.assertFalse(is_type_exist)
-    #         self.assertTrue(is_method_exist)
-    #     elif search_view_option == 'number':
-    #         self.assertFalse(is_name_exist)
-    #         self.assertTrue(is_number_exist)
-    #         self.assertFalse(is_type_exist)
-    #         self.assertFalse(is_method_exist)
-    #
-    # def test040_test_unit_name_search_default_options_name_type_in_testplan(self):
-    #     """
-    #     New: Test unit: Configuration: Test units field Approach: Allow name & type
-    #     to display by default in the test plan form In case I select them from the
-    #     test unit configuration
-    #
-    #     LIMS- 6423
-    #     :return:
-    #     """
-    #
-    #     self.info('Generate random data for update')
-    #     new_random_name = self.generate_random_string()
-    #     new_random_method = self.generate_random_string()
-    #
-    #     self.test_unit_page.open_configurations()
-    #     self.test_unit_page.open_testunit_name_configurations_options()
-    #     old_values = self.test_unit_page.deselect_all_options_to_view_search_with()
-    #
-    #     self.info('Get testunits page')
-    #     self.test_unit_page.get_test_units_page()
-    #
-    #     self.info('Create new testunit with qualitative and random generated data')
-    #     self.test_unit_page.create_qualitative_testunit(name=new_random_name, method=new_random_method,
-    #                                                     material_type='All')
-    #
-    #     self.info('Search by the testunit name {} to get number'.format(new_random_name))
-    #     row = self.test_unit_page.search(value=new_random_name)[0]
-    #     new_auto_generated_number = self.base_selenium.get_row_cell_text_related_to_header(row=row,
-    #                                                                                        column_value='Test Unit No.')
-    #
-    #     new_auto_generated_number = new_auto_generated_number.replace("'", '')
-    #     self.info('get the newly created testunit number of {}'.format(new_auto_generated_number))
-    #
-    #     self.test_plan.get_test_plans_page()
-    #     self.test_plan.get_test_plan_edit_page(name='in progress')
-    #     is_name_exist = self.test_plan.search_test_unit_not_set(test_unit=new_random_name)
-    #     is_number_exist = self.test_plan.search_test_unit_not_set(test_unit=new_auto_generated_number)
-    #     is_type_exist = self.test_plan.search_test_unit_not_set(test_unit='Qualitative')
-    #     is_method_exist = self.test_plan.search_test_unit_not_set(test_unit=new_random_method)
-    #
-    #     self.info('Get testunits page')
-    #     self.test_unit_page.get_test_units_page()
-    #     self.test_unit_page.open_configurations()
-    #     self.test_unit_page.open_testunit_name_configurations_options()
-    #     old_values = old_values.split('\n×')
-    #
-    #     self.test_unit_page.select_option_to_view_search_with(view_search_options=old_values)
-    #
-    #     self.assertTrue(is_name_exist)
-    #     self.assertFalse(is_number_exist)
-    #     self.assertTrue(is_type_exist)
-    #     self.assertFalse(is_method_exist)
-    #
-    # def test041_test_unit_name_view_method_option_multiple_line_in_testplan(self):
-    #     """
-    #     New: Test Unit: Configuration: Test unit Name Approach: In case you select
-    #     the method to display and you entered long text in it, the method should
-    #     display into multiple lines (test plan)
-    #
-    #     LIMS- 6424
-    #     :return:
-    #     """
-    #
-    #     self.info('Generate random data for update')
-    #     new_random_name = self.generate_random_string()
-    #     new_random_method = self.generate_random_string() + self.generate_random_string() + self.generate_random_string()
-    #
-    #     self.test_unit_page.open_configurations()
-    #     self.test_unit_page.open_testunit_name_configurations_options()
-    #     old_values = self.test_unit_page.select_option_to_view_search_with(view_search_options=['method'])
-    #
-    #     self.info('Create new testunit with qualitative and random generated data')
-    #     self.test_unit_page.create_qualitative_testunit(name=new_random_name, method=new_random_method,
-    #                                                     material_type='All')
-    #     self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save new testunit')
-    #
-    #     self.test_plan.get_test_plans_page()
-    #     self.test_plan.get_test_plan_edit_page(name='in progress')
     #     is_method_exist = self.test_plan.set_test_unit(test_unit=new_random_method)
+    #     import ipdb;ipdb.set_trace()
     #     multiple_lines_properties = self.test_plan.get_testunit_in_testplan_title_multiple_line_properties()
-    #
-    #     self.info('Get testunits page')
-    #     self.test_unit_page.get_test_units_page()
-    #     self.test_unit_page.open_configurations()
-    #     self.test_unit_page.open_testunit_name_configurations_options()
-    #     old_values = old_values.split('\n×')
-    #
-    #     self.test_unit_page.select_option_to_view_search_with(view_search_options=old_values)
-    #
     #     self.assertEquals(multiple_lines_properties['textOverflow'], 'clip')
     #     self.assertEquals(multiple_lines_properties['lineBreak'], 'auto')
-    #
-    # @parameterized.expand([('name', 'type'),
-    #                        ('name', 'method'),
-    #                        ('name', 'number'),
-    #                        ('type', 'method'),
-    #                        ('type', 'number'),
-    #                        ('method', 'number')
-    #                        ])
-    # def test042_test_unit_name_allow_user_to_search_with_selected_two_options_testplan(self, search_view_option1,
-    #                                                                                    search_view_option2):
-    #     """
-    #
-    #     New: Test Unit: Configuration: Test unit Name Approach: Allow user to search with
-    #     (name, number, type, method) in the drop down list of the analysis for
-    #
-    #     LIMS- 6426
-    #     :return:
-    #     """
-    #
-    #     self.info('Generate random data for update')
-    #     new_random_name = self.generate_random_string()
-    #     new_random_method = self.generate_random_string()
-    #
-    #     self.test_unit_page.open_configurations()
-    #     self.test_unit_page.open_testunit_name_configurations_options()
-    #     old_values = self.test_unit_page.select_option_to_view_search_with(
-    #         view_search_options=[search_view_option1, search_view_option2])
-    #
-    #     self.info('Get testunits page')
-    #     self.test_unit_page.get_test_units_page()
-    #
-    #     self.info('Create new testunit with qualitative and random generated data')
-    #     self.test_unit_page.create_qualitative_testunit(name=new_random_name, method=new_random_method,
-    #                                                     material_type='All')
-    #
-    #     self.info('Search by the testunit name {} to get number'.format(new_random_name))
-    #     row = self.test_unit_page.search(value=new_random_name)[0]
-    #     new_auto_generated_number = self.base_selenium.get_row_cell_text_related_to_header(row=row,
-    #                                                                                        column_value='Test Unit No.')
-    #     new_auto_generated_number = new_auto_generated_number.replace("'", '')
-    #     self.info('get the newly created testunit number of {}'.format(new_auto_generated_number))
-    #
-    #     self.test_plan.get_test_plans_page()
-    #     self.test_plan.get_test_plan_edit_page(name='in progress')
-    #     is_name_exist = self.test_plan.search_test_unit_not_set(test_unit=new_random_name)
-    #     is_number_exist = self.test_plan.search_test_unit_not_set(test_unit=new_auto_generated_number)
-    #     is_type_exist = self.test_plan.search_test_unit_not_set(test_unit='Qualitative')
-    #     is_method_exist = self.test_plan.search_test_unit_not_set(test_unit=new_random_method)
-    #
-    #     self.info('Get testunits page')
-    #     self.test_unit_page.get_test_units_page()
-    #     self.test_unit_page.open_configurations()
-    #     self.test_unit_page.open_testunit_name_configurations_options()
-    #     old_values = old_values.split('\n×')
-    #
-    #     self.test_unit_page.select_option_to_view_search_with(view_search_options=old_values)
-    #
-    #     if search_view_option1 == 'name' and search_view_option2 == 'type':
-    #         self.assertTrue(is_name_exist)
-    #         self.assertFalse(is_number_exist)
-    #         self.assertTrue(is_type_exist)
-    #         self.assertFalse(is_method_exist)
-    #     elif search_view_option1 == 'name' and search_view_option2 == 'method':
-    #         self.assertTrue(is_name_exist)
-    #         self.assertFalse(is_number_exist)
-    #         self.assertFalse(is_type_exist)
-    #         self.assertTrue(is_method_exist)
-    #     elif search_view_option1 == 'name' and search_view_option2 == 'number':
-    #         self.assertTrue(is_name_exist)
-    #         self.assertTrue(is_number_exist)
-    #         self.assertFalse(is_type_exist)
-    #         self.assertFalse(is_method_exist)
-    #     elif search_view_option1 == 'type' and search_view_option2 == 'method':
-    #         self.assertFalse(is_name_exist)
-    #         self.assertFalse(is_number_exist)
-    #         self.assertTrue(is_type_exist)
-    #         self.assertTrue(is_method_exist)
-    #     elif search_view_option1 == 'type' and search_view_option2 == 'number':
-    #         self.assertFalse(is_name_exist)
-    #         self.assertTrue(is_number_exist)
-    #         self.assertTrue(is_type_exist)
-    #         self.assertFalse(is_method_exist)
-    #     elif search_view_option1 == 'method' and search_view_option2 == 'number':
-    #         self.assertFalse(is_name_exist)
-    #         self.assertTrue(is_number_exist)
-    #         self.assertFalse(is_type_exist)
-    #         self.assertTrue(is_method_exist)
-    #
-    # def test043_testunits_search_then_navigate(self):
-    #     """
-    #     Search Approach: Make sure that you can search then navigate to any other page
-    #     LIMS-6201
-    #     """
-    #     test_units_response = self.test_unit_api.get_all_test_units()
-    #     testunits = test_units_response.json()['testUnits']
-    #     testunit_name = random.choice(testunits)['name']
-    #     search_results = self.test_unit_page.search(testunit_name)
-    #     self.assertGreater(len(search_results), 1, " * There is no search results for it, Report a bug.")
-    #     for search_result in search_results:
-    #         search_data = self.base_selenium.get_row_cells_dict_related_to_header(search_result)
-    #         if search_data['Test Unit Name'] == testunit_name:
-    #             break
-    #     else:
-    #         self.assertTrue(False, " * There is no search results for it, Report a bug.")
-    #     self.assertEqual(testunit_name, search_data['Test Unit Name'])
-    #     # Navigate to articles page
-    #     self.info('navigate to articles page')
-    #     Articles().get_articles_page()
-    #     self.assertEqual(self.base_selenium.get_url(), '{}articles'.format(self.base_selenium.url))
-    #
-    # def test044_hide_all_table_configurations(self):
-    #     """
-    #     Table configuration: Make sure that you can't hide all the fields from the table configuration
-    #
-    #     LIMS-6288
-    #     """
-    #     self.assertFalse(self.test_unit_page.deselect_all_configurations())
-    #
-    # @parameterized.expand([('number', 'testunit_number_filter', 'Test Unit No.'),
-    #                        ('name', 'name_filter', 'Test Unit Name'),
-    #                        ('method', 'method_filter', 'Method'),
-    #                        ('createdAt', 'filter_created_at', 'Created On')])
-    # def test045_filter_by_testunit_text_fields(self, filter_case, filter, header_name):
-    #     """
-    #     New: Test units: Filter Approach: Make sure you can filter by test unit no
-    #     LIMS-6430
-    #
-    #     New:  Test units: Filter Approach: Make sure you can filter by name
-    #     LIMS-6432
-    #
-    #     New:  Test units: Filter Approach: Make sure you can filter by method
-    #     LIMS-6434
-    #
-    #     New:  Test units: Filter Approach: Make sure you can filter by created on
-    #     LIMS-6431
-    #     """
-    #
-    #     data_to_filter_with = self.test_unit_api.get_first_record_with_data_in_attribute(attribute=filter_case)
-    #     self.assertNotEqual(data_to_filter_with, False)
-    #
-    #     if filter_case == 'createdAt':
-    #         data_to_filter_with = self.test_unit_page.convert_to_dot_date_format(date=data_to_filter_with)
-    #
-    #     self.info('filter with {}'.format(data_to_filter_with))
-    #     self.test_unit_page.apply_filter_scenario(filter_element='test_unit:{}'.format(filter),
-    #                                               filter_text=data_to_filter_with, field_type='text')
-    #
-    #     table_records = self.test_unit_page.result_table()[:-1]
-    #
-    #     for record in table_records:
-    #         row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=record)
-    #         self.assertIn(str(data_to_filter_with), row_data[header_name].replace("'", ""))
-    #
-    # def test046_filter_by_testunit_unit_returns_only_correct_results(self):
-    #     """
-    #     New:  Test units: Filter Approach: Make sure you can filter by unit
-    #
-    #     LIMS-6427
-    #     """
-    #
-    #     data_to_filter_with = self.test_unit_api.get_first_record_with_data_in_attribute(attribute='unit')
-    #     self.assertNotEqual(data_to_filter_with, False)
-    #     self.info('filter with {}'.format(data_to_filter_with))
-    #
-    #     self.test_unit_page.apply_filter_scenario(filter_element='test_unit:spec_unit_filter', filter_text=data_to_filter_with, field_type='text')
-    #     table_records = self.test_unit_page.result_table()
-    #     del table_records[-1]
-    #     for record in table_records:
-    #         row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=record)
-    #         self.assertEqual(row_data['Unit'].replace("'",""), str(data_to_filter_with.replace('{','').replace('}','').replace('[', '').replace(']','')))
-    #
-    #
-    # @parameterized.expand([('categoryName', 'category_filter', 'Category'),
-    #                        ('typeName', 'filter_type', 'Type'),
-    #                        ('lastModifiedUser', 'filter_changed_by', 'Changed By')])
-    # def test047_filter_by_testunit_drop_down_fields(self, filter_case, filter, header_name):
-    #     """
-    #     New:  Test units: Filter Approach: Make sure you can filter by category
-    #     LIMS-6429
-    #
-    #     New:  Test units: Filter Approach: Make sure you can filter by type
-    #     LIMS-6435
-    #
-    #     New:  Test units: Filter Approach: Make sure you can filter by changed by
-    #     LIMS-6428
-    #     """
-    #
-    #     data_to_filter_with = self.test_unit_api.get_first_record_with_data_in_attribute(attribute=filter_case)
-    #     self.assertNotEqual(data_to_filter_with, False)
-    #     self.info('filter with {}'.format(data_to_filter_with))
-    #     self.test_unit_page.apply_filter_scenario(filter_element='test_unit:{}'.format(filter), filter_text=data_to_filter_with)
-    #     table_records = self.test_unit_page.result_table()
-    #
-    #     del table_records[-1]
-    #     for record in table_records:
-    #         row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=record)
-    #         self.assertIn(str(data_to_filter_with), row_data[header_name].replace("'",""))
-    #
-    # def test048_filter_by_testunit_material_type_returns_only_correct_results(self):
-    #     """
-    #     New:  Test units: Filter Approach: Make sure you can filter by material type
-    #
-    #     LIMS-6433
-    #     """
-    #     data_to_filter_with = self.test_unit_api.get_first_record_with_data_in_attribute(attribute='materialTypes')
-    #     self.assertNotEqual(data_to_filter_with, False)
-    #     self.info('filter with {}'.format(data_to_filter_with[0]))
-    #     self.test_unit_page.apply_filter_scenario(filter_element='test_unit:filter_material_type',
-    #                                               filter_text=data_to_filter_with[0])
-    #     table_records = self.test_unit_page.result_table()
-    #     del table_records[-1]
-    #     for record in table_records:
-    #         row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=record)
-    #         testunit_material_types = row_data['Material Type'].split(', ')[0]
-    #         self.assertEqual(testunit_material_types.replace("'", ""), str(data_to_filter_with[0]))
+
+    @parameterized.expand([('name', 'type'),
+                           ('name', 'method'),
+                           ('name', 'number'),
+                           ('type', 'method'),
+                           ('type', 'number'),
+                           ('method', 'number')
+                           ])
+    def test040_test_unit_name_allow_user_to_search_with_selected_two_options_testplan(self, search_view_option1,
+                                                                                       search_view_option2):
+        """
+        New: Test Unit: Configuration: Test unit Name Approach: Allow user to search with
+        (name, number, type, method) in the drop down list of the analysis for
+
+        LIMS- 6426
+        """
+        self.test_unit_page.select_option_to_view_search_with(
+            view_search_options=[search_view_option1, search_view_option2])
+        self.info('Create new testunit with qualitative and random generated data')
+        response, payload = self.test_unit_api.create_qualitative_testunit()
+        self.assertEqual(response['status'], 1, payload)
+        self.info('new testunit created with number  {}'.format(payload['number']))
+        self.info('get random In Progrees test plan')
+        test_plan = random.choice(TestPlanAPI().get_inprogress_testplans())
+        self.assertTrue(test_plan, 'No test plan selected')
+        self.info('Navigate to test plan edit page')
+        self.test_plan.get_test_plan_edit_page_by_id(test_plan['id'])
+        self.test_plan.sleep_small()
+        is_name_exist = self.test_plan.search_test_unit_not_set(test_unit=payload['name'])
+        is_number_exist = self.test_plan.search_test_unit_not_set(test_unit=str(payload['number']))
+        is_type_exist = self.test_plan.search_test_unit_not_set(test_unit='Qualitative')
+        is_method_exist = self.test_plan.search_test_unit_not_set(test_unit=payload['method'])
+
+        if search_view_option1 == 'name' and search_view_option2 == 'type':
+            self.assertTrue(is_name_exist)
+            self.assertFalse(is_number_exist)
+            self.assertTrue(is_type_exist)
+            self.assertFalse(is_method_exist)
+        elif search_view_option1 == 'name' and search_view_option2 == 'method':
+            self.assertTrue(is_name_exist)
+            self.assertFalse(is_number_exist)
+            self.assertFalse(is_type_exist)
+            self.assertTrue(is_method_exist)
+        elif search_view_option1 == 'name' and search_view_option2 == 'number':
+            self.assertTrue(is_name_exist)
+            self.assertTrue(is_number_exist)
+            self.assertFalse(is_type_exist)
+            self.assertFalse(is_method_exist)
+        elif search_view_option1 == 'type' and search_view_option2 == 'method':
+            self.assertFalse(is_name_exist)
+            self.assertFalse(is_number_exist)
+            self.assertTrue(is_type_exist)
+            self.assertTrue(is_method_exist)
+        elif search_view_option1 == 'type' and search_view_option2 == 'number':
+            self.assertFalse(is_name_exist)
+            self.assertTrue(is_number_exist)
+            self.assertTrue(is_type_exist)
+            self.assertFalse(is_method_exist)
+        elif search_view_option1 == 'method' and search_view_option2 == 'number':
+            self.assertFalse(is_name_exist)
+            self.assertTrue(is_number_exist)
+            self.assertFalse(is_type_exist)
+            self.assertTrue(is_method_exist)
+
+    def test041_testunits_search_then_navigate(self):
+        """
+        Search Approach: Make sure that you can search then navigate to any other page
+
+        LIMS-6201
+        """
+        testunit_name = random.choice(self.test_unit_api.get_all_testunits_json())['name']
+        search_results = self.test_unit_page.search(testunit_name)
+        self.assertGreater(len(search_results), 1, " * There is no search results for it, Report a bug.")
+        for search_result in search_results:
+            search_data = self.base_selenium.get_row_cells_dict_related_to_header(search_result)
+            if search_data['Test Unit Name'] == testunit_name:
+                break
+        else:
+            self.assertTrue(False, " * There is no search results for it, Report a bug.")
+        self.assertEqual(testunit_name, search_data['Test Unit Name'])
+        # Navigate to articles page
+        self.info('navigate to articles page')
+        Articles().get_articles_page()
+        self.assertEqual(self.base_selenium.get_url(), '{}articles'.format(self.base_selenium.url))
+
+    def test042_hide_all_table_configurations(self):
+        """
+        Table configuration: Make sure that you can't hide all the fields from the table configuration
+
+        LIMS-6288
+        """
+        self.assertFalse(self.test_unit_page.deselect_all_configurations())
+
+    @parameterized.expand([('number', 'testunit_number_filter', 'Test Unit No.'),
+                           ('name', 'testunit_name_filter', 'Test Unit Name'),
+                           ('method', 'method_filter', 'Method'),
+                           ('createdAt', 'filter_created_at', 'Created On')])
+    def test043_filter_by_testunit_text_fields(self, filter_case, filter, header_name):
+        """
+        New: Test units: Filter Approach: Make sure you can filter by test unit no
+        LIMS-6430
+
+        New:  Test units: Filter Approach: Make sure you can filter by name
+        LIMS-6432
+
+        New:  Test units: Filter Approach: Make sure you can filter by method
+        LIMS-6434
+
+        New:  Test units: Filter Approach: Make sure you can filter by created on
+        LIMS-6431
+        """
+
+        data_to_filter_with = self.test_unit_api.get_first_record_with_data_in_attribute(attribute=filter_case)
+        self.assertNotEqual(data_to_filter_with, False)
+
+        if filter_case == 'createdAt':
+            data_to_filter_with = self.test_unit_page.convert_to_dot_date_format(date=data_to_filter_with)
+
+        self.info('filter with {}'.format(data_to_filter_with))
+        self.test_unit_page.apply_filter_scenario(filter_element='test_units:{}'.format(filter),
+                                                  filter_text=data_to_filter_with, field_type='text')
+
+        table_records = self.test_unit_page.result_table()[:-1]
+
+        for record in table_records:
+            row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=record)
+            self.assertIn(str(data_to_filter_with), row_data[header_name].replace("'", ""))
+
+    def test044_filter_by_testunit_unit_returns_only_correct_results(self):
+        """
+        New:  Test units: Filter Approach: Make sure you can filter by unit
+
+        LIMS-6427
+        """
+        data_to_filter_with = self.test_unit_api.get_first_record_with_data_in_attribute(attribute='unit')
+        self.assertNotEqual(data_to_filter_with, False)
+        self.info('filter with {}'.format(data_to_filter_with))
+
+        self.test_unit_page.apply_filter_scenario(filter_element='test_unit:spec_unit_filter', filter_text=data_to_filter_with, field_type='text')
+        table_records = self.test_unit_page.result_table()
+        del table_records[-1]
+        for record in table_records:
+            row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=record)
+            self.assertEqual(row_data['Unit'].replace("'",""), str(data_to_filter_with.replace('{','').replace('}','').replace('[', '').replace(']','')))
+
+
+    @parameterized.expand([('categoryName','filter_category','Category'),
+                           ('typeName', 'filter_Type', 'Type')])
+    def test045_filter_by_testunit_drop_down_fields(self, filter_case, filter, header_name):
+        """
+        New:  Test units: Filter Approach: Make sure you can filter by category
+        LIMS-6429
+
+        New:  Test units: Filter Approach: Make sure you can filter by type
+        LIMS-6435
+        """
+        data_to_filter_with = self.test_unit_api.get_first_record_with_data_in_attribute(attribute=filter_case)
+        self.assertNotEqual(data_to_filter_with, False)
+        self.info('filter with {}'.format(data_to_filter_with))
+        self.test_unit_page.apply_filter_scenario(filter_element='test_units:{}'.format(filter), filter_text=data_to_filter_with)
+        table_records = self.test_unit_page.result_table()
+
+        del table_records[-1]
+        for record in table_records:
+            row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=record)
+            self.assertIn(str(data_to_filter_with), row_data[header_name].replace("'",""))
+
+    def test046_filter_by_testunit_material_type_returns_only_correct_results(self):
+        """
+        New:  Test units: Filter Approach: Make sure you can filter by material type
+
+        LIMS-6433
+        """
+        data_to_filter_with = self.test_unit_api.get_first_record_with_data_in_attribute(attribute='materialTypes')
+        self.assertNotEqual(data_to_filter_with, False)
+        self.info('filter with {}'.format(data_to_filter_with[0]))
+        self.test_unit_page.apply_filter_scenario(filter_element='test_units:filter_material_type',
+                                                  filter_text=data_to_filter_with[0])
+        table_records = self.test_unit_page.result_table()
+        del table_records[-1]
+        for record in table_records:
+            row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=record)
+            testunit_material_types = row_data['Material Type'].split(',')
+            self.assertIn(str(data_to_filter_with[0]), testunit_material_types)
+
+    def test047_filter_by_testunit_changed_by(self):
+        """
+        New:  Test units: Filter Approach: Make sure you can filter by changed by
+
+        LIMS-6428
+        """
+        self.login_page = Login()
+        self.info('Calling the users api to create a new user with username')
+        response, payload = UsersAPI().create_new_user()
+        self.assertEqual(response['status'], 1, payload)
+        self.login_page.logout()
+        self.login_page.login(username=payload['username'], password=payload['password'])
+        self.base_selenium.wait_until_page_url_has(text='dashboard')
+        self.test_units_page.get_test_units_page()
+        new_name = self.generate_random_string()
+        method = self.generate_random_string()
+        test_unit_no = self.test_unit_page.create_qualitative_testunit(name=new_name, method=method)
+        self.test_unit_page.save_and_wait()
+        self.assertTrue(test_unit_no, 'Test unit not created')
+        self.info('New unit is created successfully with number: {}'.format(test_unit_no))
+        self.test_units_page.sleep_tiny()
+        test_unit_found = self.test_units_page.filter_by_user_get_result(payload['username'])
+        self.assertTrue(test_unit_found)

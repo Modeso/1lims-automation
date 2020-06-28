@@ -37,7 +37,8 @@ class TstUnits(BasePages):
         self.base_selenium.click(element='test_units:testunit_menu')
         self.sleep_small()
         self.base_selenium.click(element='test_units:versions')
-        self.sleep_small()
+        self.base_selenium.wait_until_page_url_has(text='versions')
+        self.wait_until_page_is_loaded()
 
     def get_archived_test_units(self):
         self.base_selenium.scroll()
@@ -51,7 +52,6 @@ class TstUnits(BasePages):
         self.base_selenium.click(element='test_units:right_menu')
         self.base_selenium.click(element='test_units:configurations')
         self.sleep_small()
-
 
     def is_test_unit_in_table(self, value):
         """
@@ -100,10 +100,12 @@ class TstUnits(BasePages):
 
     def open_testunit_name_configurations_options(self):
         self.info('open testunits name configurations options')
+        self.base_selenium.scroll()
+        self.sleep_tiny()
         self.base_selenium.click(element='configurations_page:display_options_menu')
         self.sleep_tiny()
         self.base_selenium.click(element='configurations_page:field_options')
-        self.sleep_small()
+        self.sleep_tiny()
 
     def clear_all_selected_view_and_search_options(self):
         self.info('clear selected view and search options of testunits name')
@@ -200,6 +202,11 @@ class TstUnits(BasePages):
 
         return self.base_selenium.get_row_cells_dict_related_to_header(row=testunit_records[0])
 
+    def filter_by_user_get_result(self, text=''):
+        self.apply_filter_scenario(filter_element='test_units:filter_changed_by',
+                                   filter_text=text)
+        return self.get_the_latest_row_data()
+
     def filter_and_get_latest_row_data(self, text=''):
         self.apply_filter_scenario(filter_element='test_units:testunit_number_filter',
                                    filter_text=text, field_type='text')
@@ -222,7 +229,6 @@ class TstUnits(BasePages):
         self.sleep_tiny()
         self.info('Open Versions for the selected test unit')
         self.get_versions_of_selected_test_units()
-        self.sleep_medium()
         version_data = []
         rows = self.result_table()
         for item in rows:

@@ -140,7 +140,7 @@ class TstUnit(TstUnits):
         if category:
             self.base_selenium.select_item_from_drop_down(element='test_unit:category', item_text=category)
         else:
-            self.base_selenium.select_item_from_drop_down(element='test_unit:category')
+            self.base_selenium.select_item_from_drop_down(element='test_unit:category', item_text='')
             self.sleep_small()
             return self.get_category()
 
