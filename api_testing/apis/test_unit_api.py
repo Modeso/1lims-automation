@@ -309,6 +309,15 @@ class TestUnitAPI(TestUnitAPIFactory):
                 testunits_name.append(testunit['name'])
         return testunits_name
 
+    def get_testunit_with_quntification_limits_and_empty_specification(self):
+        testunits_request, _ = self.get_all_test_units(filter='{"typeName":2}')
+        testunits = testunits_request['testUnits']
+        testunits_list = []
+        for testunit in testunits:
+            if testunit['specifications'] == '' and testunit['quantification'] not in ['', '-*-', '-']:
+                testunits_list.append(testunit)
+        return testunits_list
+
     def delete_active_testunit(self, id=1):
         if self.archive_testunits(ids=[str(id)])[0]['message'] == 'delete_success':
             if self.delete_archived_testunit(id=id)[0]['message'] == 'hard_delete_success':

@@ -162,26 +162,31 @@ class TestUnitsTestCases(BaseTest):
 
         LIMS-4161
         """
-        new_random_name = self.generate_random_string()
-        new_random_method = self.generate_random_string()
-        new_random_upper_limit = self.generate_random_number(lower=50, upper=100)
-        self.info('Create new test unit with name {}'.format(new_random_name))
-        test_unit_no = self.test_unit_page.create_new_testunit(name=new_random_name,
-                                                               testunit_type='Quantitative',
-                                                               method=new_random_method,
-                                                               spec_or_quan=specification_type,
-                                                               upper_limit=new_random_upper_limit)
-
-        self.test_unit_page.save_and_wait()
-        self.info('filter by test unit number: {}, to make sure that test unit created successfully'.
-                  format(test_unit_no))
-        test_unit_found = self.test_units_page.filter_and_get_latest_row_data(test_unit_no)
-        self.info('Checking with upper limit to make sure that data saved normally')
+        self.info('create Quantitative test unit using api')
         if specification_type == 'spec':
-            self.assertEqual('<= '+str(new_random_upper_limit), test_unit_found['Specifications'])
+            response, payload = self.test_unit_api.create_quantitative_testunit()
         else:
-            self.assertEqual('<= '+str(new_random_upper_limit), test_unit_found['Quantification Limit'])
+            upperLimit = self.generate_random_number(lower=50, upper=100)
+            lowerLimit = self.generate_random_number(lower=1, upper=49)
+            response, payload = self.test_unit_api.create_quantitative_testunit(useSpec=False, useQuantification=True,
+                                                                                quantificationUpperLimit=upperLimit,
+                                                                                quantificationLowerLimit=lowerLimit)
+
+        self.assertEqual(response['status'], 1, 'test unit not created with payload {} '.format(payload))
+        self.info('filter by test unit number: {}, to make sure that test unit created successfully'.
+                  format(payload['number']))
+        test_unit_found = self.test_units_page.filter_and_get_latest_row_data(payload['number'])
+        self.info('Checking with upper and lower limit to make sure that data saved normally')
+        if specification_type == 'spec':
+            self.assertEqual(str(payload['lowerLimit'])+'-'+str(payload['upperLimit']),
+                             test_unit_found['Specifications'])
             self.info('+ Assert unit value after save is: {}, and should be empty'.format(test_unit_found['Unit']))
+            self.assertEqual(test_unit_found['Unit'], '-')
+        else:
+            self.assertEqual(str(payload['quantificationLowerLimit'])+'-'+str(payload['quantificationUpperLimit']),
+                             test_unit_found['Quantification Limit'])
+            self.info('+ Assert unit value after save is: {}, and should be empty'.format(
+                test_unit_found['Quantification Limit Unit']))
             self.assertEqual(test_unit_found['Quantification Limit Unit'], '-')
 
     @parameterized.expand(['spec', 'quan'])
@@ -317,26 +322,32 @@ class TestUnitsTestCases(BaseTest):
         LIMS-3681
         LIMS-4415
         """
-        new_random_name = self.generate_random_string()
-        new_random_method = self.generate_random_string()
-        new_random_limit = self.generate_random_number(lower=500, upper=1000)
-
         self.info('Create new test unit with qualitative and random generated data')
         if limit == "upper":
-            self.info('Create with upper limit : {} & {} '.format(new_random_limit, spec_or_quan))
-            test_unit_no = self.test_unit_page.create_quantitative_testunit(
-                name=new_random_name, method=new_random_method, upper_limit=new_random_limit, spec_or_quan=spec_or_quan)
+            self.info('Create with upper limit')
+            if spec_or_quan == 'spec':
+                response, payload = self.test_unit_api.create_quantitative_testunit(lowerLimit='')
+            else:
+                upperLimit = self.generate_random_number(lower=50, upper=100)
+                response, payload = self.test_unit_api.create_quantitative_testunit(useSpec=False,
+                                                                                    useQuantification=True,
+                                                                                    quantificationUpperLimit=upperLimit,
+                                                                                    quantificationLowerLimit='')
+
         else:
-            self.info('Create with lower limit : {} & {} '.format(new_random_limit, spec_or_quan))
-            test_unit_no = self.test_unit_page.create_quantitative_testunit(
-                name=new_random_name, method=new_random_method, lower_limit=new_random_limit, spec_or_quan=spec_or_quan)
-
-        self.test_unit_page.sleep_tiny()
-        self.test_unit_page.save_and_wait()
+            self.info('Create with lower limit')
+            if spec_or_quan == 'spec':
+                response, payload = self.test_unit_api.create_quantitative_testunit(upperLimit='')
+            else:
+                lowerLimit = self.generate_random_number(lower=1, upper=49)
+                response, payload = self.test_unit_api.create_quantitative_testunit(useSpec=False,
+                                                                                    useQuantification=True,
+                                                                                    quantificationUpperLimit='',
+                                                                                    quantificationLowerLimit=lowerLimit)
+        self.assertEqual(response['status'], 1, payload)
         self.info('filter by test unit number: {}, to make sure that test unit created successfully'.
-                  format(test_unit_no))
-        test_unit_found = self.test_units_page.filter_and_get_latest_row_data(test_unit_no)
-
+                  format(payload['number']))
+        test_unit_found = self.test_units_page.filter_and_get_latest_row_data(payload['number'])
         if limit == "upper":
             self.info('Check that <= is existing in {}'.format(spec_or_quan))
             self.assertIn('<=', test_unit_found['Specifications']) if 'spec' in spec_or_quan \
@@ -346,36 +357,7 @@ class TestUnitsTestCases(BaseTest):
             self.assertIn('>=', test_unit_found['Specifications']) if 'spec' in spec_or_quan \
                 else self.assertIn('>=', test_unit_found['Quantification Limit'])
 
-    @parameterized.expand(['upper', 'lower'])
-    def test013_limits_of_quantification_approach(self, limit):
-        """
-        New: Test units : Limits of quantification Approach: In case I didn't enter empty values in the upper/lower
-        limits of the specification of limits of quantification, it should display N/A in the active table
-
-        LIMS:4427
-        """
-        new_random_name = self.generate_random_string()
-        new_random_method = self.generate_random_string()
-        new_random_limit = self.generate_random_number(lower=500, upper=1000)
-        spec_or_quan = 'spec'
-        self.info('Create new testunit with qualitative and random generated data')
-        if limit == "upper":
-            self.info('Create with upper limit : {} & {} '.format(new_random_limit, spec_or_quan))
-            test_unit_no = self.test_unit_page.create_quantitative_testunit(
-                name=new_random_name, method=new_random_method, upper_limit=new_random_limit, spec_or_quan=spec_or_quan)
-        else:
-            self.info('Create with lower limit : {} & {} '.format(new_random_limit, spec_or_quan))
-            test_unit_no = self.test_unit_page.create_quantitative_testunit(
-                name=new_random_name, method=new_random_method, lower_limit=new_random_limit, spec_or_quan=spec_or_quan)
-
-        self.test_unit_page.sleep_tiny()
-        self.test_unit_page.save_and_wait()
-        self.info('filter by test unit number: {}, to make sure that test unit created successfully'.
-                  format(test_unit_no))
-        test_unit_found = self.test_units_page.filter_and_get_latest_row_data(test_unit_no)
-        self.assertIn('N/A', test_unit_found['Quantification Limit'])
-
-    def test014_quantitative_mibi_type_allow_upper_limit_the_concentration_to_be_mandatory_fields(self):
+    def test013_quantitative_mibi_type_allow_upper_limit_the_concentration_to_be_mandatory_fields(self):
         """
         Test unit: Specification Approach: In quantitative MiBi type allow upper
         limit & the concentration to be mandatory fields
@@ -408,7 +390,7 @@ class TestUnitsTestCases(BaseTest):
         self.info('Assert error msg')
         self.assertEqual(validation_result, True)
 
-    def test015_specification_limit_of_quantification_approach(self):
+    def test014_specification_limit_of_quantification_approach(self):
         """
         New: Test unit: Specification/limit of quantification Approach: Allow user to select those both options
         ( specification & limit of quantification ) at the same time ( create test unit with both selection )
@@ -438,7 +420,7 @@ class TestUnitsTestCases(BaseTest):
         self.assertEqual("{}-{}".format(new_random_lower_limit, new_random_upper_limit),
                          test_unit_found['Quantification Limit'])
 
-    def test016_fields_of_the_specification_limits_of_quant_should_be_disabled_if_the_checkbox_is_not_selected(self):
+    def test015_fields_of_the_specification_limits_of_quant_should_be_disabled_if_the_checkbox_is_not_selected(self):
         """
         The fields of the specification & limits of quantification should be disabled if the checkbox is not selected
 
@@ -456,7 +438,7 @@ class TestUnitsTestCases(BaseTest):
             self.assertNotIn('ng-valid', class_attr)
 
     @parameterized.expand(['quan', 'spec'])
-    def test017_create_quantative_with_limits_of_quantative_only_and_specification_only(self, limits_type):
+    def test016_create_quantative_with_limits_of_quantative_only_and_specification_only(self, limits_type):
         """
         New:Test unit: Create Approach: User can create test unit with limits of quantification type only &
         with upper lower limits
@@ -464,6 +446,11 @@ class TestUnitsTestCases(BaseTest):
 
         LIMS-5427
         LIMS-4156
+
+        New: Test units : Limits of quantification Approach: In case I didn't enter empty values in the upper/lower
+        limits of the specification of limits of quantification, it should display N/A in the active table
+
+        LIMS-4427
         """
         new_name = self.generate_random_string()
         new_method = self.generate_random_string()
@@ -477,9 +464,15 @@ class TestUnitsTestCases(BaseTest):
         self.info('filter by test unit number: {}, to make sure that test unit created successfully'.
                   format(test_unit_no))
         test_unit_found = self.test_units_page.filter_and_get_latest_row_data(test_unit_no)
-        self.assertEqual(new_name, test_unit_found['Test Unit Name'])
+        self.assertTrue(test_unit_found)
+        if limits_type == 'quan':
+            self.assertNotEqual(test_unit_found['Quantification Limit'], 'N/A')
+            self.assertEqual(test_unit_found['Specifications'], 'N/A')
+        else:
+            self.assertNotEqual(test_unit_found['Specifications'], 'N/A')
+            self.assertEqual(test_unit_found['Quantification Limit'], 'N/A')
 
-    def test018_download_test_units_sheet(self):
+    def test017_download_test_units_sheet(self):
         """
         I can download all the data in the table view in the excel sheet
 
@@ -499,32 +492,24 @@ class TestUnitsTestCases(BaseTest):
                     continue
                 self.assertIn(item, fixed_sheet_row_data)
 
-    def test019_specification_limit_of_quantification_approach_can_be_minus(self):
+    def test018_specification_limit_of_quantification_approach_can_be_minus(self):
         """
         New: Test unit: Quantitative: Specification Approach User can enter (-) in upper/lower limit
 
         LIMS-3767
-        :return:
         """
-
-        new_random_name = self.generate_random_string()
-        new_random_method = self.generate_random_string()
-        spec_or_quan = 'spec_quan'
-
-        self.info('Create new testunit with qualitative and random generated data')
-        test_unit_no = self.test_unit_page.create_quantitative_testunit(
-            name=new_random_name, method=new_random_method, upper_limit="-",
-            lower_limit="-", spec_or_quan=spec_or_quan)
-        self.test_unit_page.sleep_tiny()
-        self.test_unit_page.save_and_wait()
-        self.info('Get the test unit of it')
+        self.info('Create new Qualitative testunit with - in upper and lower limit')
+        response, payload = self.test_unit_api.create_quantitative_testunit(upperLimit='-', lowerLimit='-')
+        self.assertEqual(response['status'], 1, payload)
         self.info('filter by test unit number: {}, to make sure that test unit created successfully'.
-                  format(test_unit_no))
-        test_unit_found = self.test_units_page.filter_and_get_latest_row_data(test_unit_no)
+                  format(payload['number']))
+        test_unit_found = self.test_units_page.filter_and_get_latest_row_data(payload['number'])
+        self.info('Assert test unit created successfully')
+        self.assertTrue(test_unit_found)
         self.info('Assert upper and lower limits are in specifications with N/A values')
         self.assertEqual("N/A", test_unit_found['Specifications'])
 
-    def test020_change_quantification_limits_not_effect_test_plan(self):
+    def test019_change_quantification_limits_not_effect_test_plan(self):
         """
         New: Test units/effect on test plan: Limits of quantification Approach: In case I
         make any edit in the limits of quantification, this shouldn't effect on test plan
@@ -532,7 +517,6 @@ class TestUnitsTestCases(BaseTest):
         LIMS-4420
         """
         self.info("Create new quantitative testunit with quantification limits")
-        self.test_unit_api = TestUnitAPI()
         oldUpperLimit = self.generate_random_number(lower=50, upper=100)
         oldLowerLimit = self.generate_random_number(lower=1, upper=49)
         tu_response, tu_payload = self.test_unit_api.create_quantitative_testunit(
@@ -546,6 +530,7 @@ class TestUnitsTestCases(BaseTest):
         self.assertTrue(test_plan, "failed to create test plan")
         self.info('change upper limits of the test unit')
         self.test_unit_page.open_test_unit_edit_page_by_id(tu_response['testUnit']['testUnitId'])
+        self.test_unit_page.sleep_small()
         self.test_unit_page.set_quan_upper_limit('1000')
         self.test_unit_page.set_quan_lower_limit('100')
         self.test_unit_page.save_and_wait()
@@ -555,7 +540,7 @@ class TestUnitsTestCases(BaseTest):
         self.info('assert that limits have not changed')
         self.assertEqual(child_table_data['Quantification Limit'], testunit_display_old_quantification_limit)
 
-    def test021_create_multi_test_units_with_same_name(self):
+    def test020_create_multi_test_units_with_same_name(self):
         """
         New: Test unit: Creation Approach; In case I create two test units with the same name,
         when I go to the test plan I found both of those with the same name
@@ -584,7 +569,7 @@ class TestUnitsTestCases(BaseTest):
         self.test_plan.sleep_tiny()
         self.assertEqual(len(test_units), 3, test_units)
 
-    def test022_duplicate_test_unit(self):
+    def test021_duplicate_test_unit(self):
         """"
         New: Test unit: Duplication Approach: I can duplicate the test unit with only one record
 
@@ -605,9 +590,10 @@ class TestUnitsTestCases(BaseTest):
         self.info('Asserting that the data is duplicated correctly')
         self.assertEqual(random_test_unit_list, found_testunit_data_list)
 
-    def test023_duplicate_multiple_test_units(self):
+    def test022_duplicate_multiple_test_units(self):
         """"
         New: Test unit: Duplication Approach: I can't duplicate multiple test units
+
         LIMS-3678- case 2
         """
         self.info('Choosing a random testunit table rows')
@@ -623,7 +609,7 @@ class TestUnitsTestCases(BaseTest):
                            ('unitsub', 'quantitative'),
                            ('unitsuper', 'qualitative'),
                            ('unitsuper', 'quantitative')])
-    def test024_test_unit_with_sub_and_super_scripts_appears_in_exported_sheet(self, unit_with_sub_or_super, type):
+    def test023_test_unit_with_sub_and_super_scripts_appears_in_exported_sheet(self, unit_with_sub_or_super, type):
         """
         New: Test unit: Export: Sub & Super scripts Approach: Allow user to see the
         sub & super scripts in the export file
@@ -671,7 +657,7 @@ class TestUnitsTestCases(BaseTest):
         self.assertIn(preview_unit, fixed_sheet_row_data)
 
     @parameterized.expand(['quantitative', 'qualitative'])
-    def test025_create_test_unit_appears_in_version_table(self, unit_type):
+    def test024_create_test_unit_appears_in_version_table(self, unit_type):
         """
         New: Test unit: Versions Approach: After you create new record,
         all the columns should display in the version table
@@ -687,13 +673,13 @@ class TestUnitsTestCases(BaseTest):
 
         self.assertEqual(response['status'], 1, 'test unit not created {}'.format(payload))
         test_unit_data, version_data = self.test_units_page.filter_and_get_version(payload['number'])
-        self.assertEqual(version_data['Test Unit No.'], test_unit_data['Test Unit No.']+'.1')
-        for item in version_data.keys():
+        self.assertEqual(version_data[0]['Test Unit No.'], test_unit_data['Test Unit No.']+'.1')
+        for item in version_data[0].keys():
             if item not in ['Test Unit No.', 'Comment']:
-                self.assertEqual(version_data[item], test_unit_data[item])
+                self.assertEqual(version_data[0][item], test_unit_data[item])
 
     @parameterized.expand(['ok', 'cancel'])
-    def test026_create_approach_overview_button(self, ok):
+    def test025_create_approach_overview_button(self, ok):
         """
         Master data: Create: Overview button Approach: Make sure
         after I press on the overview button, it redirects me to the active table
@@ -713,7 +699,7 @@ class TestUnitsTestCases(BaseTest):
             self.assertEqual(self.base_selenium.get_url(), '{}testUnits/add'.format(self.base_selenium.url))
             self.info('clicking on Overview cancelled')
 
-    def test027_edit_approach_overview_button(self):
+    def test026_edit_approach_overview_button(self):
         """
         Edit: Overview Approach: Make sure after I press on
         the overview button, it redirects me to the active table
@@ -731,7 +717,7 @@ class TestUnitsTestCases(BaseTest):
         self.info('clicking on Overview confirmed')
 
     @parameterized.expand(['Quantitative', 'Qualitative', 'Quantitative MiBi'])
-    def test_028_changing_testunit_type_update_fields_accordingly(self, testunit_type):
+    def test_027_changing_testunit_type_update_fields_accordingly(self, testunit_type):
         """
         New: Test unit: Type Approach: When I change type from edit mode, the values should
         changed according to this type that selected
@@ -754,13 +740,14 @@ class TestUnitsTestCases(BaseTest):
         elif testunit_type == 'Quantitative MiBi':
             self.assertTrue(self.test_unit_page.check_for_quantitative_mibi_fields())
 
-    def test_029_allow_user_to_change_from_specification_to_quantification(self):
+    def test_028_allow_user_to_change_from_specification_to_quantification(self):
         """
         New: Test unit: Edit mode:  Limit of quantification Approach: Allow user to change between
         the two options specification and limit of quantification from edit mode.
 
         LIMS-4160
         """
+        self.info('select random quantitative unit with specification only ')
         test_unit_id = self.test_unit_api.get_test_unit_with_spec_or_quan_only('spec')
         self.test_unit_page.open_test_unit_edit_page_by_id(id=test_unit_id)
         self.test_unit_page.sleep_small()
@@ -772,13 +759,14 @@ class TestUnitsTestCases(BaseTest):
         self.assertEqual(self.test_unit_page.get_quan_upper_limit(), '100')
         self.assertEqual(self.test_unit_page.get_quan_lower_limit(), '50')
 
-    def test_030_allow_user_to_change_to_specification_from_quantification(self):
+    def test_029_allow_user_to_change_to_specification_from_quantification(self):
         """
         New: Test unit: Edit mode:  Limit of quantification Approach: Allow user to change between
         the two options specification and limit of quantification from edit mode.
 
         LIMS-4160
         """
+        self.info('select random quantitative unit with quantification only ')
         test_unit_id = self.test_unit_api.get_test_unit_with_spec_or_quan_only('quan')
         self.test_unit_page.open_test_unit_edit_page_by_id(id=test_unit_id)
         self.info('switch to specification')
@@ -789,192 +777,102 @@ class TestUnitsTestCases(BaseTest):
         self.assertEqual(self.test_unit_page.get_spec_upper_limit(), '100')
         self.assertEqual(self.test_unit_page.get_spec_lower_limit(), '50')
 
-    # def test031_allow_unit_field_to_be_displayed_in_case_of_mibi(self):
-    #     """
-    #     New: Test unit: limit of quantification Approach: Allow the unit field to display
-    #     when I select quantitative MiBi type & make sure it displayed in the active table
-    #     & in the export sheet
-    #
-    #     LIMS-4162
-    #     """
-    #     testunit_record = self.test_unit_page.search(value='Quantitative MiBi')[0]
-    #     row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=testunit_record)
-    #     testunit_number = row_data['Test Unit No.']
-    #     initial_unit = row_data['Unit']
-    #     if initial_unit == '-':
-    #         self.info('unit field has no value, update the record to make sure ')
-    #         self.test_unit_page.open_edit_page(row=testunit_record)
-    #         random_unit = self.test_unit_page.generate_random_text()
-    #         self.test_unit_page.set_spec_unit(value=random_unit)
-    #         self.test_unit_page.save(save_btn='general:save_form', logger_msg='Save testunit')
-    #         self.test_unit_page.get_test_units_page()
-    #
-    #     testunit_record = self.test_unit_page.search(value=testunit_number)[0]
-    #     row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=testunit_record)
-    #
-    #     self.info('unit field has value {}'.format(row_data['Unit']))
-    #     if initial_unit == '-':
-    #         self.assertEqual(row_data['Unit'], random_unit)
-    #
-    #     self.info(' * Download XSLX sheet')
-    #     self.test_unit_page.download_xslx_sheet()
-    #     rows_data = self.test_unit_page.get_table_rows_data()
-    #     for index in range(len(rows_data) - 1):
-    #         self.info(' * Comparing the test units with index : {} '.format(index))
-    #         fixed_row_data = self.fix_data_format(rows_data[index].split('\n'))
-    #         values = self.test_unit_page.sheet.iloc[index].values
-    #         fixed_sheet_row_data = self.fix_data_format(values)
-    #         self.info('search for value of the unit field: {}'.format(row_data['Unit']))
-    #         self.assertIn(row_data['Unit'], fixed_sheet_row_data)
+    def test030_allow_unit_field_to_be_displayed_in_case_of_mibi(self):
+        """
+        New: Test unit: limit of quantification Approach: Allow the unit field to display
+        when I select quantitative MiBi type & make sure it displayed in the active table
+        & in the export sheet
 
-    # def test032_edit_category_edits_category_label_in_testplan_step_two(self):
-    #     """
-    #
-    #     New: Test unit: Category Approach: Any update in test unit category should
-    #     reflect in the test plan ( step two ) in this test unit
-    #
-    #     LIMS-3687
-    #     :return:
-    #     """
-    #     new_random_name = self.generate_random_string()
-    #     new_random_number = self.generate_random_number()
-    #     new_random_method = self.generate_random_string()
-    #     new_random_category = self.generate_random_string()
-    #     new_random_qualtitative_value = self.generate_random_string()
-    #     category = {
-    #         'id': 'new',
-    #         'text': new_random_category
-    #     }
-    #     material_type = [{
-    #         'id': 0,
-    #         'text': 'All'
-    #     }]
-    #     self.info('Create new testunit with qualitative and random generated data')
-    #     testunit_id, _ = self.test_unit_api.create_qualitative_testunit(name=new_random_name, number=new_random_number,
-    #                                                                  method=new_random_method, category=category,
-    #                                                                  selectedMaterialTypes=material_type,
-    #                                                                  textValue=new_random_qualtitative_value)[
-    #         'testUnitId']
-    #     testunit_form_data = self.test_unit_api.get_testunit_form_data(id=str(testunit_id))
-    #     testunit_testplan_formated = self.test_unit_page.map_testunit_to_testplan_format(testunit=testunit_form_data)
-    #
-    #     active_article = {}
-    #     active_article_request = self.article_api.get_all_articles()[0]['articles']
-    #     active_article = active_article_request[0]
-    #
-    #     all_materialtypes = GeneralUtilitiesAPI().list_all_material_types()['materialTypes']
-    #
-    #     article_materialtype = list(filter(lambda x: x['name'] == active_article['materialType'], all_materialtypes))[0]
-    #     article_object = [{
-    #         'id': active_article['id'],
-    #         'text': active_article['name']
-    #     }]
-    #     self.test_plan.get_test_plans_page()
-    #
-    #     random_testplan_name = self.generate_random_string()
-    #     random_testplan_number = self.generate_random_number()
-    #
-    #     testplan_name = {
-    #         'id': 'new',
-    #         'text': random_testplan_name
-    #     }
-    #
-    #     self.info('Create new testPlan to use the newly created testunit')
-    #     testplan_data = TestPlanAPI().create_testplan(testUnits=[testunit_testplan_formated],
-    #                                                        testPlan=testplan_name, selectedArticles=article_object,
-    #                                                        materialType=article_materialtype,
-    #                                                        number=random_testplan_number)
-    #
-    #     self.test_plan.get_test_plan_edit_page(random_testplan_name)
-    #     random_category_before_edit = self.test_plan.get_test_unit_category()
-    #
-    #     self.test_unit_page.get_test_units_page()
-    #     new_random_category_edit = self.generate_random_string()
-    #
-    #     self.info('edit newly created testunit with qualitative and random generated data')
-    #     self.info('Get the test unit of it')
-    #     self.test_unit_page.search(new_random_name)
-    #     self.test_unit_page.get_random_test_units()
-    #     self.test_unit_page.set_category(new_random_category_edit)
-    #     self.test_unit_page.save_and_return_overview()
-    #
-    #     self.test_plan.get_test_plans_page()
-    #     self.test_plan.get_test_plan_edit_page(random_testplan_name)
-    #     random_category_after_edit = self.test_plan.get_test_unit_category()
-    #
-    #     self.assertEquals(random_category_before_edit.strip(), new_random_category.strip())
-    #     self.assertEquals(random_category_after_edit.strip(), new_random_category_edit.strip())
-    #
-    # def test033_editing_limit_of_quantification_fields_should_affect_table_and_version(self):
-    #     """
-    #     New: Test unit: Limits of quantification Approach: Versions:In case I edit any field
-    #     in the limits of quantification and press on save and create new version,
-    #     new version should create & display in the active table & versions table
-    #
-    #     LIMS-4423
-    #     """
-    #     testunit_name = random.choice(self.test_unit_api.get_testunit_with_empty_specification())
-    #
-    #     self.info('generate random data to update testunit with')
-    #     random_upper_limit = self.test_unit_page.generate_random_number(lower=50, upper=100)
-    #     random_lower_limit = self.test_unit_page.generate_random_number(lower=0, upper=49)
-    #     random_unit = self.test_unit_page.generate_random_text()
-    #
-    #     testunit_record = self.test_unit_page.search(value=testunit_name)[0]
-    #     testunit_data = self.base_selenium.get_row_cells_dict_related_to_header(row=testunit_record)
-    #     version_value = int(testunit_data['Version'])
-    #     updated_version = version_value + 1
-    #
-    #     self.info('open the testunit in edit form to update it')
-    #     self.test_unit_page.open_edit_page(row=testunit_record)
-    #     self.info('set upper limit to {}'.format(random_upper_limit))
-    #     self.test_unit_page.set_quan_upper_limit(value=random_upper_limit)
-    #     self.info('set lower limit to {}'.format(random_lower_limit))
-    #     self.test_unit_page.set_quan_lower_limit(value=random_lower_limit)
-    #     self.info('set unit limit to {}'.format(random_unit))
-    #     self.test_unit_page.set_quan_unit(value=random_unit)
-    #     self.test_unit_page.save_and_create_new_version()
-    #
-    #     self.info('refresh to make sure that data are saved correctly')
-    #     self.base_selenium.refresh()
-    #     self.assertEqual(self.test_unit_page.get_quan_upper_limit(), str(random_upper_limit))
-    #     self.assertEqual(self.test_unit_page.get_quan_lower_limit(), str(random_lower_limit))
-    #     self.assertEqual(self.test_unit_page.get_quan_unit(), str(random_unit))
-    #
-    #     self.info('making sure that version is updated successfully')
-    #     self.test_unit_page.get_test_units_page()
-    #     testunit_record_after_update = self.test_unit_page.search(value=testunit_name)[0]
-    #     testunit_data_after_update = self.base_selenium.get_row_cells_dict_related_to_header(
-    #         row=testunit_record_after_update)
-    #     self.test_unit_page.sleep_small()
-    #     self.info('version is {}, ant it should be {}'.format(
-    #         testunit_data_after_update['Version'], str(updated_version)))
-    #
-    #     self.assertEqual(testunit_data_after_update['Version'], str(updated_version))
-    #     self.assertEqual(testunit_data_after_update['Quantification Limit'],
-    #                      str(random_lower_limit) + '-' + str(random_upper_limit))
-    #     self.assertEqual(testunit_data_after_update['Quantification Limit Unit'], random_unit)
-    #
-    #     self.test_unit_page.click_check_box(source=testunit_record_after_update)
-    #     self.test_unit_page.get_versions_table()
-    #     testunits_records_versions = self.test_unit_page.result_table()
-    #
-    #     version_counter = 1
-    #     record_counter = 0
-    #     while record_counter < len(testunits_records_versions) - 1:
-    #         record_data = self.base_selenium.get_row_cells_dict_related_to_header(
-    #             row=testunits_records_versions[record_counter])
-    #         self.assertEqual(record_data['Version'], str(version_counter))
-    #
-    #         if version_counter == updated_version:
-    #             self.assertEqual(record_data['Quantification Limit'],
-    #                              str(random_lower_limit) + '-' + str(random_upper_limit))
-    #             self.assertEqual(record_data['Quantification Limit Unit'], random_unit)
-    #
-    #         version_counter = version_counter + 1
-    #         record_counter = record_counter + 1
+        LIMS-4162
+        """
+        self.info('create  Quantitative MiBi with unit')
+        response, payload = self.test_unit_api.create_mibi_testunit(unit='%')
+        self.assertEqual(response['status'], 1, payload)
+        self.info('filter by test unit number: {}, to make sure that test unit created successfully'.
+                  format(payload['number']))
+        test_unit_found = self.test_units_page.filter_and_get_latest_row_data(payload['number'])
+        self.assertTrue(test_unit_found['Unit'], '%')
 
-    def test034_archived_testunit_should_not_appear_in_order(self):
+        self.info(' * Download XSLX sheet')
+        self.test_unit_page.download_xslx_sheet()
+        values = self.test_unit_page.sheet.iloc[0].values
+        fixed_sheet_row_data = self.fix_data_format(values)
+        self.info('search for value of the unit field: {}'.format(test_unit_found['Unit']))
+        self.assertIn(test_unit_found['Unit'], fixed_sheet_row_data)
+
+    def test031_edit_category_affects_testplan_step_two(self):
+        """
+        New: Test unit: Category Approach: Any update in test unit category should
+        reflect in the test plan ( step two ) in this test unit
+
+        LIMS-3687
+        """
+        self.info('Create new test unit with qualitative and random generated data')
+        response, payload = self.test_unit_api.create_qualitative_testunit()
+        self.assertEqual(response['status'], 1, payload)
+        self.info('create new test plan with created test unit with name {}'.format(payload['name']))
+        test_plan = TestPlanAPI().create_testplan_from_test_unit_id(response['testUnit']['testUnitId'])
+        self.assertTrue(test_plan)
+        self.info('created test unit with number {}'.format(test_plan['number']))
+        self.info('Navigate to test plan edit page ang get test unit category')
+        self.test_plan.get_test_plan_edit_page_by_id(test_plan['id'])
+        self.test_plan.sleep_small()
+        random_category_before_edit = self.test_plan.get_test_unit_category()
+        self.assertEqual(random_category_before_edit, payload['selectedCategory'][0]['text'])
+        self.info('edit newly created testunit with qualitative and random generated data')
+        self.test_unit_page.open_test_unit_edit_page_by_id(response['testUnit']['testUnitId'])
+        new_random_category_edit = self.generate_random_string()
+        self.info('update test unit category to {}'.format(new_random_category_edit))
+        self.test_unit_page.set_category(new_random_category_edit)
+        self.test_unit_page.save_and_wait()
+        self.info('Navigate to test plan edit page and get test unit category')
+        self.test_plan.get_test_plan_edit_page_by_id(test_plan['id'])
+        test_plan_category_after_edit = self.test_plan.get_test_unit_category()
+        self.info('Assert that category updated successfully')
+        self.assertEqual(test_plan_category_after_edit, new_random_category_edit)
+
+    def test032_editing_limit_of_quantification_fields_should_affect_table_and_version(self):
+        """
+        New: Test unit: Limits of quantification Approach: Versions:In case I edit any field
+        in the limits of quantification and press on save and create new version,
+        new version should create & display in the active table & versions table
+
+        LIMS-4423
+        """
+        self.info("get random quantitative test unit with qualtification limits only")
+        random_testunit = random.choice(
+            self.test_unit_api.get_testunit_with_quntification_limits_and_empty_specification())
+        self.assertTrue(random_testunit, 'can not get random test unit')
+        random_upper_limit = self.test_unit_page.generate_random_number(lower=50, upper=100)
+        random_lower_limit = self.test_unit_page.generate_random_number(lower=0, upper=49)
+        self.info('open the test unit in edit form to update it')
+        self.test_unit_page.open_test_unit_edit_page_by_id(random_testunit['id'])
+        self.test_unit_page.sleep_small()
+        self.info('set upper limit to {}'.format(random_upper_limit))
+        self.test_unit_page.set_quan_upper_limit(value=random_upper_limit)
+        self.info('set lower limit to {}'.format(random_lower_limit))
+        self.test_unit_page.set_quan_lower_limit(value=random_lower_limit)
+        self.test_unit_page.sleep_tiny()
+        self.test_unit_page.save_and_create_new_version()
+        self.info('refresh to make sure that data are saved correctly')
+        self.base_selenium.refresh()
+        self.assertEqual(self.test_unit_page.get_quan_upper_limit(), str(random_upper_limit))
+        self.assertEqual(self.test_unit_page.get_quan_lower_limit(), str(random_lower_limit))
+        self.info('making sure that two versions is created successfully')
+        self.test_unit_page.get_test_units_page()
+        test_unit_found, version_data = self.test_unit_page.filter_and_get_version(random_testunit['number'])
+        self.info('version is {}, ant it should be {}'.format(test_unit_found['Version'],
+                                                              str(random_testunit['version']+1)))
+
+        self.assertEqual(test_unit_found['Version'], str(random_testunit['version']+1))
+        self.assertEqual(test_unit_found['Quantification Limit'],
+                         str(random_lower_limit) + '-' + str(random_upper_limit))
+        self.info('assert that version data created sucesssfully')
+        self.assertEqual(len(version_data), random_testunit['version']+1)
+        self.assertEqual(version_data[-1]['Quantification Limit'],
+                         str(random_lower_limit) + '-' + str(random_upper_limit))
+
+    def test033_archived_testunit_should_not_appear_in_order(self):
         """
         Orders: Archived Test unit: Archive Approach: Archived test units
         shouldn't appear in orders in the drop down list
@@ -998,121 +896,83 @@ class TestUnitsTestCases(BaseTest):
 
         self.assertFalse(test_unit_suggetion_list)
 
-    # def test035_archive_quantifications_limit_field(self):
-    #     """
-    #     New: Test unit: Configuration: Limit of quantification Approach: Display the new fields in the configuration section
-    #     ( Upper limit & lower limit & unit of  limit of quantification ) and I can archive them.
-    #     User can archive the quantification limits field from the configuration section
-    #
-    #     LIMS-4164
-    #     """
-    #     self.test_unit_page.open_configurations()
-    #     self.assertTrue(self.test_unit_page.archive_quantification_limit_field())
-    #     if self.base_selenium.check_element_is_exist(element='configurations_page:error_msg'):
-    #         self.info(
-    #             'this field is used in another testunit, you need to delete all testunits with quantification option to archive this field')
-    #     else:
-    #         self.assertFalse(
-    #             self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
-    #         self.test_unit_page.get_archived_fields_tab()
-    #         self.assertTrue(
-    #             self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
-    #
-    # @skip('waiting for API deleting')
-    # def test036_archive_quantifications_limit_field(self):
-    #     """
-    #     New: Test unit: Configuration: Limit of quantification Approach: Display the new fields in the configuration section
-    #     ( Upper limit & lower limit & unit of  limit of quantification ) and I can archive them.
-    #     User can archive the quantification limits field from the configuration section
-    #     "Archive-allowed"
-    #     LIMS-4164
-    #     """
-    #     self.test_unit_page.open_configurations()
-    #     self.assertTrue(self.test_unit_page.archive_quantification_limit_field())
-    #     self.assertFalse(
-    #         self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
-    #     self.test_unit_page.get_archived_fields_tab()
-    #     self.assertTrue(self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
-    #     self.test_unit_page.get_test_units_page()
-    #     self.test_unit_page.click_create_new_testunit()
-    #     self.test_unit_page.set_testunit_type(testunit_type='Quantitative')
-    #     self.assertFalse(self.base_selenium.check_element_is_exist(element='test_unit:use_quantification'))
-    #
-    # @skip('waiting for API deleting')
-    # def test037_restore_quantifications_limit_field(self):
-    #     """
-    #     New: Test unit: Configuration: Limit of quantification Approach: Display the new fields in the configuration section
-    #     ( Upper limit & lower limit & unit of  limit of quantification ) and I can archive them.
-    #     User can archive the quantification limits field from the configuration section
-    #     "Restore"
-    #     LIMS-4164
-    #     """
-    #     self.test_unit_page.open_configurations()
-    #     self.test_unit_page.get_archived_fields_tab()
-    #     self.assertTrue(self.test_unit_page.restore_quantification_limit_field())
-    #     self.assertFalse(
-    #         self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
-    #     self.test_unit_page.get_active_fields_tab()
-    #     self.assertTrue(self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
-    #     self.test_unit_page.get_test_units_page()
-    #     self.test_unit_page.click_create_new_testunit()
-    #     self.test_unit_page.set_testunit_type(testunit_type='Quantitative')
-    #     self.assertTrue(self.base_selenium.check_element_is_exist(element='test_unit:use_quantification'))
-    #
-    # def test038_test_unit_name_is_mandatory(self):
-    #     """
-    #
-    #     New: Test unit: Configuration: Test unit Name Approach: Make the test units field as as mandatory field (This mean you can't remove it )
-    #
-    #     LIMS- 5651
-    #     :return:
-    #     """
-    #
-    #     self.test_unit_page.open_configurations()
-    #     self.test_unit_page.open_testunit_name_configurations_options()
-    #
-    #     self.assertTrue(self.test_unit_page.check_all_options_of_search_view_menu())
-    #
+    @skip('waiting for API deleting')
+    def test034_archive_quantifications_limit_field(self):
+        """
+        New: Test unit: Configuration: Limit of quantification Approach: Display the new fields in the configuration section
+        ( Upper limit & lower limit & unit of  limit of quantification ) and I can archive them.
+        User can archive the quantification limits field from the configuration section
+        "Archive-allowed"
+        LIMS-4164
+        """
+        self.test_unit_page.open_configurations()
+        self.assertTrue(self.test_unit_page.archive_quantification_limit_field())
+        self.assertFalse(
+            self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
+        self.test_unit_page.get_archived_fields_tab()
+        self.assertTrue(self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
+        self.test_unit_page.get_test_units_page()
+        self.test_unit_page.click_create_new_testunit()
+        self.test_unit_page.set_testunit_type(testunit_type='Quantitative')
+        self.assertFalse(self.base_selenium.check_element_is_exist(element='test_unit:use_quantification'))
+
+    @skip('waiting for API deleting')
+    def test035_restore_quantifications_limit_field(self):
+        """
+        New: Test unit: Configuration: Limit of quantification Approach: Display the new fields in the configuration section
+        ( Upper limit & lower limit & unit of  limit of quantification ) and I can archive them.
+        User can archive the quantification limits field from the configuration section
+        "Restore"
+        LIMS-4164
+        """
+        self.test_unit_page.open_configurations()
+        self.test_unit_page.get_archived_fields_tab()
+        self.assertTrue(self.test_unit_page.restore_quantification_limit_field())
+        self.assertFalse(
+            self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
+        self.test_unit_page.get_active_fields_tab()
+        self.assertTrue(self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
+        self.test_unit_page.get_test_units_page()
+        self.test_unit_page.click_create_new_testunit()
+        self.test_unit_page.set_testunit_type(testunit_type='Quantitative')
+        self.assertTrue(self.base_selenium.check_element_is_exist(element='test_unit:use_quantification'))
+
+    def test036_test_unit_name_is_mandatory(self):
+        """
+        New: Test unit: Configuration: Test unit Name Approach: Make the test units field
+        as as mandatory field (This mean you can't remove it )
+
+        LIMS- 5651
+        """
+        self.test_unit_page.open_configurations()
+        self.test_unit_page.open_testunit_name_configurations_options()
+        self.assertTrue(self.test_unit_page.check_all_options_of_search_view_menu())
+
     # @parameterized.expand(['name', 'method', 'type', 'number'])
-    # def test039_test_unit_name_allow_user_to_search_with_selected_options_testplan(self, search_view_option):
+    # def test037_test_unit_name_allow_user_to_search_with_selected_options_testplan(self, search_view_option):
     #     """
-    #
-    #     New: Test Unit: Configuration: Test unit Name Approach: Allow user to search with ( name, number, type, method ) in the drop down list of the analysis for
+    #     New: Test Unit: Configuration: Test unit Name Approach: Allow user to search with
+    #     (name, number, type, method) in the drop down list of the test plan for.
     #
     #     LIMS- 6422
-    #     :return:
     #     """
-    #
-    #     self.info('Generate random data for update')
-    #     new_random_name = self.generate_random_string()
-    #     new_random_method = self.generate_random_string()
-    #
     #     self.test_unit_page.open_configurations()
     #     self.test_unit_page.open_testunit_name_configurations_options()
     #     old_values = self.test_unit_page.select_option_to_view_search_with(view_search_options=[search_view_option])
-    #
-    #     self.info('Get testunits page')
-    #     self.test_unit_page.get_test_units_page()
-    #
     #     self.info('Create new testunit with qualitative and random generated data')
-    #     self.test_unit_page.create_qualitative_testunit(name=new_random_name, method=new_random_method,
-    #                                                     material_type='All')
-    #
-    #
-    #     self.info('Search by the testunit name {} to get number'.format(new_random_name))
-    #     row = self.test_unit_page.search(value=new_random_name)[0]
-    #     new_auto_generated_number = self.base_selenium.get_row_cell_text_related_to_header(row=row,
-    #                                                                                        column_value='Test Unit No.')
-    #
-    #     new_auto_generated_number = new_auto_generated_number.replace("'", '')
-    #     self.info('get the newly created testunit number of {}'.format(new_auto_generated_number))
-    #
-    #     self.test_plan.get_test_plans_page()
-    #     self.test_plan.get_test_plan_edit_page(name='in progress')
-    #     is_name_exist = self.test_plan.search_test_unit_not_set(test_unit=new_random_name)
-    #     is_number_exist = self.test_plan.search_test_unit_not_set(test_unit=new_auto_generated_number)
+    #     response, payload = self.test_unit_api.create_qualitative_testunit()
+    #     self.assertEqual(response['status'], 1, payload)
+    #     self.info('new testunit created with number  {}'.format(payload['number']))
+    #     self.info('get random In Progrees test plan')
+    #     test_plan = random.choice(TestPlanAPI().get_inprogress_testplans())
+    #     self.assertTrue(test_plan, 'No test plan selected')
+    #     self.info('Navigate to test plan edit page')
+    #     self.test_plan.get_test_plan_edit_page_by_id(test_plan['id'])
+    #     import ipdb;ipdb.set_trace()
+    #     is_name_exist = self.test_plan.search_test_unit_not_set(test_unit=payload['name'])
+    #     is_number_exist = self.test_plan.search_test_unit_not_set(test_unit=payload['number'])
     #     is_type_exist = self.test_plan.search_test_unit_not_set(test_unit='Qualitative')
-    #     is_method_exist = self.test_plan.search_test_unit_not_set(test_unit=new_random_method)
+    #     is_method_exist = self.test_plan.search_test_unit_not_set(test_unit=payload['method'])
     #
     #     self.info('Get testunits page')
     #     self.test_unit_page.get_test_units_page()
@@ -1145,8 +1005,9 @@ class TestUnitsTestCases(BaseTest):
     #
     # def test040_test_unit_name_search_default_options_name_type_in_testplan(self):
     #     """
-    #
-    #     New: Test unit: Configuration: Test units field Approach: Allow name & type to display by default in the test plan form In case I select them from the test unit configuration
+    #     New: Test unit: Configuration: Test units field Approach: Allow name & type
+    #     to display by default in the test plan form In case I select them from the
+    #     test unit configuration
     #
     #     LIMS- 6423
     #     :return:
@@ -1197,8 +1058,9 @@ class TestUnitsTestCases(BaseTest):
     #
     # def test041_test_unit_name_view_method_option_multiple_line_in_testplan(self):
     #     """
-    #
-    #     New: Test Unit: Configuration: Test unit Name Approach: In case you select the method to display and you entered long text in it, the method should display into multiple lines (test plan )
+    #     New: Test Unit: Configuration: Test unit Name Approach: In case you select
+    #     the method to display and you entered long text in it, the method should
+    #     display into multiple lines (test plan)
     #
     #     LIMS- 6424
     #     :return:
@@ -1244,7 +1106,8 @@ class TestUnitsTestCases(BaseTest):
     #                                                                                    search_view_option2):
     #     """
     #
-    #     New: Test Unit: Configuration: Test unit Name Approach: Allow user to search with ( name, number, type, method ) in the drop down list of the analysis for
+    #     New: Test Unit: Configuration: Test unit Name Approach: Allow user to search with
+    #     (name, number, type, method) in the drop down list of the analysis for
     #
     #     LIMS- 6426
     #     :return:

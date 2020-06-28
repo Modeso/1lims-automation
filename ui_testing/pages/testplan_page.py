@@ -49,7 +49,7 @@ class TstPlan(TestPlans):
         self.info('navigate to testplan second step')
         self.base_selenium.click('test_plan:next')
         self.sleep_tiny()
-        self.base_selenium.click('test_plan:add_test_units')
+        self.base_selenium.click('test_plan:add_new_item')
         self.sleep_tiny()
         is_option_exist = self.base_selenium.select_item_from_drop_down(element='test_plan:test_units',
                                                                         item_text=test_unit)
@@ -109,8 +109,8 @@ class TstPlan(TestPlans):
     def get_test_unit_category(self):
         self.base_selenium.click('test_plan:next')
         self.sleep_small()
-        category_label_test_unit = self.base_selenium.find_element('test_plan:category-label')
-        return category_label_test_unit.get_attribute('textContent')
+        return self.base_selenium.get_text(element='test_plan:test_unit_category')
+
 
     def create_new_test_plan(self, name='', material_type='', article='', test_unit='', save=True, **kwargs):
         self.info(' Create new test plan')

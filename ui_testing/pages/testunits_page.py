@@ -37,7 +37,7 @@ class TstUnits(BasePages):
         self.base_selenium.click(element='test_units:testunit_menu')
         self.sleep_small()
         self.base_selenium.click(element='test_units:versions')
-        self.sleep_medium()
+        self.sleep_small()
 
     def get_archived_test_units(self):
         self.base_selenium.scroll()
@@ -215,15 +215,20 @@ class TstUnits(BasePages):
     def filter_and_get_version(self, test_unit_number):
         self.apply_filter_scenario(filter_element='test_units:testunit_number_filter',
                                    filter_text=test_unit_number, field_type='text')
-        self.sleep_tiny()
+        self.sleep_small()
         test_unit_data = self.get_the_latest_row_data()
         row = self.base_selenium.get_table_rows(element='general:table')[0]
         self.click_check_box(row)
         self.sleep_tiny()
         self.info('Open Versions for the selected test unit')
         self.get_versions_of_selected_test_units()
-        self.sleep_tiny()
-        version_data = self.get_the_latest_row_data()
+        self.sleep_medium()
+        version_data = []
+        rows = self.result_table()
+        for item in rows:
+            item_data = self.base_selenium.get_row_cells_dict_related_to_header(item)
+            if item_data:
+                version_data.append(item_data)
         return test_unit_data, version_data
 
 
