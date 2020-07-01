@@ -119,7 +119,7 @@ class TestUnitsTestCases(BaseTest):
     def test005_quantative_mibi_not_entering_dash_in_upper_limit(self):
         """
         Upper limit Approach, user can't enter  in the upper limit
-        
+
         LIMS-3768
         """
         new_random_name = self.generate_random_string()
@@ -720,7 +720,7 @@ class TestUnitsTestCases(BaseTest):
         self.info('clicking on Overview confirmed')
 
     @parameterized.expand(['Quantitative', 'Qualitative', 'Quantitative MiBi'])
-    def test_027_changing_testunit_type_update_fields_accordingly(self, testunit_type):
+    def test027_changing_testunit_type_update_fields_accordingly(self, testunit_type):
         """
         New: Test unit: Type Approach: When I change type from edit mode, the values should
         changed according to this type that selected
@@ -743,7 +743,7 @@ class TestUnitsTestCases(BaseTest):
         elif testunit_type == 'Quantitative MiBi':
             self.assertTrue(self.test_unit_page.check_for_quantitative_mibi_fields())
 
-    def test_028_allow_user_to_change_from_specification_to_quantification(self):
+    def test028_allow_user_to_change_from_specification_to_quantification(self):
         """
         New: Test unit: Edit mode:  Limit of quantification Approach: Allow user to change between
         the two options specification and limit of quantification from edit mode.
@@ -762,7 +762,7 @@ class TestUnitsTestCases(BaseTest):
         self.assertEqual(self.test_unit_page.get_quan_upper_limit(), '100')
         self.assertEqual(self.test_unit_page.get_quan_lower_limit(), '50')
 
-    def test_029_allow_user_to_change_to_specification_from_quantification(self):
+    def test029_allow_user_to_change_to_specification_from_quantification(self):
         """
         New: Test unit: Edit mode:  Limit of quantification Approach: Allow user to change between
         the two options specification and limit of quantification from edit mode.
@@ -950,8 +950,8 @@ class TestUnitsTestCases(BaseTest):
         self.test_unit_page.set_testunit_type(testunit_type='Quantitative')
         self.assertTrue(self.base_selenium.check_element_is_exist(element='test_unit:use_quantification'))
 
-    @attr(parallel='false')
-    def test_036_test_unit_name_is_mandatory(self):
+    @attr(series=True)
+    def test036_test_unit_name_is_mandatory(self):
         """
         New: Test unit: Configuration: Test unit Name Approach: Make the test units field
         as as mandatory field (This mean you can't remove it )
@@ -962,9 +962,9 @@ class TestUnitsTestCases(BaseTest):
         self.test_unit_page.open_testunit_name_configurations_options()
         self.assertTrue(self.test_unit_page.check_all_options_of_search_view_menu())
 
-    @attr(parallel='false')
     @parameterized.expand(['name', 'method', 'type', 'number'])
-    def test_037_test_unit_name_allow_user_to_search_with_selected_options_testplan(self, search_view_option):
+    @attr(series=True)
+    def test037_test_unit_name_allow_user_to_search_with_selected_options_testplan(self, search_view_option):
         """
         New: Test Unit: Configuration: Test unit Name Approach: Allow user to search with
         (name, number, type, method) in the drop down list of the test plan for.
@@ -1009,8 +1009,8 @@ class TestUnitsTestCases(BaseTest):
             self.assertFalse(is_type_exist)
             self.assertFalse(is_method_exist)
 
-    @attr(parallel='false')
-    def test_038_test_unit_name_search_default_options_name_type_in_testplan(self):
+    @attr(series=True)
+    def test038_test_unit_name_search_default_options_name_type_in_testplan(self):
         """
         New: Test unit: Configuration: Test units field Approach: Allow name & type
         to display by default in the test plan form In case I select them from the
@@ -1041,8 +1041,8 @@ class TestUnitsTestCases(BaseTest):
         self.assertFalse(is_type_exist)
         self.assertFalse(is_method_exist)
 
-    @attr(parallel='false')
-    def test_039_test_unit_name_view_method_option_multiple_line_in_testplan(self):
+    @attr(series=True)
+    def test039_test_unit_name_view_method_option_multiple_line_in_testplan(self):
         """
         New: Test Unit: Configuration: Test unit Name Approach: In case you select
         the method to display and you entered long text in it, the method should
@@ -1072,7 +1072,6 @@ class TestUnitsTestCases(BaseTest):
         self.assertEquals(multiple_lines_properties['textOverflow'], 'clip')
         self.assertEquals(multiple_lines_properties['lineBreak'], 'auto')
 
-    @attr(parallel='false')
     @parameterized.expand([('name', 'type'),
                            ('name', 'method'),
                            ('name', 'number'),
@@ -1080,7 +1079,8 @@ class TestUnitsTestCases(BaseTest):
                            ('type', 'number'),
                            ('method', 'number')
                            ])
-    def test_040_test_unit_name_allow_user_to_search_with_selected_two_options_testplan(self, search_view_option1,
+    @attr(series=True)
+    def test040_test_unit_name_allow_user_to_search_with_selected_two_options_testplan(self, search_view_option1,
                                                                                        search_view_option2):
         """
         New: Test Unit: Configuration: Test unit Name Approach: Allow user to search with
@@ -1174,13 +1174,13 @@ class TestUnitsTestCases(BaseTest):
         New: Test units: Filter Approach: Make sure you can filter by test unit no
         LIMS-6430
 
-        New:  Test units: Filter Approach: Make sure you can filter by name
+        New: Test units: Filter Approach: Make sure you can filter by name
         LIMS-6432
 
-        New:  Test units: Filter Approach: Make sure you can filter by method
+        New: Test units: Filter Approach: Make sure you can filter by method
         LIMS-6434
 
-        New:  Test units: Filter Approach: Make sure you can filter by created on
+        New: Test units: Filter Approach: Make sure you can filter by created on
         LIMS-6431
         """
 
@@ -1202,7 +1202,7 @@ class TestUnitsTestCases(BaseTest):
 
     def test044_filter_by_testunit_unit_returns_only_correct_results(self):
         """
-        New:  Test units: Filter Approach: Make sure you can filter by unit
+        New: Test units: Filter Approach: Make sure you can filter by unit
 
         LIMS-6427
         """
@@ -1222,10 +1222,10 @@ class TestUnitsTestCases(BaseTest):
                            ('typeName', 'filter_Type', 'Type')])
     def test045_filter_by_testunit_drop_down_fields(self, filter_case, filter, header_name):
         """
-        New:  Test units: Filter Approach: Make sure you can filter by category
+        New: Test units: Filter Approach: Make sure you can filter by category
         LIMS-6429
 
-        New:  Test units: Filter Approach: Make sure you can filter by type
+        New: Test units: Filter Approach: Make sure you can filter by type
         LIMS-6435
         """
         data_to_filter_with = self.test_unit_api.get_first_record_with_data_in_attribute(attribute=filter_case)
@@ -1241,7 +1241,7 @@ class TestUnitsTestCases(BaseTest):
 
     def test046_filter_by_testunit_material_type_returns_only_correct_results(self):
         """
-        New:  Test units: Filter Approach: Make sure you can filter by material type
+        New: Test units: Filter Approach: Make sure you can filter by material type
 
         LIMS-6433
         """
@@ -1257,10 +1257,10 @@ class TestUnitsTestCases(BaseTest):
             testunit_material_types = row_data['Material Type'].split(',')
             self.assertIn(str(data_to_filter_with[0]), testunit_material_types)
 
-    @attr(parallel='false')
-    def test_047_filter_by_testunit_changed_by(self):
+    @attr(series=True)
+    def test047_filter_by_testunit_changed_by(self):
         """
-        New:  Test units: Filter Approach: Make sure you can filter by changed by
+        New: Test units: Filter Approach: Make sure you can filter by changed by
 
         LIMS-6428
         """
