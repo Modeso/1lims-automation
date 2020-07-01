@@ -12,7 +12,6 @@ from api_testing.apis.users_api import UsersAPI
 from unittest import skip
 from parameterized import parameterized
 import re, random
-from nose.plugins.attrib import attr
 
 
 class TestUnitsTestCases(BaseTest):
@@ -950,7 +949,6 @@ class TestUnitsTestCases(BaseTest):
         self.test_unit_page.set_testunit_type(testunit_type='Quantitative')
         self.assertTrue(self.base_selenium.check_element_is_exist(element='test_unit:use_quantification'))
 
-    @attr(parallel='false')
     def test_036_test_unit_name_is_mandatory(self):
         """
         New: Test unit: Configuration: Test unit Name Approach: Make the test units field
@@ -962,7 +960,6 @@ class TestUnitsTestCases(BaseTest):
         self.test_unit_page.open_testunit_name_configurations_options()
         self.assertTrue(self.test_unit_page.check_all_options_of_search_view_menu())
 
-    @attr(parallel='false')
     @parameterized.expand(['name', 'method', 'type', 'number'])
     def test_037_test_unit_name_allow_user_to_search_with_selected_options_testplan(self, search_view_option):
         """
@@ -1009,7 +1006,6 @@ class TestUnitsTestCases(BaseTest):
             self.assertFalse(is_type_exist)
             self.assertFalse(is_method_exist)
 
-    @attr(parallel='false')
     def test_038_test_unit_name_search_default_options_name_type_in_testplan(self):
         """
         New: Test unit: Configuration: Test units field Approach: Allow name & type
@@ -1041,7 +1037,6 @@ class TestUnitsTestCases(BaseTest):
         self.assertFalse(is_type_exist)
         self.assertFalse(is_method_exist)
 
-    @attr(parallel='false')
     def test_039_test_unit_name_view_method_option_multiple_line_in_testplan(self):
         """
         New: Test Unit: Configuration: Test unit Name Approach: In case you select
@@ -1072,7 +1067,6 @@ class TestUnitsTestCases(BaseTest):
         self.assertEquals(multiple_lines_properties['textOverflow'], 'clip')
         self.assertEquals(multiple_lines_properties['lineBreak'], 'auto')
 
-    @attr(parallel='false')
     @parameterized.expand([('name', 'type'),
                            ('name', 'method'),
                            ('name', 'number'),
@@ -1257,7 +1251,6 @@ class TestUnitsTestCases(BaseTest):
             testunit_material_types = row_data['Material Type'].split(',')
             self.assertIn(str(data_to_filter_with[0]), testunit_material_types)
 
-    @attr(parallel='false')
     def test_047_filter_by_testunit_changed_by(self):
         """
         New:  Test units: Filter Approach: Make sure you can filter by changed by
