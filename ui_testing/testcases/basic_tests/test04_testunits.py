@@ -9,10 +9,10 @@ from api_testing.apis.test_plan_api import TestPlanAPI
 from ui_testing.pages.order_page import Order
 from ui_testing.pages.login_page import Login
 from api_testing.apis.users_api import UsersAPI
-from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from unittest import skip
 from parameterized import parameterized
 import re, random
+from nose.plugins.attrib import attr
 
 
 class TestUnitsTestCases(BaseTest):
@@ -901,39 +901,57 @@ class TestUnitsTestCases(BaseTest):
 
     def test034_can_not_archive_quantifications_limit_field(self):
         """
-        New: Test unit: Configuration: Limit of quantification Approach: Display the new fields in the configuration section
-        ( Upper limit & lower limit & unit of  limit of quantification ) and I can archive them.
-        User can archive the quantification limits field from the configuration section
+        New: Test unit: Configuration: Limit of quantification Approach: Display the new
+        fields in the configuration section ( Upper limit & lower limit & unit of limit of
+        quantification ) can't archived if used.
 
-        LIMS-4164
+        LIMS-8309
         """
         self.test_unit_page.open_configurations()
         self.assertTrue(self.test_unit_page.archive_quantification_limit_field())
         validation_result = self.base_selenium.wait_element(element='test_units:archive_config_error')
         self.assertTrue(validation_result)
 
-    # @skip('waiting for API deleting')
-    # def test035_restore_quantifications_limit_field(self):
-    #     """
-    #     New: Test unit: Configuration: Limit of quantification Approach: Display the new fields in the configuration section
-    #     ( Upper limit & lower limit & unit of  limit of quantification ) and I can archive them.
-    #     User can archive the quantification limits field from the configuration section
-    #     "Restore"
-    #     LIMS-4164
-    #     """
-    #     self.test_unit_page.open_configurations()
-    #     self.test_unit_page.get_archived_fields_tab()
-    #     self.assertTrue(self.test_unit_page.restore_quantification_limit_field())
-    #     self.assertFalse(
-    #         self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
-    #     self.test_unit_page.get_active_fields_tab()
-    #     self.assertTrue(self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
-    #     self.test_unit_page.get_test_units_page()
-    #     self.test_unit_page.click_create_new_testunit()
-    #     self.test_unit_page.set_testunit_type(testunit_type='Quantitative')
-    #     self.assertTrue(self.base_selenium.check_element_is_exist(element='test_unit:use_quantification'))
+    @skip('waiting for API deleting')
+    def test035_archive_quantifications_limit_field(self):
+        """
+        User can archive the quantification limits field from the configuration section if not used.
+        "Archive-allowed"
+        LIMS-4164
+        """
+        self.test_unit_page.open_configurations()
+        self.assertTrue(self.test_unit_page.archive_quantification_limit_field())
+        self.assertFalse(
+            self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
+        self.test_unit_page.get_archived_fields_tab()
+        self.assertTrue(self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
+        self.test_unit_page.get_test_units_page()
+        self.test_unit_page.click_create_new_testunit()
+        self.test_unit_page.set_testunit_type(testunit_type='Quantitative')
+        self.assertFalse(self.base_selenium.check_element_is_exist(element='test_unit:use_quantification'))
 
-    def test036_test_unit_name_is_mandatory(self):
+    @skip('waiting for API deleting')
+    def test035_restore_quantifications_limit_field(self):
+        """
+        User can archive the quantification limits field from the configuration section if not used.
+
+        "Restore"
+        LIMS-4164
+        """
+        self.test_unit_page.open_configurations()
+        self.test_unit_page.get_archived_fields_tab()
+        self.assertTrue(self.test_unit_page.restore_quantification_limit_field())
+        self.assertFalse(
+            self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
+        self.test_unit_page.get_active_fields_tab()
+        self.assertTrue(self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
+        self.test_unit_page.get_test_units_page()
+        self.test_unit_page.click_create_new_testunit()
+        self.test_unit_page.set_testunit_type(testunit_type='Quantitative')
+        self.assertTrue(self.base_selenium.check_element_is_exist(element='test_unit:use_quantification'))
+
+    @attr(parallel='false')
+    def test_036_test_unit_name_is_mandatory(self):
         """
         New: Test unit: Configuration: Test unit Name Approach: Make the test units field
         as as mandatory field (This mean you can't remove it )
@@ -944,8 +962,9 @@ class TestUnitsTestCases(BaseTest):
         self.test_unit_page.open_testunit_name_configurations_options()
         self.assertTrue(self.test_unit_page.check_all_options_of_search_view_menu())
 
+    @attr(parallel='false')
     @parameterized.expand(['name', 'method', 'type', 'number'])
-    def test037_test_unit_name_allow_user_to_search_with_selected_options_testplan(self, search_view_option):
+    def test_037_test_unit_name_allow_user_to_search_with_selected_options_testplan(self, search_view_option):
         """
         New: Test Unit: Configuration: Test unit Name Approach: Allow user to search with
         (name, number, type, method) in the drop down list of the test plan for.
@@ -990,7 +1009,8 @@ class TestUnitsTestCases(BaseTest):
             self.assertFalse(is_type_exist)
             self.assertFalse(is_method_exist)
 
-    def test038_test_unit_name_search_default_options_name_type_in_testplan(self):
+    @attr(parallel='false')
+    def test_038_test_unit_name_search_default_options_name_type_in_testplan(self):
         """
         New: Test unit: Configuration: Test units field Approach: Allow name & type
         to display by default in the test plan form In case I select them from the
@@ -1021,37 +1041,38 @@ class TestUnitsTestCases(BaseTest):
         self.assertFalse(is_type_exist)
         self.assertFalse(is_method_exist)
 
-    # def test039_test_unit_name_view_method_option_multiple_line_in_testplan(self):
-    #     """
-    #     New: Test Unit: Configuration: Test unit Name Approach: In case you select
-    #     the method to display and you entered long text in it, the method should
-    #     display into multiple lines (test plan)
-    #
-    #     LIMS-6424
-    #     """
-    #
-    #     self.info('Generate random data for update')
-    #     new_random_method = self.generate_random_string() + self.generate_random_string() + \
-    #                         self.generate_random_string()
-    #
-    #     self.test_unit_page.open_configurations()
-    #     self.test_unit_page.open_testunit_name_configurations_options()
-    #     self.test_unit_page.select_option_to_view_search_with(view_search_options=['method'])
-    #     self.info('Create new testunit with qualitative and random generated data')
-    #     response, payload = self.test_unit_api.create_qualitative_testunit(method=new_random_method)
-    #     self.assertEqual(response['status'], 1, payload)
-    #     self.info('new testunit created with number  {}'.format(payload['number']))
-    #     self.info('get random In Progrees test plan')
-    #     test_plan = random.choice(TestPlanAPI().get_inprogress_testplans())
-    #     self.assertTrue(test_plan, 'No test plan selected')
-    #     self.info('Navigate to test plan edit page')
-    #     self.test_plan.get_test_plan_edit_page_by_id(test_plan['id'])
-    #     is_method_exist = self.test_plan.set_test_unit(test_unit=new_random_method)
-    #     import ipdb;ipdb.set_trace()
-    #     multiple_lines_properties = self.test_plan.get_testunit_in_testplan_title_multiple_line_properties()
-    #     self.assertEquals(multiple_lines_properties['textOverflow'], 'clip')
-    #     self.assertEquals(multiple_lines_properties['lineBreak'], 'auto')
+    @attr(parallel='false')
+    def test_039_test_unit_name_view_method_option_multiple_line_in_testplan(self):
+        """
+        New: Test Unit: Configuration: Test unit Name Approach: In case you select
+        the method to display and you entered long text in it, the method should
+        display into multiple lines (test plan)
 
+        LIMS-6424
+        """
+
+        self.info('Generate random data for update')
+        new_random_method = self.generate_random_string() + self.generate_random_string() + \
+                            self.generate_random_string()
+
+        self.test_unit_page.open_configurations()
+        self.test_unit_page.open_testunit_name_configurations_options()
+        self.test_unit_page.select_option_to_view_search_with(view_search_options=['Method'])
+        self.info('Create new testunit with qualitative and random generated data')
+        response, payload = self.test_unit_api.create_qualitative_testunit(method=new_random_method)
+        self.assertEqual(response['status'], 1, payload)
+        self.info('new testunit created with number  {}'.format(payload['number']))
+        self.info('get random In Progrees test plan')
+        test_plan = random.choice(TestPlanAPI().get_inprogress_testplans())
+        self.assertTrue(test_plan, 'No test plan selected')
+        self.info('Navigate to test plan edit page')
+        self.test_plan.get_test_plan_edit_page_by_id(test_plan['id'])
+        self.test_plan.set_test_unit(test_unit=new_random_method)
+        multiple_lines_properties = self.test_plan.get_testunit_in_testplan_title_multiple_line_properties()
+        self.assertEquals(multiple_lines_properties['textOverflow'], 'clip')
+        self.assertEquals(multiple_lines_properties['lineBreak'], 'auto')
+
+    @attr(parallel='false')
     @parameterized.expand([('name', 'type'),
                            ('name', 'method'),
                            ('name', 'number'),
@@ -1059,7 +1080,7 @@ class TestUnitsTestCases(BaseTest):
                            ('type', 'number'),
                            ('method', 'number')
                            ])
-    def test040_test_unit_name_allow_user_to_search_with_selected_two_options_testplan(self, search_view_option1,
+    def test_040_test_unit_name_allow_user_to_search_with_selected_two_options_testplan(self, search_view_option1,
                                                                                        search_view_option2):
         """
         New: Test Unit: Configuration: Test unit Name Approach: Allow user to search with
@@ -1236,7 +1257,8 @@ class TestUnitsTestCases(BaseTest):
             testunit_material_types = row_data['Material Type'].split(',')
             self.assertIn(str(data_to_filter_with[0]), testunit_material_types)
 
-    def test047_filter_by_testunit_changed_by(self):
+    @attr(parallel='false')
+    def test_047_filter_by_testunit_changed_by(self):
         """
         New:  Test units: Filter Approach: Make sure you can filter by changed by
 

@@ -405,9 +405,9 @@ elements = {
                                 'value': "//i[@class='flaticon-close']"},
         'back_button': {'method': 'id',
                         'value': 'back_btn'},
-        'testunit_title': {'method': 'css_selector',
-                           'value': '[class="m-portlet__head-text m--font-success"]'
-                           },
+        'testunit_title': {'method': 'class_name',
+                              'value': 'testunitCell-positioning',
+                               'order': 0},
         'remove_testunit': {'method': 'id',
                             'value': 'remove_testunit'},
         'test_unit_category': {'method': 'class_name',

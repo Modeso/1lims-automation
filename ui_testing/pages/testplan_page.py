@@ -81,7 +81,7 @@ class TstPlan(TestPlans):
         self.sleep_tiny()
 
     def get_testunit_in_testplan_title_multiple_line_properties(self):
-        dom_element = self.base_selenium.find_element(element='test_plan:test_units')
+        dom_element = self.base_selenium.find_element(element='test_plan:testunit_title')
         multiple_line_properties = dict()
         multiple_line_properties['textOverflow'] = self.base_selenium.driver.execute_script('return '
                                                                                             'window'
