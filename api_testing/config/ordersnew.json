@@ -1,0 +1,1287 @@
+{
+   "fields":[
+      {
+         "options":[
+
+         ],
+         "isEditable":false,
+         "isDragable":true,
+         "order":1,
+         "section":2,
+         "archivable":false,
+         "id":79,
+         "name":"materialType",
+         "isDynamic":false,
+         "isArchived":false,
+         "componentId":8,
+         "class":"col-md-3",
+         "title":"Material Type",
+         "isStoredInServer":true,
+         "hasShowOption":true,
+         "searchable":[
+            "name"
+         ],
+         "error":false,
+         "optionsInUse":[
+
+         ]
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":false,
+         "isDragable":true,
+         "order":2,
+         "section":2,
+         "archivable":false,
+         "id":116,
+         "name":"articleName",
+         "isDynamic":false,
+         "isArchived":false,
+         "componentId":8,
+         "class":"col-md-3",
+         "title":"Article",
+         "isStoredInServer":true,
+         "hasShowOption":true,
+         "searchable":[
+            "name"
+         ],
+         "error":false,
+         "optionsInUse":[
+
+         ]
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":true,
+         "isDragable":true,
+         "order":3,
+         "htmlId":"#draggableMultiSelectionField",
+         "id":181,
+         "idInFields":181,
+         "dynamicFieldId":331,
+         "section":2,
+         "name":"MStestplans analysis",
+         "type":8,
+         "typeNameStr":"Multiple Select",
+         "isUnique":false,
+         "isRequired":false,
+         "isArchived":false,
+         "componentId":10,
+         "isDynamic":true,
+         "viewByoptions":[
+            {
+               "id":0,
+               "text":"name"
+            }
+         ],
+         "searchable":[
+            "name"
+         ],
+         "optionsComponentId":5,
+         "isStoredInServer":true,
+         "class":"col-md-3 hide ",
+         "title":"MStestplans analysis",
+         "en":"MStestplans analysis",
+         "de":"MStestplans analysis",
+         "key":"MStestplans analysis",
+         "error":false,
+         "optionsInUse":[
+
+         ]
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":true,
+         "isDragable":true,
+         "order":4,
+         "htmlId":"#draggableSingleSelectionField",
+         "id":180,
+         "idInFields":180,
+         "dynamicFieldId":330,
+         "section":2,
+         "name":"SScontacts analysis",
+         "type":7,
+         "typeNameStr":"Single Select",
+         "isUnique":false,
+         "isRequired":false,
+         "isArchived":false,
+         "componentId":10,
+         "isDynamic":true,
+         "viewByoptions":[
+            {
+               "id":0,
+               "text":"name"
+            },
+            {
+               "id":1,
+               "text":"                      number"
+            }
+         ],
+         "searchable":[
+            "name",
+            "                      number"
+         ],
+         "optionsComponentId":3,
+         "isStoredInServer":true,
+         "class":"col-md-3 hide ",
+         "title":"SScontacts analysis",
+         "en":"SScontacts analysis",
+         "de":"SScontacts analysis",
+         "key":"SScontacts analysis",
+         "error":false,
+         "optionsInUse":[
+
+         ]
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":false,
+         "isDragable":true,
+         "order":5,
+         "section":2,
+         "archivable":false,
+         "id":98,
+         "name":"testUnit",
+         "isDynamic":false,
+         "isArchived":false,
+         "componentId":8,
+         "class":"col-md-3",
+         "title":"Test Unit",
+         "isStoredInServer":true,
+         "searchable":[
+            "name"
+         ],
+         "error":false,
+         "optionsInUse":[
+
+         ]
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":false,
+         "isDragable":true,
+         "order":6,
+         "section":2,
+         "archivable":true,
+         "id":121,
+         "name":"testPlan",
+         "isDynamic":false,
+         "isArchived":false,
+         "componentId":8,
+         "class":"col-md-3",
+         "title":"Test Plan",
+         "isStoredInServer":true,
+         "hasShowOption":true,
+         "searchable":[
+            "name"
+         ],
+         "error":false,
+         "optionsInUse":[
+
+         ]
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":true,
+         "isDragable":true,
+         "order":7,
+         "htmlId":"#draggableEmailField",
+         "id":188,
+         "idInFields":188,
+         "dynamicFieldId":342,
+         "section":2,
+         "name":"Num",
+         "type":4,
+         "typeNameStr":"Num",
+         "isUnique":false,
+         "isRequired":false,
+         "isArchived":false,
+         "componentId":10,
+         "isDynamic":true,
+         "viewByoptions":[
+            {
+               "id":0,
+               "text":"name"
+            }
+         ],
+         "searchable":[
+            "name"
+         ],
+         "optionsComponentId":null,
+         "isStoredInServer":true,
+         "class":"col-md-3 hide ",
+         "title":"Num",
+         "en":"Num",
+         "de":"Num",
+         "key":"Num",
+         "error":false,
+         "optionsInUse":[
+
+         ]
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":false,
+         "isDragable":true,
+         "order":8,
+         "section":2,
+         "archivable":true,
+         "id":91,
+         "name":"attachment",
+         "isDynamic":false,
+         "isArchived":false,
+         "componentId":8,
+         "class":"col-md-3",
+         "title":"Attachments",
+         "isStoredInServer":true,
+         "searchable":[
+            "name"
+         ],
+         "error":false,
+         "optionsInUse":[
+
+         ]
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":false,
+         "isDragable":true,
+         "order":9,
+         "section":2,
+         "archivable":true,
+         "id":122,
+         "name":"departments",
+         "isDynamic":false,
+         "isArchived":false,
+         "componentId":8,
+         "class":"col-md-3",
+         "title":"Departments",
+         "isStoredInServer":true,
+         "hasShowOption":true,
+         "searchable":[
+            "name"
+         ],
+         "error":false,
+         "optionsInUse":[
+
+         ]
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":false,
+         "isDragable":true,
+         "order":10,
+         "section":1,
+         "archivable":false,
+         "id":108,
+         "name":"number",
+         "isDynamic":false,
+         "isArchived":false,
+         "componentId":10,
+         "class":"col-md-2 hide ",
+         "title":"Analysis No.",
+         "isStoredInServer":true,
+         "searchable":[
+            "name"
+         ],
+         "error":false,
+         "optionsInUse":[
+
+         ]
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":false,
+         "isDragable":true,
+         "order":11,
+         "section":1,
+         "archivable":false,
+         "id":117,
+         "name":"result",
+         "isDynamic":false,
+         "isArchived":false,
+         "componentId":10,
+         "class":"col-md-2 hide ",
+         "title":"Result",
+         "isStoredInServer":true,
+         "hasShowOption":true,
+         "searchable":[
+            "name"
+         ],
+         "error":false,
+         "optionsInUse":[
+
+         ]
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":false,
+         "isDragable":true,
+         "order":12,
+         "section":1,
+         "archivable":true,
+         "id":114,
+         "name":"orderNumber",
+         "isDynamic":false,
+         "isArchived":false,
+         "componentId":8,
+         "class":"col-md-4",
+         "title":"Order No.",
+         "isStoredInServer":true,
+         "hasShowOption":true,
+         "searchable":[
+            "name"
+         ],
+         "error":false,
+         "optionsInUse":[
+
+         ]
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":false,
+         "isDragable":true,
+         "order":13,
+         "section":1,
+         "archivable":false,
+         "id":143,
+         "name":"orderType",
+         "isDynamic":false,
+         "isArchived":false,
+         "componentId":8,
+         "class":"col-md-4",
+         "title":"Order",
+         "isStoredInServer":true,
+         "searchable":[
+            "name"
+         ],
+         "error":false,
+         "optionsInUse":[
+
+         ]
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":false,
+         "isDragable":true,
+         "order":14,
+         "section":1,
+         "archivable":true,
+         "id":118,
+         "name":"contact",
+         "isDynamic":false,
+         "isArchived":false,
+         "componentId":8,
+         "class":"col-md-4",
+         "title":"Contact",
+         "isStoredInServer":true,
+         "hasShowOption":true,
+         "searchable":[
+            "name"
+         ],
+         "error":false,
+         "optionsInUse":[
+
+         ]
+      }
+   ],
+   "archivedFields":[
+      {
+         "options":[
+            {
+               "serverId":1,
+               "id":6,
+               "text":"diana"
+            },
+            {
+               "serverId":2,
+               "id":7,
+               "text":"modeso"
+            }
+         ],
+         "isEditable":true,
+         "isDragable":true,
+         "order":1,
+         "htmlId":"#draggableSingleSelectionField",
+         "id":544,
+         "idInFields":544,
+         "dynamicFieldId":38,
+         "section":2,
+         "name":"Single Selecta",
+         "type":7,
+         "typeNameStr":"Single Select",
+         "isUnique":false,
+         "isRequired":false,
+         "isArchived":true,
+         "componentId":10,
+         "isDynamic":true,
+         "viewByoptions":[
+            {
+               "id":0,
+               "text":"name"
+            }
+         ],
+         "searchable":[
+            "name"
+         ],
+         "optionsComponentId":null,
+         "isStoredInServer":true,
+         "class":"col-md-3",
+         "title":"Single Selecta",
+         "en":"Single Selecta",
+         "de":"Single Selecta",
+         "key":"Single Selecta"
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":true,
+         "isDragable":true,
+         "order":2,
+         "htmlId":"#draggableTextField",
+         "id":617,
+         "idInFields":617,
+         "dynamicFieldId":103,
+         "section":2,
+         "name":"nooo valueeee",
+         "type":1,
+         "typeNameStr":"Text",
+         "isUnique":false,
+         "isRequired":false,
+         "isArchived":true,
+         "componentId":8,
+         "isDynamic":true,
+         "viewByoptions":[
+            {
+               "id":0,
+               "text":"name"
+            }
+         ],
+         "searchable":[
+            "name"
+         ],
+         "optionsComponentId":null,
+         "isStoredInServer":true,
+         "class":"col-md-3",
+         "title":"nooo valueeee",
+         "en":"nooo valueeee",
+         "de":"nooo valueeee",
+         "key":"nooo valueeee"
+      },
+      {
+         "options":[
+            {
+               "serverId":1,
+               "id":8,
+               "text":"ch1"
+            },
+            {
+               "serverId":2,
+               "id":9,
+               "text":"ch2"
+            }
+         ],
+         "isEditable":true,
+         "isDragable":true,
+         "order":6,
+         "htmlId":null,
+         "id":542,
+         "idInFields":542,
+         "dynamicFieldId":36,
+         "section":2,
+         "name":"list",
+         "type":11,
+         "typeNameStr":"CheckList",
+         "isUnique":false,
+         "isRequired":false,
+         "isArchived":true,
+         "componentId":10,
+         "isDynamic":true,
+         "viewByoptions":[
+            {
+               "id":0,
+               "text":"name"
+            }
+         ],
+         "searchable":[
+            "name"
+         ],
+         "optionsComponentId":null,
+         "isStoredInServer":true,
+         "class":"col-md-3",
+         "title":"list",
+         "en":"list",
+         "de":"list",
+         "key":"list"
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":true,
+         "isDragable":true,
+         "order":7,
+         "htmlId":null,
+         "id":138,
+         "idInFields":138,
+         "dynamicFieldId":23,
+         "section":2,
+         "name":"Anaysenberichte",
+         "type":9,
+         "typeNameStr":"Attachment",
+         "isUnique":false,
+         "isRequired":false,
+         "isArchived":true,
+         "componentId":10,
+         "isDynamic":true,
+         "viewByoptions":[
+            {
+               "id":0,
+               "text":"name"
+            }
+         ],
+         "searchable":[
+            "name"
+         ],
+         "optionsComponentId":null,
+         "isStoredInServer":true,
+         "class":"col-md-3",
+         "title":"Anaysenberichte",
+         "en":"Anaysenberichte",
+         "de":"Anaysenberichte",
+         "key":"Anaysenberichte"
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":true,
+         "isDragable":true,
+         "order":9,
+         "htmlId":"#draggableMultiSelectionField",
+         "id":543,
+         "idInFields":543,
+         "dynamicFieldId":37,
+         "section":2,
+         "name":"Multiple Selecta",
+         "type":8,
+         "typeNameStr":"Multiple Select",
+         "isUnique":false,
+         "isRequired":false,
+         "isArchived":true,
+         "componentId":10,
+         "isDynamic":true,
+         "viewByoptions":[
+            {
+               "id":0,
+               "text":"name"
+            }
+         ],
+         "searchable":[
+            "name"
+         ],
+         "optionsComponentId":2,
+         "isStoredInServer":true,
+         "class":"col-md-3",
+         "title":"Multiple Selecta",
+         "en":"Multiple Selecta",
+         "de":"Multiple Selecta",
+         "key":"Multiple Selecta"
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":true,
+         "isDragable":true,
+         "order":12,
+         "htmlId":"#draggableUrlField",
+         "id":590,
+         "idInFields":590,
+         "dynamicFieldId":77,
+         "section":1,
+         "name":"URL nahla",
+         "type":6,
+         "typeNameStr":"URL",
+         "isUnique":false,
+         "isRequired":false,
+         "isArchived":true,
+         "componentId":8,
+         "isDynamic":true,
+         "viewByoptions":[
+            {
+               "id":0,
+               "text":"name"
+            }
+         ],
+         "searchable":[
+            "name"
+         ],
+         "optionsComponentId":null,
+         "isStoredInServer":true,
+         "class":"col-md-4",
+         "title":"URL nahla",
+         "en":"URL nahla",
+         "de":"URL nahla",
+         "key":"URL nahla"
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":true,
+         "isDragable":true,
+         "order":13,
+         "htmlId":"#draggableCheckboxField",
+         "id":545,
+         "idInFields":545,
+         "dynamicFieldId":39,
+         "section":2,
+         "name":"Emaila",
+         "type":3,
+         "typeNameStr":"Email",
+         "isUnique":false,
+         "isRequired":false,
+         "isArchived":true,
+         "componentId":10,
+         "isDynamic":true,
+         "viewByoptions":[
+            {
+               "id":0,
+               "text":"name"
+            }
+         ],
+         "searchable":[
+            "name"
+         ],
+         "optionsComponentId":null,
+         "isStoredInServer":true,
+         "class":"col-md-3",
+         "title":"Emaila",
+         "en":"Emaila",
+         "de":"Emaila",
+         "key":"Emaila"
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":true,
+         "isDragable":true,
+         "order":15,
+         "htmlId":"#draggableTextField",
+         "id":591,
+         "idInFields":591,
+         "dynamicFieldId":78,
+         "section":1,
+         "name":"Text nahla",
+         "type":1,
+         "typeNameStr":"Text",
+         "isUnique":true,
+         "isRequired":false,
+         "isArchived":true,
+         "componentId":8,
+         "isDynamic":true,
+         "viewByoptions":[
+            {
+               "id":0,
+               "text":"name"
+            }
+         ],
+         "searchable":[
+            "name"
+         ],
+         "optionsComponentId":null,
+         "isStoredInServer":true,
+         "class":"col-md-4",
+         "title":"Text nahla",
+         "en":"Text nahla",
+         "de":"Text nahla",
+         "key":"Text nahla"
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":true,
+         "isDragable":true,
+         "order":16,
+         "htmlId":null,
+         "id":593,
+         "idInFields":593,
+         "dynamicFieldId":80,
+         "section":1,
+         "name":"Tags nahla",
+         "type":10,
+         "typeNameStr":"Tags",
+         "isUnique":false,
+         "isRequired":false,
+         "isArchived":true,
+         "componentId":8,
+         "isDynamic":true,
+         "viewByoptions":[
+            {
+               "id":0,
+               "text":"name"
+            }
+         ],
+         "searchable":[
+            "name"
+         ],
+         "optionsComponentId":null,
+         "isStoredInServer":true,
+         "class":"col-md-4",
+         "title":"Tags nahla",
+         "en":"Tags nahla",
+         "de":"Tags nahla",
+         "key":"Tags nahla"
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":true,
+         "isDragable":true,
+         "order":18,
+         "htmlId":"#draggableTextField",
+         "id":618,
+         "idInFields":618,
+         "dynamicFieldId":104,
+         "section":1,
+         "name":"Textnew",
+         "type":1,
+         "typeNameStr":"Text",
+         "isUnique":false,
+         "isRequired":false,
+         "isArchived":true,
+         "componentId":8,
+         "isDynamic":true,
+         "viewByoptions":[
+            {
+               "id":0,
+               "text":"name"
+            }
+         ],
+         "searchable":[
+            "name"
+         ],
+         "optionsComponentId":null,
+         "isStoredInServer":true,
+         "class":"col-md-4",
+         "title":"Textnew",
+         "en":"Textnew",
+         "de":"Textnew",
+         "key":"Textnew"
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":true,
+         "isDragable":true,
+         "order":18,
+         "htmlId":"#draggableNumberField",
+         "id":609,
+         "idInFields":609,
+         "dynamicFieldId":95,
+         "section":1,
+         "name":"Date nahla",
+         "type":2,
+         "typeNameStr":"Date",
+         "isUnique":false,
+         "isRequired":false,
+         "isArchived":true,
+         "componentId":8,
+         "isDynamic":true,
+         "viewByoptions":[
+            {
+               "id":0,
+               "text":"name"
+            }
+         ],
+         "searchable":[
+            "name"
+         ],
+         "optionsComponentId":null,
+         "isStoredInServer":true,
+         "class":"col-md-4",
+         "title":"Date nahla",
+         "en":"Date nahla",
+         "de":"Date nahla",
+         "key":"Date nahla"
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":true,
+         "isDragable":true,
+         "order":18,
+         "htmlId":null,
+         "id":546,
+         "idInFields":546,
+         "dynamicFieldId":40,
+         "section":2,
+         "name":"Tagsa",
+         "type":10,
+         "typeNameStr":"Tags",
+         "isUnique":false,
+         "isRequired":false,
+         "isArchived":true,
+         "componentId":10,
+         "isDynamic":true,
+         "viewByoptions":[
+            {
+               "id":0,
+               "text":"name"
+            }
+         ],
+         "searchable":[
+            "name"
+         ],
+         "optionsComponentId":null,
+         "isStoredInServer":true,
+         "class":"col-md-3",
+         "title":"Tagsa",
+         "en":"Tagsa",
+         "de":"Tagsa",
+         "key":"Tagsa"
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":true,
+         "isDragable":true,
+         "order":19,
+         "htmlId":"#draggableMultiSelectionField",
+         "id":547,
+         "idInFields":547,
+         "dynamicFieldId":41,
+         "section":2,
+         "name":"Multiple Select",
+         "type":8,
+         "typeNameStr":"Multiple Select",
+         "isUnique":false,
+         "isRequired":false,
+         "isArchived":true,
+         "componentId":10,
+         "isDynamic":true,
+         "viewByoptions":[
+            {
+               "id":0,
+               "text":"name"
+            }
+         ],
+         "searchable":[
+            "name"
+         ],
+         "optionsComponentId":3,
+         "isStoredInServer":true,
+         "class":"col-md-3",
+         "title":"Multiple Select",
+         "en":"Multiple Select",
+         "de":"Multiple Select",
+         "key":"Multiple Select"
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":true,
+         "isDragable":true,
+         "order":20,
+         "htmlId":"#draggableCheckboxField",
+         "id":603,
+         "idInFields":603,
+         "dynamicFieldId":90,
+         "section":1,
+         "name":"email nahla",
+         "type":3,
+         "typeNameStr":"Email",
+         "isUnique":false,
+         "isRequired":true,
+         "isArchived":true,
+         "componentId":8,
+         "isDynamic":true,
+         "viewByoptions":[
+            {
+               "id":0,
+               "text":"name"
+            }
+         ],
+         "searchable":[
+            "name"
+         ],
+         "optionsComponentId":null,
+         "isStoredInServer":true,
+         "class":"col-md-4",
+         "title":"email nahla",
+         "en":"Email nahla",
+         "de":"Email nahla",
+         "key":"email nahla"
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":true,
+         "isDragable":true,
+         "order":20,
+         "htmlId":null,
+         "id":615,
+         "idInFields":615,
+         "dynamicFieldId":101,
+         "section":1,
+         "name":"Attachment 222",
+         "type":9,
+         "typeNameStr":"Attachment",
+         "isUnique":false,
+         "isRequired":false,
+         "isArchived":true,
+         "componentId":8,
+         "isDynamic":true,
+         "viewByoptions":[
+            {
+               "id":0,
+               "text":"name"
+            }
+         ],
+         "searchable":[
+            "name"
+         ],
+         "optionsComponentId":null,
+         "isStoredInServer":true,
+         "class":"col-md-4",
+         "title":"Attachment 222",
+         "en":"Attachment 222",
+         "de":"Attachment 222",
+         "key":"Attachment 222"
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":true,
+         "isDragable":true,
+         "order":20,
+         "htmlId":"#draggableTextField",
+         "id":619,
+         "idInFields":619,
+         "dynamicFieldId":105,
+         "section":1,
+         "name":"Text df",
+         "type":1,
+         "typeNameStr":"Text",
+         "isUnique":false,
+         "isRequired":false,
+         "isArchived":true,
+         "componentId":10,
+         "isDynamic":true,
+         "viewByoptions":[
+            {
+               "id":0,
+               "text":"name"
+            }
+         ],
+         "searchable":[
+            "name"
+         ],
+         "optionsComponentId":null,
+         "isStoredInServer":true,
+         "class":"col-md-4",
+         "title":"Text df",
+         "en":"Text df",
+         "de":"Text df",
+         "key":"Text df"
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":true,
+         "isDragable":true,
+         "order":22,
+         "htmlId":"#draggableEmailField",
+         "id":610,
+         "idInFields":610,
+         "dynamicFieldId":96,
+         "section":1,
+         "name":"Number nahla",
+         "type":4,
+         "typeNameStr":"Num",
+         "isUnique":false,
+         "isRequired":false,
+         "isArchived":true,
+         "componentId":8,
+         "isDynamic":true,
+         "viewByoptions":[
+            {
+               "id":0,
+               "text":"name"
+            }
+         ],
+         "searchable":[
+            "name"
+         ],
+         "optionsComponentId":null,
+         "isStoredInServer":true,
+         "class":"col-md-4",
+         "title":"Number nahla",
+         "en":"Number nahla",
+         "de":"Number nahla",
+         "key":"Number nahla"
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":true,
+         "isDragable":true,
+         "order":23,
+         "htmlId":null,
+         "id":607,
+         "idInFields":607,
+         "dynamicFieldId":94,
+         "section":1,
+         "name":"Attachment nahla",
+         "type":9,
+         "typeNameStr":"Attachment",
+         "isUnique":false,
+         "isRequired":false,
+         "isArchived":true,
+         "componentId":8,
+         "isDynamic":true,
+         "viewByoptions":[
+            {
+               "id":0,
+               "text":"name"
+            }
+         ],
+         "searchable":[
+            "name"
+         ],
+         "optionsComponentId":null,
+         "isStoredInServer":true,
+         "class":"col-md-4",
+         "title":"Attachment nahla",
+         "en":"nahla Attachment",
+         "de":"nahla Attachment",
+         "key":"Attachment nahla"
+      },
+      {
+         "options":[
+            {
+               "serverId":1,
+               "id":35,
+               "text":"test 1 "
+            },
+            {
+               "serverId":2,
+               "id":36,
+               "text":"test 2"
+            },
+            {
+               "serverId":3,
+               "id":37,
+               "text":"test 3"
+            }
+         ],
+         "isEditable":true,
+         "isDragable":true,
+         "order":24,
+         "htmlId":"#draggableSingleSelectionField",
+         "id":611,
+         "idInFields":611,
+         "dynamicFieldId":97,
+         "section":1,
+         "name":"Single Select nahla",
+         "type":7,
+         "typeNameStr":"Single Select",
+         "isUnique":false,
+         "isRequired":false,
+         "isArchived":true,
+         "componentId":8,
+         "isDynamic":true,
+         "viewByoptions":[
+            {
+               "id":0,
+               "text":"name"
+            }
+         ],
+         "searchable":[
+            "name"
+         ],
+         "optionsComponentId":null,
+         "isStoredInServer":true,
+         "class":"col-md-4",
+         "title":"Single Select nahla",
+         "en":"Single Select nahla",
+         "de":"Single Select nahla",
+         "key":"Single Select nahla"
+      },
+      {
+         "options":[
+            {
+               "serverId":1,
+               "id":38,
+               "text":"nahla 1"
+            },
+            {
+               "serverId":2,
+               "id":39,
+               "text":"nahla 2"
+            },
+            {
+               "serverId":3,
+               "id":40,
+               "text":"nahla 3"
+            }
+         ],
+         "isEditable":true,
+         "isDragable":true,
+         "order":25,
+         "htmlId":"#draggableMultiSelectionField",
+         "id":612,
+         "idInFields":612,
+         "dynamicFieldId":98,
+         "section":1,
+         "name":"Multiple Select nahla",
+         "type":8,
+         "typeNameStr":"Multiple Select",
+         "isUnique":false,
+         "isRequired":false,
+         "isArchived":true,
+         "componentId":8,
+         "isDynamic":true,
+         "viewByoptions":[
+            {
+               "id":0,
+               "text":"name"
+            }
+         ],
+         "searchable":[
+            "name"
+         ],
+         "optionsComponentId":null,
+         "isStoredInServer":true,
+         "class":"col-md-4",
+         "title":"Multiple Select nahla",
+         "en":"Multiple Select nahla",
+         "de":"Multiple Select nahla",
+         "key":"Multiple Select nahla"
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":true,
+         "isDragable":true,
+         "order":26,
+         "htmlId":"#draggableDateField",
+         "id":613,
+         "idInFields":613,
+         "dynamicFieldId":99,
+         "section":1,
+         "name":"Checkbox nahla",
+         "type":5,
+         "typeNameStr":"Checkbox",
+         "isUnique":false,
+         "isRequired":false,
+         "isArchived":true,
+         "componentId":8,
+         "isDynamic":true,
+         "viewByoptions":[
+            {
+               "id":0,
+               "text":"name"
+            }
+         ],
+         "searchable":[
+            "name"
+         ],
+         "optionsComponentId":null,
+         "isStoredInServer":true,
+         "class":"col-md-4",
+         "title":"Checkbox nahla",
+         "en":"Checkbox nahla",
+         "de":"Checkbox nahla",
+         "key":"Checkbox nahla"
+      },
+      {
+         "options":[
+            {
+               "serverId":1,
+               "id":41,
+               "text":"checked "
+            },
+            {
+               "serverId":2,
+               "id":42,
+               "text":"reviewed"
+            }
+         ],
+         "isEditable":true,
+         "isDragable":true,
+         "order":27,
+         "htmlId":null,
+         "id":614,
+         "idInFields":614,
+         "dynamicFieldId":100,
+         "section":1,
+         "name":"Check List",
+         "type":11,
+         "typeNameStr":"CheckList",
+         "isUnique":false,
+         "isRequired":false,
+         "isArchived":true,
+         "componentId":8,
+         "isDynamic":true,
+         "viewByoptions":[
+            {
+               "id":0,
+               "text":"name"
+            }
+         ],
+         "searchable":[
+            "name"
+         ],
+         "optionsComponentId":null,
+         "isStoredInServer":true,
+         "class":"col-md-4",
+         "title":"Check List",
+         "en":"Check List",
+         "de":"Check List",
+         "key":"Check List"
+      }
+   ],
+   "withYear":1,
+   "analysisYearOption":1
+}
