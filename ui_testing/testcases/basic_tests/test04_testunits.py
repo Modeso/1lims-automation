@@ -11,8 +11,8 @@ from ui_testing.pages.login_page import Login
 from api_testing.apis.users_api import UsersAPI
 from unittest import skip
 from parameterized import parameterized
-import re, random
 from nose.plugins.attrib import attr
+import re, random
 
 
 class TestUnitsTestCases(BaseTest):
