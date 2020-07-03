@@ -27,7 +27,7 @@ class TestUnitsTestCases(BaseTest):
         self.test_unit_api.set_configuration()
         self.test_unit_page.get_test_units_page()
 
-    # @skip('https://modeso.atlassian.net/browse/LIMS-5237')
+    @skip('https://modeso.atlassian.net/browse/LIMS-5237')
     def test001_test_units_search(self):
         """
         New: Test units: Search Approach: I can search by any field in the table view

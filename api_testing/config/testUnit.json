@@ -495,7 +495,7 @@
          "idInFields":54,
          "dynamicFieldId":10,
          "section":4,
-         "name":"Kontakt",
+         "name":"Contact",
          "type":7,
          "typeNameStr":"Single Select",
          "isUnique":false,
@@ -510,18 +510,18 @@
             },
             {
                "id":1,
-               "text":"                           number"
+               "text":"number"
             }
          ],
          "searchable":[
             "name",
-            "                           number"
+            "number"
          ],
          "optionsComponentId":3,
          "isStoredInServer":true,
          "class":"col-md-4",
-         "title":"Kontakt",
-         "en":"Kontakt",
+         "title":"Contact",
+         "en":"Contact",
          "de":"Kontakt",
          "key":"Kontakt",
          "error":false,
@@ -606,7 +606,7 @@
          "idInFields":55,
          "dynamicFieldId":18,
          "section":4,
-         "name":"Analyse Typ",
+         "name":"Analysis Type",
          "type":8,
          "typeNameStr":"Multiple Select",
          "isUnique":false,
@@ -626,8 +626,8 @@
          "optionsComponentId":null,
          "isStoredInServer":true,
          "class":"col-md-4",
-         "title":"Analyse Typ",
-         "en":"Analyse Typ",
+         "title":"Analysis Type",
+         "en":"Analysis Type",
          "de":"Analyse Typ",
          "key":"Analyse Typ",
          "error":false,
@@ -674,7 +674,7 @@
          "idInFields":53,
          "dynamicFieldId":9,
          "section":null,
-         "name":"Analysekosten",
+         "name":"Cost of Analysis",
          "type":1,
          "typeNameStr":"Text",
          "isUnique":false,
@@ -694,10 +694,10 @@
          "optionsComponentId":null,
          "isStoredInServer":true,
          "class":"col-md-4",
-         "title":"Analysekosten",
-         "en":"Analysekosten",
+         "title":"Cost of Analysis",
+         "en":"Cost of Analysis",
          "de":"Analysekosten",
-         "key":"Analysekosten"
+         "key":"costOfAnalysis"
       },
       {
          "options":[
