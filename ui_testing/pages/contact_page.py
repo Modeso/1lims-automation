@@ -278,17 +278,18 @@ class Contact(Contacts):
         self.base_selenium.click(element='contact:contact_persons')
         self.wait_until_page_is_loaded()
 
-    def create_update_contact_person(self, create=True, indexToEdit=-1, name='', position='', email='', phone='', skype='', info='', save=False):
+    def create_update_contact_person(self, create=True, indexToEdit=-1, name='', position='',
+                                     email='', phone='', skype='', info='', save=False):
         if create:
             self.base_selenium.click(element='contact:add_another_item')
-
 
         contact_persons_table_records = self.base_selenium.get_table_rows(element='contact:contact_persons_table')
         
         if create == False or indexToEdit == -1:
-            indexToEdit = len(contact_persons_table_records) -1
+            indexToEdit = len(contact_persons_table_records)-1
             
-        row_data = self.base_selenium.get_row_cells_elements_related_to_header(row=contact_persons_table_records[indexToEdit], table_element='contact:contact_persons_table')
+        row_data = self.base_selenium.get_row_cells_elements_related_to_header(
+            row=contact_persons_table_records[indexToEdit], table_element='contact:contact_persons_table')
 
         name = name or self.generate_random_text()
         
@@ -321,22 +322,24 @@ class Contact(Contacts):
         self.base_selenium.update_item_value(item=row_data['Info:'], item_text=info)
 
         self.info('Acquire contact persons data')
-        contact_person_data = self.get_contact_persons_data()
+        contact_person_data = self.get_contact_persons_data(navigate_to_person_page=False)
         
         if save:
             self.save(save_btn='contact:save')
 
         return contact_person_data
         
-    def get_contact_persons_data(self):
-        self.get_contact_persons_page()
+    def get_contact_persons_data(self, navigate_to_person_page=True):
+        if navigate_to_person_page:
+            self.get_contact_persons_page()
         contact_persons_arr = []
         webdriver.ActionChains(self.base_selenium.driver).send_keys(Keys.ESCAPE).perform()
         self.info('Collecting persons data')
         contact_persons_table_records = self.base_selenium.get_table_rows(element='contact:contact_persons_table')
-        if self.check_contact_persons_table_is_empty() != True:
+        if not self.check_contact_persons_table_is_empty():
             for person in contact_persons_table_records:
-                row_data = self.base_selenium.get_row_cells_elements_related_to_header(row=person, table_element='contact:contact_persons_table')
+                row_data = self.base_selenium.get_row_cells_elements_related_to_header(
+                    row=person, table_element='contact:contact_persons_table')
                 contact_persons_arr.append({
                     'name': row_data['Contact Person: *'].text,
                     'position': row_data['Position:'].text,
@@ -355,23 +358,32 @@ class Contact(Contacts):
     def delete_contact_person(self, index=0, save=False):
         contact_persons_table_records = self.base_selenium.get_table_rows(element='contact:contact_persons_table')
         if index < len(contact_persons_table_records):
-            delete_button = contact_persons_table_records[index].find_element(element='contact:delete_person_button')
+            delete_button = contact_persons_table_records[index].find_element('contact:row_delete_button')
             if delete_button:
                 delete_button.click()
 
         else:
-            delete_button = contact_persons_table_records[0].find_element(element='contact:delete_person_button')
+            delete_button = contact_persons_table_records[0].find_element('contact:delete_person_button')
             if delete_button:
                 delete_button.click()
 
         if save:
             self.save(save_btn='contact:save')
 
+    def delete_contact_persons(self, save=True):
+        rows = self.base_selenium.get_table_rows(element='contact:contact_persons_table')
+        for row in rows:
+            self.base_selenium.click(element='contact:row_delete_button')
+
+        if save:
+            self.save(save_btn='contact:save')
+
     def check_contact_persons_table_is_empty(self):
         contact_persons_table_records = self.base_selenium.get_table_rows(element='contact:contact_persons_table')
-        if contact_persons_table_records[0].text != 'No Results Found':
+        if contact_persons_table_records[0].text == 'No Results Found':
+            return True
+        else:
             return False
-        return True
 
     def compare_contact_main_data(self, data_before_save, data_after_save):
         self.info('Comparing contact main data')

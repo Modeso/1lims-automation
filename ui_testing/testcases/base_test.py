@@ -64,7 +64,7 @@ class BaseTest(TestCase):
                 elif str(item) in ["-", "nan", "N/A"]:
                     continue
                 elif '&' in str(item):
-                    tmp.extend(str(item).split('&'))
+                    tmp.extend(str(item).split('& '))
                 elif ',' in str(item):
                     tmp.extend(str(item).split(', '))
                 elif ' ' == str(item)[-1]:

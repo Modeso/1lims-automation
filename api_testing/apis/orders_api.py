@@ -229,6 +229,10 @@ class OrdersAPIFactory(BaseAPI):
         return [payload]
 
 class OrdersAPI(OrdersAPIFactory):
+    def get_all_orders_json(self, **kwargs):
+        orders_response, _ = self.get_all_orders(**kwargs)
+        return orders_response['orders']
+
     def get_order_with_multiple_sub_orders(self):
         api, payload = self.get_all_orders(limit=100)
         all_orders = api['orders']

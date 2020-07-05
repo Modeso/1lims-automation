@@ -1,7 +1,5 @@
 from api_testing.apis.base_api import BaseAPI
 from api_testing.apis.base_api import api_factory
-import json, os
-
 
 
 class ContactsAPIFactory(BaseAPI):
@@ -23,7 +21,7 @@ class ContactsAPIFactory(BaseAPI):
 
     @api_factory('get')
     def get_contact_form_data(self, id=1):
-        api = '{}{}{}'.format(self.url, self.END_POINTS['contacts_api']['form_data'], str(id)) 
+        api = '{}{}{}'.format(self.url, self.END_POINTS['contacts_api']['form_data'], str(id))
         return api, {}
 
     @api_factory('put')
@@ -33,7 +31,7 @@ class ContactsAPIFactory(BaseAPI):
         :param ids:
         :return:
         """
-        api = '{}{}{}'.format(self.url, self.END_POINTS['contacts_api']['archive_contacts'], ','.join(ids)) 
+        api = '{}{}{}'.format(self.url, self.END_POINTS['contacts_api']['archive_contacts'], ','.join(ids))
         return api, {}
 
     @api_factory('put')
@@ -43,7 +41,7 @@ class ContactsAPIFactory(BaseAPI):
         :param ids:
         :return:
         """
-        api = '{}{}{}'.format(self.url, self.END_POINTS['contacts_api']['restore_contacts'], ','.join(ids)) 
+        api = '{}{}{}'.format(self.url, self.END_POINTS['contacts_api']['restore_contacts'], ','.join(ids))
         return api, {}
 
     @api_factory('delete')
@@ -53,7 +51,7 @@ class ContactsAPIFactory(BaseAPI):
         :param id:
         :return:
         """
-        api = '{}{}{}'.format(self.url, self.END_POINTS['contacts_api']['delete_contact'], str(id)) 
+        api = '{}{}{}'.format(self.url, self.END_POINTS['contacts_api']['delete_contact'], str(id))
         return api, {}
 
     @api_factory('post')
@@ -109,15 +107,16 @@ class ContactsAPIFactory(BaseAPI):
             ],
             "departmentArray": [],
             "persons": [],
+            "email": {"text": "", "recipient": 0},
             "companyNo": self.generate_random_number(),
             "name": self.generate_random_string(),
             "isSupplier": "true",
             "country": "",
             "dynamicFieldsValues": []
-            }
-
+        }
+        payload = self.update_payload(_payload, **kwargs)
         api = '{}{}'.format(self.url, self.END_POINTS['contacts_api']['create_contact'])
-        return api, {}
+        return api, payload
 
 
 class ContactsAPI(ContactsAPIFactory):
@@ -132,7 +131,7 @@ class ContactsAPI(ContactsAPIFactory):
 
     def delete_active_contact(self, id=1):
         if self.archive_contacts(ids=[str(id)])[0]['message'] == 'delete_success':
-            if self.delete_archived_contact(id=id)[0]['message']=='hard_delete_success':
+            if self.delete_archived_contact(id=id)[0]['message'] == 'hard_delete_success':
                 return True
             else:
                 self.restore_contacts(ids=[str(id)])
@@ -152,7 +151,7 @@ class ContactsAPI(ContactsAPIFactory):
                   '"modifiedAt","type","phone","location"]}}'.format(contact_name)
 
         api, contacts_data = self.get_all_contacts(filter=_filter)
-        if api['status'] == 1 and api['count']==1:
+        if api['status'] == 1 and api['count'] == 1:
             return api['contacts'][0]['departments'].split(', ')
         elif api['status'] == 1 and api['count'] > 1:
             for contact in api['contacts']:
@@ -169,3 +168,11 @@ class ContactsAPI(ContactsAPIFactory):
                                 'departments': departments}
                 departments_list_with_contacts.append(contact_dict)
         return departments_list_with_contacts
+
+    def create_contact_with_person(self):
+        person_name = self.generate_random_string()
+        person = {"gender": 0, "name": person_name, "position": 0,
+                  "email": {"text": "", "recipient": 0},
+                  "phone": 0, "skype": 0, "moreInfo": 0}
+        payload = {"persons": [person], "departments": []}
+        return self.create_contact(**payload)

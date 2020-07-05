@@ -118,5 +118,14 @@ class Contacts(BasePages):
                         'laboratory': 'Laboratory'}
         return types[contact_type]
 
+    def get_contact_edit_page_by_id(self, id):
+        url_text = "{}/contacts/edit/" + str(id)
+        self.base_selenium.get(url=url_text.format(self.base_selenium.url))
+        self.wait_until_page_is_loaded()
 
-    
+    def filter_by_contact_no(self, contact_no):
+        self.open_filter_menu()
+        self.info('Filter by contact no. : {}'.format(contact_no))
+        self.filter_by(filter_element='contact:contact_no_filter', filter_text=contact_no, field_type='text')
+        self.filter_apply()
+
