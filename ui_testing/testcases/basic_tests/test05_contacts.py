@@ -249,167 +249,142 @@ class ContactsTestCases(BaseTest):
         self.contact_page.click_check_box(source=contact_archived_records)
         self.assertFalse(self.contact_page.delete_selected_contacts())
 
-    # @skip('https://modeso.atlassian.net/browse/LIMS-6402')
-    # def test011_user_can_show_hide_any_column(self):
-    #     """
-    #     New:  contacts: Optional fields: User can hide/show any optional field in Edit/Create form
-    #     In the configuration section, In case I archive any optional field this field should be hidden from Edit/Create from and it should also found in the archive in table configuration.
-    #     LIMS-4129
-    #     """
-    #
-    #     self.info('hide multiple columns')
-    #     hidden_columns = self.contact_page.hide_columns(always_hidden_columns=['fax'])
-    #     self.contact_page.sleep_small()
-    #
-    #     self.info('Compare the headers of teh tables to make sure that those columns are hidden')
-    #     table_headers = self.base_selenium.get_table_head_elements(element="contacts:contact_table")
-    #     headers_text = [header.text for header in table_headers]
-    #
-    #     for column in hidden_columns:
-    #         self.assertNotIn(column, headers_text)
-    #
-    #     self.info('All columns are hidden successfully')
-    #     self.info('export the data to make sure that hidden columns are hidden also form export')
-    #     self.contact_page.download_xslx_sheet()
-    #     rows_data = self.contact_page.get_table_rows_data()
-    #     for index in range(len(rows_data)):
-    #         self.info(' * Comparing the contact no. {} '.format(index))
-    #         fixed_row_data = self.fix_data_format(rows_data[index].split('\n'))
-    #         values = self.contact_page.sheet.iloc[index].values
-    #         fixed_sheet_row_data = self.fix_data_format(values)
-    #         for item in fixed_row_data:
-    #             self.assertIn(item, fixed_sheet_row_data)
-    #
-    # def test012_update_departments_should_reflect_orders(self):
-    #     """
-    #     New: Contacts: Department Approach: Any edit in the department, will reflect in the table view of orders and analysis sections.
-    #     Any edit in the department, will reflect in the table view of orders and analysis sections.
-    #     LIMS-3571
-    #     """
-    #     self.order_page = Order()
-    #
-    #     self.info(
-    #         'Creating new contact with new department to keep track of the updated departments')
-    #     contact_data = self.contact_page.create_update_contact()
-    #
-    #     contact_name = contact_data['Contact Name']
-    #     departments = contact_data['Departments']
-    #
-    #     self.info('create order with the desired contact to keep track of the updated')
-    #     self.order_page.get_orders_page()
-    #     self.order_page.create_new_order(material_type='Raw Material', departments=departments,
-    #                                      contact=contact_name, test_plans=[])
-    #     order_id = self.order_page.get_order_id()
-    #     self.info('get the contacts to update the desired contact department')
-    #     self.contact_page.get_contacts_page()
-    #
-    #     contact_record = self.contact_page.search(value=contact_data['Contact No'])[0]
-    #     self.contact_page.open_edit_page(row=contact_record)
-    #
-    #     self.info('generating list of new updated departments')
-    #     new_departments_list = []
-    #     counter = 0
-    #     while counter < 1:
-    #         new_departments_list.append(self.contact_page.generate_random_text())
-    #         counter = counter + 1
-    #
-    #     new_updated_departments = self.contact_page.update_department_list(departments=new_departments_list)
-    #     self.info('refresh to make sure that departments updated correctly')
-    #
-    #     self.base_selenium.refresh()
-    #     new_departments_after_refresh = self.contact_page.get_contact_departments()
-    #     self.info(
-    #         'compare departments, departments are {}, and should be {}'.format(new_departments_after_refresh,
-    #                                                                            new_updated_departments))
-    #
-    #     self.assertEqual(new_updated_departments, new_departments_after_refresh)
-    #
-    #     departments_list = new_updated_departments.split(', ')
-    #
-    #     self.info('get order data of order with id {}'.format(order_id))
-    #     order_request = OrdersAPI().get_order_by_id(id=order_id)
-    #     self.assertEqual(order_request['status'], 1)
-    #     order_data = order_request['orders']
-    #     self.assertNotEqual(len(order_data), 0)
-    #
-    #     orders_departments = []
-    #     for suborder in order_data:
-    #         temp_departments = list(map(lambda s: s['name'], suborder['departments']))
-    #         orders_departments = orders_departments + temp_departments
-    #
-    #     self.info(
-    #         'making sure that the updated departments does exist in the order departments list')
-    #     for dep in departments_list:
-    #         self.assertIn(dep, orders_departments)
-    #
-    # @parameterized.expand(['ok', 'cancel'])
-    # def test013_create_approach_overview_button(self, ok):
-    #     """
-    #     Master data: Create: Overview button Approach: Make sure
-    #     after I press on the overview button, it redirects me to the active table
-    #     LIMS-6203
-    #     """
-    #     self.info('create new contact.')
-    #     self.base_selenium.click(element='contacts:new_contact')
-    #     self.contact_page.sleep_small()
-    #     # click on Overview, this will display an alert to the user
-    #     self.base_page.click_overview()
-    #     # switch to the alert
-    #     if 'ok' == ok:
-    #         self.base_page.confirm_overview_pop_up()
-    #         self.assertEqual(self.base_selenium.get_url(), '{}contacts'.format(self.base_selenium.url))
-    #         self.info('clicking on Overview confirmed')
-    #     else:
-    #         self.base_page.cancel_overview_pop_up()
-    #         self.assertEqual(self.base_selenium.get_url(), '{}contacts/add'.format(self.base_selenium.url))
-    #         self.info('clicking on Overview cancelled')
-    #
-    # def test014_edit_approach_overview_button(self):
-    #     """
-    #     Edit: Overview Approach: Make sure after I press on
-    #     the overview button, it redirects me to the active table
-    #     LIMS-6202
-    #
-    #     New: Contact: Cancel button: After I edit in any field
-    #     then press on cancel button, a pop up will appear that
-    #     the data will be lost
-    #     LIMS-3585
-    #     """
-    #     self.contacts_page.get_random_contact()
-    #     contact_url = self.base_selenium.get_url()
-    #     self.contacts_page.info('contact_url : {}'.format(contact_url))
-    #     # click on Overview, it will redirect you to contacts' page
-    #     self.contacts_page.info('click on Overview and confirm pop-up')
-    #     self.base_page.click_overview()
-    #     self.contacts_page.confirm_overview_pop_up()
-    #     self.contacts_page.sleep_tiny()
-    #     self.assertEqual(self.base_selenium.get_url(), '{}contacts'.format(self.base_selenium.url))
-    #     self.contacts_page.info('clicking on Overview confirmed')
-    #
-    # def test015_contacts_search_then_navigate(self):
-    #     """
-    #     Search Approach: Make sure that you can search then navigate to any other page
-    #     LIMS-6201
-    #
-    #     """
-    #
-    #     contacts_response, _ = self.contacts_api.get_all_contacts()
-    #     contacts = contacts_response['contacts']
-    #     contact_name = random.choice(contacts)['name']
-    #     search_results = self.contact_page.search(contact_name)
-    #     self.assertGreater(len(search_results), 1, " * There is no search results for it, Report a bug.")
-    #     for search_result in search_results:
-    #         search_data = self.base_selenium.get_row_cells_dict_related_to_header(search_result)
-    #         if search_data['Contact Name'] == contact_name:
-    #             break
-    #     else:
-    #         self.assertTrue(False, " * There is no search results for it, Report a bug.")
-    #     self.assertEqual(contact_name, search_data['Contact Name'])
-    #     # Navigate to test plan page
-    #     self.info('navigate to test plans page')
-    #     TstPlan().get_testplans_page()
-    #     self.assertEqual(self.base_selenium.get_url(), '{}testPlans'.format(self.base_selenium.url))
-    #
+    def test011_user_can_show_hide_any_column(self):
+        """
+        New:  contacts: Optional fields: User can hide/show any optional field in Edit/Create form
+        In the configuration section, In case I archive any optional field this field should be hidden
+        from Edit/Create from and it should also found in the archive in table configuration.
+
+        LIMS-4129
+        """
+        self.info('hide multiple columns')
+        hidden_columns = self.contact_page.hide_columns(always_hidden_columns=['fax'])
+        self.contact_page.sleep_small()
+        self.info('Compare the headers of teh tables to make sure that those columns are hidden')
+        table_headers = self.base_selenium.get_table_head_elements(element="contacts:contact_table")
+        headers_text = [header.text for header in table_headers]
+
+        for column in hidden_columns:
+            self.assertNotIn(column, headers_text)
+
+        self.info('All columns are hidden successfully')
+        self.info('export the data to make sure that hidden columns are hidden also form export')
+        self.contact_page.download_xslx_sheet()
+        rows_data = self.contact_page.get_table_rows_data()
+        for index in range(len(rows_data)):
+            self.info(' * Comparing the contact no. {} '.format(index))
+            fixed_row_data = self.fix_data_format(rows_data[index].split('\n'))
+            values = self.contact_page.sheet.iloc[index].values
+            fixed_sheet_row_data = self.fix_data_format(values)
+            for item in fixed_row_data:
+                self.assertIn(item, fixed_sheet_row_data)
+
+    def test012_update_departments_should_reflect_orders(self):
+        """
+        New: Contacts: Department Approach: Any edit in the department,
+        will reflect in the table view of orders and analysis sections.
+
+        LIMS-3571
+        """
+        self.info("create new order with department")
+        order_response, payload = OrdersAPI().create_order_with_department()
+        self.assertEqual(order_response['status'], 1, payload)
+        self.info('order created with contact {} snd department {}'.format(payload[0]['contact'][0]['text'],
+                                                                           payload[0]['departments'][0]['text']))
+
+        self.info("Navigate to contact edit page")
+        self.contacts_page.get_contact_edit_page_by_id(payload[0]['contact'][0]['id'])
+
+        self.info('generating list of new updated departments')
+        new_departments_list = [self.contact_page.generate_random_text()]
+        new_updated_departments = self.contact_page.update_department_list(departments=new_departments_list)
+        self.info('refresh to make sure that departments updated correctly')
+
+        self.base_selenium.refresh()
+        new_departments_after_refresh = self.contact_page.get_contact_departments()
+        self.info('compare departments, departments are {}, and should be {}'.
+                  format(new_departments_after_refresh, new_updated_departments))
+
+        self.assertEqual(new_updated_departments, new_departments_after_refresh)
+
+        departments_list = new_updated_departments.split(', ')
+        self.info('get order data of order with id {}'.format(order_response['order']['mainOrderId']))
+        order_request = OrdersAPI().get_order_by_id(id=order_response['order']['mainOrderId'])[0]
+        self.assertEqual(order_request['status'], 1)
+        order_data = order_request['orders']
+        self.assertNotEqual(len(order_data), 0)
+
+        orders_departments = []
+        for suborder in order_data:
+            temp_departments = list(map(lambda s: s['name'], suborder['departments']))
+            orders_departments = orders_departments + temp_departments
+
+        self.info(
+            'making sure that the updated departments does exist in the order departments list')
+        for dep in departments_list:
+            self.assertIn(dep, orders_departments)
+
+    @parameterized.expand(['ok', 'cancel'])
+    def test013_create_approach_overview_button(self, ok):
+        """
+        Master data: Create: Overview button Approach: Make sure
+        after I press on the overview button, it redirects me to the active table
+        LIMS-6203
+        """
+        self.info('create new contact.')
+        self.base_selenium.click(element='contacts:new_contact')
+        self.contact_page.sleep_medium()
+        self.info('click on Overview, this will display an alert to the user')
+        self.base_page.click_overview()
+        # switch to the alert
+        if 'ok' == ok:
+            self.base_page.confirm_overview_pop_up()
+            self.assertEqual(self.base_selenium.get_url(), '{}contacts'.format(self.base_selenium.url))
+            self.info('clicking on Overview confirmed')
+        else:
+            self.base_page.cancel_overview_pop_up()
+            self.assertEqual(self.base_selenium.get_url(), '{}contacts/add'.format(self.base_selenium.url))
+            self.info('clicking on Overview cancelled')
+
+    def test014_edit_approach_overview_button(self):
+        """
+        Edit: Overview Approach: Make sure after I press on
+        the overview button, it redirects me to the active table
+        LIMS-6202
+
+        New: Contact: Cancel button: After I edit in any field
+        then press on cancel button, a pop up will appear that
+        the data will be lost
+        LIMS-3585
+        """
+        self.contacts_page.get_random_contact()
+        contact_url = self.base_selenium.get_url()
+        self.contacts_page.info('contact_url : {}'.format(contact_url))
+        # click on Overview, it will redirect you to contacts' page
+        self.contacts_page.info('click on Overview ')
+        self.base_page.click_overview()
+        self.contacts_page.sleep_tiny()
+        self.assertEqual(self.base_selenium.get_url(), '{}contacts'.format(self.base_selenium.url))
+        self.contacts_page.info('clicking on Overview confirmed')
+
+    def test015_contacts_search_then_navigate(self):
+        """
+        Search Approach: Make sure that you can search then navigate to any other page
+
+        LIMS-6201
+        """
+        self.info('select Random Contact')
+        contacts_response, _ = self.contacts_api.get_all_contacts(limit=10)
+        self.assertEqual(contacts_response['status'],1)
+
+        random_contact_data = random.choice(contacts_response['contacts'])
+        contact_name = random_contact_data['name']
+        search_results = self.contact_page.search(contact_name)
+        self.assertGreater(len(search_results), 1, " * There is no search results for it, Report a bug.")
+        self.info('navigate to test plans page')
+        Order().get_orders_page()
+        self.assertEqual(self.base_selenium.get_url(), '{}sample/orders'.format(self.base_selenium.url))
+
     # def test016_create_user_with_role_contact(self):
     #     """
     #     New: Contact: User management: All the contacts created should be found when I create new user with role contact
