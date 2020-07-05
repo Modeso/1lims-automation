@@ -33,16 +33,20 @@ class Contacts(BasePages):
         return self.get_random_table_row(table_element='contacts:contact_table')
         
     def archive_selected_contacts(self):
+        self.info("Archive selected contacts")
         self.base_selenium.scroll()
         self.base_selenium.click(element='general:right_menu')
         self.base_selenium.click(element='general:archive')
         self.confirm_popup()
+        self.sleep_tiny()
 
     def restore_selected_contacts(self):
+        self.info("Restore selected contacts")
         self.base_selenium.scroll()
         self.base_selenium.click(element='articles:right_menu')
         self.base_selenium.click(element='articles:restore')
         self.confirm_popup()
+        self.sleep_tiny()
 
     def is_contact_in_table(self, value):
         """
@@ -61,12 +65,14 @@ class Contacts(BasePages):
                 return False
 
     def get_archived_contacts(self):
+        self.info("Navigate to archived contacts table")
         self.base_selenium.scroll()
         self.base_selenium.click(element='general:right_menu')
         self.base_selenium.click(element='general:archived')
         self.sleep_small()
 
     def get_active_contacts(self):
+        self.info("Navigate to active contacts table")
         self.base_selenium.scroll()
         self.base_selenium.click(element='general:right_menu')
         self.base_selenium.click(element='general:active')

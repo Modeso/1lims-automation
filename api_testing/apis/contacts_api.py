@@ -1,5 +1,7 @@
 from api_testing.apis.base_api import BaseAPI
 from api_testing.apis.base_api import api_factory
+import json, os
+
 
 
 class ContactsAPIFactory(BaseAPI):

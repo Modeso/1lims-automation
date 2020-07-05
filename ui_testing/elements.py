@@ -876,7 +876,7 @@ elements = {
         'country': {'method': 'id',
                     'value': 'selectedcountryfield'},
         'email': {'method': 'id',
-                  'value': 'emailfield'},
+                  'value': 'emailfield_email'},
         'phone': {'method': 'id',
                   'value': 'phonefield'},
         'skype': {'method': 'id',
