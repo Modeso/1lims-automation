@@ -376,6 +376,20 @@ class OrdersAPI(OrdersAPIFactory):
         }
         return self.create_new_order(**payload)
 
+    def create_order_with_department_by_contact_id(self, contact_id):
+        contact = ContactsAPI().get_contact_form_data(contact_id)[0]['contact']
+        department_data = contact['departments'][0]
+        payload = {
+            'contact': [
+                {"id": contact['id'],
+                 "text": contact['name'],
+                 'No': contact['companyNumber']},
+            ],
+            'departments': [{"id": department_data['id'], "text": department_data['name'],
+                             "group": contact['id'], "groupName": contact['name']}],
+        }
+        return self.create_new_order(**payload)
+
     def set_configuration(self):
         self.info('set order configuration')
         config_file = os.path.abspath('api_testing/config/order.json')

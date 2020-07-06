@@ -791,7 +791,6 @@ elements = {
                                   'value': 'confirmPassword'},
         'user_contact': {'method': 'id',
                          'value': 'supplierfield'},
-
         'create_user_button': {'method': 'xpath',
                                'value': '//*[contains(text(),"New User")]'},
         'save_btn': {'method': 'id',
@@ -813,7 +812,6 @@ elements = {
                         'value': 'usernamefield'},
         'filter_email': {'method': 'id',
                          'value': 'emailfield'},
-
         'filter_role': {'method': 'id',
                         'value': 'rolefield'},
         'filter_reset_btn': {'method': 'id',
@@ -877,6 +875,8 @@ elements = {
                     'value': 'selectedcountryfield'},
         'email': {'method': 'id',
                   'value': 'emailfield_email'},
+        'email_filter': {'method': 'id',
+                  'value': 'emailfield'},
         'phone': {'method': 'id',
                   'value': 'phonefield'},
         'skype': {'method': 'id',
