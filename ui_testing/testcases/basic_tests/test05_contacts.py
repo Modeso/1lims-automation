@@ -457,10 +457,11 @@ class ContactsTestCases(BaseTest):
         LIMS-6411
         LIMS-6421
         """
-        data_to_filter_with = \
-            self.contacts_api.get_first_record_with_data_in_attribute(attribute=attribute)
-        if attribute != 'country':
+        data_to_filter_with = self.contacts_api.get_first_record_with_data_in_attribute(attribute=attribute)
+        if attribute == 'departments':
             data_to_filter_with = data_to_filter_with.split(',')[0]
+        elif attribute == 'type':
+            data_to_filter_with = data_to_filter_with[0]
         self.assertNotEqual(data_to_filter_with, False)
         self.info('filter with {} {}'.format(attribute, data_to_filter_with))
         self.contact_page.apply_filter_scenario(filter_element='contact:{}'.format(filter_element),
