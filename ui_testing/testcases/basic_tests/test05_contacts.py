@@ -461,6 +461,8 @@ class ContactsTestCases(BaseTest):
         if attribute == 'departments':
             data_to_filter_with = data_to_filter_with.split(',')[0]
         elif attribute == 'type':
+            import ipdb;
+            ipdb.set_trace()
             data_to_filter_with = data_to_filter_with[0]
         self.assertNotEqual(data_to_filter_with, False)
         self.info('filter with {} {}'.format(attribute, data_to_filter_with))
@@ -472,6 +474,8 @@ class ContactsTestCases(BaseTest):
             row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=table_records[counter])
             if attribute == 'country':
                 self.assertEqual(row_data[key], data_to_filter_with)
+            elif attribute == 'type':
+                self.assertEqual(data_to_filter_with, row_data[key].split(', ')[0].lower())
             else:
                 self.assertIn(data_to_filter_with, row_data[key].split(', '))
             counter = counter + 1
