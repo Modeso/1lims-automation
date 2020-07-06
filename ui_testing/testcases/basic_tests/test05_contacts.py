@@ -443,7 +443,7 @@ class ContactsTestCases(BaseTest):
         counter = 0
         while counter < (len(table_records) - 1):
             row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=table_records[counter])
-            self.assertEqual(row_data['Contact No'].replace("'", ""), data_to_filter_with.replace("'", ""))
+            self.assertEqual(row_data[key].replace("'", ""), data_to_filter_with.replace("'", ""))
             counter = counter + 1
 
     @parameterized.expand([('departments', 'departments', 'Departments'),
