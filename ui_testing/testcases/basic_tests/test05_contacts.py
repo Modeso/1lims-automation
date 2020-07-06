@@ -447,25 +447,18 @@ class ContactsTestCases(BaseTest):
             counter = counter + 1
 
     @parameterized.expand([('departments', 'departments', 'Departments'),
-                           ('type', 'type_filter', 'Contact Type'),
                            ('country', 'country_filter', 'Country')])
     def test019_filter_by_contact_drop_down_feild(self, attribute, filter_element, key):
         """
-        Contacts: Filter Approach: Make sure you can filter by departments, Type and Country
+        Contacts: Filter Approach: Make sure you can filter by departments and Country
 
         LIMS-6413
         LIMS-6411
-        LIMS-6421
         """
         data_to_filter_with = self.contacts_api.get_first_record_with_data_in_attribute(attribute=attribute)
         self.assertNotEqual(data_to_filter_with, False)
         if attribute == 'departments':
             data_to_filter_with = data_to_filter_with.split(',')[0]
-        elif attribute == 'type':
-            if isinstance(data_to_filter_with, list):
-                data_to_filter_with = data_to_filter_with[0]
-            elif isinstance(data_to_filter_with, str):
-                data_to_filter_with = data_to_filter_with.split(',')[0]
         self.info('filter with {} {}'.format(attribute, data_to_filter_with))
         self.contact_page.apply_filter_scenario(filter_element='contact:{}'.format(filter_element),
                                                 filter_text=data_to_filter_with)
@@ -475,8 +468,6 @@ class ContactsTestCases(BaseTest):
             row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=table_records[counter])
             if attribute == 'country':
                 self.assertEqual(row_data[key], data_to_filter_with)
-            elif attribute == 'type':
-                self.assertEqual(data_to_filter_with, row_data[key].split(', ')[0].lower())
             else:
                 self.assertIn(data_to_filter_with, row_data[key].split(', '))
             counter = counter + 1
@@ -507,3 +498,23 @@ class ContactsTestCases(BaseTest):
         self.assertEqual(row_data['Changed By'], payload['username'])
         self.assertEqual(row_data['Contact Name'], contact_data['Contact Name'])
         self.assertEqual(row_data['Contact No'], contact_data['Contact No'])
+
+    def test021_filter_by_contact_type(self):
+        """
+        Contacts: Filter Approach: Make sure you can filter by type
+
+        LIMS-6421
+        """
+        data_to_filter_with = self.contacts_api.get_first_record_with_data_in_attribute(attribute='type')
+        self.assertNotEqual(data_to_filter_with, False)
+        data_to_filter_with = self.contact_page.get_mapped_contact_type(contact_type=data_to_filter_with[0])
+
+        self.info('filter with {}'.format(data_to_filter_with))
+        self.contact_page.apply_filter_scenario(filter_element='contact:type_filter', filter_text=data_to_filter_with)
+        table_records = self.contact_page.result_table()
+        counter = 0
+        while counter < (len(table_records) - 1):
+            row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=table_records[counter])
+            contact_type = row_data['Type'].split(', ')
+            self.assertIn(data_to_filter_with, contact_type)
+            counter = counter + 1
