@@ -416,7 +416,7 @@ class ContactsTestCases(BaseTest):
 
     @parameterized.expand([('name', 'name', 'Contact Name'),
                            ('skype', 'skype', 'Skype'),
-                           ('companyNo', 'contact_no_filter', 'Method'),
+                           ('companyNo', 'contact_no_filter', 'Contact No'),
                            ('email', 'email_filter', 'Email'),
                            ('postalCode', 'postalcode_filter', 'Postal Code'),
                            ('website', 'website', 'Website'),
