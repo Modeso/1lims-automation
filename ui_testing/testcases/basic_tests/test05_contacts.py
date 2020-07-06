@@ -461,8 +461,6 @@ class ContactsTestCases(BaseTest):
         if attribute == 'departments':
             data_to_filter_with = data_to_filter_with.split(',')[0]
         elif attribute == 'type':
-            import ipdb;
-            ipdb.set_trace()
             data_to_filter_with = data_to_filter_with[0]
         self.assertNotEqual(data_to_filter_with, False)
         self.info('filter with {} {}'.format(attribute, data_to_filter_with))
