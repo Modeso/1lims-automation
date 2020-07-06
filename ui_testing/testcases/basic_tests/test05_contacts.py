@@ -459,7 +459,7 @@ class ContactsTestCases(BaseTest):
         """
         data_to_filter_with = \
             self.contacts_api.get_first_record_with_data_in_attribute(attribute=attribute)
-        if attribute == 'departments':
+        if attribute != 'country':
             data_to_filter_with = data_to_filter_with.split(',')[0]
         self.assertNotEqual(data_to_filter_with, False)
         self.info('filter with {} {}'.format(attribute, data_to_filter_with))
