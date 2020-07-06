@@ -447,7 +447,7 @@ class ContactsTestCases(BaseTest):
             counter = counter + 1
 
     @parameterized.expand([('departments', 'departments', 'Departments'),
-                           ('type', 'type_filter', 'Type'),
+                           ('type', 'type_filter', 'Contact Type'),
                            ('country', 'country_filter', 'Country')])
     def test019_filter_by_contact_drop_down_feild(self, attribute, filter_element, key):
         """
