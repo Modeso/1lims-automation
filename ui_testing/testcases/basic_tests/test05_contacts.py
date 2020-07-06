@@ -458,11 +458,14 @@ class ContactsTestCases(BaseTest):
         LIMS-6421
         """
         data_to_filter_with = self.contacts_api.get_first_record_with_data_in_attribute(attribute=attribute)
+        self.assertNotEqual(data_to_filter_with, False)
         if attribute == 'departments':
             data_to_filter_with = data_to_filter_with.split(',')[0]
         elif attribute == 'type':
-            data_to_filter_with = data_to_filter_with[0]
-        self.assertNotEqual(data_to_filter_with, False)
+            if isinstance(data_to_filter_with, list):
+                data_to_filter_with = data_to_filter_with[0]
+            elif isinstance(data_to_filter_with, str):
+                data_to_filter_with = data_to_filter_with.split(',')[0]
         self.info('filter with {} {}'.format(attribute, data_to_filter_with))
         self.contact_page.apply_filter_scenario(filter_element='contact:{}'.format(filter_element),
                                                 filter_text=data_to_filter_with)
