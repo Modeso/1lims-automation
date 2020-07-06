@@ -433,6 +433,8 @@ class ContactsTestCases(BaseTest):
         """
         data_to_filter_with = self.contacts_api.get_first_record_with_data_in_attribute(attribute=attribute)
         self.assertNotEqual(data_to_filter_with, False)
+        if attribute == 'createdAt':
+            data_to_filter_with = self.contact_page.convert_to_dot_date_format(date=data_to_filter_with)
         self.info('filter with contact name {}'.format(data_to_filter_with))
         self.contact_page.apply_filter_scenario(filter_element='contact:{}'.format(filter_element),
                                                 filter_text=data_to_filter_with,
