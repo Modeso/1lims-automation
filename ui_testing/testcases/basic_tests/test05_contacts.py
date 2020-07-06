@@ -443,10 +443,7 @@ class ContactsTestCases(BaseTest):
         counter = 0
         while counter < (len(table_records) - 1):
             row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=table_records[counter])
-            if key == 'Contact No':
-                self.assertEqual(row_data['Contact No'].replace("'", ""), data_to_filter_with.replace("'", ""))
-            else:
-                self.assertEqual(row_data[key], data_to_filter_with)
+            self.assertEqual(row_data['Contact No'].replace("'", ""), data_to_filter_with.replace("'", ""))
             counter = counter + 1
 
     @parameterized.expand([('departments', 'departments', 'Departments'),
@@ -475,7 +472,7 @@ class ContactsTestCases(BaseTest):
             if attribute == 'country':
                 self.assertEqual(row_data[key], data_to_filter_with)
             else:
-                self.assertIn(data_to_filter_with, row_data['Departments'].split(', '))
+                self.assertIn(data_to_filter_with, row_data[key].split(', '))
             counter = counter + 1
 
     def test020_filter_by_contact_changed_by(self):
