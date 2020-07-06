@@ -435,7 +435,7 @@ class ContactsTestCases(BaseTest):
         self.assertNotEqual(data_to_filter_with, False)
         if attribute == 'createdAt':
             data_to_filter_with = self.contact_page.convert_to_dot_date_format(date=data_to_filter_with)
-        self.info('filter with contact name {}'.format(data_to_filter_with))
+        self.info('filter with {} {}'.format(attribute, data_to_filter_with))
         self.contact_page.apply_filter_scenario(filter_element='contact:{}'.format(filter_element),
                                                 filter_text=data_to_filter_with,
                                                 field_type='text')
@@ -465,7 +465,7 @@ class ContactsTestCases(BaseTest):
         if attribute == 'departments':
             data_to_filter_with = data_to_filter_with.split(',')[0]
         self.assertNotEqual(data_to_filter_with, False)
-        self.info('filter with department {}'.format(data_to_filter_with))
+        self.info('filter with {} {}'.format(attribute, data_to_filter_with))
         self.contact_page.apply_filter_scenario(filter_element='contact:{}'.format(filter_element),
                                                 filter_text=data_to_filter_with)
         table_records = self.contact_page.result_table()
