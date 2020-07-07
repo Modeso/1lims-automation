@@ -42,11 +42,10 @@ class AuditTrailTestCases(BaseTest):
 
         LIMS-6355
         """
-        # get random row data
+        self.info('get random row data')
         audit_trail = self.audit_trail_page.get_random_mapped_audit_trail_data()
-        # open filter menu
+        self.info('filter by {} {}'.format(filter, audit_trail[filter]))
         self.audit_trail_page.open_filter_menu()
-        # filter by Action Date
         if filter == 'action_date' or filter == 'entity_number':
             field_type = 'text'
         else:
@@ -64,8 +63,9 @@ class AuditTrailTestCases(BaseTest):
 
         LIMS-6356
         """
-        # get random row data
+        self.info('get random row data')
         audit_trail = self.audit_trail_page.get_random_mapped_audit_trail_data()
-        # search by changed by
+        self.info('search by {} {}'.format(filter, audit_trail[filter]))
         result = self.audit_trail_page.search(audit_trail[search_feild])[0].text
-        self.assertIn(audit_trail[search_feild], result)
+
+        self.assertIn(audit_trail[search_feild].replace("'", ""), result.replace("'", ""))
