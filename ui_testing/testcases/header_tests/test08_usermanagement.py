@@ -1,7 +1,6 @@
 from ui_testing.testcases.base_test import BaseTest
-from ui_testing.pages.base_pages import BasePages
-from ui_testing.pages.order_page import Order
 from ui_testing.pages.header_page import Header
+from ui_testing.pages.login_page import Login
 from api_testing.apis.users_api import UsersAPI
 from api_testing.apis.roles_api import RolesAPI
 from parameterized import parameterized
@@ -12,12 +11,9 @@ from unittest import skip
 class HeaderTestCases(BaseTest):
     def setUp(self):
         super().setUp()
-        self.order_page = Order()
         self.header_page = Header()
-        self.base_page = BasePages()
         self.roles_api = RolesAPI()
         self.users_api = UsersAPI()
-
         self.set_authorization(auth=self.roles_api.AUTHORIZATION_RESPONSE)
         self.header_page.click_on_header_button()
 
@@ -36,7 +32,7 @@ class HeaderTestCases(BaseTest):
                                                archived_element='user_management:archived')
         for user in selected_user_management_data:
             user_name = user['Name']
-            self.base_selenium.LOGGER.info(' + {} user should be activated.'.format(user_name))
+            self.info(' + {} user should be activated.'.format(user_name))
             self.assertTrue(self.header_page.is_user_in_table(value=user_name))
 
     def test002_restore_user(self):
@@ -91,12 +87,12 @@ class HeaderTestCases(BaseTest):
         LIMS-6101
         """
         self.base_selenium.click(element='header:user_management_button')
-        self.base_selenium.LOGGER.info(' * Download XSLX sheet')
+        self.info(' * Download XSLX sheet')
         self.header_page.sleep_small()
         self.header_page.download_xslx_sheet()
         rows_data = self.header_page.get_table_rows_data()
         for index in range(len(rows_data)):
-            self.base_selenium.LOGGER.info(' * Comparing the user no. {} '.format(index))
+            self.info(' * Comparing the user no. {} '.format(index))
             fixed_row_data = self.fix_data_format(rows_data[index].split('\n'))
             values = self.header_page.sheet.iloc[index].values
             fixed_sheet_row_data = self.fix_data_format(values)
@@ -113,7 +109,7 @@ class HeaderTestCases(BaseTest):
         self.base_selenium.click(element='header:user_management_button')
         # create new user
         random_user_name = self.generate_random_string()
-        random_user_email = self.base_page.generate_random_email()
+        random_user_email = self.header_page.generate_random_email()
         random_user_password = self.generate_random_string()
         created_user = self.users_api.create_new_user(username=random_user_name, email=random_user_email,
                                        password=random_user_password)[0]['user']
@@ -143,7 +139,7 @@ class HeaderTestCases(BaseTest):
         """
         self.base_selenium.click(element='header:user_management_button')
         random_user_name = self.generate_random_string()
-        random_user_email = self.base_page.generate_random_email()
+        random_user_email = self.header_page.generate_random_email()
         self.header_page.create_new_user(user_name=random_user_name, user_email=random_user_email, user_password='1', user_confirm_password='1')
 
         user_row = self.header_page.search(value=random_user_name)
@@ -161,14 +157,14 @@ class HeaderTestCases(BaseTest):
         self.base_selenium.click(element='header:user_management_button')
         self.header_page.click_create_new_user()
         self.header_page.click_on_overview_btn()
-        self.base_selenium.LOGGER.info('it will redirect me to the active table')
+        self.info('it will redirect me to the active table')
         self.header_page.get_users_page()
         self.assertEqual(self.base_selenium.get_url(), '{}users'.format(self.base_selenium.url))
 
         # from the edit mode it will redirect me to the active table
         self.header_page.get_random_user()
         self.header_page.click_on_overview_btn()
-        self.base_selenium.LOGGER.info('it will redirect me to the active table')
+        self.info('it will redirect me to the active table')
         self.header_page.get_users_page()
         self.assertEqual(self.base_selenium.get_url(), '{}users'.format(self.base_selenium.url))
 
@@ -182,8 +178,8 @@ class HeaderTestCases(BaseTest):
         self.base_selenium.click(element='header:user_management_button')
         self.header_page.get_random_user()
         user_url = self.base_selenium.get_url()
-        self.base_selenium.LOGGER.info(' + user_url : {}'.format(user_url))
-        self.order_page.sleep_tiny()
+        self.info(' + user_url : {}'.format(user_url))
+        self.header_page.sleep_tiny()
 
         current_name = self.header_page.get_user_name()
         self.header_page.set_user_name(self.generate_random_string())
@@ -198,11 +194,11 @@ class HeaderTestCases(BaseTest):
 
         user_name = self.header_page.get_user_name()
         if 'save_btn' == save:
-            self.base_selenium.LOGGER.info(
+            self.info(
                 ' + Assert {} (new_name) == {} (user_name)'.format(new_name, user_name))
             self.assertEqual(new_name, user_name)
         else:
-            self.base_selenium.LOGGER.info(
+            self.info(
                 ' + Assert {} (current_name) == {} (user_name)'.format(current_name, user_name))
             self.assertEqual(current_name, user_name)
 
@@ -217,8 +213,8 @@ class HeaderTestCases(BaseTest):
         # open random user in the edit mode
         self.header_page.get_random_user()
         user_url = self.base_selenium.get_url()
-        self.base_selenium.LOGGER.info(' + user_url : {}'.format(user_url))
-        self.order_page.sleep_tiny()
+        self.info(' + user_url : {}'.format(user_url))
+        self.header_page.sleep_tiny()
         current_role = self.header_page.get_user_role()
         self.header_page.set_user_role()
         new_role = self.header_page.get_user_role()
@@ -232,11 +228,11 @@ class HeaderTestCases(BaseTest):
 
         user_role = self.header_page.get_user_role()
         if 'save_btn' == save:
-            self.base_selenium.LOGGER.info(
+            self.info(
                 ' + Assert {} (new_role) == {} (user_role)'.format(new_role, user_role))
             self.assertEqual(new_role, user_role)
         else:
-            self.base_selenium.LOGGER.info(
+            self.info(
                 ' + Assert {} (current_role) == {} (user_role)'.format(current_role, user_role))
             self.assertEqual(current_role, user_role)
 
@@ -251,8 +247,8 @@ class HeaderTestCases(BaseTest):
         # open random user in the edit mode
         self.header_page.get_random_user()
         user_url = self.base_selenium.get_url()
-        self.base_selenium.LOGGER.info(' + user_url : {}'.format(user_url))
-        self.order_page.sleep_tiny()
+        self.info(' + user_url : {}'.format(user_url))
+        self.header_page.sleep_tiny()
         current_email = self.header_page.get_user_email()
         new_email = self.header_page.generate_random_email()
         self.header_page.set_user_email(new_email)
@@ -266,11 +262,11 @@ class HeaderTestCases(BaseTest):
 
         user_email = self.header_page.get_user_email()
         if 'save_btn' == save:
-            self.base_selenium.LOGGER.info(
+            self.info(
                 ' + Assert {} (new_email) == {} (user_email)'.format(new_email, user_email))
             self.assertEqual(new_email, user_email)
         else:
-            self.base_selenium.LOGGER.info(
+            self.info(
                 ' + Assert {} (current_email) == {} (user_email)'.format(current_email, user_email))
             self.assertEqual(current_email, user_email)
 
@@ -287,9 +283,9 @@ class HeaderTestCases(BaseTest):
         self.header_page.clear_user_name()
         self.header_page.clear_user_email()
         self.header_page.save(save_btn='user_management:save_btn')
-        self.base_selenium.LOGGER.info('Waiting for error message')
+        self.info('Waiting for error message')
         validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
-        self.base_selenium.LOGGER.info('Assert error msg')
+        self.info('Assert error msg')
         self.assertEqual(validation_result, True)
 
     def test012_filter_by_name(self):
@@ -308,7 +304,7 @@ class HeaderTestCases(BaseTest):
         users_result = self.header_page.result_table()
         self.assertIn(str(user_data['name']), (users_result[0].text).replace("'", ""))
 
-        self.base_selenium.LOGGER.info('filter results displayed with random user name')
+        self.info('filter results displayed with random user name')
         self.base_selenium.click(element='user_management:filter_reset_btn')
 
     def test013_filter_by_email(self):
@@ -327,7 +323,7 @@ class HeaderTestCases(BaseTest):
         users_result = self.header_page.result_table()
         self.assertIn(str(user_data['email']), (users_result[0].text). replace("'", ""))
 
-        self.base_selenium.LOGGER.info('filter results displayed with the user email')
+        self.info('filter results displayed with the user email')
         self.base_selenium.click(element='user_management:filter_reset_btn')
 
     def test014_filter_by_no(self):
@@ -346,7 +342,7 @@ class HeaderTestCases(BaseTest):
         users_result = self.header_page.result_table()
         self.assertIn(str(user_data['number'].replace("'", "")), (users_result[0].text).replace("'", ""))
 
-        self.base_selenium.LOGGER.info('filter results displayed with the user no')
+        self.info('filter results displayed with the user no')
         self.base_selenium.click(element='user_management:filter_reset_btn')
 
     def test015_filter_by_role(self):
@@ -358,7 +354,7 @@ class HeaderTestCases(BaseTest):
         self.base_selenium.click(element='header:roles_and_permissions_button')
         random_role_name = self.generate_random_string()
         self.roles_api.create_role(random_role_name)
-        self.base_selenium.LOGGER.info('make sure that that the user record created in the active table')
+        self.info('make sure that that the user record created in the active table')
         created_role = self.header_page.search(random_role_name)[0]
         role_data = self.base_selenium.get_row_cells_dict_related_to_header(row=created_role)
         self.assertTrue(created_role, role_data)
@@ -366,7 +362,7 @@ class HeaderTestCases(BaseTest):
         self.header_page.click_on_header_button()
         self.base_selenium.click(element='header:user_management_button')
         random_user_name = self.generate_random_string()
-        random_user_email = self.base_page.generate_random_email()
+        random_user_email = self.header_page.generate_random_email()
         self.header_page.create_new_user(user_name=random_user_name, user_email=random_user_email,
                                          user_role=random_role_name, user_password='1', user_confirm_password='1')
 
@@ -377,7 +373,7 @@ class HeaderTestCases(BaseTest):
                                                              filter_text=random_role_name)
 
         self.assertIn(user_filter, result_user)
-        self.base_selenium.LOGGER.info('filter results displayed with the random user role')
+        self.info('filter results displayed with the random user role')
         self.base_selenium.click(element='user_management:filter_reset_btn')
 
     def test016_filter_created_on(self):
@@ -397,7 +393,7 @@ class HeaderTestCases(BaseTest):
         users_result = self.header_page.result_table()
         self.assertIn(str(user_data['created_on']), (users_result[0].text).replace("'", ""))
 
-        self.base_selenium.LOGGER.info('filter results displayed with the date ( created on ) ')
+        self.info('filter results displayed with the date ( created on ) ')
         self.base_selenium.click(element='user_management:filter_reset_btn')
 
     @skip('https://modeso.atlassian.net/browse/LIMS-6624')
@@ -410,11 +406,11 @@ class HeaderTestCases(BaseTest):
         self.base_selenium.click(element='header:user_management_button')
         # create new user with random data
         random_user_name = self.generate_random_string()
-        random_user_email = self.base_page.generate_random_email()
+        random_user_email = self.header_page.generate_random_email()
         self.header_page.create_new_user(user_name=random_user_name, user_email=random_user_email,
                                          user_role='Admin', user_password='1', user_confirm_password='1')
 
-        self.base_selenium.LOGGER.info(
+        self.info(
             'search to make sure that the role created '.format(random_user_name))
         created_user = self.header_page.search(random_user_name)[0]
         user_data = self.base_selenium.get_row_cells_dict_related_to_header(row=created_user)
@@ -423,25 +419,27 @@ class HeaderTestCases(BaseTest):
         # create role with the same name
         self.header_page.create_new_user(user_name=random_user_name, user_email=random_user_email,
                                          user_role='Admin', user_password='1', user_confirm_password='1')
-        self.base_selenium.LOGGER.info(
+        self.info(
             'waiting fo validation message appear when I enter two users with the same name')
         validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
 
-        self.base_selenium.LOGGER.info(
+        self.info(
             'Assert the error message to make sure that validation when I enter two users with the same name? {}'.format(
                 validation_result))
         self.assertTrue(validation_result)
 
 
 class LoginRandomUser(BaseTest):
-
     def setUp(self):
         super().setUp()
+        self.header_page = Header()
+        self.roles_api = RolesAPI()
+        self.users_api = UsersAPI()
         self.random_user_name = self.generate_random_string()
-        random_user_email = self.base_page.generate_random_email()
+        random_user_email = self.header_page.generate_random_email()
         random_user_password = self.generate_random_string()
         self.users_api.create_new_user(self.random_user_name, random_user_email, random_user_password)
-        self.login_page.login(username=self.random_user_name, password=random_user_password)
+        Login().login(username=self.random_user_name, password=random_user_password)
         self.base_selenium.wait_until_page_url_has(text='dashboard')
         self.header_page.click_on_header_button()
 
@@ -475,7 +473,7 @@ class LoginRandomUser(BaseTest):
         self.base_selenium.click(element='header:user_management_button')
 
         new_user = self.generate_random_string()
-        new_email = self.base_page.generate_random_email()
+        new_email = self.header_page.generate_random_email()
         self.header_page.create_new_user(user_name=new_user, user_email=new_email,
                                          user_role='Admin', user_password='1', user_confirm_password='1')
 
@@ -489,15 +487,3 @@ class LoginRandomUser(BaseTest):
 
         users_result = self.header_page.get_table_rows_data()
         self.assertIn(self.random_user_name, users_result[0])
-
-
-
-
-
-
-
-
-
-
-
-
