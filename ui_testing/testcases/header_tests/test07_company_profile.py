@@ -108,6 +108,9 @@ class CompanyProfileTestCases(BaseTest):
         """
         self.info("choose file from assets to be uploaded")
         file_name = 'logo.png'
+        import ipdb;ipdb.set_trace()
+        xpath = self.base_selenium.driver.find_element_by_xpath("//div[@class='dz-filename']")
+        old_file_name = xpath.find_element_by_tag_name('span').text
         self.info("upload the file then cancel")
         self.company_profile_page.upload_file(
             file_name=file_name, drop_zone_element='company_profile:logo_field', remove_current_file=True)
