@@ -108,15 +108,21 @@ class CompanyProfileTestCases(BaseTest):
         """
         self.info("choose file from assets to be uploaded")
         file_name = 'logo.png'
-        import ipdb;ipdb.set_trace()
-        xpath = self.base_selenium.driver.find_element_by_xpath("//div[@class='dz-filename']")
-        old_file_name = xpath.find_element_by_tag_name('span').text
+        old_file_exist = self.base_selenium.check_element_is_exist(element='general:file_upload_success_flag')
+        if old_file_exist:
+            xpath = self.base_selenium.driver.find_element_by_xpath("//div[@class='dz-image']")
+            old_file_name = xpath.find_element_by_tag_name('img').get_attribute('alt')
         self.info("upload the file then cancel")
         self.company_profile_page.upload_file(
-            file_name=file_name, drop_zone_element='company_profile:logo_field', remove_current_file=True)
+            file_name=file_name, drop_zone_element='company_profile:logo_field', save=False, remove_current_file=True)
         self.company_profile_page.cancel()
         self.info("go back to the company profile")
         self.company_profile_page.get_company_profile_page()
         self.info("check that the image is not saved")
-        is_the_file_exist = self.base_selenium.check_element_is_exist(element='general:file_upload_success_flag')
-        self.assertFalse(is_the_file_exist)
+        if old_file_exist:
+            new_xpath = self.base_selenium.driver.find_element_by_xpath("//div[@class='dz-image']")
+            found_file_name = new_xpath.find_element_by_tag_name('img').get_attribute('alt')
+            self.assertEqual(found_file_name, old_file_name)
+            self.assertNotEqual(file_name, found_file_name)
+        else:
+            self.assertFalse(self.base_selenium.check_element_is_exist(element='general:file_upload_success_flag'))

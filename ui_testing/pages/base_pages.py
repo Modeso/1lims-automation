@@ -472,7 +472,7 @@ class BasePages:
         else:
             return True
 
-    def upload_file(self, file_name, drop_zone_element, remove_current_file=False):
+    def upload_file(self, file_name, drop_zone_element, remove_current_file=False, save=True):
         """
         Upload single file to a page that only have 1 drop zone
         
@@ -490,7 +490,8 @@ class BasePages:
             if is_the_file_exist:
                 self.sleep_tiny()
                 self.base_selenium.click('general:remove_file')
-                self.save()
+                if save:
+                    self.save()
             else:
                 self.base_selenium.LOGGER.info(" there is no current file")
 
