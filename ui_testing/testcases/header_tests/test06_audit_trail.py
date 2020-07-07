@@ -65,7 +65,7 @@ class AuditTrailTestCases(BaseTest):
         """
         self.info('get random row data')
         audit_trail = self.audit_trail_page.get_random_mapped_audit_trail_data()
-        self.info('search by {} {}'.format(filter, audit_trail[filter]))
+        self.info('search by {} {}'.format(search_feild, audit_trail[search_feild]))
         result = self.audit_trail_page.search(audit_trail[search_feild])[0].text
 
         self.assertIn(audit_trail[search_feild].replace("'", ""), result.replace("'", ""))
