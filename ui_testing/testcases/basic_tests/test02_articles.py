@@ -465,7 +465,8 @@ class ArticlesTestCases(BaseTest):
         self.article_page.select_all_records()
         self.base_selenium.LOGGER.info(' + Delete this article, should fail.')
         self.assertFalse(self.article_page.delete_selected_article())
-
+        
+    @skip('https://modeso.atlassian.net/browse/LIMSA-201')
     def test018_download_article_sheet(self):
         """
         New: Articles: XSLX File: I can download all the data in the table view in the excel sheet
