@@ -63,9 +63,9 @@ class TestPlansTestCases(BaseTest):
                   format(testplan['testPlanName'], testplan['version']))
         self.test_plan.get_test_plan_edit_page_by_id(testplan['id'])
         self.info('Going to step 2 to add test unit to this test plan')
-        self.info("select test unit of same material type of test plan and has values to complete test plan")
-        test_unit = TestUnitAPI().get_test_unit_name_with_value_with_material_type(
-            material_type=testplan['materialTypes'][0])
+        self.info("createt test unit of  material type  = All  to complete test plan")
+        response, test_unit = TestUnitAPI().create_qualitative_testunit()
+        self.assertEqual(response['status'], 1, 'can not create test unit')
         self.test_plan.sleep_tiny()
         self.test_plan.set_test_unit(test_unit=test_unit['name'])
         if status == 'InProgress':
@@ -476,11 +476,13 @@ class TestPlansTestCases(BaseTest):
         self.info('Calling the users api to create a new user with username')
         response, payload = UsersAPI().create_new_user()
         self.assertEqual(response['status'], 1, payload)
+        self.test_plan.sleep_tiny()
         self.login_page.logout()
+        self.test_plan.sleep_tiny()
         self.login_page.login(username=payload['username'], password=payload['password'])
         self.base_selenium.wait_until_page_url_has(text='dashboard')
         self.test_plan.get_test_plans_page()
-
+        self.test_plan.sleep_tiny()
         testplan_name = self.test_plan.create_new_test_plan()
 
         self.info('New testplan is created successfully with name: {}'.format(testplan_name))
