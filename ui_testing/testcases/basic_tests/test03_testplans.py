@@ -695,6 +695,7 @@ class TestPlansTestCases(BaseTest):
         self.info('Asserting the limits of quantification viewed correctly')
         self.assertIn(testunit_display_old_quantification_limit, testplan_childtable_data[0].values())
 
+
         new_quantification_lower_limit, new_quantification_upper_limit = \
             self.test_plan.update_upper_lower_limits_of_testunit(test_plan['id'])
 
