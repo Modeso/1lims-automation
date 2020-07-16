@@ -26,7 +26,6 @@ class ArticlesTestCases(BaseTest):
         self.set_authorization(auth=self.article_api.AUTHORIZATION_RESPONSE)
         self.article_api.set_configuration()
         self.article_page.get_articles_page()
-        #self.archived_optional_fields_flag = False
         self.default_filters_flags = {
             'name': False,
             'number': False,
@@ -290,9 +289,6 @@ class ArticlesTestCases(BaseTest):
         """
         article_created = self.article_page.create_new_article(material_type='Raw Material')
         self.test_plan_page.get_test_plans_page()
-        first_testplan_name, payload1 = self.test_plan_api.create_testplan()
-        print(first_testplan_name)
-        print(payload1)
         self.test_plan_page.create_new_test_plan(material_type=article_created['material_type'],
                                             article=article_created['name'])
         self.article_page.get_articles_page()
@@ -528,7 +524,7 @@ class ArticlesTestCases(BaseTest):
                          '{}articles'.format(self.base_selenium.url))
         self.article_page.info('clicking on Overview confirmed')
 
-    @skip('we will skip it until we decide that we will implement the configuration or no')
+    @skip('we will skip it until we fix the issue')
     def test021_user_archive_optional_config_fields(self):
         """
             LIMS-4123
@@ -550,7 +546,7 @@ class ArticlesTestCases(BaseTest):
         self.assertFalse(self.article_page.is_field_active('comment'))
         self.assertFalse(self.article_page.is_field_active('related article'))
 
-    @skip('we will skip it until we decide that we will implement the configuration or no')
+    @skip('we will skip it until we fix the issue')
     def test022_user_restore_optional_config_fields(self):
         """
             LIMS-4123
@@ -572,7 +568,7 @@ class ArticlesTestCases(BaseTest):
         self.assertFalse(self.article_page.is_field_restore('comment'))
         self.assertFalse(self.article_page.is_field_restore('related article'))
 
-    @skip('we will skip it until we decide that we will implement the configuration or no')
+    @skip('we will skip it until we teh issue')
     def test023_archive_optional_config_fields_does_not_effect_table(self):
         """
             LIMS-4123
@@ -596,8 +592,8 @@ class ArticlesTestCases(BaseTest):
         self.info(' assert unit field existance in the table')
         self.assertIn('Unit', article_headers_text)
 
-    #@skip('we will skip it until we decide that we will implement the configuration or no')
     @parameterized.expand(['edit', 'create'])
+    @skip('we will skip it until we fix the issue')
     def test024_archive_optional_config_fields_effect_(self, page):
         """
             LIMS-4123
@@ -626,8 +622,8 @@ class ArticlesTestCases(BaseTest):
         self.info(' assert related article field is not existing in article page')
         self.assertTrue(self.base_selenium.check_element_is_not_exist('article:related_article'))
 
-    @skip('we will skip it until we decide that we will implement the configuration or no')
     @parameterized.expand(['edit', 'create'])
+    @skip('we will skip it until we decide that we fix the issue')
     def test025_restore_optional_config_fields_effect_(self, page):
         """
             LIMS-4123
