@@ -1,7 +1,7 @@
 from api_testing.apis.base_api import BaseAPI
 from api_testing.apis.base_api import api_factory
 from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
-import random
+import random, json, os
 
 
 class ArticleAPIFactory(BaseAPI):
@@ -199,3 +199,11 @@ class ArticleAPI(ArticleAPIFactory):
     def get_random_article_articleID(self):
         selected_article = random.choice(self.get_all_articles(limit=30)[0]['articles'])
         return selected_article['name'], selected_article['id']
+
+    def set_configuration(self):
+        self.info('set article configuration')
+        config_file = os.path.abspath('api_testing/config/articles.json')
+        with open(config_file, "r") as read_file:
+            payload = json.load(read_file)
+        super().set_configuration(payload=payload)
+

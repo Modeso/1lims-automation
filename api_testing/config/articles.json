@@ -74,45 +74,84 @@
          "optionsInUse":[
 
          ]
-      }
-   ],
-   "archivedFields":[
+      },
       {
          "options":[
 
          ],
-         "isEditable":true,
+         "isEditable":false,
          "isDragable":true,
-         "order":2,
-         "htmlId":"#draggableTextField",
-         "id":559,
-         "idInFields":559,
-         "dynamicFieldId":53,
-         "section":2,
-         "name":"Text",
-         "type":1,
-         "typeNameStr":"Text",
-         "isUnique":false,
-         "isRequired":false,
-         "isArchived":true,
+         "order":4,
+         "section":1,
+         "archivable":true,
+         "id":12,
+         "name":"selectedArticles",
+         "isDynamic":false,
+         "isArchived":false,
          "componentId":2,
-         "isDynamic":true,
-         "viewByoptions":[
-            {
-               "id":0,
-               "text":"name"
-            }
-         ],
+         "class":"col-md-4",
+         "title":"Related Article",
+         "isStoredInServer":true,
          "searchable":[
             "name"
          ],
-         "optionsComponentId":null,
+         "error":false,
+         "optionsInUse":[
+
+         ]
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":false,
+         "isDragable":true,
+         "order":1,
+         "section":2,
+         "archivable":true,
+         "id":7,
+         "name":"comment",
+         "isDynamic":false,
+         "isArchived":false,
+         "componentId":2,
+         "class":"separate-row",
+         "title":"Comment",
          "isStoredInServer":true,
+         "searchable":[
+            "name"
+         ],
+         "error":false,
+         "optionsInUse":[
+
+         ]
+      },
+      {
+         "options":[
+
+         ],
+         "isEditable":false,
+         "isDragable":true,
+         "order":2,
+         "section":2,
+         "archivable":true,
+         "id":5,
+         "name":"unit",
+         "isDynamic":false,
+         "isArchived":false,
+         "componentId":2,
          "class":"col-md-4",
-         "title":"Text",
-         "en":"Text",
-         "de":"Text",
-         "key":"Text"
+         "title":"Unit",
+         "isStoredInServer":true,
+         "searchable":[
+            "name"
+         ],
+         "error":false,
+         "optionsInUse":[
+
+         ]
       }
+   ],
+   "archivedFields":[
+
    ]
 }

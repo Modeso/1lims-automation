@@ -24,9 +24,9 @@ class ArticlesTestCases(BaseTest):
         self.order_api = OrdersAPI()
         self.order_page = Order()
         self.set_authorization(auth=self.article_api.AUTHORIZATION_RESPONSE)
-
+        self.article_api.set_configuration()
         self.article_page.get_articles_page()
-        self.archived_optional_fields_flag = False
+        #self.archived_optional_fields_flag = False
         self.default_filters_flags = {
             'name': False,
             'number': False,
@@ -72,19 +72,6 @@ class ArticlesTestCases(BaseTest):
             self.article_page.toggle_default_filters(
                 element1='article:default_filter_test_plan')
             self.default_filters_flags['test_plan'] = False
-
-            # if test case of archive/restore configurations we need to
-            # restore archived configuration fields before tear down
-        test_case_tag = self._testMethodName
-        if test_case_tag in ["test022_user_archive_optional_config_fields",
-                             "test023_user_restore_optional_config_fields",
-                             "test024_archive_optional_config_fields_effect_0_edit",
-                             "test024_archive_optional_config_fields_effect_1_create",
-                             "test025_restore_optional_config_fields_effect_0_edit",
-                             "test025_restore_optional_config_fields_effect_1_create",
-                             "test026_archive_optional_config_fields_does_not_effect_table"]:
-            self.article_api.restore_all_optional_fields()
-        super().tearDown()
 
     @parameterized.expand(['save', 'cancel'])
     def test001_cancel_button_edit_unit(self, save):
@@ -236,6 +223,7 @@ class ArticlesTestCases(BaseTest):
                 'Assert {} (current_comment) == {} (article_comment)'.format(current_comment, article_comment))
             self.assertEqual(current_comment, article_comment)
 
+    @skip('https://modeso.atlassian.net/browse/LIMSA-200')
     def test005_archived_articles_shoudnt_dispaly_in_test_plan(self):
         """
         New: Article: In case I archived any article this article shouldn't display in the test plan module when
@@ -250,6 +238,7 @@ class ArticlesTestCases(BaseTest):
         self.base_selenium.LOGGER.info(
             'Create test plan with the same material type.')
         self.test_plan_page.click_create_test_plan_button()
+        self.article_page.sleep_small()
         self.test_plan_page.set_material_type(
             material_type=payload['materialType']['text'])
         self.article_page.sleep_tiny()
@@ -264,19 +253,19 @@ class ArticlesTestCases(BaseTest):
 
         LIMS-3668
         """
-        article_created = self.article_api.create_article(materialTypeId=1)
-        self.article_api.list_articles_by_materialtype(name=article_created[0]['article']['name'])
-        self.article_api.archive_articles(ids=[str(article_created[0]['article']['id'])])
+        api, payload = self.article_api.create_article()
+        self.article_api.archive_articles(ids=[str(api['article']['id'])])
         orders, payload = self.order_api.get_all_orders(limit=20)
         random_order = random.choice(orders['orders'])
         self.base_selenium.LOGGER.info(
             '{}'.format(random_order['orderNo']))
         self.orders_page.get_order_edit_page_by_id(random_order['id'])
         self.order_page.set_material_type_of_first_suborder(material_type='Raw Material', sub_order_index=0)
-        self.order_page.set_article(article=article_created[0]['article']['name'])
+        self.order_page.set_article(article=api['article']['name'])
         self.assertFalse(self.order_page.is_article_existing(
-            article=article_created[0]['article']['name']))
+            article=api['article']['name']))
 
+    @skip('https://modeso.atlassian.net/browse/LIMSA-200')
     def test007_created_article_appear_in_test_plan(self):
         """
         New: Article/Test plan: Any article I created should appear in the test plan according to the materiel type.
@@ -292,17 +281,20 @@ class ArticlesTestCases(BaseTest):
         self.assertTrue(self.test_plan_page.is_article_existing(
             article=article_created['article']['name']))
 
-    @skip('https://modeso.atlassian.net/browse/LIMSA-189')
+    @skip('https://modeso.atlassian.net/browse/LIMSA-200')
     def test008_create_article_with_test_plan_search_by_test_plan(self):
         """
         In case I create test plan with the article that I created, this test plan should display in the table view
 
         LIMS-3583
         """
-        article_created, payload = self.article_api.create_article()
+        article_created = self.article_page.create_new_article(material_type='Raw Material')
         self.test_plan_page.get_test_plans_page()
-        self.test_plan_page.create_new_test_plan(material_type=payload['materialType']['text'],
-                                            article=article_created['article']['name'])
+        first_testplan_name, payload1 = self.test_plan_api.create_testplan()
+        print(first_testplan_name)
+        print(payload1)
+        self.test_plan_page.create_new_test_plan(material_type=article_created['material_type'],
+                                            article=article_created['name'])
         self.article_page.get_articles_page()
         self.article_page.sleep_small()
         article = self.article_page.search(value=self.test_plan_page.test_plan_name)[0]
@@ -316,10 +308,11 @@ class ArticlesTestCases(BaseTest):
         self.test_plan.save(save_btn='test_plan:save_btn')
         self.article_page.get_articles_page()
         self.article_page.sleep_small()
-        article = self.article_page.search(value=article_created['article']['name'])
+        article = self.article_page.search(value=article_created['article']['name'])[0]
         self.article_page.sleep_small()
-        self.assertNotIn(self.test_plan_page.test_plan_name, article)
+        self.assertNotIn(self.test_plan_page.test_plan_name, article.text)
 
+    @skip('https://modeso.atlassian.net/browse/LIMSA-200')
     def test009_create_article_with_test_plan_filter_by_test_plan(self):
         """
         In case I create test plan with the article that I created, user could filter with test plan
@@ -477,7 +470,6 @@ class ArticlesTestCases(BaseTest):
         self.base_selenium.LOGGER.info(' + Delete this article, should fail.')
         self.assertFalse(self.article_page.delete_selected_article())
 
-    @skip('https://modeso.atlassian.net/browse/LIMSA-188')
     def test018_download_article_sheet(self):
         """
         New: Articles: XSLX File: I can download all the data in the table view in the excel sheet
@@ -604,7 +596,7 @@ class ArticlesTestCases(BaseTest):
         self.info(' assert unit field existance in the table')
         self.assertIn('Unit', article_headers_text)
 
-    @skip('we will skip it until we decide that we will implement the configuration or no')
+    #@skip('we will skip it until we decide that we will implement the configuration or no')
     @parameterized.expand(['edit', 'create'])
     def test024_archive_optional_config_fields_effect_(self, page):
         """
@@ -703,7 +695,7 @@ class ArticlesTestCases(BaseTest):
         self.assertIn(article[filter_name], result_article.text)
 
     @parameterized.expand(['name', 'number', 'unit', 'created_at', 'material_type', 'changed_by', 'test_plan'])
-    @skip('https://modeso.atlassian.net/browse/LIMSA-190')
+    @skip('https://modeso.atlassian.net/browse/LIMSA-200')
     def test027_filter_article_by_any_default_filter(self, filter_name):
         """
         New: Article: Filter Approach: I can filter by any static field & and also from the default filter.
