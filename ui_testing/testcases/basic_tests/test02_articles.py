@@ -774,3 +774,5 @@ class ArticlesTestCases(BaseTest):
         """
         self.article_page.sleep_medium()
         assert (self.article_page.deselect_all_configurations(), False)
+
+        
