@@ -60,6 +60,7 @@ class TestUnitsTestCases(BaseTest):
 
         LIMS-3670
         """
+        import ipdb;ipdb.set_trace()
         self.info('select random multiple rows')
         selected_test_units_data, _ = self.test_unit_page.select_random_multiple_table_rows()
         self.info('Archive selected test units')
