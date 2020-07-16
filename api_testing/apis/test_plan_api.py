@@ -143,7 +143,7 @@ class TestPlanAPIFactory(BaseAPI):
             payload['selectedTestPlan'] = [kwargs['testPlan']['text']]
         if 'materialType' in kwargs:
             payload['materialType'] = kwargs['materialType']
-            payload['materialTypeId'] = kwargs['materialType'][0]['id']
+            payload['materialTypeId'] = [kwargs['materialType'][0]['id']]
 
         api = '{}{}'.format(self.url, self.END_POINTS['test_plan_api']['create_testplan'])
         return api, payload
@@ -299,7 +299,6 @@ class TestPlanAPI(TestPlanAPIFactory):
 
         formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
         formatted_article = ArticleAPI().get_formatted_article_with_formatted_material_type(formatted_material)
-        import ipdb;ipdb.set_trace()
         testplan, payload = self.create_testplan(testUnits=[formated_testunit],
                                                  selectedArticles=[formatted_article],
                                                  materialType=[formatted_material])

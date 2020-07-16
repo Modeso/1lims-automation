@@ -212,7 +212,8 @@ class TestUnitAPIFactory(BaseAPI):
             'quantificationUpperLimit': '',
             'quantificationLowerLimit': '',
             'useSpec': True,
-            'iterations': '1'
+            'iterations': '1',
+            "roundingOption": {"id": 0, "text": "No Rounding"}
         }
         payload = self.update_payload(_payload, **kwargs)
         if 'category' in kwargs:
