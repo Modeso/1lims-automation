@@ -11,8 +11,9 @@ class AuditTrailTestCases(BaseTest):
         self.audit_trail_page = AuditTrail()
         self.set_authorization(auth=BaseAPI().AUTHORIZATION_RESPONSE)
         self.audit_trail_page.get_audit_trails_page()
+        self.audit_trail_page.sleep_medium()
 
-    @skip('https://modeso.atlassian.net/browse/LIMS-6399')
+    #@skip('https://modeso.atlassian.net/browse/LIMS-6399')
     def test001_download_audit_trail_sheet(self):
         """
         Header: Audit trail: Make sure that you can export all the fields in the active table
@@ -34,7 +35,8 @@ class AuditTrailTestCases(BaseTest):
             for item in fixed_row_data:
                 self.assertIn(item, fixed_sheet_row_data)
 
-    @parameterized.expand(['action_date', 'changed_by', 'action', 'entity', 'entity_number'])
+    # @parameterized.expand(['action_date', 'changed_by', 'action', 'entity', 'entity_number'])
+    @parameterized.expand(['changed_by', 'action', 'entity', 'entity_number'])
     def test002_audit_trail_filter(self, filter):
         """
         Header: Audit trail Approach: Make sure that I can filter by all the following fields 
