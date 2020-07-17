@@ -114,15 +114,15 @@ class ContactsTestCases(BaseTest):
                 continue
             self.info('search for {} : {}'.format(column, row_data[column]))
             if column == 'Contact Type':
-                search_results = Article().search(row_data[column].lower())
+                search_results = self.contacts_page.search(row_data[column].lower())
             else:
-                search_results = Article().search(row_data[column])
+                search_results = self.contacts_page.search(row_data[column])
             self.assertGreater(len(search_results), 1, " * There is no search results for it, Report a bug.")
             for search_result in search_results:
                 search_data = self.base_selenium.get_row_cells_dict_related_to_header(search_result)
-                if search_data[column] == row_data[column]:
+                if search_data[column] == row_data[column].replace("'", ''):
                     break
-            self.assertEqual(row_data[column], search_data[column])
+            self.assertEqual(row_data[column].replace("'", ''), search_data[column])
 
     #@skip('https://modeso.atlassian.net/browse/LIMS-6402')
     def test006_download_contact_sheet(self):
@@ -523,6 +523,6 @@ class ContactsTestCases(BaseTest):
         counter = 0
         while counter < (len(table_records) - 1):
             row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=table_records[counter])
-            contact_type = row_data['Type'].split(', ')
+            contact_type = row_data['Contact Type'].split(', ')
             self.assertIn(data_to_filter_with, contact_type)
             counter = counter + 1
