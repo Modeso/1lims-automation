@@ -14,6 +14,7 @@ class AuditTrailTestCases(BaseTest):
         self.audit_trail_page.sleep_medium()
 
     #@skip('https://modeso.atlassian.net/browse/LIMS-6399')
+    @skip('https://modeso.atlassian.net/browse/LIMSA-206')
     def test001_download_audit_trail_sheet(self):
         """
         Header: Audit trail: Make sure that you can export all the fields in the active table
@@ -69,5 +70,4 @@ class AuditTrailTestCases(BaseTest):
         audit_trail = self.audit_trail_page.get_random_mapped_audit_trail_data()
         self.info('search by {} {}'.format(search_feild, audit_trail[search_feild]))
         result = self.audit_trail_page.search(audit_trail[search_feild])[0].text
-
         self.assertIn(audit_trail[search_feild].replace("'", ""), result.replace("'", ""))
