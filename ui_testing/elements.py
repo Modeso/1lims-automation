@@ -152,7 +152,7 @@ elements = {
             'method': 'id',
             'value': 'table_last'
         },
-        'file_input_field': {'method': 'css_selector', 'value':'[type="file"]'},
+        'file_input_field': {'method': 'css_selector', 'value': '[type="file"]'},
         'file_upload_success_flag': {'method': 'class_name', 'value': 'dz-complete', 'order': 0},
         'files_upload_success_flags': {'method': 'class_name', 'value': 'dz-complete', 'order': -1},
         'remove_file': {'method': 'class_name', 'value': 'dz-remove', 'order': 0},
@@ -353,11 +353,11 @@ elements = {
         'test_units': {'method': 'id',
                        'value': 'selectedTestUnitsfield'},
         'test_unit': {'method': 'id',
-                       'value': 'selectedTestUnits'},
+                      'value': 'selectedTestUnits'},
         'add': {'method': 'id',
                 'value': 'new_testunit_add_button'},
         'check_btn': {'method': 'xpath',
-                'value': '//i[@class="la la-check"]'},
+                      'value': '//i[@class="la la-check"]'},
         'save_btn': {'method': 'id',
                      'value': 'save_btn'},
         'save_and_complete': {'method': 'id',
@@ -401,10 +401,10 @@ elements = {
         'remove_testunit': {'method': 'id',
                             'value': 'remove_testunit'},
         'test_unit_category': {'method': 'class_name',
-                              'value': 'testunitCell-positioning',
+                               'value': 'testunitCell-positioning',
                                'order': 1},
         'test_unit_iteration': {'method': 'xpath',
-                               'value': '//input[@placeholder="Iterations"]'},
+                                'value': '//input[@placeholder="Iterations"]'},
         'testunit_unit': {'method': 'id',
                           'value': 'testunit_unit'},
         'testunit_quantification_upper_limit': {
@@ -538,9 +538,9 @@ elements = {
         'archive': {'method': 'link_text',
                     'value': 'Archive'},
         'active': {'method': 'link_text',
-                    'value': 'Active'},
+                   'value': 'Active'},
         'archived': {'method': 'link_text',
-                    'value': 'Archived'},
+                     'value': 'Archived'},
         'analysis-confirmation': {
             'method': 'class_name',
             'value': 'swal2-header'},
@@ -557,7 +557,7 @@ elements = {
         'analysis_filter': {'method': 'id',
                             'value': 'analysisfield'},
         'analysis_result_filter': {'method': 'id',
-                            'value': 'analysisResultsfield'},
+                                   'value': 'analysisResultsfield'},
         'order_filter': {'method': 'id',
                          'value': 'orderNofield'},
         'contact_filter': {'method': 'id',
@@ -598,8 +598,8 @@ elements = {
         'suborder_archive': {'method': 'id', 'value': 'child_table_archive'},
         'suborder_restore': {'method': 'id', 'value': 'child_table_restore'},
         'suborder_delete': {'method': 'id',
-                             'value': 'child_table_delete'},
-        'confirm_delete': {'method':'xpath',
+                            'value': 'child_table_delete'},
+        'confirm_delete': {'method': 'xpath',
                            'value': '//h2[@id="swal2-title"]'}
     },
 
@@ -610,8 +610,6 @@ elements = {
         'filter_entity': {'method': 'id', 'value': 'entityfield'},
         'filter_entity_number': {'method': 'id', 'value': 'entityNumberfield'},
     },
-
-
 
     'order': {
         'order': {'method': 'id',
@@ -695,8 +693,8 @@ elements = {
             'order': 0
         },
         'add_new_item11': {'method': 'class_name',
-                         'value': 'addNewItem',
-                         'order': 0},
+                           'value': 'addNewItem',
+                           'order': 0},
 
         'add_new_item': {'method': 'link_text',
                          'value': 'Add another item'},
@@ -712,23 +710,33 @@ elements = {
                            'value': '//i[@class="la la-cloud-upload"]',
                            },
         'uploader_zone': {'method': 'id',
-                           'value': 'fieldUploaderComponent',
-                           },
+                          'value': 'fieldUploaderComponent',
+                          },
 
         'uploader_close_btn': {'method': 'id',
-                           'value': 'uploaderPopUpClose',
-                           },
-
-        'attachments_btn': {'method': 'xpath',
-                               'value': '//i[@class="fa fa-cloud-upload"]',
+                               'value': 'uploaderPopUpClose',
                                },
 
+        'attachments_btn': {'method': 'xpath',
+                            'value': '//i[@class="fa fa-cloud-upload"]',
+                            },
+
         'testplan_popup_btn': {'method': 'xpath',
-                           'value': '//span[@class="pull-right collapse-long-words"]',
-                           },
+                               'value': '//span[@class="pull-right collapse-long-words"]',
+                               'order':0
+                               },
+        'testplan_cancel_btn': {'method': 'xpath',
+                                'value': '//*[@id="infoModalTable"]/div/div/div[3]/button'
+                                },
+        'testplan_close_btn': {'method': 'xpath',
+                               'value': '//*[@id="infoModalTable"]/div/div/div[1]/button'},
         'popup_data': {'method': 'class_name',
-                           'value': 'border-bottom',
-                             },
+                       'value': 'border-bottom',
+                       },
+        'testplan_popup': {'method': 'id',
+                        'value': 'infoModalTable'
+
+        },
         'analysis': {
             'filter_order_no': {
                 'method': 'id',
@@ -1069,7 +1077,7 @@ elements = {
         'confirm_password_field': {'method': 'id', 'value': 'confirmPassword'},
         'language_field': {'method': 'id', 'value': 'languagefield'},
         'signature_field': {'method': 'id', 'value': 'signiture'},
-        'cancel_button':  {'method': 'class_name', 'value': 'btn-secondary', 'order': 2},
+        'cancel_button': {'method': 'class_name', 'value': 'btn-secondary', 'order': 2},
         'save_button': {'method': 'class_name', 'value': 'btn-primary', 'order': 1},
         'username': {'method': 'class_name', 'value': 'm-card-profile__name', 'order': 0},
         'email': {'method': 'class_name', 'value': 'm-card-profile__email', 'order': 0},
