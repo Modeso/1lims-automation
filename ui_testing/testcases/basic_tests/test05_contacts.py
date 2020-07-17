@@ -134,7 +134,7 @@ class ContactsTestCases(BaseTest):
         self.info(' * Download XSLX sheet')
         self.contact_page.download_xslx_sheet()
         rows_data = self.contact_page.get_table_rows_data()
-        for index in range(len(rows_data)):
+        for index in range(len(rows_data)-1):
             self.info(' * Comparing the contact no. {} '.format(index))
             fixed_row_data = self.fix_data_format(rows_data[index].split('\n'))
             values = self.contact_page.sheet.iloc[index].values
@@ -276,7 +276,7 @@ class ContactsTestCases(BaseTest):
         self.info('export the data to make sure that hidden columns are hidden also form export')
         self.contact_page.download_xslx_sheet()
         rows_data = self.contact_page.get_table_rows_data()
-        for index in range(len(rows_data)):
+        for index in range(len(rows_data)-1):
             self.info(' * Comparing the contact no. {} '.format(index))
             fixed_row_data = self.fix_data_format(rows_data[index].split('\n'))
             values = self.contact_page.sheet.iloc[index].values
