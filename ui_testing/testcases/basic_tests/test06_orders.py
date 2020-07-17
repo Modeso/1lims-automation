@@ -2316,10 +2316,3 @@ class OrdersTestCases(BaseTest):
             self.base_selenium.click(element='order:testplan_close_btn')
             self.base_selenium.check_element_is_not_exist(element='order:testplan_popup')
 
-    def test067_archived_contact_not_in_ddl(self):
-        """ LIMS-5829- Archived contacts shouldn't appear in the contacts drop down list
-             """
-        api, contact =self.contacts_api.archive_contacts()
-        print(api)
-        print('***************************')
-        print(contact)
