@@ -10,6 +10,7 @@ from api_testing.apis.orders_api import OrdersAPI
 from api_testing.apis.contacts_api import ContactsAPI
 from api_testing.apis.users_api import UsersAPI
 from parameterized import parameterized
+from unittest import skip
 import re, random
 
 
@@ -61,6 +62,7 @@ class ContactsTestCases(BaseTest):
             self.info(' + {} Contact sucessfully restored.'.format(contact_no))
             self.assertTrue(self.contact_page.is_contact_in_table(value=contact_no))
 
+    @skip("https://modeso.atlassian.net/browse/LIMSA-204")
     def test003_create_contact(self):
         """
         New: Contact: Creation Approach: I can create new contact successfully
@@ -78,6 +80,7 @@ class ContactsTestCases(BaseTest):
             if key in found_contact_data.keys():
                 self.assertEqual(found_contact_data[key].replace("'", ""), contact_data[key])
 
+    @skip("https://modeso.atlassian.net/browse/LIMSA-204")
     def test004_upadte_contact(self):
         """
         New: Contact: Edit Approach: I can update any contact record 
@@ -126,7 +129,7 @@ class ContactsTestCases(BaseTest):
         """
         New: Contact: XSLX File: I can download all the data in the table view in the excel sheet
 
-        LIMS:3568
+        LIMS-3568
         """
         self.info(' * Download XSLX sheet')
         self.contact_page.download_xslx_sheet()
@@ -139,6 +142,7 @@ class ContactsTestCases(BaseTest):
             for item in fixed_row_data:
                 self.assertIn(item, fixed_sheet_row_data)
 
+    @skip("https://modeso.atlassian.net/browse/LIMSA-204")
     def test007_create_contact_with_person(self):
         """
         New: Contact: Creation Approach: I can create new contact successfully with contact person
@@ -165,6 +169,7 @@ class ContactsTestCases(BaseTest):
             data_after_save=contact_persons_data_after_create, data_before_save=contact_data["contact_persons"]))
         self.info('contact persons have been saved successfully')
 
+    @skip("https://modeso.atlassian.net/browse/LIMSA-204")
     def test008_create_contact_person_from_edit_update_old_value(self):
         """
         Contact: Edit Approach: make sure that you can add contact person from the edit mode 
@@ -414,6 +419,7 @@ class ContactsTestCases(BaseTest):
         """
         assert (self.contacts_page.deselect_all_configurations(), False)
 
+    @skip("https://modeso.atlassian.net/browse/LIMSA-204")
     @parameterized.expand([('name', 'name', 'Contact Name'),
                            ('skype', 'skype', 'Skype'),
                            ('companyNo', 'contact_no_filter', 'Contact No'),
@@ -446,6 +452,7 @@ class ContactsTestCases(BaseTest):
             self.assertEqual(row_data[key].replace("'", ""), data_to_filter_with.replace("'", ""))
             counter = counter + 1
 
+    @skip("https://modeso.atlassian.net/browse/LIMSA-204")
     @parameterized.expand([('departments', 'departments', 'Departments'),
                            ('country', 'country_filter', 'Country')])
     def test019_filter_by_contact_drop_down_feild(self, attribute, filter_element, key):
@@ -472,6 +479,7 @@ class ContactsTestCases(BaseTest):
                 self.assertIn(data_to_filter_with, row_data[key].split(', '))
             counter = counter + 1
 
+    @skip("https://modeso.atlassian.net/browse/LIMSA-204")
     def test020_filter_by_contact_changed_by(self):
         """
         Contacts: Filter Approach: Make sure you can filter by changed by
