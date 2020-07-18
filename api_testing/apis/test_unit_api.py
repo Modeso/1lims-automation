@@ -344,6 +344,7 @@ class TestUnitAPI(TestUnitAPIFactory):
 
     def get_test_unit_name_with_value_with_material_type(self, material_type,
                                                          avoid_duplicate=False, duplicated_test_unit=''):
+
         material_id = GeneralUtilitiesAPI().get_material_id(material_type)
         testunits = TestUnitAPI().list_testunit_by_name_and_material_type(materialtype_id=material_id)[0]['testUnits']
 
