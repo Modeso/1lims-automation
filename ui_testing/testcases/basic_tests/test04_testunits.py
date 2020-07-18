@@ -1154,6 +1154,7 @@ class TestUnitsTestCases(BaseTest):
             self.assertFalse(is_type_exist)
             self.assertTrue(is_method_exist)
 
+    @skip('https://modeso.atlassian.net/browse/LIMSA-207')
     def test043_testunits_search_then_navigate(self):
         """
         Search Approach: Make sure that you can search then navigate to any other page
