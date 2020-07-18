@@ -187,6 +187,13 @@ class TestUnitAPIFactory(BaseAPI):
 
     @api_factory('post')
     def create_quantitative_testunit(self, **kwargs):
+        """
+        if you want to create  quantitative test unit with Quantification limits you should call
+        create_quantitative_testunit(useSpec=False, useQuantification=True,
+                                     quantificationUpperLimit=upperLimit,
+                                     quantificationLowerLimit=lowerLimit)
+
+        """
         random_category = self.generate_random_string()
         _payload = {
             'name': self.generate_random_string(),
@@ -217,7 +224,8 @@ class TestUnitAPIFactory(BaseAPI):
             'quantificationUpperLimit': '',
             'quantificationLowerLimit': '',
             'useSpec': True,
-            'iterations': '1'
+            'iterations': '1',
+            "roundingOption": {"id": 0, "text": "No Rounding"}
         }
         payload = self.update_payload(_payload, **kwargs)
         if 'category' in kwargs:
