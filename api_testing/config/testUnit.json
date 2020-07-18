@@ -1,9 +1,7 @@
 {
    "fields":[
       {
-         "options":[
-​
-         ],
+         "options":[""],
          "isEditable":false,
          "isDragable":true,
          "order":1,
@@ -21,14 +19,10 @@
             "name"
          ],
          "error":false,
-         "optionsInUse":[
-​
-         ]
+         "optionsInUse":[""]
       },
       {
-         "options":[
-​
-         ],
+         "options":[""],
          "isEditable":false,
          "isDragable":true,
          "order":2,
@@ -47,14 +41,10 @@
             "type"
          ],
          "error":false,
-         "optionsInUse":[
-​
-         ]
+         "optionsInUse":[""]
       },
       {
-         "options":[
-​
-         ],
+         "options":[""],
          "isEditable":false,
          "isDragable":true,
          "order":3,
@@ -72,14 +62,10 @@
             "name"
          ],
          "error":false,
-         "optionsInUse":[
-​
-         ]
+         "optionsInUse":[""]
       },
       {
-         "options":[
-​
-         ],
+         "options":[""],
          "isEditable":false,
          "isDragable":true,
          "order":4,
@@ -97,14 +83,10 @@
             "name"
          ],
          "error":false,
-         "optionsInUse":[
-​
-         ]
+         "optionsInUse":[""]
       },
       {
-         "options":[
-​
-         ],
+         "options":[""],
          "isEditable":false,
          "isDragable":true,
          "order":5,
@@ -122,14 +104,10 @@
             "name"
          ],
          "error":false,
-         "optionsInUse":[
-​
-         ]
+         "optionsInUse":[""]
       },
       {
-         "options":[
-​
-         ],
+         "options":[""],
          "isEditable":false,
          "isDragable":false,
          "order":1,
@@ -146,14 +124,10 @@
          "searchable":[
             "name"
          ],
-         "optionsInUse":[
-​
-         ]
+         "optionsInUse":[""]
       },
       {
-         "options":[
-​
-         ],
+         "options":[""],
          "isEditable":false,
          "isDragable":false,
          "order":2,
@@ -170,14 +144,10 @@
          "searchable":[
             "name"
          ],
-         "optionsInUse":[
-​
-         ]
+         "optionsInUse":[""]
       },
       {
-         "options":[
-​
-         ],
+         "options":[""],
          "isEditable":false,
          "isDragable":false,
          "order":3,
@@ -194,14 +164,10 @@
          "searchable":[
             "name"
          ],
-         "optionsInUse":[
-​
-         ]
+         "optionsInUse":[""]
       },
       {
-         "options":[
-​
-         ],
+         "options":[""],
          "isEditable":false,
          "isDragable":false,
          "order":4,
@@ -218,14 +184,10 @@
          "searchable":[
             "name"
          ],
-         "optionsInUse":[
-​
-         ]
+         "optionsInUse":[""]
       },
       {
-         "options":[
-​
-         ],
+         "options":[""],
          "isEditable":false,
          "isDragable":true,
          "order":5,
@@ -243,14 +205,10 @@
             "name"
          ],
          "error":false,
-         "optionsInUse":[
-​
-         ]
+         "optionsInUse":[""]
       },
       {
-         "options":[
-​
-         ],
+         "options":[""],
          "isEditable":false,
          "isDragable":true,
          "order":6,
@@ -268,14 +226,10 @@
             "name"
          ],
          "error":false,
-         "optionsInUse":[
-​
-         ]
+         "optionsInUse":[""]
       },
       {
-         "options":[
-​
-         ],
+         "options":[""],
          "isEditable":false,
          "isDragable":true,
          "order":1,
@@ -293,14 +247,10 @@
             "name"
          ],
          "error":false,
-         "optionsInUse":[
-​
-         ]
+         "optionsInUse":[""]
       },
       {
-         "options":[
-​
-         ],
+         "options":[""],
          "isEditable":false,
          "isDragable":true,
          "order":2,
@@ -318,14 +268,10 @@
             "name"
          ],
          "error":false,
-         "optionsInUse":[
-​
-         ]
+         "optionsInUse":[""]
       },
       {
-         "options":[
-​
-         ],
+         "options":[""],
          "isEditable":false,
          "isDragable":true,
          "order":1,
@@ -343,14 +289,10 @@
             "name"
          ],
          "error":false,
-         "optionsInUse":[
-​
-         ]
+         "optionsInUse":[""]
       },
       {
-         "options":[
-​
-         ],
+         "options":[""],
          "isEditable":false,
          "isDragable":true,
          "order":2,
@@ -368,12 +310,8 @@
             "name"
          ],
          "error":false,
-         "optionsInUse":[
-​
-         ]
+         "optionsInUse":[""]
       }
    ],
-   "archivedFields":[
-​
-   ]
+   "archivedFields":[""]
 }

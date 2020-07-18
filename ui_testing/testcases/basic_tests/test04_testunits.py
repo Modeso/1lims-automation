@@ -34,7 +34,6 @@ class TestUnitsTestCases(BaseTest):
 
         LIMS-3674
         """
-        import ipdb;ipdb.set_trace()
         row = self.test_unit_page.get_random_test_units_row()
         row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=row)
         for column in row_data:
