@@ -338,7 +338,7 @@ elements = {
         'test_plan': {'method': 'id',
                       'value': 'testPlan'},
         'material_type': {'method': 'id',
-                          'value': 'materialTypefield'},
+                          'value': 'materialType'},
         'material_type_options': {'method': 'class_name',
                                   'value': 'ng-option'},
         'article': {'method': 'id',
@@ -1116,6 +1116,7 @@ elements = {
         'postal_code_field': {'method': 'id', 'value': 'postalCodefield'},
         'location_field': {'method': 'id', 'value': 'locationfield'},
         'logo_field': {'method': 'id', 'value': 'logo'},
+        'logo_name': {'method': 'xpath', 'value': "//div[@class='dz-filename']"},
         'username': {'method': 'class_name', 'value': 'm-card-profile__name', 'order': 0},
         'email': {'method': 'class_name', 'value': 'm-card-profile__email', 'order': 0},
         'validation_error': {'method': 'id', 'value': 'ohSnapMsg'}
