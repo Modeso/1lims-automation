@@ -1229,7 +1229,7 @@ class TestUnitsTestCases(BaseTest):
         self.assertNotEqual(data_to_filter_with, False)
         self.info('filter with {}'.format(data_to_filter_with))
 
-        self.test_unit_page.apply_filter_scenario(filter_element='test_unit:spec_unit_filter',
+        self.test_unit_page.apply_filter_scenario(filter_element='test_unit:spec_unit',
                                                   filter_text=data_to_filter_with, field_type='text')
         table_records = self.test_unit_page.result_table()
         del table_records[-1]
