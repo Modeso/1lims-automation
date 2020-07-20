@@ -160,7 +160,7 @@ class TestUnitsTestCases(BaseTest):
         self.assertFalse(self.base_selenium.is_item_in_drop_down(
             element='test_plan:test_unit', item_text=archived_test_unit['name']))
 
-    @skip("https://modeso.atlassian.net/browse/LIMSA-208")
+    @skip('https://modeso.atlassian.net/browse/LIMSA-208')
     @parameterized.expand(['spec', 'quan'])
     def test007_allow_unit_field_to_be_optional(self, specification_type):
         """
@@ -196,7 +196,7 @@ class TestUnitsTestCases(BaseTest):
                 test_unit_found['Quantification Limit Unit']))
             self.assertEqual(test_unit_found['Quantification Limit Unit'], '-')
 
-    @skip("https://modeso.atlassian.net/browse/LIMSA-208")
+    @skip('https://modeso.atlassian.net/browse/LIMSA-208')
     @parameterized.expand(['spec', 'quan'])
     def test008_force_use_to_choose_specification_or_limit_of_quantification(self, specification_type):
         """
@@ -695,7 +695,7 @@ class TestUnitsTestCases(BaseTest):
         test_unit_data, version_data = self.test_units_page.filter_and_get_version(payload['number'])
         self.assertEqual(version_data[0]['Test Unit No.'], test_unit_data['Test Unit No.']+'.1')
         for item in version_data[0].keys():
-            if item not in ['Test Unit No.', 'Comment']:
+            if item not in ['Test Unit No.', 'Comment', 'Enter Value', 'Quantification Limit Unit']:
                 self.assertEqual(version_data[0][item], test_unit_data[item])
 
     @parameterized.expand(['ok', 'cancel'])
@@ -727,7 +727,8 @@ class TestUnitsTestCases(BaseTest):
         LIMS-6202
         """
         self.info('open edit page of random test unit')
-        self.test_unit_page.get_random_test_units()
+        random_test_unit = random.choice(self.test_unit_api.get_all_testunits_json())
+        self.test_unit_page.open_test_unit_edit_page_by_id(random_test_unit['id'])
         test_units_url = self.base_selenium.get_url()
         self.info('test_units_url: {}'.format(test_units_url))
         self.info("click on Overview, it will redirect you to testunits' page")
@@ -1036,15 +1037,12 @@ class TestUnitsTestCases(BaseTest):
 
         LIMS-6423
         """
-        self.test_unit_page.open_configurations()
-        self.test_unit_page.open_testunit_name_configurations_options()
-        self.test_unit_page.deselect_all_options_to_view_search_with()
-
-        self.info('Create new testunit with qualitative and random generated data')
+        # in set_configuration() I set search to be by name and type so I don't need to add this steps here
+        self.info('Create new test unit with qualitative and random generated data')
         response, payload = self.test_unit_api.create_qualitative_testunit()
         self.assertEqual(response['status'], 1, payload)
-        self.info('new testunit created with number  {}'.format(payload['number']))
-        self.info('get random In Progrees test plan')
+        self.info('new test unit created with number  {}'.format(payload['number']))
+        self.info('get random In Progress test plan')
         test_plan = random.choice(TestPlanAPI().get_inprogress_testplans())
         self.assertTrue(test_plan, 'No test plan selected')
         self.info('Navigate to test plan edit page')
@@ -1056,7 +1054,7 @@ class TestUnitsTestCases(BaseTest):
         is_method_exist = self.test_plan.search_test_unit_not_set(test_unit=payload['method'])
         self.assertTrue(is_name_exist)
         self.assertFalse(is_number_exist)
-        self.assertFalse(is_type_exist)
+        self.assertTrue(is_type_exist)
         self.assertFalse(is_method_exist)
 
     @attr(series=True)
@@ -1068,9 +1066,9 @@ class TestUnitsTestCases(BaseTest):
 
         LIMS-6424
         """
-
         self.info('Generate random data for update')
-        new_random_method = self.generate_random_string() + self.generate_random_string() + \
+        new_random_method = self.generate_random_string() + \
+                            self.generate_random_string() + \
                             self.generate_random_string()
 
         self.test_unit_page.open_configurations()
@@ -1106,13 +1104,15 @@ class TestUnitsTestCases(BaseTest):
 
         LIMS- 6426
         """
+        self.test_unit_page.open_configurations()
+        self.test_unit_page.open_testunit_name_configurations_options()
         self.test_unit_page.select_option_to_view_search_with(
             view_search_options=[search_view_option1, search_view_option2])
-        self.info('Create new testunit with qualitative and random generated data')
+        self.info('Create new test unit with qualitative and random generated data')
         response, payload = self.test_unit_api.create_qualitative_testunit()
         self.assertEqual(response['status'], 1, payload)
-        self.info('new testunit created with number  {}'.format(payload['number']))
-        self.info('get random In Progrees test plan')
+        self.info('new test unit created with number  {}'.format(payload['number']))
+        self.info('get random In Progress test plan')
         test_plan = random.choice(TestPlanAPI().get_inprogress_testplans())
         self.assertTrue(test_plan, 'No test plan selected')
         self.info('Navigate to test plan edit page')
@@ -1176,6 +1176,7 @@ class TestUnitsTestCases(BaseTest):
         Articles().get_articles_page()
         self.assertEqual(self.base_selenium.get_url(), '{}articles'.format(self.base_selenium.url))
 
+    @skip('https://modeso.atlassian.net/browse/LIMSA-212')
     def test044_hide_all_table_configurations(self):
         """
         Table configuration: Make sure that you can't hide all the fields from the table configuration

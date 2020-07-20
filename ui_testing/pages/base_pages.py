@@ -407,15 +407,14 @@ class BasePages:
 
     def deselect_all_configurations(self):
         self.open_configure_table()
-        active_columns = self.base_selenium.find_elements_in_element(source_element='general:configure_table_items',
-                                                                     destination_element='general:li')
+        active_columns = self.base_selenium.find_elements_in_element(
+            source_element='general:configure_table_items', destination_element='general:li')
         for column in active_columns:
             if column.text:
                 self.change_column_view(column=column, value=False)
 
         archived_coloums = self.base_selenium.find_elements_in_element(
-            source_element='general:configure_table_archive_items',
-            destination_element='general:li')
+            source_element='general:configure_table_archive_items', destination_element='general:li')
         for column in archived_coloums:
             if column.text:
                 self.change_column_view(column=column, value=False)

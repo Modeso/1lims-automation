@@ -37,9 +37,10 @@
          "title":"Test Unit Name",
          "isStoredInServer":true,
          "searchable":[
-            "name",
-            "type"
+            "Name",
+            "Type"
          ],
+         "viewByoptions":["name","type"],
          "error":false,
          "optionsInUse":[""]
       },
