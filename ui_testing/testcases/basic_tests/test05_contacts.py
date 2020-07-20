@@ -118,7 +118,7 @@ class ContactsTestCases(BaseTest):
                 search_data = self.base_selenium.get_row_cells_dict_related_to_header(search_result)
                 if search_data[column] == row_data[column].replace("'", ''):
                     break
-            self.assertEqual(row_data[column].replace("'", ''), search_data[column])
+            self.assertIn(search_data[column], row_data[column].replace("'", ''))
 
     #@skip('https://modeso.atlassian.net/browse/LIMS-6402')
     def test006_download_contact_sheet(self):
