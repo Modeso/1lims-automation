@@ -129,7 +129,7 @@ class HeaderTestCases(BaseTest):
         self.assertEqual(result[0].get_attribute("textContent"), 'No data available in table')
         self.info('deleted successfully')
 
-    def test006_create_new_user_with_admin_role(self):
+    def test006_create_new_user(self):
         """
         Header: User management Approach:  Make sure that I can create new user successfully
 
@@ -138,7 +138,8 @@ class HeaderTestCases(BaseTest):
         random_user_name = self.generate_random_string()
         random_user_email = self.header_page.generate_random_email()
         self.header_page.create_new_user(
-            user_name=random_user_name, user_email=random_user_email, user_password='1', user_confirm_password='1')
+            user_name=random_user_name, user_email=random_user_email,
+            user_password='1', user_confirm_password='1')
 
         self.header_page.sleep_tiny()
         user_row = self.header_page.search(value=random_user_name)
@@ -208,8 +209,8 @@ class HeaderTestCases(BaseTest):
     def test010_update_user_role_with_save_cancel_btn(self, save):
         """
         User management: I can update user role with save & cancel button
+
         LIMS-6398
-        :return:
         """
         # open random user in the edit mode
         self.header_page.get_random_user()
