@@ -113,7 +113,7 @@ class TstUnits(BasePages):
         self.sleep_tiny()
 
     def check_all_options_of_search_view_menu(self):
-        items = ['name','method', 'type', 'number']
+        items = ['Name', 'Method', 'Type', 'No']
         all_options_exist = True
         for item in items:
             self.clear_all_selected_view_and_search_options()

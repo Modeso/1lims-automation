@@ -980,7 +980,7 @@ class TestUnitsTestCases(BaseTest):
         self.test_unit_page.open_testunit_name_configurations_options()
         self.assertTrue(self.test_unit_page.check_all_options_of_search_view_menu())
 
-    @parameterized.expand(['name', 'method', 'type', 'number'])
+    @parameterized.expand(['Name', 'Method', 'Type', 'No'])
     @attr(series=True)
     def test039_test_unit_name_allow_user_to_search_with_selected_options_testplan(self, search_view_option):
         """
@@ -1006,22 +1006,22 @@ class TestUnitsTestCases(BaseTest):
         is_type_exist = self.test_plan.search_test_unit_not_set(test_unit='Qualitative')
         is_method_exist = self.test_plan.search_test_unit_not_set(test_unit=payload['method'])
 
-        if search_view_option == 'name':
+        if search_view_option == 'Name':
             self.assertTrue(is_name_exist)
             self.assertFalse(is_number_exist)
             self.assertFalse(is_type_exist)
             self.assertFalse(is_method_exist)
-        elif search_view_option == 'type':
+        elif search_view_option == 'Type':
             self.assertFalse(is_name_exist)
             self.assertFalse(is_number_exist)
             self.assertTrue(is_type_exist)
             self.assertFalse(is_method_exist)
-        elif search_view_option == 'method':
+        elif search_view_option == 'Method':
             self.assertFalse(is_name_exist)
             self.assertFalse(is_number_exist)
             self.assertFalse(is_type_exist)
             self.assertTrue(is_method_exist)
-        elif search_view_option == 'number':
+        elif search_view_option == 'No':
             self.assertFalse(is_name_exist)
             self.assertTrue(is_number_exist)
             self.assertFalse(is_type_exist)
@@ -1090,12 +1090,12 @@ class TestUnitsTestCases(BaseTest):
         self.assertEquals(multiple_lines_properties['textOverflow'], 'clip')
         self.assertEquals(multiple_lines_properties['lineBreak'], 'auto')
 
-    @parameterized.expand([('name', 'type'),
-                           ('name', 'method'),
-                           ('name', 'number'),
-                           ('type', 'method'),
-                           ('type', 'number'),
-                           ('method', 'number')
+    @parameterized.expand([('Name', 'Type'),
+                           ('Name', 'Method'),
+                           ('Name', 'No'),
+                           ('Type', 'Method'),
+                           ('Type', 'No'),
+                           ('Method', 'No')
                            ])
     @attr(series=True)
     def test042_test_unit_name_allow_user_to_search_with_selected_two_options_testplan(self, search_view_option1,
@@ -1123,32 +1123,32 @@ class TestUnitsTestCases(BaseTest):
         is_type_exist = self.test_plan.search_test_unit_not_set(test_unit='Qualitative')
         is_method_exist = self.test_plan.search_test_unit_not_set(test_unit=payload['method'])
 
-        if search_view_option1 == 'name' and search_view_option2 == 'type':
+        if search_view_option1 == 'Name' and search_view_option2 == 'Type':
             self.assertTrue(is_name_exist)
             self.assertFalse(is_number_exist)
             self.assertTrue(is_type_exist)
             self.assertFalse(is_method_exist)
-        elif search_view_option1 == 'name' and search_view_option2 == 'method':
+        elif search_view_option1 == 'Name' and search_view_option2 == 'Method':
             self.assertTrue(is_name_exist)
             self.assertFalse(is_number_exist)
             self.assertFalse(is_type_exist)
             self.assertTrue(is_method_exist)
-        elif search_view_option1 == 'name' and search_view_option2 == 'number':
+        elif search_view_option1 == 'Name' and search_view_option2 == 'No':
             self.assertTrue(is_name_exist)
             self.assertTrue(is_number_exist)
             self.assertFalse(is_type_exist)
             self.assertFalse(is_method_exist)
-        elif search_view_option1 == 'type' and search_view_option2 == 'method':
+        elif search_view_option1 == 'Type' and search_view_option2 == 'Method':
             self.assertFalse(is_name_exist)
             self.assertFalse(is_number_exist)
             self.assertTrue(is_type_exist)
             self.assertTrue(is_method_exist)
-        elif search_view_option1 == 'type' and search_view_option2 == 'number':
+        elif search_view_option1 == 'Type' and search_view_option2 == 'No':
             self.assertFalse(is_name_exist)
             self.assertTrue(is_number_exist)
             self.assertTrue(is_type_exist)
             self.assertFalse(is_method_exist)
-        elif search_view_option1 == 'method' and search_view_option2 == 'number':
+        elif search_view_option1 == 'Method' and search_view_option2 == 'No':
             self.assertFalse(is_name_exist)
             self.assertTrue(is_number_exist)
             self.assertFalse(is_type_exist)
