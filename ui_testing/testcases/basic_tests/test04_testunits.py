@@ -317,7 +317,7 @@ class TestUnitsTestCases(BaseTest):
         else:
             self.assertTrue(test_unit_found['Category'])
 
-    @skip("https://modeso.atlassian.net/browse/LIMSA-208")
+    @skip('https://modeso.atlassian.net/browse/LIMSA-208')
     @parameterized.expand([('upper', 'spec'),
                            ('upper', 'quan'),
                            ('lower', 'spec'),
@@ -406,7 +406,7 @@ class TestUnitsTestCases(BaseTest):
         self.info('Assert error msg')
         self.assertEqual(validation_result, True)
 
-    @skip("https://modeso.atlassian.net/browse/LIMSA-208")
+    @skip('https://modeso.atlassian.net/browse/LIMSA-208')
     def test015_specification_limit_of_quantification_approach(self):
         """
         New: Test unit: Specification/limit of quantification Approach: Allow user to select those both options
@@ -453,7 +453,7 @@ class TestUnitsTestCases(BaseTest):
             self.info('Assert that {}_limit is not active'.format(limit))
             self.assertNotIn('ng-valid', class_attr)
 
-    @skip("https://modeso.atlassian.net/browse/LIMSA-208")
+    @skip('https://modeso.atlassian.net/browse/LIMSA-208')
     @parameterized.expand(['quan', 'spec'])
     def test017_create_quantative_with_limits_of_quantative_only_and_specification_only(self, limits_type):
         """
@@ -526,7 +526,7 @@ class TestUnitsTestCases(BaseTest):
         self.info('Assert upper and lower limits are in specifications with N/A values')
         self.assertEqual("N/A", test_unit_found['Specifications'])
 
-    @skip("https://modeso.atlassian.net/browse/LIMSA-208")
+    @skip('https://modeso.atlassian.net/browse/LIMSA-208')
     def test020_change_quantification_limits_not_effect_test_plan(self):
         """
         New: Test units/effect on test plan: Limits of quantification Approach: In case I
@@ -852,7 +852,7 @@ class TestUnitsTestCases(BaseTest):
         self.info('Assert that category updated successfully')
         self.assertEqual(test_plan_category_after_edit, new_random_category_edit)
 
-    @skip("https://modeso.atlassian.net/browse/LIMSA-208")
+    @skip('https://modeso.atlassian.net/browse/LIMSA-208')
     def test033_editing_limit_of_quantification_fields_should_affect_table_and_version(self):
         """
         New: Test unit: Limits of quantification Approach: Versions:In case I edit any field
