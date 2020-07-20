@@ -16,6 +16,7 @@ jobs:
       - uses: actions/checkout@master
       - name: pull docker image
         run:  docker pull 0xislamtaha/seleniumchromenose:83
+
       - name: Execute test case
         env:
           TEST_FILE: ui_testing/testcases/header_tests/test08_usermanagement.py
