@@ -380,13 +380,18 @@ class LoginRandomUser(BaseTest):
         super().setUp()
         self.header_page = Header()
         self.roles_api = RolesAPI()
-        self.random_user_name = self.generate_random_string()
-        random_user_email = self.header_page.generate_random_email()
-        random_user_password = self.generate_random_string()
-        UsersAPI().create_new_user(self.random_user_name, random_user_email, random_user_password)
-        Login().login(username=self.random_user_name, password=random_user_password)
-        self.base_selenium.wait_until_page_url_has(text='dashboard')
-        self.header_page.click_on_header_button()
+        self.login_page = Login()
+        self.set_authorization(auth=self.roles_api.AUTHORIZATION_RESPONSE)
+        self.header_page.get_users_page()
+        self.info("Logout")
+        self.login_page.logout()
+        response, payload = UsersAPI().create_new_user()
+        self.assertEqual(response['status'], 1, payload)
+        self.user_name = payload['username']
+        self.info("Login with new user {} and pw {}".format(self.user_name,payload['password']))
+        self.login_page.login(username=payload['username'], password=payload['password'])
+        self.header_page.sleep_medium()
+        self.header_page.get_users_page()
 
     @attr(series=True)
     def test016_delete_user_used_in_other_entity(self):
@@ -395,11 +400,8 @@ class LoginRandomUser(BaseTest):
 
         LIMS-6407
         """
-        self.base_selenium.click(element='header:user_management_button')
-
         last_row = self.header_page.get_last_user_row()
         self.header_page.click_check_box(source=last_row)
-
         self.header_page.archive_entity(menu_element='user_management:right_menu',
                                         archive_element='user_management:archive')
         self.header_page.get_archived_entities(menu_element='user_management:right_menu',
@@ -417,8 +419,6 @@ class LoginRandomUser(BaseTest):
 
         LIMS-6507
         """
-        self.base_selenium.click(element='header:user_management_button')
-
         new_user = self.generate_random_string()
         new_email = self.header_page.generate_random_email()
         self.header_page.create_new_user(user_name=new_user, user_email=new_email,
@@ -430,7 +430,7 @@ class LoginRandomUser(BaseTest):
 
         self.base_selenium.click(element='general:menu_filter_view')
         self.header_page.filter_user_drop_down(filter_name='user_management:filter_changed_by',
-                                               filter_text=self.random_user_name)
+                                               filter_text=self.user_name)
 
         users_result = self.header_page.get_table_rows_data()
-        self.assertIn(self.random_user_name, users_result[0])
+        self.assertIn(self.user_name, users_result[0])
