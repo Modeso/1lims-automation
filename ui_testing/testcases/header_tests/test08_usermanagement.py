@@ -13,7 +13,6 @@ class HeaderTestCases(BaseTest):
         super().setUp()
         self.header_page = Header()
         self.roles_api = RolesAPI()
-        self.users_api = UsersAPI()
         self.set_authorization(auth=self.roles_api.AUTHORIZATION_RESPONSE)
         self.header_page.get_users_page()
 
@@ -112,7 +111,7 @@ class HeaderTestCases(BaseTest):
         LIMS-6381
         """
         self.info("create new user")
-        response, payload = self.users_api.create_new_user()
+        response, payload = UsersAPI().create_new_user()
         self.assertEqual(response['status'], 1, payload)
         new_user_name = response['user']['username']
         self.header_page.search(value=new_user_name)
@@ -175,7 +174,7 @@ class HeaderTestCases(BaseTest):
     @parameterized.expand(['save_btn', 'cancel'])
     def test009_update_user_name_with_save_cancel_btn(self, save):
         """
-        User managemen: User management: I can update user name with save & cancel button
+        User management: User management: I can update user name with save & cancel button
 
         LIMS-6395
         """
@@ -290,9 +289,9 @@ class HeaderTestCases(BaseTest):
 
     def test013_filter_by_name(self):
         """
-        User management Approach: I can filter by no successfully
+        User management Approach: I can filter by name successfully
 
-        LIMS-6488
+        LIMS-6002
         """
         user_data = self.header_page.get_data_from_row()
         self.base_selenium.click(element='general:menu_filter_view')
@@ -309,7 +308,7 @@ class HeaderTestCases(BaseTest):
         """
         User management Approach: I can filter by no successfully
 
-        LIMS-6488
+        LIMS-6442
         """
         user_data = self.header_page.get_data_from_row()
 
@@ -375,11 +374,11 @@ class HeaderTestCases(BaseTest):
     def test017_filter_created_on(self):
         """
         User management Approach: I can filter by created on successfully
-        LIMS-64
-        :return:
+
+        LIMS-6486
         """
         self.header_page.get_users_page()
-        self.users_api.get_all_users()
+        UsersAPI().get_all_users()
         user_data = self.header_page.get_data_from_row()
 
         self.base_selenium.click(element='general:menu_filter_view')
@@ -430,11 +429,10 @@ class LoginRandomUser(BaseTest):
         super().setUp()
         self.header_page = Header()
         self.roles_api = RolesAPI()
-        self.users_api = UsersAPI()
         self.random_user_name = self.generate_random_string()
         random_user_email = self.header_page.generate_random_email()
         random_user_password = self.generate_random_string()
-        self.users_api.create_new_user(self.random_user_name, random_user_email, random_user_password)
+        UsersAPI().create_new_user(self.random_user_name, random_user_email, random_user_password)
         Login().login(username=self.random_user_name, password=random_user_password)
         self.base_selenium.wait_until_page_url_has(text='dashboard')
         self.header_page.click_on_header_button()
@@ -463,8 +461,8 @@ class LoginRandomUser(BaseTest):
     def test019_filter_by_changed_by(self):
         """
         Header: Roles & Permissions Approach: Make sure that you can filter by role changed by
+
         LIMS-6507
-        :return:
         """
         self.base_selenium.click(element='header:user_management_button')
 
