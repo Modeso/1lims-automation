@@ -4,6 +4,7 @@ from ui_testing.pages.login_page import Login
 from api_testing.apis.users_api import UsersAPI
 from api_testing.apis.roles_api import RolesAPI
 from parameterized import parameterized
+from nose.plugins.attrib import attr
 import re
 from unittest import skip
 
@@ -287,60 +288,29 @@ class HeaderTestCases(BaseTest):
         self.info('Assert error msg')
         self.assertEqual(validation_result, True)
 
-    def test013_filter_by_name(self):
+    @parameterized.expand([('name', 'filter_name'),
+                           ('email', 'filter_email'),
+                           ('number', 'filter_number'),
+                           ('created_on', 'filter_created_on')])
+    def test013_filter_by_text_feild(self, feild, filter_elem):
         """
         User management Approach: I can filter by name successfully
 
         LIMS-6002
-        """
-        user_data = self.header_page.get_data_from_row()
-        self.base_selenium.click(element='general:menu_filter_view')
-        self.header_page.filter_user_by(filter_element='user_management:filter_name',
-                                        filter_text=user_data['name'])
-
-        users_result = self.header_page.result_table()
-        self.assertIn(str(user_data['name']), (users_result[0].text).replace("'", ""))
-
-        self.info('filter results displayed with random user name')
-        self.base_selenium.click(element='user_management:filter_reset_btn')
-
-    def test014_filter_by_email(self):
-        """
-        User management Approach: I can filter by no successfully
-
         LIMS-6442
-        """
-        user_data = self.header_page.get_data_from_row()
-
-        self.base_selenium.click(element='general:menu_filter_view')
-        self.header_page.filter_user_by(filter_element='user_management:filter_email',
-                                        filter_text=user_data['email'])
-
-        users_result = self.header_page.result_table()
-        self.assertIn(str(user_data['email']), (users_result[0].text). replace("'", ""))
-
-        self.info('filter results displayed with the user email')
-        self.base_selenium.click(element='user_management:filter_reset_btn')
-
-    def test015_filter_by_no(self):
-        """
-        User management Approach: I can filter by no successfully
-
         LIMS-6488
+        LIMS-6486
         """
-        user_data = self.header_page.get_data_from_row()
-
+        filter_data = self.header_page.get_data_from_row()[feild]
+        self.info(" filter by  {}".format(filter_data))
         self.base_selenium.click(element='general:menu_filter_view')
-        self.header_page.filter_user_by(filter_element='user_management:filter_number',
-                                        filter_text=user_data['number'])
+        self.header_page.filter_user_by(filter_element='user_management:{}'.format(filter_elem),
+                                        filter_text=filter_data)
 
         users_result = self.header_page.result_table()
-        self.assertIn(str(user_data['number'].replace("'", "")), (users_result[0].text).replace("'", ""))
+        self.assertIn(str(filter_data).replace("'", ""), (users_result[0].text).replace("'", ""))
 
-        self.info('filter results displayed with the user no')
-        self.base_selenium.click(element='user_management:filter_reset_btn')
-
-    def test016_filter_by_role(self):
+    def test014_filter_by_role(self):
         """
         User management Approach: I can filter by user role successfully
 
@@ -348,7 +318,8 @@ class HeaderTestCases(BaseTest):
         """
         self.base_selenium.click(element='header:roles_and_permissions_button')
         random_role_name = self.generate_random_string()
-        self.roles_api.create_role(random_role_name)
+        response, payload = self.roles_api.create_role(random_role_name)
+        self.assertEqual(response['status'], 1, payload)
         self.info('make sure that that the user record created in the active table')
         created_role = self.header_page.search(random_role_name)[0]
         role_data = self.base_selenium.get_row_cells_dict_related_to_header(row=created_role)
@@ -371,32 +342,12 @@ class HeaderTestCases(BaseTest):
         self.info('filter results displayed with the random user role')
         self.base_selenium.click(element='user_management:filter_reset_btn')
 
-    def test017_filter_created_on(self):
-        """
-        User management Approach: I can filter by created on successfully
-
-        LIMS-6486
-        """
-        self.header_page.get_users_page()
-        UsersAPI().get_all_users()
-        user_data = self.header_page.get_data_from_row()
-
-        self.base_selenium.click(element='general:menu_filter_view')
-        self.header_page.filter_user_by(filter_element='user_management:filter_created_on',
-                                        filter_text=user_data['created_on'])
-
-        users_result = self.header_page.result_table()
-        self.assertIn(str(user_data['created_on']), (users_result[0].text).replace("'", ""))
-
-        self.info('filter results displayed with the date ( created on ) ')
-        self.base_selenium.click(element='user_management:filter_reset_btn')
-
     @skip('https://modeso.atlassian.net/browse/LIMS-6624')
-    def test018_cant_create_two_users_with_the_same_name(self):
+    def test015_cant_create_two_users_with_the_same_name(self):
         """
         User management: Can't create two users with the same name
+
         LIMS-6503
-        :return:
         """
         self.base_selenium.click(element='header:user_management_button')
         # create new user with random data
@@ -437,11 +388,12 @@ class LoginRandomUser(BaseTest):
         self.base_selenium.wait_until_page_url_has(text='dashboard')
         self.header_page.click_on_header_button()
 
-    def test018_delete_user_used_in_other_entity(self):
+    @attr(series=True)
+    def test016_delete_user_used_in_other_entity(self):
         """
         User management: Make sure that you can't delete any user record If this record used in other entity
+
         LIMS-6407
-        :return:
         """
         self.base_selenium.click(element='header:user_management_button')
 
@@ -458,7 +410,8 @@ class LoginRandomUser(BaseTest):
         self.header_page.delete_entity()
         self.assertTrue(self.base_selenium.element_is_displayed(element='general:confirmation_pop_up'))
 
-    def test019_filter_by_changed_by(self):
+    @attr(series=True)
+    def test017_filter_by_changed_by(self):
         """
         Header: Roles & Permissions Approach: Make sure that you can filter by role changed by
 
