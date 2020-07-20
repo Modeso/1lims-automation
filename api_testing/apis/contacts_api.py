@@ -1,5 +1,6 @@
 from api_testing.apis.base_api import BaseAPI
 from api_testing.apis.base_api import api_factory
+import json, os
 
 
 class ContactsAPIFactory(BaseAPI):
@@ -176,3 +177,10 @@ class ContactsAPI(ContactsAPIFactory):
                   "phone": 0, "skype": 0, "moreInfo": 0}
         payload = {"persons": [person], "departments": []}
         return self.create_contact(**payload)
+
+    def set_configuration(self):
+        self.info('set contact configuration')
+        config_file = os.path.abspath('api_testing/config/contacts.json')
+        with open(config_file, "r") as read_file:
+            payload = json.load(read_file)
+        super().set_configuration(payload=payload)
