@@ -288,6 +288,7 @@ class HeaderTestCases(BaseTest):
         self.info('Assert error msg')
         self.assertEqual(validation_result, True)
 
+    @attr(series=True)
     @parameterized.expand([('name', 'filter_name'),
                            ('email', 'filter_email'),
                            ('number', 'filter_number'),
@@ -313,6 +314,7 @@ class HeaderTestCases(BaseTest):
         users_result = self.header_page.result_table()
         self.assertIn(str(filter_data).replace("'", ""), (users_result[0].text).replace("'", ""))
 
+    @attr(series=True)
     def test014_filter_by_role(self):
         """
         User management Approach: I can filter by user role successfully
