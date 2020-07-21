@@ -288,7 +288,6 @@ class HeaderTestCases(BaseTest):
         self.info('Assert error msg')
         self.assertEqual(validation_result, True)
 
-    @attr(series=True)
     @parameterized.expand([('name', 'filter_name'),
                            ('email', 'filter_email'),
                            ('number', 'filter_number'),
@@ -369,10 +368,8 @@ class HeaderTestCases(BaseTest):
         self.info(
             'waiting fo validation message appear when I enter two users with the same name')
         validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
-
-        self.info(
-            'Assert the error message to make sure that validation when I enter two users with the same name? {}'.format(
-                validation_result))
+        self.info('Assert the error message to make sure that validation when '
+                  'I enter two users with the same name? {}'.format(validation_result))
         self.assertTrue(validation_result)
 
 
@@ -394,7 +391,6 @@ class LoginRandomUser(BaseTest):
         self.header_page.sleep_medium()
         self.header_page.get_users_page()
 
-    @attr(series=True)
     def test016_delete_user_used_in_other_entity(self):
         """
         User management: Make sure that you can't delete any user record If this record used in other entity
@@ -413,7 +409,6 @@ class LoginRandomUser(BaseTest):
         self.header_page.delete_entity()
         self.assertTrue(self.base_selenium.element_is_displayed(element='general:confirmation_pop_up'))
 
-    @attr(series=True)
     def test017_filter_by_changed_by(self):
         """
         Header: Roles & Permissions Approach: Make sure that you can filter by role changed by
