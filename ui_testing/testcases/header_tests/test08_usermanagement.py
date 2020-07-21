@@ -304,9 +304,11 @@ class HeaderTestCases(BaseTest):
         self.header_page.sleep_tiny()
         filter_data = self.header_page.get_data_from_row()[feild]
         self.info(" filter by  {}".format(filter_data))
+        self.header_page.sleep_tiny()
         self.base_selenium.click(element='general:menu_filter_view')
         self.header_page.filter_user_by(filter_element='user_management:{}'.format(filter_elem),
                                         filter_text=filter_data)
+        self.header_page.sleep_tiny()
 
         users_result = self.header_page.result_table()
         self.assertIn(str(filter_data).replace("'", ""), (users_result[0].text).replace("'", ""))
@@ -327,13 +329,14 @@ class HeaderTestCases(BaseTest):
         random_user_email = self.header_page.generate_random_email()
         self.header_page.create_new_user(user_name=random_user_name, user_email=random_user_email,
                                          user_role=random_role_name, user_password='1', user_confirm_password='1')
-
+        self.header_page.sleep_tiny()
         self.base_selenium.click(element='general:menu_filter_view')
         self.info("filter by {}".format(random_role_name))
         result_user = self.header_page.get_table_rows_data()
         user_filter = self.header_page.filter_user_drop_down(filter_name='user_management:filter_role',
                                                              filter_text=random_role_name)
 
+        self.header_page.sleep_tiny()
         self.assertIn(user_filter, result_user)
         self.info('filter results displayed with the random user role')
         self.base_selenium.click(element='user_management:filter_reset_btn')
@@ -423,10 +426,10 @@ class LoginRandomUser(BaseTest):
         self.header_page.click_on_user_config_btn()
         self.base_selenium.click(element='user_management:checked_changed_by')
         self.base_selenium.click(element='user_management:apply_btn')
-
+        self.header_page.sleep_tiny()
         self.base_selenium.click(element='general:menu_filter_view')
         self.header_page.filter_user_drop_down(filter_name='user_management:filter_changed_by',
                                                filter_text=self.user_name)
-
+        self.header_page.sleep_tiny()
         users_result = self.header_page.get_table_rows_data()
         self.assertIn(self.user_name, users_result[0])

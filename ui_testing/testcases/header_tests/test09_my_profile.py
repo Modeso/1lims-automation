@@ -9,7 +9,6 @@ from api_testing.apis.base_api import BaseAPI
 class MyProfileTestCases(BaseTest):
     def setUp(self):
         super().setUp()
-
         self.header_page = Header()
         self.my_profile_page = MyProfile()
         self.users_api = UsersAPI()
