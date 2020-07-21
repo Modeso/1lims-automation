@@ -4,7 +4,6 @@ from ui_testing.pages.login_page import Login
 from api_testing.apis.users_api import UsersAPI
 from api_testing.apis.roles_api import RolesAPI
 from parameterized import parameterized
-from nose.plugins.attrib import attr
 import re
 from unittest import skip
 
@@ -288,13 +287,13 @@ class HeaderTestCases(BaseTest):
         self.info('Assert error msg')
         self.assertEqual(validation_result, True)
 
-    @parameterized.expand([('name', 'filter_name'),
-                           ('email', 'filter_email'),
-                           ('number', 'filter_number'),
-                           ('created_on', 'filter_created_on')])
-    def test013_filter_by_text_feild(self, feild, filter_elem):
+    @parameterized.expand([('name', 'filter_name', 'Name'),
+                           ('email', 'filter_email', 'Email'),
+                           ('number', 'filter_number', 'No'),
+                           ('created_on', 'filter_created_on', 'Created On')])
+    def test013_filter_by_text_feild(self, feild, filter_elem, header):
         """
-        User management Approach: I can filter by name successfully
+        User management Approach: I can filter by name, email, number and created on successfully
 
         LIMS-6002
         LIMS-6442
@@ -304,16 +303,10 @@ class HeaderTestCases(BaseTest):
         self.header_page.sleep_tiny()
         filter_data = self.header_page.get_data_from_row()[feild]
         self.info(" filter by  {}".format(filter_data))
-        self.header_page.sleep_tiny()
-        self.base_selenium.click(element='general:menu_filter_view')
-        self.header_page.filter_user_by(filter_element='user_management:{}'.format(filter_elem),
+        users_result = self.header_page.filter_user_by(filter_element='user_management:{}'.format(filter_elem),
                                         filter_text=filter_data)
-        self.header_page.sleep_tiny()
+        self.assertEqual(users_result[header].replace("'", ""), filter_data.replace("'", ""))
 
-        users_result = self.header_page.result_table()
-        self.assertIn(str(filter_data).replace("'", ""), (users_result[0].text).replace("'", ""))
-
-    @attr(series=True)
     def test014_filter_by_role(self):
         """
         User management Approach: I can filter by user role successfully
@@ -330,17 +323,11 @@ class HeaderTestCases(BaseTest):
         random_user_email = self.header_page.generate_random_email()
         self.header_page.create_new_user(user_name=random_user_name, user_email=random_user_email,
                                          user_role=random_role_name, user_password='1', user_confirm_password='1')
-        self.header_page.sleep_tiny()
-        self.base_selenium.click(element='general:menu_filter_view')
-        self.info("filter by {}".format(random_role_name))
-        result_user = self.header_page.get_table_rows_data()
-        user_filter = self.header_page.filter_user_drop_down(filter_name='user_management:filter_role',
+
+        result_user = self.header_page.filter_user_drop_down(filter_name='user_management:filter_role',
                                                              filter_text=random_role_name)
 
-        self.header_page.sleep_tiny()
-        self.assertIn(user_filter, result_user)
-        self.info('filter results displayed with the random user role')
-        self.base_selenium.click(element='user_management:filter_reset_btn')
+        self.assertEqual(random_role_name, result_user['Role'])
 
     @skip('https://modeso.atlassian.net/browse/LIMS-6624')
     def test015_cant_create_two_users_with_the_same_name(self):
@@ -349,15 +336,13 @@ class HeaderTestCases(BaseTest):
 
         LIMS-6503
         """
-        self.base_selenium.click(element='header:user_management_button')
         # create new user with random data
         random_user_name = self.generate_random_string()
         random_user_email = self.header_page.generate_random_email()
         self.header_page.create_new_user(user_name=random_user_name, user_email=random_user_email,
                                          user_role='Admin', user_password='1', user_confirm_password='1')
 
-        self.info(
-            'search to make sure that the role created '.format(random_user_name))
+        self.info('search to make sure that the role created '.format(random_user_name))
         created_user = self.header_page.search(random_user_name)[0]
         user_data = self.base_selenium.get_row_cells_dict_related_to_header(row=created_user)
         self.assertTrue(created_user, user_data)
@@ -365,13 +350,11 @@ class HeaderTestCases(BaseTest):
         # create role with the same name
         self.header_page.create_new_user(user_name=random_user_name, user_email=random_user_email,
                                          user_role='Admin', user_password='1', user_confirm_password='1')
-        self.info(
-            'waiting fo validation message appear when I enter two users with the same name')
+        self.info('waiting fo validation message appear when I enter two users with the same name')
         validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
         self.info('Assert the error message to make sure that validation when '
                   'I enter two users with the same name? {}'.format(validation_result))
         self.assertTrue(validation_result)
-
 
 class LoginRandomUser(BaseTest):
     def setUp(self):
@@ -424,9 +407,8 @@ class LoginRandomUser(BaseTest):
         self.base_selenium.click(element='user_management:checked_changed_by')
         self.base_selenium.click(element='user_management:apply_btn')
         self.header_page.sleep_tiny()
-        self.base_selenium.click(element='general:menu_filter_view')
-        self.header_page.filter_user_drop_down(filter_name='user_management:filter_changed_by',
-                                               filter_text=self.user_name)
-        self.header_page.sleep_tiny()
-        users_result = self.header_page.get_table_rows_data()
-        self.assertIn(self.user_name, users_result[0])
+        users_result = self.header_page.filter_user_drop_down(
+            filter_name='user_management:filter_changed_by',
+            filter_text=self.user_name)
+
+        self.assertEqual(self.user_name, users_result['Changed By'])

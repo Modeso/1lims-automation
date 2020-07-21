@@ -138,20 +138,25 @@ class Header(BasePages):
         self.open_edit_page(row=user)
 
     def filter_user_by(self, filter_element, filter_text, field_type='text'):
-        self.info(
-            ' + Filter by {} : {}'.format(filter_element.replace('user:filter_', '').replace('_', ' '), filter_text))
+        self.info("open filter menu")
+        self.base_selenium.click(element='general:menu_filter_view')
+        self.info('+ Filter by {} : {}'.format(
+            filter_element.replace('user:filter_', '').replace('_', ' '), filter_text))
         self.filter_by(filter_element=filter_element, filter_text=filter_text, field_type=field_type)
         self.filter_apply()
+        self.sleep_tiny()
+        return self.get_the_latest_row_data()
 
-    def filter_user_drop_down(self, filter_name, filter_text, field_type='drop_down'):
+    def filter_user_drop_down(self, filter_name, filter_text):
+        self.info("open filter menu")
+        self.base_selenium.click(element='general:menu_filter_view')
         self.info(' + Filter by user : {}'.format(filter_text))
         self.filter_by(filter_element=filter_name, filter_text=filter_text)
         self.filter_apply()
         self.sleep_tiny()
-        return self.get_table_rows_data()[0]
+        return self.get_the_latest_row_data()
 
     def get_data_from_row(self):
-
         user_row = self.get_random_table_row(table_element='general:table')
         user_row_data = self.base_selenium.get_row_cells_dict_related_to_header(row=user_row)
         return {
