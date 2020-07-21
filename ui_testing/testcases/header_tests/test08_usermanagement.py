@@ -301,6 +301,7 @@ class HeaderTestCases(BaseTest):
         LIMS-6488
         LIMS-6486
         """
+        self.header_page.sleep_tiny()
         filter_data = self.header_page.get_data_from_row()[feild]
         self.info(" filter by  {}".format(filter_data))
         self.base_selenium.click(element='general:menu_filter_view')
@@ -316,24 +317,19 @@ class HeaderTestCases(BaseTest):
 
         LIMS-6443
         """
-        self.base_selenium.click(element='header:roles_and_permissions_button')
+        self.info("create new role")
         random_role_name = self.generate_random_string()
-        response, payload = self.roles_api.create_role(random_role_name)
+        response, payload = self.roles_api.create_role(role_name=random_role_name)
         self.assertEqual(response['status'], 1, payload)
-        self.info('make sure that that the user record created in the active table')
-        created_role = self.header_page.search(random_role_name)[0]
-        role_data = self.base_selenium.get_row_cells_dict_related_to_header(row=created_role)
-        self.assertTrue(created_role, role_data)
-
-        self.header_page.click_on_header_button()
-        self.base_selenium.click(element='header:user_management_button')
+        self.info("new role created with name {}".format(random_role_name))
+        self.info(" create new user with created role")
         random_user_name = self.generate_random_string()
         random_user_email = self.header_page.generate_random_email()
         self.header_page.create_new_user(user_name=random_user_name, user_email=random_user_email,
                                          user_role=random_role_name, user_password='1', user_confirm_password='1')
 
         self.base_selenium.click(element='general:menu_filter_view')
-
+        self.info("filter by {}".format(random_role_name))
         result_user = self.header_page.get_table_rows_data()
         user_filter = self.header_page.filter_user_drop_down(filter_name='user_management:filter_role',
                                                              filter_text=random_role_name)
