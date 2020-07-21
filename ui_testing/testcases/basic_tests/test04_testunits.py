@@ -160,8 +160,8 @@ class TestUnitsTestCases(BaseTest):
         self.assertFalse(self.base_selenium.is_item_in_drop_down(
             element='test_plan:test_unit', item_text=archived_test_unit['name']))
 
-    @skip('https://modeso.atlassian.net/browse/LIMSA-208')
     @parameterized.expand(['spec', 'quan'])
+    @skip('https://modeso.atlassian.net/browse/LIMSA-208')
     def test007_allow_unit_field_to_be_optional(self, specification_type):
         """
         Test unit: Limit of quantification Approach: Allow unit field to be optional field
@@ -196,8 +196,8 @@ class TestUnitsTestCases(BaseTest):
                 test_unit_found['Quantification Limit Unit']))
             self.assertEqual(test_unit_found['Quantification Limit Unit'], '-')
 
-    @skip('https://modeso.atlassian.net/browse/LIMSA-208')
     @parameterized.expand(['spec', 'quan'])
+    @skip('https://modeso.atlassian.net/browse/LIMSA-208')
     def test008_force_use_to_choose_specification_or_limit_of_quantification(self, specification_type):
         """
         The specification & Limit of quantification one of them should be mandatory.
@@ -317,12 +317,12 @@ class TestUnitsTestCases(BaseTest):
         else:
             self.assertTrue(test_unit_found['Category'])
 
-    @skip('https://modeso.atlassian.net/browse/LIMSA-208')
     @parameterized.expand([('upper', 'spec'),
                            ('upper', 'quan'),
                            ('lower', 'spec'),
                            ('lower', 'quan')
                            ])
+    @skip('https://modeso.atlassian.net/browse/LIMSA-208')
     def test012_create_test_unit_with_one_limit_only(self, limit, spec_or_quan):
         """
         New: Test unit: Specification Approach: In case I entered the upper limit or the lower limit only,
@@ -453,8 +453,8 @@ class TestUnitsTestCases(BaseTest):
             self.info('Assert that {}_limit is not active'.format(limit))
             self.assertNotIn('ng-valid', class_attr)
 
-    @skip('https://modeso.atlassian.net/browse/LIMSA-208')
     @parameterized.expand(['quan', 'spec'])
+    @skip('https://modeso.atlassian.net/browse/LIMSA-208')
     def test017_create_quantative_with_limits_of_quantative_only_and_specification_only(self, limits_type):
         """
         New:Test unit: Create Approach: User can create test unit with limits of quantification type only &
