@@ -13,6 +13,7 @@ class Header(BasePages):
         self.info(' + Get users page.')
         self.base_selenium.get(url=self.user_url)
         self.wait_until_page_is_loaded()
+        self.sleep_tiny()
 
     def get_random_user(self):
         row = self.get_random_user_row()
