@@ -87,6 +87,8 @@ class MyProfileTestCases(BaseTest):
             self.my_profile_page.chang_lang('EN')
             self.my_profile_page.sleep_tiny()
 
+        self.base_selenium.scroll()
+        self.my_profile_page.sleep_tiny()
         page_name = self.base_selenium.get_text('my_profile:page_name')
         if lang == 'EN':
             self.assertEqual(page_name, 'My Profile')
