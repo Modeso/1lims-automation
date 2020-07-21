@@ -63,6 +63,10 @@ class Order(Orders):
         self.set_test_unit(test_unit=test_unit)
         return self.base_selenium.check_item_partially_in_items(element='order:test_unit', item_text=test_unit)
 
+    def is_contact_existing(self, contact):
+        self.set_contact(contact=contact)
+        return self.base_selenium.check_item_in_items(element='order:contact', item_text=contact)
+
     def set_contact(self, contact='', remove_old=False):
         if remove_old:
            self.base_selenium.clear_items_in_drop_down(element='order:contact')

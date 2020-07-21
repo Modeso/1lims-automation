@@ -2316,3 +2316,22 @@ class OrdersTestCases(BaseTest):
             self.base_selenium.click(element='order:testplan_close_btn')
             self.base_selenium.check_element_is_not_exist(element='order:testplan_popup')
 
+    def test067_archived_contact_not_retrieved(self):
+        """ LIMS-5829- Make sure that Archived contacts are n't appear in contacts drop down list
+                                 """
+        api, payload = self.contacts_api.get_all_contacts(deleted=1)
+        archived_contact = random.choice(api['contacts'])['name']
+        print('***********************')
+        print(archived_contact)
+        self.base_selenium.click(element='orders:new_order')
+        self.order_page.set_new_order()
+        self.order_page.sleep_small()
+        self.info('Asset that archived contact is not existing in the list')
+        self.assertFalse(self.order_page.is_contact_existing(archived_contact))
+
+
+
+
+
+
+
