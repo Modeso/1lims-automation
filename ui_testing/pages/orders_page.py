@@ -131,6 +131,13 @@ class Orders(BasePages):
         self.filter_by(filter_element='orders:order_filter', filter_text=filter_text, field_type='text')
         self.filter_apply()
 
+    def filter_by_test_unit(self, filter_text):
+        self.open_filter_menu()
+        self.sleep_medium()
+        self.info('Filter by test unit : {}'.format(filter_text))
+        self.filter_by(filter_element='orders:test_units_filter', filter_text=filter_text, field_type='text')
+        self.filter_apply()
+
     def open_filter_menu(self):
         self.base_selenium.scroll()
         filter = self.base_selenium.find_element_in_element(source_element='general:menu_filter_view',
@@ -288,6 +295,13 @@ class Orders(BasePages):
         self.base_selenium.set_text(element='orders:analysis_filter',value=analysis_number)
         self.base_selenium.click(element='general:filter_btn')
         time.sleep(self.base_selenium.TIME_MEDIUM)
+
+    def search_by_test_unit(self, test_unit):
+        self.base_selenium.click(element='general:filter_button')
+        self.base_selenium.set_text(element='orders:test_units_filter', value=test_unit)
+        self.base_selenium.click(element='general:filter_btn')
+        time.sleep(self.base_selenium.TIME_MEDIUM)
+
 
     def is_order_in_table(self, value):
         results = self.base_selenium.get_table_rows(element='general:table')

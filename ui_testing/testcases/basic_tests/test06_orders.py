@@ -15,6 +15,7 @@ from api_testing.apis.test_plan_api import TestPlanAPI
 from ui_testing.pages.testplan_page import TstPlan
 from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from ui_testing.pages.contacts_page import Contacts
+from ui_testing.pages.testunits_page import TstUnits
 from random import randint
 import random
 
@@ -25,6 +26,7 @@ class OrdersTestCases(BaseTest):
         self.order_page = Order()
         self.orders_api = OrdersAPI()
         self.testplan_page = TstPlan()
+        self.testunits_page = TstUnits()
         self.orders_page = Orders()
         self.analyses_page = AllAnalysesPage()
         self.article_api = ArticleAPI()
@@ -38,6 +40,7 @@ class OrdersTestCases(BaseTest):
         self.set_authorization(auth=self.contacts_api.AUTHORIZATION_RESPONSE)
         self.order_page.get_orders_page()
         self.orders_api.set_configuration()
+
 
     @parameterized.expand(['save_btn', 'cancel'])
     def test001_edit_order_number_with_save_cancel_btn(self, save):
@@ -2321,13 +2324,31 @@ class OrdersTestCases(BaseTest):
                                  """
         api, payload = self.contacts_api.get_all_contacts(deleted=1)
         archived_contact = random.choice(api['contacts'])['name']
-        print('***********************')
         print(archived_contact)
         self.base_selenium.click(element='orders:new_order')
         self.order_page.set_new_order()
         self.order_page.sleep_small()
         self.info('Asset that archived contact is not existing in the list')
         self.assertFalse(self.order_page.is_contact_existing(archived_contact))
+
+    def test068_filter_testunit_by_scripts(self):
+        self.testunits_page.get_test_units_page()
+        # self.testunits_page.open_configurations()
+        # self.testunits_page.sleep_small()
+        # self.testunits_page.open_testunit_name_configurations_options()
+        # self.testunits_page.sleep_medium()
+        # self.testunits_page.select_option_to_view_search_with('Unit')
+        # self.testunits_page.sleep_medium()
+        api, testunit = self.test_unit_api.create_qualitative_testunit(unit='10[5258]')
+        unit = testunit['unit']
+        self.orders_page.get_orders_page()
+        self.order_page.sleep_small()
+        self.base_selenium.scroll(False)
+        self.orders_page.apply_filter_scenario(filter_element='orders:test_units_filter',
+                                               filter_text=unit , field_type='drop_down')
+        self.assertTrue(self.base_selenium.is_item_in_drop_down(unit))
+
+
 
 
 
