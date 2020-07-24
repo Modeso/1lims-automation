@@ -192,6 +192,7 @@ class HeaderTestCases(BaseTest):
         self.info('Assert error msg')
         self.assertEqual(validation_result, True)
 
+    @skip('https://modeso.atlassian.net/browse/LIMSA-220')
     def test009_download_role_sheet(self):
         """
         Roles & Permissions: Make sure you can export all the data in the active table
