@@ -10,7 +10,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
+<<<<<<< HEAD
         test_cases: ["ui_testing/testcases/basic_tests/test06_orders.py:OrdersTestCases.test066_close_testplan_popup"]
+=======
+        test_cases: ["ui_testing/testcases/basic_tests/test04_testunits.py:TestUnitsTestCases"]
+>>>>>>> 4e5068b766e626514d6a492041541f33ad1c3e80
 
     steps:
       - uses: actions/checkout@master
