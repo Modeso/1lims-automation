@@ -19,6 +19,7 @@ class HeaderTestCases(BaseTest):
         super().setUp()
         self.header_page = Header()
         self.users_api = UsersAPI()
+        self.roles_api = RolesAPI()
         self.set_authorization(auth=self.users_api.AUTHORIZATION_RESPONSE)
         self.header_page.get_roles_page()
 
@@ -110,7 +111,7 @@ class HeaderTestCases(BaseTest):
         LIMS-6404- edit approach
         """
         self.info("get random role edit page")
-        response, payload = RolesAPI().get_all_roles()
+        response, payload = self.roles_api.get_all_roles()
         self.assertEqual(response['status'], 1, response)
         random_role_id = random.choice(response['roles'])['id']
         self.header_page.get_role_edit_page_by_id(random_role_id)
@@ -128,7 +129,7 @@ class HeaderTestCases(BaseTest):
         LIMS-6108
         """
         self.info("get random role edit page")
-        random_role = random.choice(RolesAPI().get_random_role())
+        random_role = random.choice(self.roles_api.get_random_role())
         self.header_page.get_role_edit_page_by_id(random_role['id'])
         new_name = self.generate_random_string()
         self.header_page.set_role_name(role_name=new_name)
@@ -151,33 +152,24 @@ class HeaderTestCases(BaseTest):
 
         LIMS-6401
         """
-        random_role_name = self.generate_random_string()
-        self.header_page.create_new_role(role_name=random_role_name)
-
-        self.info('make sure that that the user record created in the active table')
-        created_role = self.header_page.search(random_role_name)[0]
-        role_data = self.base_selenium.get_row_cells_dict_related_to_header(row=created_role)
-        self.assertTrue(created_role, role_data)
-
-        self.header_page.select_all_records()
-        self.header_page.archive_entity(menu_element='roles_and_permissions:right_menu',
-                                        archive_element='roles_and_permissions:archive')
+        role_name = self.generate_random_string()
+        response, payload = self.roles_api.create_role(role_name=role_name)
+        self.assertEqual(response['status'], 1)
+        row = self.header_page.search(role_name)
+        self.header_page.sleep_tiny()
+        self.header_page.click_check_box(row[0])
+        self.header_page.archive_selected_items()
         self.header_page.get_archived_entities(menu_element='roles_and_permissions:right_menu',
                                                archived_element='roles_and_permissions:archived')
-
         self.info('make sure that that the user record navigate to the archive table')
-        created_role = self.header_page.search(random_role_name)[0]
-        role_data = self.base_selenium.get_row_cells_dict_related_to_header(row=created_role)
-        self.assertTrue(created_role, role_data)
-
-        self.header_page.select_all_records()
+        archived_row = self.header_page.search(role_name)
+        self.header_page.click_check_box(archived_row[0])
         self.info('Press on the right menu')
         self.base_selenium.click(element='roles_and_permissions:right_menu')
         self.info('Press on the delete button')
         self.base_selenium.click(element='roles_and_permissions:delete')
         self.header_page.confirm_popup()
-
-        result = self.header_page.search(value=random_role_name)
+        result = self.header_page.search(value=role_name)
         self.info('deleted successfully')
         self.assertTrue(result, 'No records found')
 
@@ -189,7 +181,7 @@ class HeaderTestCases(BaseTest):
         LIMS-6404
         """
         self.info("get random role edit page")
-        random_role = random.choice(RolesAPI().get_random_role())
+        random_role = random.choice(self.roles_api.get_random_role())
         self.header_page.get_role_edit_page_by_id(random_role['id'])
         self.header_page.clear_role_name()
         self.header_page.sleep_medium()
@@ -216,7 +208,7 @@ class HeaderTestCases(BaseTest):
             values = self.header_page.sheet.iloc[index].values
             fixed_sheet_row_data = self.fix_data_format(values)
             for item in fixed_row_data:
-                self.assertIn(item, fixed_sheet_row_data)
+                self.assertIn(str(item).lower, fixed_sheet_row_data)
 
     @parameterized.expand(['10', '20', '25', '50', '100'])
     def test010_testing_table_pagination(self, pagination_limit):
@@ -249,26 +241,28 @@ class HeaderTestCases(BaseTest):
 
         LIMS-6437
         """
-        # create new role with random data
+        self.info('create new role with random data')
         role_random_name = self.generate_random_string()
-        response, payload = RolesAPI().create_role(role_name=role_random_name)
+        response, payload = self.roles_api.create_role(role_name=role_random_name)
         self.assertEqual(response['status'], 1, response)
         self.info("Navigate to users page")
         self.header_page.get_users_page()
         self.info("get random user edit page and set role to {}".format(role_random_name))
         self.header_page.get_random_user()
+        self.header_page.sleep_tiny()
         self.header_page.set_user_role(user_role=role_random_name)
         self.header_page.save(save_btn='roles_and_permissions:save_btn')
         self.info("navigate to the role page to delete it")
         self.header_page.get_roles_page()
-        self.header_page.search(value=role_random_name)
-        self.header_page.select_all_records()
-        # navigate to the archived table to delete it
-        self.header_page.archive_entity(menu_element='roles_and_permissions:right_menu',
-                                        archive_element='roles_and_permissions:archive')
+        row = self.header_page.search(role_random_name)
+        self.header_page.sleep_tiny()
+        self.header_page.click_check_box(row[0])
+        self.header_page.archive_selected_items()
         self.header_page.get_archived_entities(menu_element='roles_and_permissions:right_menu',
                                                archived_element='roles_and_permissions:archived')
-        self.header_page.select_all_records()
+        self.info('make sure that that the user record navigate to the archive table')
+        archived_row = self.header_page.search(role_random_name)
+        self.header_page.click_check_box(archived_row[0])
         self.info('Press on the right menu')
         self.base_selenium.click(element='roles_and_permissions:right_menu')
         self.info('Press on the delete button')
@@ -288,7 +282,7 @@ class HeaderTestCases(BaseTest):
         """
         self.info('create new role with random data')
         role_random_name = self.generate_random_string()
-        response, payload = RolesAPI().create_role(role_name=role_random_name)
+        response, payload = self.roles_api.create_role(role_name=role_random_name)
         self.assertEqual(response['status'], 1, response)
         self.info('archive the role that you created')
         self.header_page.select_all_records()
@@ -308,7 +302,7 @@ class HeaderTestCases(BaseTest):
         """
         self.info('create new role with random data')
         role_random_name = self.generate_random_string()
-        response, payload = RolesAPI().create_role(role_name=role_random_name)
+        response, payload = self.roles_api.create_role(role_name=role_random_name)
         self.assertEqual(response['status'], 1, response)
 
         self.info('create role with the same name')
@@ -394,7 +388,7 @@ class HeaderTestCases(BaseTest):
         LIMS-6120
         """
         self.info("get random role name")
-        random_role = random.choice(RolesAPI().get_random_role())
+        random_role = random.choice(self.roles_api.get_random_role())
         roles_result = self.header_page.filter_user_by(
             filter_element='roles_and_permissions:role_name',
             filter_text=random_role['name'])
@@ -408,7 +402,7 @@ class HeaderTestCases(BaseTest):
         LIMS-6003
         """
         self.info("get random role name")
-        random_role = random.choice(RolesAPI().get_random_role())
+        random_role = random.choice(self.roles_api.get_random_role())
         roles_result = self.header_page.filter_role_by_no(random_role['id'])
 
         self.assertEqual(str(random_role['id']), roles_result['No'])
@@ -438,6 +432,7 @@ class HeaderTestCases(BaseTest):
         response, payload = UsersAPI().create_new_user()
         self.assertEqual(response['status'], 1, response)
         self.login_page.logout()
+        self.header_page.sleep_tiny()
         self.info('login with role & user {}:{}'.format(payload['username'], payload['password']))
         self.login_page.login(username=payload['username'], password=payload['password'])
         self.header_page.wait_until_page_is_loaded()
@@ -449,8 +444,7 @@ class HeaderTestCases(BaseTest):
         self.header_page.click_on_table_configuration_button()
         self.base_selenium.click(element='roles_and_permissions:checked_role_changed_by')
         self.base_selenium.click(element='roles_and_permissions:apply_btn')
-
-        self.base_selenium.click(element='general:menu_filter_view')
+        self.header_page.sleep_tiny()
         self.header_page.filter_user_drop_down(filter_name='roles_and_permissions:filter_changed_by',
                                                filter_text=payload['username'])
 

@@ -147,6 +147,8 @@ class Header(BasePages):
         return self.get_the_latest_row_data()
 
     def filter_user_drop_down(self, filter_name, filter_text, field_type='drop_down'):
+        self.open_filter_menu()
+
         self.info(' + Filter by user : {}'.format(filter_text))
         self.filter_by(filter_element=filter_name, filter_text=filter_text)
         self.filter_apply()
