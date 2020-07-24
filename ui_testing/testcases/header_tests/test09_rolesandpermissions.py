@@ -10,7 +10,8 @@ from ui_testing.pages.analysis_page import SingleAnalysisPage
 from api_testing.apis.users_api import UsersAPI
 from api_testing.apis.roles_api import RolesAPI
 from parameterized import parameterized
-import re, time, random
+from nose.plugins.attrib import attr
+import re, random
 
 
 class HeaderTestCases(BaseTest):
@@ -426,6 +427,7 @@ class HeaderTestCases(BaseTest):
         roles_result = self.header_page.result_table()
         self.assertIn(str(role_data['created_on']), (roles_result[0].text).replace("'", ""))
 
+    @attr(series=True)
     def test019_filter_by_changed_by(self):
         """
         Header: Roles & Permissions Approach: Make sure that you can filter by role changed by
