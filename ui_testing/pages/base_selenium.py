@@ -66,8 +66,8 @@ class BaseSelenium:
         self.username = config['site']['username']
         self.password = config['site']['password']
         self.browser = config['browser']['browser'].lower()
-        self.headless_mode = config['browser']['headless_mode'].capitalize()
-        self.remote_webdriver = config['browser']['remote_driver'].capitalize()
+        self.headless = config['browser']['headless'].capitalize()
+        self.remote_webdriver = config['browser']['remote'].capitalize()
         self.elements = elements
 
     @contextmanager
@@ -86,7 +86,7 @@ class BaseSelenium:
                 desired_capabilities = DesiredCapabilities.FIREFOX
             self.driver = webdriver.Remote(command_executor=self.remote_webdriver + '/wd/hub',
                                            desired_capabilities=desired_capabilities)
-        elif self.headless_mode == 'True':
+        elif self.headless == 'True':
             options = Options()
             options.add_argument('--headless')
             options.add_argument('--no-sandbox')
@@ -725,9 +725,10 @@ class BaseSelenium:
         self.click(element=element)
         time.sleep(sleep)
         sheets = []
-        for file_name in os.listdir(os.path.expanduser("~/Downloads")):
+        downloaded_file_path = "~/Downloads" if os.path.isdir("~/Downloads") else "./"
+        for file_name in os.listdir(os.path.expanduser(downloaded_file_path)):
             if '.xlsx' in file_name:
-                sheets.append(os.path.expanduser("~/Downloads/") + file_name)
+                sheets.append(os.path.expanduser(downloaded_file_path) + file_name)
         downloaded_file_name = max(sheets, key=os.path.getctime)
         data = pd.read_excel(downloaded_file_name)
         # row = data.iloc[1]
