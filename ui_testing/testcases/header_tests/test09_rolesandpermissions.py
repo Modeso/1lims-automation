@@ -12,6 +12,7 @@ from api_testing.apis.roles_api import RolesAPI
 from parameterized import parameterized
 from nose.plugins.attrib import attr
 import re, random
+from unittest import skip
 
 
 class HeaderTestCases(BaseTest):
