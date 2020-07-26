@@ -2331,22 +2331,31 @@ class OrdersTestCases(BaseTest):
         self.info('Asset that archived contact is not existing in the list')
         self.assertFalse(self.order_page.is_contact_existing(archived_contact))
 
-    def test068_filter_testunit_by_scripts(self):
-        self.testunits_page.get_test_units_page()
-        # self.testunits_page.open_configurations()
-        # self.testunits_page.sleep_small()
-        # self.testunits_page.open_testunit_name_configurations_options()
-        # self.testunits_page.sleep_medium()
-        # self.testunits_page.select_option_to_view_search_with('Unit')
-        # self.testunits_page.sleep_medium()
-        api, testunit = self.test_unit_api.create_qualitative_testunit(unit='10[5258]')
+    @parameterized.expand(['sub_script', 'super_script'])
+    def test068_filter_testunit_by_scripts(self, value):
+        """ LIMS-7447- Make sure that user can filter by sub & super scripts in the filter drop down list
+                                        """
+        self.test_unit_api.set_configuration()
+        if value == 'sub_script':
+            api, testunit = self.test_unit_api.create_qualitative_testunit(unit='14[158]')
+            self.assertEqual(api['status'], 1)
+        else:
+            api, testunit = self.test_unit_api.create_qualitative_testunit(unit='15{158}')
+            self.assertEqual(api['status'], 1)
+
         unit = testunit['unit']
         self.orders_page.get_orders_page()
         self.order_page.sleep_small()
         self.base_selenium.scroll(False)
         self.orders_page.apply_filter_scenario(filter_element='orders:test_units_filter',
-                                               filter_text=unit , field_type='drop_down')
-        self.assertTrue(self.base_selenium.is_item_in_drop_down(unit))
+                                               filter_text=unit, field_type='drop_down')
+        self.assertIsNotNone(self.base_selenium.is_text_included_in_drop_down_items(element='orders:test_units_filter', item_text=unit))
+
+
+
+
+
+
 
 
 

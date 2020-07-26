@@ -40,7 +40,7 @@
             "Name",
             "Type"
          ],
-         "viewByoptions":["name","type"],
+         "viewByoptions":["name","type","unit"],
          "error":false,
          "optionsInUse":[""]
       },
