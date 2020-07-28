@@ -18,6 +18,7 @@ class Header(BasePages):
     def get_random_user(self):
         row = self.get_random_user_row()
         self.open_edit_page(row=row)
+        self.sleep_small()
 
     def get_random_user_row(self):
         return self.get_random_table_row(table_element='user_management:user_table')
@@ -70,8 +71,8 @@ class Header(BasePages):
         self.sleep_small()
 
     def create_new_user(self, user_role='', sleep=True, user_email='', user_password='', user_confirm_password='',
-                        user_name=''):
-        self.info(' + Create new user.')
+                        user_name='', contact=''):
+        self.base_selenium.LOGGER.info(' + Create new user.')
         self.base_selenium.click(element='user_management:create_user_button')
         self.sleep_medium()
         user_name = self.set_user_name(user_name)
@@ -79,7 +80,6 @@ class Header(BasePages):
         user_role = self.set_user_role(user_role)
         user_password = self.set_user_password(user_password)
         user_confirm_password = self.set_user_confirm_password(user_confirm_password)
-
         user_data = {
             "user_name": user_name,
             "user_email": user_email,
@@ -87,7 +87,11 @@ class Header(BasePages):
             "user_password": user_password,
             "user_confirm_password": user_confirm_password,
         }
-        self.save()
+        if contact:
+            user_contact = self.set_contact(contact)
+            user_data.update({"user_contact": user_contact})
+
+        self.save(sleep)
         return user_data
 
     def set_user_name(self, user_name):
@@ -150,6 +154,7 @@ class Header(BasePages):
     def filter_user_drop_down(self, filter_name, filter_text):
         self.info("open filter menu")
         self.base_selenium.click(element='general:menu_filter_view')
+
         self.info(' + Filter by user : {}'.format(filter_text))
         self.filter_by(filter_element=filter_name, filter_text=filter_text)
         self.filter_apply()
@@ -381,3 +386,16 @@ class Header(BasePages):
     def get_last_user_row(self):
         rows = self.result_table()
         return rows[0]
+
+    def get_role_edit_page_by_id(self, id):
+        url_text = "{}roles/edit/" + str(id)
+        self.base_selenium.get(url=url_text.format(self.base_selenium.url))
+        self.wait_until_page_is_loaded()
+
+    def filter_role_by_no(self, filter_text):
+        self.info('Filter by Role number {}'.format(filter_text))
+        self.open_filter_menu()
+        self.filter_by(filter_element='roles_and_permissions:filter_no', filter_text=filter_text, field_type='text')
+        self.filter_apply()
+        self.sleep_tiny()
+        return self.get_the_latest_row_data()

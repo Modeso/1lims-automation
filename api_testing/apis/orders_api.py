@@ -57,11 +57,11 @@ class OrdersAPIFactory(BaseAPI):
         material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
         testplan_form_data = TestPlanAPI()._get_testplan_form_data(id=testplan['id'])[0]
         article = testplan_form_data['testPlan']['selectedArticles'][0]['name']
-        article_id =testplan_form_data['testPlan']['selectedArticles'][0]['id']
+        article_id = testplan_form_data['testPlan']['selectedArticles'][0]['id']
         if article == 'all':
             article, article_id = ArticleAPI().get_random_article_articleID()
 
-        #modify_test_plan_ID
+        # modify_test_plan_ID
         testplan['id'] = testplan_form_data['testPlan']['testPlanEntity']['id']
         testunit = testplan_form_data['testPlan']['specifications'][0]
 
@@ -228,7 +228,12 @@ class OrdersAPIFactory(BaseAPI):
 
         return [payload]
 
+
 class OrdersAPI(OrdersAPIFactory):
+    def get_all_orders_json(self, **kwargs):
+        orders_response, _ = self.get_all_orders(**kwargs)
+        return orders_response['orders']
+
     def get_order_with_multiple_sub_orders(self):
         api, payload = self.get_all_orders(limit=100)
         all_orders = api['orders']
@@ -236,7 +241,7 @@ class OrdersAPI(OrdersAPIFactory):
             suborder = self.get_suborder_by_order_id(id=order['orderId'])[0]['orders']
             if len(suborder) > 1:
                 return order
-              
+
     def get_order_with_field_name(self, field, no_of_field):
         """
         :param field: must be in this list ['article', 'materialType','analysis','testPlans','testUnit']
@@ -247,7 +252,7 @@ class OrdersAPI(OrdersAPIFactory):
         for order in orders:
             suborders_data, a = self.get_suborder_by_order_id(order['id'])
             suborders = suborders_data['orders']
-            for i in range(0, len(suborders)-1):
+            for i in range(0, len(suborders) - 1):
                 if field in suborders[i].keys():
                     if suborders[i][field] and suborders[i][field] != "-" \
                             and len(suborders[i][field]) == int(no_of_field):
@@ -288,7 +293,7 @@ class OrdersAPI(OrdersAPIFactory):
             for i in range(0, len(suborders) - 1):
                 if suborders[i]['departments']:
                     return suborders[i]['departments']
-                      
+
     def create_order_with_double_test_plans(self, only_test_plans=False):
         testplan = random.choice(TestPlanAPI().get_completed_testplans())
         testplan_form_data = TestPlanAPI()._get_testplan_form_data(id=testplan['id'])[0]
@@ -366,6 +371,20 @@ class OrdersAPI(OrdersAPIFactory):
                 {"id": contact['id'],
                  "text": contact['name'],
                  'No': contact['companyNo']},
+            ],
+            'departments': [{"id": department_data['id'], "text": department_data['name'],
+                             "group": contact['id'], "groupName": contact['name']}],
+        }
+        return self.create_new_order(**payload)
+
+    def create_order_with_department_by_contact_id(self, contact_id):
+        contact = ContactsAPI().get_contact_form_data(contact_id)[0]['contact']
+        department_data = contact['departments'][0]
+        payload = {
+            'contact': [
+                {"id": contact['id'],
+                 "text": contact['name'],
+                 'No': contact['companyNumber']},
             ],
             'departments': [{"id": department_data['id'], "text": department_data['name'],
                              "group": contact['id'], "groupName": contact['name']}],
