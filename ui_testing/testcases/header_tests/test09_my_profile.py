@@ -17,7 +17,7 @@ class MyProfileTestCases(BaseTest):
         self.current_password = payload["password"]
         self.username = payload["username"]
         self.email = payload["email"]
-        self.info('User  created with {}:{}'.format(self.username, self.current_password))
+        self.info('user {}:{}'.format(self.username, self.current_password))
         self.users_api._get_authorized_session(username=self.username, password=self.current_password, reset_token=True)
         self.set_authorization(auth=self.users_api.AUTHORIZATION_RESPONSE)
         self.my_profile_page.get_my_profile_page()
