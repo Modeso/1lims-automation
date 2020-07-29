@@ -165,19 +165,6 @@ class ArticleAPI(ArticleAPIFactory):
         _filter = '{{"quickSearch":"{}","columns":["name"]}}'.format(name)
         return self.get_all_articles(filter=_filter)
 
-    def get_article_id(self, article, articleNo):
-        filter = '{{"quickSearch": "","No": "{}", "name":"{}","columns": ' \
-                 '["name", "materialType","number", "modifiedAt","modifiedBy",' \
-                 ' "comment", "createdAt", "testPlans", "unit"]}}'.format(articleNo, article)
-
-        api, articles = self.get_all_articles(filter=filter, sort_value='No')
-        if api['status'] == 1 and api['count'] == 1:
-            return api['articles'][0]['id']
-        elif api['count'] > 1:
-            self.info(" there's error as {} article has same data".format(api['count']))
-        else:
-            self.info(" there's no article with name {} and no {}".format(article, articleNo))
-
     def get_article_with_material_type(self, material_type):
         material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
         articles, payload = self.get_all_articles(limit=500)

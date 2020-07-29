@@ -432,11 +432,19 @@ class Order(Orders):
         order_data['suborders'] = suborders_data
         return order_data
 
+    def remove_testplan_by_name(self, index, testplan_name):
+        suborder_table_rows = self.base_selenium.get_table_rows(element='order:suborder_table')
+        suborder_row = suborder_table_rows[index]
+        suborder_elements_dict = self.base_selenium.get_row_cells_id_elements_related_to_header(
+            row=suborder_row, table_element='order:suborder_table')
+        self.base_selenium.update_item_value(item=suborder_elements_dict['testPlans'],
+                                             item_text=testplan_name.replace("'", ''))
+
     def remove_testunit_by_name(self, index, testunit_name):
         suborder_table_rows = self.base_selenium.get_table_rows(element='order:suborder_table')
         suborder_row = suborder_table_rows[index]
-        suborder_elements_dict = self.base_selenium.get_row_cells_id_elements_related_to_header(row=suborder_row,
-                                                                                                table_element='order:suborder_table')
+        suborder_elements_dict = self.base_selenium.get_row_cells_id_elements_related_to_header(
+            row=suborder_row, table_element='order:suborder_table')
         self.base_selenium.update_item_value(item=suborder_elements_dict['testUnits'],
                                              item_text=testunit_name.replace("'", ''))
 

@@ -1872,13 +1872,22 @@ class OrdersTestCases(BaseTest):
 
         self.info("duplicate order No {} ".format(payload[0]['orderNo']))
         self.orders_page.search(payload[0]['orderNo'])
-        suborder_data = self.orders_page.get_child_table_data()[0]
-        self.assertEqual(suborder_data['Test Plans'].split(',\n')[0], payload[0]['testPlans'][0]['testPlanName'])
-        self.assertEqual(suborder_data['Test Plans'].split(',\n')[1], payload[0]['testPlans'][1]['testPlanName'])
-        self.assertEqual(suborder_data['Material Type'], payload[0]['materialType']['text'])
-        self.assertEqual(suborder_data['Article Name'], payload[0]['article']['text'])
-        self.assertEqual(suborder_data['Test Units'].split(',\n')[0], payload[0]['testUnits'][0]['name'])
-        self.assertEqual(suborder_data['Test Units'].split(',\n')[1], payload[0]['testUnits'][1]['name'])
+        self.info("duplicate sub order with one copy only")
+        self.orders_page.open_child_table(source=self.orders_page.result_table()[0])
+        self.orders_page.duplicate_sub_order_from_table_overview()
+        self.info("update test plan to {} and test unit to {}".format(new_test_plan, new_test_unit))
+        self.order_page.update_suborder(test_plans=[new_test_plan], test_units=[new_test_unit], remove_old=True)
+        self.order_page.save(save_btn='order:save')
+
+        self.info("navigate to analysis page")
+        self.order_page.get_orders_page()
+        self.order_page.navigate_to_analysis_tab()
+        self.analyses_page.search(payload[0]['orderNo'])
+        analyses = self.analyses_page.get_the_latest_row_data()
+        self.assertEqual(new_test_plan, analyses['Test Plans'].replace("'", ""))
+        child_data = self.analyses_page.get_child_table_data()
+        test_units = [test_unit['Test Unit'] for test_unit in child_data]
+        self.assertIn(new_test_unit, test_units)
 
     @parameterized.expand(["duplicate", "edit"])
     def test042_Duplicate_or_update_order_with_test_plan_only(self, case):
