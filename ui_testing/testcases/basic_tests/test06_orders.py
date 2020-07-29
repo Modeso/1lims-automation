@@ -1890,7 +1890,7 @@ class OrdersTestCases(BaseTest):
         self.assertIn(new_test_unit, test_units)
 
     @parameterized.expand(["duplicate", "edit"])
-    def test042_Duplicate_or_update_order_with_test_plan_only(self, case):
+    def test053_Duplicate_or_update_order_with_test_plan_only(self, case):
         """
         Duplicate main order Approach: duplicate order with test plan
 
@@ -1942,7 +1942,7 @@ class OrdersTestCases(BaseTest):
         analyses = self.analyses_page.get_the_latest_row_data()
         self.assertCountEqual([new_test_plan], analyses['Test Plans'].split(', '))
 
-    def test053_Duplicate_sub_order_with_multiple_testplans_and_testunits_add_approach(self):
+    def test054_Duplicate_sub_order_with_multiple_testplans_and_testunits_add_approach(self):
         """
         Duplicate suborder Approach: Duplicate any sub order then add test unit & test plan
 
@@ -1987,7 +1987,7 @@ class OrdersTestCases(BaseTest):
         self.assertCountEqual(duplicated_suborder_test_units, test_units)
         self.assertCountEqual(duplicated_suborder_test_plans, test_plans)
 
-    def test054_user_can_edit_multiple_columns(self):
+    def test055_user_can_edit_multiple_columns(self):
         """
         user can edit multiple columns at the same time
 
@@ -2039,7 +2039,7 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(first_test_date, test_date)
 
     # @skip('https://modeso.atlassian.net/browse/LIMS-7722')
-    def test055_duplicate_main_order_with_testPlans_and_testUnits(self):
+    def test056_duplicate_main_order_with_testPlans_and_testUnits(self):
         """
         Duplicate main order Approach: duplicate order with test plan & test units
         LIMS-4353
@@ -2070,7 +2070,7 @@ class OrdersTestCases(BaseTest):
         duplicated_test_units = [testunit['Test Unit'] for testunit in duplicated_suborder_data]
         self.assertCountEqual(test_units, duplicated_test_units)
 
-    def test056_table_with_add_edit_single_row(self):
+    def test057_table_with_add_edit_single_row(self):
         """
         Orders: Table with add: In case I have two suborders and I update the first one
         then press on the second one the first one should updated according to that
@@ -2102,7 +2102,7 @@ class OrdersTestCases(BaseTest):
         self.assertNotEqual(testunit_before_edit_row, testunit_after_edit_row)
 
     @parameterized.expand(['2020', '20'])
-    def test057_search_by_year(self, search_text):
+    def test058_search_by_year(self, search_text):
         """
         Search: Orders: Make sure that you can search by all the year format
         ( with year in case year after or before & without year )
@@ -2116,7 +2116,7 @@ class OrdersTestCases(BaseTest):
         for order in orders:
             self.assertIn(search_text, order.replace("'", ""))
 
-    def test058_upload_attachment(self):
+    def test059_upload_attachment(self):
         """
         I can upload any attachment successfully from the order section
         LIMS-8258
@@ -2132,7 +2132,7 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(upload_file, file_name)
 
     @skip('https://modeso.atlassian.net/browse/LIMS-177')
-    def test059_upload_attachment_then_remove(self):
+    def test060_upload_attachment_then_remove(self):
         """
         Orders step 1: Attachment download approach: There is a link under remove link for
         download and you can preview it by clicking on it
@@ -2159,7 +2159,7 @@ class OrdersTestCases(BaseTest):
             after_remove_attachment, file_name))
         self.assertNotEqual(after_remove_attachment, file_name)
 
-    def test060_testplans_popup(self):
+    def test061_testplans_popup(self):
         """
         Orders: Test plan pop up Approach: Make sure the test plans
         & units displayed on the test plans & units fields same as in the test plan pop up
@@ -2182,7 +2182,7 @@ class OrdersTestCases(BaseTest):
             testunit_name, testplans_testunits_names_in_popup[0]['test_units'][0]))
         self.assertEqual(testunit_name, testplans_testunits_names_in_popup[0]['test_units'][0])
 
-    def test061_testplans_popup_after_edit_by_add(self):
+    def test062_testplans_popup_after_edit_by_add(self):
         """
         Orders: Test plan pop up  Approach: Make sure In case you edit the test plans
         & add another ones this update should reflect on the test plan pop up
@@ -2213,7 +2213,7 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(testunit_name, testplans_testunits_names_in_popup[1]['test_units'][0])
 
     @skip("https://modeso.atlassian.net/browse/LIMSA-127")
-    def test062_testplans_popup_after_edit_by_replace(self):
+    def test063_testplans_popup_after_edit_by_replace(self):
         """
         Orders: Test plan: Test unit pop up Approach: In case I delete test plan, make sure it
         deleted from the pop up with it's test units and updated with another one
@@ -2243,7 +2243,7 @@ class OrdersTestCases(BaseTest):
             testunit_name, testplans_testunits_names_in_popup[0]['test_units'][0]))
         self.assertEqual(testunit_name, testplans_testunits_names_in_popup[0]['test_units'][0])
 
-    def test063_create_order_with_multiple_contacts_then_add_department(self):
+    def test064_create_order_with_multiple_contacts_then_add_department(self):
         """
         User should be able to choose more than one contact from drop down menu upon creating a new order
 
@@ -2285,7 +2285,7 @@ class OrdersTestCases(BaseTest):
         self.info('assert that department updated')
         self.assertEqual([department], order_data['suborders'][0]['departments'])
 
-    def test064_edit_department_of_order_with_multiple_contacts(self):
+    def test065_edit_department_of_order_with_multiple_contacts(self):
         """
         In case I select multiple contacts the departments should be updated according to that
 
@@ -2320,7 +2320,7 @@ class OrdersTestCases(BaseTest):
         suborder_data = self.order_page.get_suborder_data()
         self.assertEqual([department], suborder_data['suborders'][0]['departments'])
 
-    def test065_download_suborder_sheet_for_single_order(self):
+    def test066_download_suborder_sheet_for_single_order(self):
         """
         Export order child table
 
