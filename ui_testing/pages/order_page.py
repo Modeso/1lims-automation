@@ -440,7 +440,7 @@ class Order(Orders):
         self.base_selenium.update_item_value(item=suborder_elements_dict['testUnits'],
                                              item_text=testunit_name.replace("'", ''))
 
-    def update_suborder(self, sub_order_index=0, contacts=False, departments=[], material_type=False, articles=False,
+    def update_suborder(self, sub_order_index=0, contacts=False, departments=[], material_type=False, articles=[],
                         test_plans=[], test_units=[], shipment_date=False, test_date=False, remove_old=False,
                         confirm_pop_up=False):
 
@@ -473,7 +473,8 @@ class Order(Orders):
         for testplan in test_plans:
             if remove_old:
                 self.clear_test_plan()
-                self.confirm_popup()
+                if confirm_pop_up:
+                    self.confirm_popup()
                 self.sleep_small()
             self.set_test_plan(test_plan=testplan)
             self.sleep_small()

@@ -63,7 +63,7 @@ class BasePages:
         self.save(save_btn=save_btn)
         self.info('Refresh to make sure that data are saved correctly')
         self.base_selenium.refresh()
-        self.wait_until_page_is_loaded()
+        self.sleep_medium()
 
     def cancel(self, force=True):
         if self.base_selenium.check_element_is_exist(element='general:cancel'):

@@ -219,7 +219,8 @@ class TestPlanAPI(TestPlanAPIFactory):
 
     def get_completed_testplans_with_material_and_same_article(self, material_type, article, articleNo):
         all_test_plans = self.get_completed_testplans(limit=1000)
-        completed_test_plans = [test_plan for test_plan in all_test_plans if test_plan['materialType'] == material_type]
+        completed_test_plans = [test_plan for test_plan in all_test_plans
+                                if material_type in test_plan['materialTypes']]
         test_plan_same_article = []
         for testplan in completed_test_plans:
             if testplan['article'][0] in [article, 'all'] and testplan['articleNo'][0] in [articleNo, 'all']:
@@ -229,13 +230,14 @@ class TestPlanAPI(TestPlanAPIFactory):
     def create_completed_testplan(self, material_type, formatted_article):
         material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
         formatted_material = {'id': material_type_id, 'text': material_type}
-        test_unit = TestUnitAPI().get_test_unit_name_with_value_with_material_type(material_type)
-        testunit_data = TestUnitAPI().get_testunit_form_data(id=test_unit['id'])[0]['testUnit']
+        tu_response, tu_payload = TestUnitAPI().create_qualitative_testunit()
+        testunit_data = TestUnitAPI().get_testunit_form_data(id=tu_response['testUnit']['testUnitId'])[0]['testUnit']
         formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
 
         testplan, payload = self.create_testplan(testUnits=[formated_testunit],
                                                  selectedArticles=[formatted_article],
-                                                 materialType=formatted_material)
+                                                 materialType=[formatted_material],
+                                                 materialTypeId=[material_type_id])
 
         if testplan['status'] == 1:
             return (self.get_testplan_form_data(id=testplan['testPlanDetails']['id']))
