@@ -36,25 +36,42 @@ class BaseAPI:
         self._get_authorized_session()
 
     def _get_authorized_session(self, username=None, password=None, reset_token=False):
-        username = username or self.username
-        password = password or self.password
         if reset_token == True:
             BaseAPI.AUTHORIZATION = None
             self.headers['Authorization'] = None
 
         if not BaseAPI.AUTHORIZATION:
+            username = username or self.username
+            password = password or self.password
             self.info('Get authorized api session.')
+            self.info(f"{username}:{password}")
             api = self.url + "/api/auth"
             header = {'Content-Type': "application/json", 'Authorization': "Bearer", 'Connection': "keep-alive",
                       'cache-control': "no-cache"}
-            data = {'username': username, 'password': password}
-            response = self.session.post(api, json=data, headers=header, verify=False)
+            payload = {'username': username, 'password': password}
+            response = self.session.post(api, json=payload, headers=header, verify=False)
+            if response.json()['status'] == 0:
+                self.info(response.json())
+                raise Exception(f'authentication error : {username}:{password}')
             BaseAPI.AUTHORIZATION_RESPONSE = response.json()['data']
             BaseAPI.AUTHORIZATION = 'Bearer {}'.format(response.json()['data']['sessionId'])
-            self.info('session ID : {} .....'.format(response.json()['data']['sessionId'][:10]))
+            self.info('session ID : {} .....'.format(response.json()['data']['sessionId'].split('.')[-1]))
 
         self.headers['Authorization'] = BaseAPI.AUTHORIZATION
         return BaseAPI.AUTHORIZATION
+
+    def post_auth(self, username, password):
+        api = self.url + "/api/auth"
+        header = {'Content-Type': "application/json", 'Authorization': "Bearer", 'Connection': "keep-alive",
+                  'cache-control': "no-cache"}
+        payload = {'username': username, 'password': password}
+        return requests.post(api, json=payload, headers=header, verify=False)
+
+    def set_configuration(self, payload):
+        api = f'{self.url}{self.END_POINTS["field_data"]["configuration_update"]}'
+        response_json = self.session.put(api, json=payload, headers=self.headers, verify=False).json()
+        self.info('status code: {}'.format(response_json['status']))
+        return response_json
 
     @staticmethod
     def _update_payload(payload, **kwargs):
@@ -71,9 +88,9 @@ class BaseAPI:
             return [BaseAPI._update_payload(payload[0], **kwargs)]
         return BaseAPI._update_payload(payload, **kwargs)
 
-    @staticmethod
-    def info(message):
-        BaseAPI.LOGGER.info(message)
+    @property
+    def info(self):
+        return BaseAPI.LOGGER.info
 
     @staticmethod
     def generate_random_string():
@@ -115,5 +132,4 @@ def api_factory(method):
         return wrapper
 
     return api_request
-
 

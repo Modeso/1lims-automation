@@ -13,5 +13,19 @@ class AllAnalysesPage(BasePages):
     def filter_by_analysis_number(self, filter_text):
         self.info('Filter by analysis number : {}'.format(filter_text))
         self.open_filter_menu()
-        self.filter_by(filter_element='analysis_page:analysis_no_filter', filter_text=filter_text, field_type='text')
+        self.filter_by(filter_element='analysis_page:analysis_no_filter', filter_text=str(filter_text), field_type='text')
+        self.filter_apply()
+
+    def filter_by_order_no(self, filter_text):
+        self.info('Filter by order number : {}'.format(filter_text))
+        self.open_filter_menu()
+        self.filter_by(filter_element='analysis_page:order_no_filter',
+                       filter_text=str(filter_text), field_type='drop_down')
+        self.filter_apply()
+
+    def filter_by_order_no(self, filter_text):
+        self.info('Filter by order no. : {}'.format(filter_text))
+        self.open_filter_menu()
+        self.filter_by(filter_element='orders:filter_order_no',
+                       filter_text=filter_text.replace("'", ""), field_type='drop_down')
         self.filter_apply()

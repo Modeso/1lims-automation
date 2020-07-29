@@ -15,12 +15,12 @@ class Orders(BasePages):
     def get_order_edit_page_by_id(self, id):
         url_text = "{}sample/orders/" + str(id)
         self.base_selenium.get(url=url_text.format(self.base_selenium.url))
-        self.sleep_small()
+        self.wait_until_page_is_loaded()
 
     def click_create_order_button(self):
         self.base_selenium.LOGGER.info('Press create order button')
         self.base_selenium.click(element='orders:new_order')
-        self.sleep_small()
+        self.wait_until_page_is_loaded()
 
     def archive_selected_orders(self, check_pop_up=False):
         self.base_selenium.scroll()
@@ -70,7 +70,7 @@ class Orders(BasePages):
         self.sleep_medium()
 
     def duplicate_main_order_from_order_option(self, index=0):
-        self.info('duplicate suborder from the order\'s active table')
+        self.info('duplicate main order from the order\'s active table')
         table_records = self.result_table(element='general:table')
         self.open_row_options(row=table_records[index])
         self.base_selenium.click(element='orders:mainorder_duplicate')
@@ -127,8 +127,8 @@ class Orders(BasePages):
 
     def filter_by_order_no(self, filter_text):
         self.open_filter_menu()
-        self.base_selenium.LOGGER.info(' + Filter by order no. : {}'.format(filter_text))
-        self.filter_by(filter_element='orders:filter_order_no', filter_text=filter_text, field_type='text')
+        self.info('Filter by order no. : {}'.format(filter_text))
+        self.filter_by(filter_element='orders:order_filter', filter_text=filter_text, field_type='text')
         self.filter_apply()
 
     def open_filter_menu(self):
@@ -139,8 +139,16 @@ class Orders(BasePages):
 
     def filter_by_analysis_number(self, filter_text):
         self.open_filter_menu()
-        self.info(' + Filter by analysis number : {}'.format(filter_text))
+        self.info('Filter by analysis number : {}'.format(filter_text))
         self.filter_by(filter_element='orders:analysis_filter', filter_text=filter_text, field_type='text')
+        self.filter_apply()
+        
+    def filter_by_date(self, first_filter_element, first_filter_text, second_filter_element, second_filter_text):
+        self.open_filter_menu()
+        self.sleep_tiny()
+        self.base_selenium.set_text(element=first_filter_element, value=first_filter_text)
+        self.sleep_tiny()
+        self.base_selenium.set_text(element=second_filter_element, value=second_filter_text)
         self.filter_apply()
 
     def get_orders_duplicate_data(self, order_no):
@@ -152,14 +160,28 @@ class Orders(BasePages):
 
     # Return all filter fields used in order
     def order_filters_element(self, key='all'):
-        filter_fileds = {'Order No.': {'element': 'orders:order_filter', 'type': 'text'},
-                         'Analysis No.': {'element': 'orders:analysis_filter', 'type': 'text'},
+        filter_fileds = {'orderNo': {'element': 'orders:order_filter', 'type': 'text'},
+                         'analysis': {'element': 'orders:analysis_filter', 'type': 'text','result_key': 'Analysis No.'},
                          'Contact Name': {'element': 'orders:contact_filter', 'type': 'drop_down'},
-                         'Changed By': {'element': 'orders:changed_by', 'type': 'drop_down'},
-                         'Material Type': {'element': 'orders:material_type_filter', 'type': 'drop_down'},
-                         'Article Name': {'element': 'orders:article_filter', 'type': 'drop_down'},
-                         'Changed On': {'element': 'orders:chnaged_on_filter', 'type': 'text'},
-                         'Shipment Date': {'element': 'orders:shipment_date_filter', 'type': 'text'}
+                         'lastModifiedUser': {'element': 'orders:changed_by', 'type': 'drop_down',
+                                             'result_key':'Changed By'},
+                         'materialType': {'element': 'orders:material_type_filter', 'type': 'drop_down',
+                                          'result_key':'Material Type'},
+                         'article': {'element': 'orders:article_filter', 'type': 'drop_down',
+                                     'result_key': 'Article Name'},
+                         'shipmentDate': {'element': ['orders:shipment_date_filter', 'orders:shipment_date_filter_end'],
+                                          'type': 'text',
+                                          'result_key': 'Shipment Date'},
+                         'testDate': {'element': ['orders:test_date_filter', 'orders:test_date_filter_end'],
+                                      'type': 'text',
+                                      'result_key': 'Test Date'},
+                         'createdAt': {'element': ['orders:created_on_filter','orders:created_on_filter_end'],
+                                       'type': 'text',
+                                       'result_key': 'Created On'},
+                         'testUnit': {'element': 'orders:test_units_filter', 'type': 'drop_down',
+                                      'result_key': 'Test Units'},
+                         'testPlans': {'element': 'orders:test_plans_filter', 'type': 'drop_down',
+                                       'result_key': 'Test Plans'}
                          }
 
         if key == 'all':
@@ -257,7 +279,6 @@ class Orders(BasePages):
 
         return orders_data, orders
 
-
     def navigate_to_analysis_active_table(self):
         self.base_selenium.click(element='orders:analysis_tab')
         self.sleep_small()
@@ -268,8 +289,8 @@ class Orders(BasePages):
         self.base_selenium.click(element='general:filter_btn')
         time.sleep(self.base_selenium.TIME_MEDIUM)
 
-    def is_order_in_table(self,value):
-        results=self.base_selenium.get_table_rows(element='general:table')
+    def is_order_in_table(self, value):
+        results = self.base_selenium.get_table_rows(element='general:table')
         if len(results) == 0:
             return False
         else:

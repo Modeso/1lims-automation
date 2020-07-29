@@ -4,7 +4,8 @@ from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from api_testing.apis.test_unit_api import TestUnitAPI
 from api_testing.apis.article_api import ArticleAPI
 from ui_testing.pages.testunit_page import TstUnit
-import random
+import random, json, os
+
 
 class TestPlanAPIFactory(BaseAPI):
     @api_factory('get')
@@ -89,11 +90,9 @@ class TestPlanAPIFactory(BaseAPI):
         """
         NOTE: calling this api without adding testunits, will create an in progress testplan, to create a complete testplan
         you will need to pass parameter testunits[testunit_object], and this object is can be formated by the following steps,
-        
         testunit = self.test_unit_api.get_testunit_form_data(id=#testunit_id)
         formated_testunit = self.test_unit_page.map_testunit_to_testplan_format(testunit=testunit)
         self.test_plan_api.create_testplan(testunits=[formated_testunit])
-
         param: testplan: {
             'id': testplan id, 'new' in case of new testplan name,
             'text': testplan name text
@@ -127,21 +126,24 @@ class TestPlanAPIFactory(BaseAPI):
                 'id': -1,
                 'text': 'All'
             }],
-            'materialType': {
+            'materialType': [{
                 'id': 1,
                 'text': 'Raw Material'
-            },
+            }],
             'attachments': '[]',
             'selectedTestUnits': [],
-            'materialTypeId': 1,
+            'materialTypeId': [1],
             'dynamicFieldsValues': [],
-            'testUnits': []
+            'testUnits': [],
+            'testplan_name': []
         }
         payload = self.update_payload(_payload, **kwargs)
         if 'testPlan' in kwargs:
-            payload['selectedTestPlan'] = [kwargs['testPlan']]
+            payload['selectedTestPlan'] = [kwargs['testPlan']['text']]
         if 'materialType' in kwargs:
-            payload['materialTypeId'] = kwargs['materialType']['id']
+            payload['materialType'] = kwargs['materialType']
+            payload['materialTypeId'] = [kwargs['materialType'][0]['id']]
+
         api = '{}{}'.format(self.url, self.END_POINTS['test_plan_api']['create_testplan'])
         return api, payload
 
@@ -170,7 +172,7 @@ class TestPlanAPI(TestPlanAPIFactory):
         return testplans_response['testPlans']
 
     def get_completed_testplans(self, **kwargs):
-        response, _ = self.get_all_test_plans(**kwargs)
+        response, _ = self.get_all_test_plans()
         all_test_plans = response['testPlans']
         completed_test_plans = [test_plan for test_plan in all_test_plans if test_plan['status'] == 'Completed']
         return completed_test_plans
@@ -182,7 +184,8 @@ class TestPlanAPI(TestPlanAPIFactory):
         return inprogress_test_plans
 
     def get_testplans_with_status(self, status):
-        all_test_plans = self.get_all_test_plans_json()
+        response, _ = self.get_all_test_plans()
+        all_test_plans = response['testPlans']
         test_plans = [test_plan for test_plan in all_test_plans if test_plan['status'] == status]
         return test_plans
 
@@ -214,41 +217,100 @@ class TestPlanAPI(TestPlanAPIFactory):
         else:
             return False
 
-    def get_completed_testplans_with_material_and_same_article(self, material_type='Raw Material', article='all'):
-        all_test_plans = self.get_completed_testplans()
-        completed_test_plans = [test_plan for test_plan in all_test_plans if test_plan['materialType'] == material_type]
-        test_plan_same_article = [testplan for testplan in completed_test_plans if testplan['article'] == [article]]
+    def get_completed_testplans_with_material_and_same_article(self, material_type, article, articleNo):
+        all_test_plans = self.get_completed_testplans(limit=1000)
+        completed_test_plans = [test_plan for test_plan in all_test_plans
+                                if material_type in test_plan['materialTypes']]
+        test_plan_same_article = []
+        for testplan in completed_test_plans:
+            if testplan['article'][0] in [article, 'all'] and testplan['articleNo'][0] in [articleNo, 'all']:
+                test_plan_same_article.append(testplan)
         return test_plan_same_article
 
-    def create_completed_testplan(self, material_type, article, **kwargs):
-        article_api = ArticleAPI()
-        if article == "all":
-            article = article_api.get_article_with_material_type(material_type=material_type)
-            res, _ = article_api.quick_search_article(name=article)
-        else:
-            res, _ = article_api.quick_search_article(name=article)
-
-        for _article in res['articles']:
-            if _article['materialType'] == material_type:
-                article_id = _article['id']
-                break
-        else:
-            raise Exception('There is no article with name: {} and material: {}'.format(article, material_type))
-
-        formatted_article = {'id': article_id, 'text': article}
-
+    def create_completed_testplan(self, material_type, formatted_article):
         material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
         formatted_material = {'id': material_type_id, 'text': material_type}
-
-        testunit = random.choice(TestUnitAPI().list_testunit_by_name_and_material_type(
-            materialtype_id=material_type_id)[0]['testUnits'])
-        testunit_data = TestUnitAPI().get_testunit_form_data(id=testunit['id'])[0]['testUnit']
+        tu_response, tu_payload = TestUnitAPI().create_qualitative_testunit()
+        testunit_data = TestUnitAPI().get_testunit_form_data(id=tu_response['testUnit']['testUnitId'])[0]['testUnit']
         formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
 
-        testplan, _ = self.create_testplan(
-            testUnits=[formated_testunit], selectedArticles=[formatted_article], materialType=formatted_material)
+        testplan, payload = self.create_testplan(testUnits=[formated_testunit],
+                                                 selectedArticles=[formatted_article],
+                                                 materialType=[formatted_material],
+                                                 materialTypeId=[material_type_id])
 
         if testplan['status'] == 1:
             return (self.get_testplan_form_data(id=testplan['testPlanDetails']['id']))
         else:
             self.info(testplan)
+
+    def get_order_valid_testplan_and_test_unit(self, material_type, article_id, article, used_test_plan,
+                                               used_test_unit):
+        article_no = ArticleAPI().get_article_form_data(id=article_id)[0]['article']['No']
+        self.info("get new completed test plan with article {} No: {} and material_type {}".format(
+            article, article_no, material_type))
+        completed_test_plan_list = self.get_completed_testplans_with_material_and_same_article(
+            material_type=material_type, article=article, articleNo=article_no)
+        completed_test_plans = [testplan for testplan in completed_test_plan_list if
+                                testplan['testPlanName'] not in used_test_plan]
+        if completed_test_plans:
+            new_test_plan_data = random.choice(completed_test_plans)
+            new_test_plan = new_test_plan_data['testPlanName']
+            new_test_unit = self.get_testplan_form_data(id=new_test_plan_data['id'])['specifications'][0]['name']
+            self.info("completed test plan found with name {} and test unit {}".format(new_test_plan, new_test_unit))
+        else:
+            self.info("There is no completed test plan so create it ")
+            formatted_article = {'id': article_id, 'text': article}
+            test_plan = self.create_completed_testplan(material_type=material_type, formatted_article=formatted_article)
+            new_test_plan = test_plan['testPlanEntity']['name']
+            new_test_unit = test_plan['specifications'][0]['name']
+            self.info("completed test plan created with name {} and test unit {}".format(new_test_plan, new_test_unit))
+
+        if new_test_unit in used_test_unit:
+            api, payload = TestUnitAPI().create_quantitative_testunit()
+            if api['status'] == 1:
+                new_test_unit = payload['name']
+
+        return new_test_plan, new_test_unit
+
+    def get_testunits_in_testplan_by_No(self, no):
+        test_plan_id = self.get_testplan_with_filter(filter_option='number', filter_text=str(no))[0]['id']
+        test_units = self.get_testunits_in_testplan(test_plan_id)
+        test_units_names = [testunit['name'] for testunit in test_units]
+        return test_units_names
+
+    def get_suborder_data_with_different_material_type(self, material_type):
+        test_plans = self.get_completed_testplans(limit=1000)
+        # I need to make sure that material type not equal '47d56b4399' due to this open bug
+        # https://modeso.atlassian.net/browse/LIMS-7710
+        test_plans_without_duplicate = [test_plan for test_plan in test_plans if test_plan['materialType']
+                                        not in [material_type, '47d56b4399']]
+        test_plan = random.choice(test_plans_without_duplicate)
+        test_unit = self.get_testunits_in_testplan(test_plan['id'])[0]
+
+        return test_plan, test_unit
+
+    def create_testplan_from_test_unit_id(self, test_unit_id):
+        testunit_data = TestUnitAPI().get_testunit_form_data(id=test_unit_id)[0]['testUnit']
+        if testunit_data['materialTypesObject'][0]['name'] == 'All':
+            response, _ = GeneralUtilitiesAPI().list_all_material_types()
+            formatted_material = random.choice(response['materialTypes'])
+        else:
+            formatted_material = testunit_data['materialTypesObject'][0]
+
+        formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
+        formatted_article = ArticleAPI().get_formatted_article_with_formatted_material_type(formatted_material)
+        testplan, payload = self.create_testplan(testUnits=[formated_testunit],
+                                                 selectedArticles=[formatted_article],
+                                                 materialType=[formatted_material])
+        if testplan['status'] == 1:
+            return (self.get_testplan_form_data(id=testplan['testPlanDetails']['id']))
+        else:
+            self.info(testplan)
+
+    def set_configuration(self):
+        self.info('set test Plan configuration')
+        config_file = os.path.abspath('api_testing/config/test_plan.json')
+        with open(config_file, "r") as read_file:
+            payload = json.load(read_file)
+        super().set_configuration(payload=payload)

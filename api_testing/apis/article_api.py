@@ -1,6 +1,7 @@
 from api_testing.apis.base_api import BaseAPI
 from api_testing.apis.base_api import api_factory
 from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
+import random, json, os
 
 
 class ArticleAPIFactory(BaseAPI):
@@ -127,7 +128,8 @@ class ArticleAPI(ArticleAPIFactory):
 
     def get_articles_with_testplans(self, **kwargs):
         response = self.get_all_articles(**kwargs)
-        all_articles = response.json()['articles']
+        all_articles = response[0]['articles']
+
         articles = [article for article in all_articles if len(article['testPlanNames']) >= 1]
         return articles
 
@@ -165,7 +167,7 @@ class ArticleAPI(ArticleAPIFactory):
 
     def get_article_with_material_type(self, material_type):
         material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
-        articles, payload = self.get_all_articles()
+        articles, payload = self.get_all_articles(limit=500)
         self.info("search for article with material type {}".format(material_type))
         for article in articles['articles']:
             if article['materialType'] == material_type:
@@ -178,3 +180,29 @@ class ArticleAPI(ArticleAPIFactory):
                                            materialTypeId=int(material_type_id))
         if api['status'] == 1:
             return api['article']['name']
+
+    def get_formatted_article_with_formatted_material_type(self, material_type):
+        articles, payload = self.get_all_articles(limit=500)
+        self.info("search for article with material type {}".format(material_type))
+        for article in articles['articles']:
+            if article['materialType'] == material_type['name']:
+                formatted_article = {'id': article['id'], 'name': article['name']}
+                return formatted_article
+
+        self.info("No article with requested material type, So create atricle")
+        api, payload = self.create_article(materialType=material_type['name'],
+                                           selectedMaterialType=[material_type],
+                                           materialTypeId=int(material_type['id']))
+        if api['status'] == 1:
+            return api['article']
+
+    def get_random_article_articleID(self):
+        selected_article = random.choice(self.get_all_articles(limit=30)[0]['articles'])
+        return selected_article['name'], selected_article['id']
+
+    def set_configuration(self):
+        self.info('set article configuration')
+        config_file = os.path.abspath('api_testing/config/articles.json')
+        with open(config_file, "r") as read_file:
+            payload = json.load(read_file)
+        super().set_configuration(payload=payload)
