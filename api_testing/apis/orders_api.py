@@ -254,7 +254,7 @@ class OrdersAPI(OrdersAPIFactory):
             suborders = suborders_data['orders']
             for i in range(0, len(suborders) - 1):
                 if field in suborders[i].keys():
-                    if suborders[i][field] and suborders[i][field] != "-"\
+                    if suborders[i][field] and suborders[i][field] != "-" \
                             and len(suborders[i][field]) == int(no_of_field):
                         return order, suborders, i
 
