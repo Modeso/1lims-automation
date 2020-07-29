@@ -148,8 +148,13 @@ elements = {
             'method': 'id',
             'value': 'table_next'
         },
-        'file_input_field': {'method': 'css_selector', 'value': '[type="file"]'},
+        'last_page': {
+            'method': 'id',
+            'value': 'table_last'
+        },
+        'file_input_field': {'method': 'css_selector', 'value':'[type="file"]'},
         'file_upload_success_flag': {'method': 'class_name', 'value': 'dz-complete', 'order': 0},
+        'files_upload_success_flags': {'method': 'class_name', 'value': 'dz-complete', 'order': -1},
         'remove_file': {'method': 'class_name', 'value': 'dz-remove', 'order': 0},
         'uploaded_file_name': {'method': 'xpath', 'value': '//span[@data-dz-name="" and last()]'},
         'pagination_button': {'method': 'xpath', 'value': '//button[@class="btn dropdown-toggle btn-default"]'},
@@ -214,17 +219,21 @@ elements = {
         'unit_field_archive': {'method': 'xpath', 'value': '//*[@id="5_field"]//li[1]/a'},
         'unit_field_restore': {'method': 'xpath', 'value': '//*[@id="5_field"]//li[2]/a'},
 
+
         'comment_field_options': {'method': 'xpath', 'value': '//*[@id="7_field"]//a'},
         'comment_field_archive': {'method': 'xpath', 'value': '//*[@id="7_field"]//li[1]/a'},
         'comment_field_restore': {'method': 'xpath', 'value': '//*[@id="7_field"]//li[2]/a'},
 
-        'related_article_field_options': {'method': 'xpath', 'value': '//*[@id="18_field"]//a'},
-        'related_article_field_archive': {'method': 'xpath', 'value': '//*[@id="18_field"]//li[1]/a'},
-        'related_article_field_restore': {'method': 'xpath', 'value': '//*[@id="18_field"]//li[2]/a'},
+        'related_article_field_options': {'method': 'xpath', 'value': '//*[@id="12_field"]//a'},
+        'related_article_field_archive': {'method': 'xpath', 'value': '//*[@id="12_field"]//li[1]/a'},
+        'related_article_field_restore': {'method': 'xpath', 'value': '//*[@id="12_field"]//li[2]/a'},
+
+
     },
     'article': {
         'unit': {'method': 'id',
                  'value': 'unitfield'},
+
         'material_type': {'method': 'id',
                           'value': 'materialType'},
         'material_type_options': {'method': 'class_name',
@@ -246,6 +255,7 @@ elements = {
         'filter_actions': {'method': 'class_name',
                            'value': 'actions',
                            'order': 0},
+
         'default_filter_name': {'method': 'xpath', 'value': '//*[@id="name"]/div/span/label'},
         'default_filter_material_type': {'method': 'xpath', 'value': '//*[@id="materialType"]/div/span/label'},
         'default_filter_number': {'method': 'xpath', 'value': '//*[@id="number"]/div/span/label'},
@@ -263,8 +273,6 @@ elements = {
                         'order': -1},
     },
     'test_plans': {
-        'test_plans_table': {'method': 'id',
-                             'value': 'table'},
         'test_plans_edit_button': {'method': 'tag_name',
                                    'value': 'a',
                                    'order': 1},
@@ -286,6 +294,10 @@ elements = {
             'method': 'id',
             'value': 'lastModifiedUserfield'
         },
+        'testplan_created_on_filter': {
+            'method': 'id',
+            'value': 'start_createdAt'
+        },
         'testplan_status_filter': {
             'method': 'id',
             'value': 'statusfield'
@@ -301,20 +313,20 @@ elements = {
                              'value': 'table'},
         'right_menu': {'method': 'xpath',
                        'value': '//*[@id="custom-accordion-panel"]/div/a/i'},
-        'archive': {'method': 'link_text',
-                    'value': 'Archive'},
+        'archive': {'method': 'xpath',
+                    'value': '//i[@class="la la-archive"]'},
         'version_table': {'method': 'link_text',
                           'value': 'Versions'},
-        'testunit_menu': {'method': 'css_selector',
-                          'value': '[class="dropdown "]'},
-        'versions': {'method': 'id',
-                     'value': 'main_table_version'},
-        'archived': {'method': 'link_text',
-                     'value': 'Archived'},
+        'testunit_menu': {'method': 'xpath',
+                          'value': '//i[@class="flaticon-grid-menu-v2"]'},
+        'versions': {'method': 'xpath',
+                     'value': '//a[contains(text(),"Versions")]'},
+        'archived': {'method': 'xpath',
+                     'value': '//a[contains(text(),"Archived")]'},
         'restore': {'method': 'link_text',
                     'value': 'Restore'},
-        'active': {'method': 'link_text',
-                   'value': 'Active'},
+        'active': {'method': 'xpath',
+                   'value': '//a[contains(text(),"Active")]'},
         'configurations': {'method': 'link_text',
                            'value': 'Configurations'},
         'new_testunit': {'method': 'link_text',
@@ -322,17 +334,27 @@ elements = {
         'qualitative_value': {'method': 'id',
                               'value': 'textValueArrayfield'},
         'testunit_name_filter': {'method': 'id',
-                                 'value': 'namefield'}
+                                 'value': 'namefield'},
+        'testunit_number_filter': {'method': 'id',
+                                 'value': 'numberfield'},
+        'filter_material_type': {'method': 'id',
+                                 'value': 'materialTypesfield'},
+        'filter_created_at': {'method': 'id', 'value': 'start_createdAt'},
+        'method_filter': {'method': 'id', 'value': 'methodfield'},
+        'filter_changed_by': {'method': 'id', 'value': 'lastModifiedUserfield'},
+        'filter_unit': {'method': 'id', 'value': 'unitfield'},
+        'filter_category': {'method': 'id', 'value': 'categoryNamefield'},
+        'filter_Type': {'method': 'id', 'value': 'typeNamefield'},
+        'archive_config_error': {'method': 'xpath', 'value': "//span[@class='m-form__help error-display']"}
     },
 
     'test_plan': {
         'no': {'method': 'id',
                'value': 'numberfield'},
-
         'test_plan': {'method': 'id',
                       'value': 'testPlan'},
         'material_type': {'method': 'id',
-                          'value': 'materialTypefield'},
+                          'value': 'materialType'},
         'material_type_options': {'method': 'class_name',
                                   'value': 'ng-option'},
         'article': {'method': 'id',
@@ -346,8 +368,12 @@ elements = {
                            'value': '[class="category-label"]'},
         'test_units': {'method': 'id',
                        'value': 'selectedTestUnitsfield'},
+        'test_unit': {'method': 'id',
+                       'value': 'selectedTestUnits'},
         'add': {'method': 'id',
                 'value': 'new_testunit_add_button'},
+        'check_btn': {'method': 'xpath',
+                'value': '//i[@class="la la-check"]'},
         'save_btn': {'method': 'id',
                      'value': 'save_btn'},
         'save_and_complete': {'method': 'id',
@@ -380,35 +406,36 @@ elements = {
         'ok': {'method': 'class_name',
                'value': 'swal2-confirm',
                'order': 0},
-        'cancel_add_testunit': {'method': 'class_name',
-                                'value': 'btn-secondary',
-                                'order': 1},
+        'cancel_add_testunit': {'method': 'xpath',
+                                'value': "//i[@class='flaticon-close']"},
         'back_button': {'method': 'id',
                         'value': 'back_btn'},
-        'testunit_title': {'method': 'css_selector',
-                           'value': '[class="m-portlet__head-text m--font-success"]'
-                           },
+        'testunit_title': {'method': 'class_name',
+                              'value': 'testunitCell-positioning',
+                               'order': 0},
         'remove_testunit': {'method': 'id',
                             'value': 'remove_testunit'},
-        'testunit_category': {'method': 'class_name',
-                              'value': 'category-label',
-                              'order': 0},
-        'testunit_iteration': {'method': 'id',
-                               'value': 'testunit_iterations_value'},
+        'test_unit_category': {'method': 'class_name',
+                              'value': 'testunitCell-positioning',
+                               'order': 1},
+        'test_unit_iteration': {'method': 'xpath',
+                               'value': '//input[@placeholder="Iterations"]'},
         'testunit_unit': {'method': 'id',
                           'value': 'testunit_unit'},
         'testunit_quantification_upper_limit': {
-            'method': 'id',
-            'value': 'quantification_upper_limit'
+            'method': 'xpath',
+            'value': ' //input[@placeholder="Upper Limit"]'
         },
         'testunit_quantification_lower_limit': {
-            'method': 'id',
-            'value': 'quantification_lower_limit'
+            'method': 'xpath',
+            'value': ' //input[@placeholder="Lower Limit"]'
         },
         'add_testunit_error_msg': {
             'method': 'xpath',
             'value': '//span[@class="m-form__help"]'
-        }
+        },
+        'add_new_item': {'method': 'link_text',
+                         'value': 'Add another item'},
     },
 
     'test_unit': {
@@ -544,6 +571,8 @@ elements = {
                             'value': 'orderNofield'},
         'analysis_filter': {'method': 'id',
                             'value': 'analysisfield'},
+        'analysis_result_filter': {'method': 'id',
+                            'value': 'analysisResultsfield'},
         'order_filter': {'method': 'id',
                          'value': 'orderNofield'},
         'contact_filter': {'method': 'id',
@@ -554,12 +583,27 @@ elements = {
                                  'value': 'materialTypefield'},
         'article_filter': {'method': 'id',
                            'value': 'articlefield'},
-        'chnaged_on_filter': {'method': 'id',
-                              'value': 'start_createdAt'},
+        'test_plans_filter': {'method': 'id',
+                              'value': 'testPlanfield'},
+        'test_units_filter': {'method': 'id',
+                              'value': 'testUnitfield'},
+        'status_filter': {'method': 'id',
+                          'value': 'status_idfield'},
+        'departments_filter': {'method': 'id', 'value': 'departmentsfield'},
+        'created_on_filter': {'method': 'id',
+                              'value': "start_createdAt"},
+        'created_on_filter_end': {'method': 'id',
+                                  'value': 'end_createdAt'},
         'test_date_filter': {'method': 'id',
                              'value': 'start_testDate'},
+        'test_date_filter_end': {'method': 'id', 'value': 'end_testDate'},
+        'shipment_date_filter_end': {'method': 'id',
+                                     'value': 'end_shipmentDate',
+                                     'order': 1
+                                     },
         'shipment_date_filter': {'method': 'id',
-                                 'value': 'start_shipmentDate'},
+                                 'value': 'start_shipmentDate',
+                                 'order': 1},
         'analysis_tab': {
             'method': 'xpath',
             'value': "//label[@class='btn tab']"},
@@ -679,6 +723,27 @@ elements = {
         'confirm_cancel': {'method': 'class_name',
                            'value': 'btn-secondary',
                            'order': 2},
+        'attachment_btn': {'method': 'xpath',
+                           'value': '//i[@class="la la-cloud-upload"]',
+                           },
+        'uploader_zone': {'method': 'id',
+                           'value': 'fieldUploaderComponent',
+                           },
+
+        'uploader_close_btn': {'method': 'id',
+                           'value': 'uploaderPopUpClose',
+                           },
+
+        'attachments_btn': {'method': 'xpath',
+                               'value': '//i[@class="fa fa-cloud-upload"]',
+                               },
+
+        'testplan_popup_btn': {'method': 'xpath',
+                           'value': '//span[@class="pull-right collapse-long-words"]',
+                           },
+        'popup_data': {'method': 'class_name',
+                           'value': 'border-bottom',
+                             },
         'analysis': {
             'filter_order_no': {
                 'method': 'id',
@@ -741,7 +806,6 @@ elements = {
                                   'value': 'confirmPassword'},
         'user_contact': {'method': 'id',
                          'value': 'supplierfield'},
-
         'create_user_button': {'method': 'xpath',
                                'value': '//*[contains(text(),"New User")]'},
         'save_btn': {'method': 'id',
@@ -763,7 +827,6 @@ elements = {
                         'value': 'usernamefield'},
         'filter_email': {'method': 'id',
                          'value': 'emailfield'},
-
         'filter_role': {'method': 'id',
                         'value': 'rolefield'},
         'filter_reset_btn': {'method': 'id',
@@ -826,6 +889,8 @@ elements = {
         'country': {'method': 'id',
                     'value': 'selectedcountryfield'},
         'email': {'method': 'id',
+                  'value': 'emailfield_email'},
+        'email_filter': {'method': 'id',
                   'value': 'emailfield'},
         'phone': {'method': 'id',
                   'value': 'phonefield'},
@@ -867,6 +932,9 @@ elements = {
                                    'value': '//label[@id="isLaboratory"]//input[@type="checkbox"]'},
         'delete_person_button': {'method': 'id',
                                  'value': 'delete_table_view'},
+        'row_delete_button': {'method': 'class_name',
+                              'value': 'flaticon-close',
+                              'order': 0},
         'last_modified_user_field': {'method': 'id',
                                      'value': 'lastModifiedUserfield'},
         'created_on_field': {'method': 'id',
@@ -1019,8 +1087,8 @@ elements = {
         'confirm_password_field': {'method': 'id', 'value': 'confirmPassword'},
         'language_field': {'method': 'id', 'value': 'languagefield'},
         'signature_field': {'method': 'id', 'value': 'signiture'},
-        'cancel_button': {'method': 'class_name', 'value': 'btn-secondary', 'order': 2},
-        'save_button': {'method': 'id', 'value': 'saveButton'},
+        'cancel_button':  {'method': 'class_name', 'value': 'btn-secondary', 'order': 2},
+        'save_button': {'method': 'class_name', 'value': 'btn-primary', 'order': 1},
         'username': {'method': 'class_name', 'value': 'm-card-profile__name', 'order': 0},
         'email': {'method': 'class_name', 'value': 'm-card-profile__email', 'order': 0},
         'password_tab': {'method': 'xpath', 'value': '//*[@data-wizard-target="#m_wizard_form_step_1"]'},
@@ -1053,7 +1121,9 @@ elements = {
         },
         'analysis_page_table': {'method': 'class_name', 'value': 'm_accordion_7', 'order': 0},
         'headers': {'method': 'id', 'value': 'headers'},
-        'analysis_no_filter': {'method': 'id', 'value': 'nofield'}
+        'analysis_no_filter': {'method': 'id', 'value': 'nofield'},
+        'order_no_filter': {'method': 'id', 'value': 'orderNofield'}
+
     },
 
     'company_profile': {
@@ -1064,6 +1134,7 @@ elements = {
         'postal_code_field': {'method': 'id', 'value': 'postalCodefield'},
         'location_field': {'method': 'id', 'value': 'locationfield'},
         'logo_field': {'method': 'id', 'value': 'logo'},
+        'logo_name': {'method': 'xpath', 'value': "//div[@class='dz-filename']"},
         'username': {'method': 'class_name', 'value': 'm-card-profile__name', 'order': 0},
         'email': {'method': 'class_name', 'value': 'm-card-profile__email', 'order': 0},
         'validation_error': {'method': 'id', 'value': 'ohSnapMsg'}

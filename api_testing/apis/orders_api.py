@@ -6,7 +6,7 @@ from api_testing.apis.test_unit_api import TestUnitAPI
 from api_testing.apis.article_api import ArticleAPI
 from ui_testing.pages.testunit_page import TstUnit
 from api_testing.apis.base_api import api_factory
-import random
+import random, json, os
 
 
 class OrdersAPIFactory(BaseAPI):
@@ -28,7 +28,6 @@ class OrdersAPIFactory(BaseAPI):
     @api_factory('get')
     def get_order_by_id(self, id=1, **kwargs):
         """
-
         :param id: order ID
         :param kwargs:
         :return: response, payload
@@ -54,13 +53,15 @@ class OrdersAPIFactory(BaseAPI):
         """
         order_no = self.get_auto_generated_order_no()[0]['id']
         testplan = random.choice(TestPlanAPI().get_completed_testplans(limit=1000))
-        material_type = testplan['materialType']
+        material_type = testplan['materialTypes'][0]
         material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
         testplan_form_data = TestPlanAPI()._get_testplan_form_data(id=testplan['id'])[0]
         article = testplan_form_data['testPlan']['selectedArticles'][0]['name']
-        article_id =testplan_form_data['testPlan']['selectedArticles'][0]['id']
+        article_id = testplan_form_data['testPlan']['selectedArticles'][0]['id']
+        if article == 'all':
+            article, article_id = ArticleAPI().get_random_article_articleID()
 
-        #modify_test_plan_ID
+        # modify_test_plan_ID
         testplan['id'] = testplan_form_data['testPlan']['testPlanEntity']['id']
         testunit = testplan_form_data['testPlan']['specifications'][0]
 
@@ -98,7 +99,7 @@ class OrdersAPIFactory(BaseAPI):
                 'articleId': article_id,
                 'shipmentDate': shipment_date,
                 'testDate': test_date,
-                'year': current_year,
+                'year': current_year[2:4],
                 'yearOption': 1
             }]
         payload = self.update_payload(_payload, **kwargs)
@@ -227,7 +228,12 @@ class OrdersAPIFactory(BaseAPI):
 
         return [payload]
 
+
 class OrdersAPI(OrdersAPIFactory):
+    def get_all_orders_json(self, **kwargs):
+        orders_response, _ = self.get_all_orders(**kwargs)
+        return orders_response['orders']
+
     def get_order_with_multiple_sub_orders(self):
         api, payload = self.get_all_orders(limit=100)
         all_orders = api['orders']
@@ -235,7 +241,7 @@ class OrdersAPI(OrdersAPIFactory):
             suborder = self.get_suborder_by_order_id(id=order['orderId'])[0]['orders']
             if len(suborder) > 1:
                 return order
-              
+
     def get_order_with_field_name(self, field, no_of_field):
         """
         :param field: must be in this list ['article', 'materialType','analysis','testPlans','testUnit']
@@ -246,22 +252,64 @@ class OrdersAPI(OrdersAPIFactory):
         for order in orders:
             suborders_data, a = self.get_suborder_by_order_id(order['id'])
             suborders = suborders_data['orders']
-            for i in range(0, len(suborders)-1):
+            for i in range(0, len(suborders) - 1):
                 if field in suborders[i].keys():
                     if suborders[i][field] and suborders[i][field] != "-" \
                             and len(suborders[i][field]) == int(no_of_field):
                         return order, suborders, i
 
-    def create_order_with_double_test_plans(self):
+    def get_order_with_testunit_testplans(self):
+        """
+        :return: order, suborder,
+        """
+        orders_data, payload = self.get_all_orders(limit=50)
+        orders = orders_data['orders']
+        for order in orders:
+            suborders_data, a = self.get_suborder_by_order_id(order['id'])
+            suborders = suborders_data['orders']
+            for i in range(0, len(suborders) - 1):
+                if suborders[i]['testPlans'] and suborders[i]['testUnit']:
+                    return order, suborders
+
+    def get_random_contact_in_order(self):
+        """
+        :return: contact name
+        """
+        orders_data, payload = self.get_all_orders(limit=50)
+        orders = orders_data['orders']
+        for order in orders:
+            if order['company']:
+                return order['company'][0]['name']
+
+    def get_random_department_in_order(self):
+        """
+        :return: contact name
+        """
+        orders_data, payload = self.get_all_orders()
+        orders = orders_data['orders']
+        for order in orders:
+            suborders_data, a = self.get_suborder_by_order_id(order['id'])
+            suborders = suborders_data['orders']
+            for i in range(0, len(suborders) - 1):
+                if suborders[i]['departments']:
+                    return suborders[i]['departments']
+
+    def create_order_with_double_test_plans(self, only_test_plans=False):
         testplan = random.choice(TestPlanAPI().get_completed_testplans())
         testplan_form_data = TestPlanAPI()._get_testplan_form_data(id=testplan['id'])[0]
         testplan['id'] = testplan_form_data['testPlan']['testPlanEntity']['id']
         article = testplan_form_data['testPlan']['selectedArticles'][0]['name']
         article_id = testplan_form_data['testPlan']['selectedArticles'][0]['id']
+        if article == 'all':
+            article, article_id = ArticleAPI().get_random_article_articleID()
         material_type = testplan['materialType']
         material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
         testunit1 = testplan_form_data['testPlan']['specifications'][0]
-        testunit_data = TestUnitAPI().get_testunit_form_data(id=testunit1['id'])[0]['testUnit']
+        testunit2 = TestUnitAPI().get_test_unit_name_with_value_with_material_type(
+            material_type=material_type, avoid_duplicate=True, duplicated_test_unit=testunit1['name'])
+        testunit_list = [testunit1, testunit2]
+
+        testunit_data = TestUnitAPI().get_testunit_form_data(id=testunit2['id'])[0]['testUnit']
         formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
 
         formatted_article = {'id': article_id, 'text': article}
@@ -276,41 +324,13 @@ class OrdersAPI(OrdersAPIFactory):
                 testUnits=[formated_testunit], selectedArticles=[formatted_article], materialType=formatted_material)
 
         second_testPlan_data = TestPlanAPI()._get_testplan_form_data(id=testplan2['testPlanDetails']['id'])
-
         testPlan2 = {
-            'id': int(second_testPlan_data[0]['testPlan']['testPlanEntity']['id']),
+            'id': int(second_testPlan_data[0]['testPlan']['testPlanEntity']['id']),  # article_test_plan_id
             'testPlanName': second_testPlan_data[0]['testPlan']['testPlanEntity']['name'],
+            'number': int(second_testPlan_data[0]['testPlan']['number']),
             'version': 1
         }
         testplan_list = [testplan, testPlan2]
-
-        testunits = TestUnitAPI().list_testunit_by_name_and_material_type(materialtype_id=material_type_id)
-        selected_test_unit_list = []
-        for testunit in testunits[0]['testUnits']:  # make sure test unit have value
-            if testunit['name'] == testunit1['name']: # select test unit != first test unit
-                continue
-            if testunit['typeName'] == 'Quantitative MiBi':
-                if testunit['mibiValue']:
-                    selected_test_unit_list = [testunit]
-                    break
-            elif testunit['typeName'] == 'Quantitative':
-                if testunit['lowerLimit'] and testunit['upperLimit']:
-                    selected_test_unit_list = [testunit]
-                    break
-            elif testunit['typeName'] == 'Qualitative':
-                if testunit['textValue']:
-                    selected_test_unit_list = [testunit]
-                    break
-
-        # in case I have no test units with required material type and has values, create one
-        if not selected_test_unit_list:
-            api, testunit_payload = TestUnitAPI().create_quantitative_testunit()
-            selected_test_unit_list = TestUnitAPI().get_testunit_form_data(id=api['testUnit']['testUnitId'])[0]['testUnit']
-
-        testunit2 = selected_test_unit_list[0]
-
-
-        testunit_list = [testunit1, testunit2]
 
         payload = {
             'testPlans': testplan_list,
@@ -338,7 +358,7 @@ class OrdersAPI(OrdersAPIFactory):
                         return order, suborders, i
 
     def create_order_with_multiple_contacts(self):
-        contacts = ContactsAPI().get_all_contacts()[0]['contacts']
+        contacts = random.choices(ContactsAPI().get_contacts_with_department(), k=3)
         first_contact = contacts[0]
         second_contact = contacts[1]
         third_contact = contacts[2]
@@ -353,8 +373,42 @@ class OrdersAPI(OrdersAPIFactory):
                 {"id": third_contact['id'],
                  "text": third_contact['name'],
                  'No': third_contact['companyNo']}
-
             ]
 
         }
         return self.create_new_order(**payload)
+
+    def create_order_with_department(self):
+        contact = random.choice(ContactsAPI().get_contacts_with_department())
+        department_data = ContactsAPI().get_contact_form_data(contact['id'])[0]['contact']['departments'][0]
+        payload = {
+            'contact': [
+                {"id": contact['id'],
+                 "text": contact['name'],
+                 'No': contact['companyNo']},
+            ],
+            'departments': [{"id": department_data['id'], "text": department_data['name'],
+                             "group": contact['id'], "groupName": contact['name']}],
+        }
+        return self.create_new_order(**payload)
+
+    def create_order_with_department_by_contact_id(self, contact_id):
+        contact = ContactsAPI().get_contact_form_data(contact_id)[0]['contact']
+        department_data = contact['departments'][0]
+        payload = {
+            'contact': [
+                {"id": contact['id'],
+                 "text": contact['name'],
+                 'No': contact['companyNumber']},
+            ],
+            'departments': [{"id": department_data['id'], "text": department_data['name'],
+                             "group": contact['id'], "groupName": contact['name']}],
+        }
+        return self.create_new_order(**payload)
+
+    def set_configuration(self):
+        self.info('set order configuration')
+        config_file = os.path.abspath('api_testing/config/order.json')
+        with open(config_file, "r") as read_file:
+            payload = json.load(read_file)
+        super().set_configuration(payload=payload)

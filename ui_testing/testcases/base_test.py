@@ -3,28 +3,51 @@ from ui_testing.pages.base_selenium import BaseSelenium
 from uuid import uuid4
 from random import randint
 from ui_testing.pages.article_page import Article
-from ui_testing.pages.login_page import Login
 from ui_testing.pages.testplan_page import TstPlan
 from ui_testing.pages.testunit_page import TstUnit
-from ui_testing.pages.analysis_page import SingleAnalysisPage
-import datetime, re
+from api_testing.apis.base_api import BaseAPI
+import datetime, re, os, shutil
 
 
 class BaseTest(TestCase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.base_selenium = BaseSelenium()
+
+    @classmethod
+    def setUpClass(cls) -> None:
+        cls.create_screenshots_dir()
+        cls.base_selenium = BaseSelenium()
+        cls.base_selenium.get_driver()
+        cls.base_selenium.get(url=cls.base_selenium.url)
+        cls.pass_refresh_feature()
+        cls.set_authorization(auth=BaseAPI().AUTHORIZATION_RESPONSE)
 
     def setUp(self):
         print('\t')
         self.info('Test case : {}'.format(self._testMethodName))
-        self.base_selenium.get_driver()
-        self.base_selenium.get(url=self.base_selenium.url)
-        self.pass_refresh_feature()
+        # self.base_selenium.get(url=self.base_selenium.url)
+        # self.base_selenium.wait_until_page_load_resources()
 
     def tearDown(self):
-        self.base_selenium.quit_driver()
+        self.screen_shot()
+        self.info('go to dashboard page')
+        self.base_selenium.get(url=f"{self.base_selenium.url}dashboard")
         self.info('TearDown. \t')
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        cls.base_selenium.quit_driver()
+
+    def screen_shot(self):
+        try:
+            method, error = self._outcome.errors[0]
+            if error:
+                screen_shot = f"./screenshots/screenshot_{method._testMethodName}_.png"
+                self.info(f"saved error screen shot : {screen_shot}")
+                self.base_selenium.driver.get_screenshot_as_file(
+                    f"./screenshots/screenshot_{method._testMethodName}_.png")
+        except:
+            pass
 
     def generate_random_string(self):
         return str(uuid4()).replace("-", "")[:10]
@@ -42,12 +65,29 @@ class BaseTest(TestCase):
                     tmp.append(datetime.datetime.strptime(item, '%d.%m.%Y'))
                 elif str(item) in ["-", "nan", "N/A"]:
                     continue
+                elif ',' in str(item) and '&' in str(item):
+                    item = str(item).replace('&', ',')
+                    tmp.extend(str(item).split(','))
+                elif ',' in str(item):
+                    tmp.extend(str(item).split(','))
+                elif ', ' in str(item):
+                    tmp.extend(str(item).split(', '))
                 elif '&' in str(item):
                     tmp.extend(str(item).split('&'))
                 elif ' ' == str(item)[-1]:
                     tmp.append(item[:-1])
+                elif 'all' == str(item)[-1]:
+                    tmp.append('All')
                 else:
-                    tmp.append(str(item).replace(',', '').replace("'", "").replace(' - ', '-'))
+                    tmp.append(str(item).replace(',', '&').replace("'", "").replace(' - ', '-'))
+
+        return tmp
+
+    def reformat_data(self, data_list):
+        tmp = []
+        for item in data_list:
+            if len(str(item)) > 0:
+                tmp.append(str(item).replace(',', ' &').replace("'", ""))
         return tmp
 
     def get_active_article_with_tst_plan(self, test_plan_status='complete'):
@@ -107,11 +147,11 @@ class BaseTest(TestCase):
                 return test_unit_dict
         return {}
 
-
     '''
     Removes the data that was changed in the duplication process in order to compare
     between the objects to make sure that the duplication was done correcly.
     '''
+
     def remove_unduplicated_data(self, data_changed=[], first_element=[], second_element=[]):
         for data in data_changed:
             if data in first_element and data in second_element:
@@ -122,18 +162,28 @@ class BaseTest(TestCase):
 
         return first_element, second_element
 
-    def info(self, message):
-        self.base_selenium.LOGGER.info(message)
+    @property
+    def info(self):
+        return self.base_selenium.LOGGER.info
 
-    def set_authorization(self, auth):
-        if "Admin" in auth['role']:
+    @classmethod
+    def set_authorization(cls, auth):
+        if "Admin" == auth.get('role'):
             del auth['role']
             auth['roles'] = ["Admin"]
-        self.base_selenium.set_local_storage('modeso-auth-token', auth)
+        cls.base_selenium.set_local_storage('modeso-auth-token', auth)
 
-    def pass_refresh_feature(self):
-        with self.base_selenium._change_implicit_wait(new_value=2):
+    @classmethod
+    def pass_refresh_feature(cls):
+        with cls.base_selenium._change_implicit_wait(new_value=2):
             try:
-                self.base_selenium.driver.find_element_by_xpath("//button[@class='btn btn-primary']").click()
+                cls.base_selenium.driver.find_element_by_xpath("//button[@class='btn btn-primary']").click()
             except:
                 pass
+
+    @staticmethod
+    def create_screenshots_dir():
+        dir = 'screenshots'
+        if os.path.exists(dir):
+            shutil.rmtree(dir, ignore_errors=True)
+        os.mkdir(dir)
