@@ -2312,63 +2312,40 @@ class OrdersTestCases(BaseTest):
         api, payload = self.orders_api.create_new_order()
         self.assertEqual(api['status'], 1)
         test_unit_before_duplicate = payload[0]['testUnits'][0]['name']
-
         self.info('Order created with order No {}, article {}'.format(
             payload[0]['orderNo'], payload[0]['article']['text']))
-        self.info('get random completed test plan with different article')
-        test_plans = TestPlanAPI().get_completed_testplans()
-        test_plans_with_same_material_diff_article = \
-            [test_plan for test_plan in test_plans if
-             payload[0]['materialType']['text'] in test_plan['materialType']
-             and payload[0]['article']['text'] != test_plan['article'][0]]
 
-        if test_plans_with_same_material_diff_article:
-            test_plan_data = random.choice(test_plans_with_same_material_diff_article)
-            test_plan = test_plan_data['testPlanName']
-            article = test_plan_data['article'][0]
-        else:
-            self.info("There is no completed test plan with material type {} and different article, "
-                      "so create it ".format(payload[0]['materialType']['text']))
-            article = ArticleAPI().get_article_with_material_type(payload[0]['materialType']['text'])
-            new_test_plan = TestPlanAPI().create_completed_testplan(
-                material_type=payload[0]['materialType']['text'], article=article)
-            test_plan = new_test_plan['testPlanEntity']['name']
+        self.info("create completed test plan with material type {} and different article, "
+                  .format(payload[0]['materialType']['text']))
+        article = ArticleAPI().get_formatted_article_with_formatted_material_type(
+            {'name': payload[0]['materialType']['text']})
 
         self.info("duplicate order {}".format(payload[0]['orderNo']))
         self.order_page.search(payload[0]['orderNo'])
         if case == 'main_order':
             self.info("duplicate main order")
             self.order_page.duplicate_main_order_from_order_option()
-            self.order_page.sleep_small()
             duplicated_order_no = self.order_page.get_no()
         else:
             self.info("duplicate sub order")
             self.orders_page.open_child_table(source=self.orders_page.result_table()[0])
             self.orders_page.duplicate_sub_order_from_table_overview()
 
-        if article == 'all':
-            self.order_page.update_duplicated_order_article(article='')
-            article = self.order_page.get_article()
-        else:
-            self.order_page.update_duplicated_order_article(article=article)
-
-        self.info("article updated to {}".format(article))
+        self.info("update article to {}".format(article['name']))
+        self.order_page.update_duplicated_order_article(article=article['name'])
         self.info("assert that test plan is empty and test unit is {}".format(test_unit_before_duplicate))
         self.assertFalse(self.order_page.get_test_plan())
-        self.assertEqual(test_unit_before_duplicate, self.order_page.get_test_unit())
-        self.info("update test plan to {}".format(test_plan))
-        self.order_page.set_test_plan(test_plan)
+        self.assertCountEqual([test_unit_before_duplicate], self.order_page.get_test_unit())
         self.order_page.save(save_btn='order:save')
 
         self.info("navigate to active table")
         self.orders_page.get_orders_page()
         if case == 'main_order':
-            self.orders_page.filter_by_order_no(duplicated_order_no)
+            self.orders_page.search(duplicated_order_no)
         else:
-            self.orders_page.filter_by_order_no(payload[0]['orderNo'])
-
+            self.orders_page.search(payload[0]['orderNo'])
         duplicated_order_data = self.orders_page.get_child_table_data()[0]
         self.info('assert that duplicated order data is updated correctly')
-        self.assertEqual(duplicated_order_data['Test Plans'], test_plan)
-        self.assertEqual(duplicated_order_data['Article Name'].replace(" ", ""), article.replace(" ", ""))
+        self.assertEqual(duplicated_order_data['Test Plans'], '-')
+        self.assertEqual(duplicated_order_data['Article Name'].replace(" ", ""), article['name'].replace(" ", ""))
         self.assertEqual(duplicated_order_data['Test Units'], test_unit_before_duplicate)
