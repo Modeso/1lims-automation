@@ -605,7 +605,7 @@ class TestPlansTestCases(BaseTest):
 
         LIMS-6288
         """
-        assert (self.test_plan.deselect_all_configurations(), False)
+        self.assertFalse(self.test_plan.deselect_all_configurations())
 
     @skip("https://modeso.atlassian.net/browse/LIMSA-184")
     def test027_test_unit_update_version_in_testplan(self):
