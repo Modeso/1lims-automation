@@ -71,6 +71,14 @@ class UsersAPIFactory(BaseAPI):
         api = '{}{}{}'.format(self.url, self.END_POINTS['users_api']['delete_user'], str(id)) 
         return api, {}
 
+    # @api_factory('get')
+    # def get_all_roles(self):
+    #     """
+    #     if success, response = list of roles
+    #     :return:
+    #     """
+    #     api = '{}{}0'.format(self.url, self.END_POINTS['users_api']['get_roles'])
+    #     return api, {}
 
 class UsersAPI(UsersAPIFactory):
     def delete_active_user(self, id=1):

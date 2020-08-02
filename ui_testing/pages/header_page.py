@@ -10,7 +10,7 @@ class Header(BasePages):
         self.role_url = "{}roles".format(self.base_selenium.url)
 
     def get_users_page(self):
-        self.info(' + Get users page.')
+        self.info('get users page.')
         self.base_selenium.get(url=self.user_url)
         self.wait_until_page_is_loaded()
         self.sleep_tiny()
@@ -72,7 +72,7 @@ class Header(BasePages):
 
     def create_new_user(self, user_role='', sleep=True, user_email='', user_password='', user_confirm_password='',
                         user_name='', contact=''):
-        self.base_selenium.LOGGER.info(' + Create new user.')
+        self.base_selenium.LOGGER.info('create new user.')
         self.base_selenium.click(element='user_management:create_user_button')
         self.sleep_medium()
         user_name = self.set_user_name(user_name)
@@ -132,7 +132,6 @@ class Header(BasePages):
     def set_user_role(self, user_role='', random=False):
         if random:
             self.base_selenium.select_item_from_drop_down(element='user_management:user_role', avoid_duplicate=True)
-
         else:
             self.base_selenium.select_item_from_drop_down(element='user_management:user_role', item_text=user_role)
             return self.get_user_role()
@@ -142,24 +141,12 @@ class Header(BasePages):
         self.open_edit_page(row=user)
 
     def filter_user_by(self, filter_element, filter_text, field_type='text'):
-        self.info("open filter menu")
-        self.base_selenium.click(element='general:menu_filter_view')
-        self.info('+ Filter by {} : {}'.format(
+        self.open_filter_menu()
+        self.info('filter by {} : {}'.format(
             filter_element.replace('user:filter_', '').replace('_', ' '), filter_text))
         self.filter_by(filter_element=filter_element, filter_text=filter_text, field_type=field_type)
         self.filter_apply()
-        self.sleep_tiny()
-        return self.get_the_latest_row_data()
-
-    def filter_user_drop_down(self, filter_name, filter_text):
-        self.info("open filter menu")
-        self.base_selenium.click(element='general:menu_filter_view')
-
-        self.info(' + Filter by user : {}'.format(filter_text))
-        self.filter_by(filter_element=filter_name, filter_text=filter_text)
-        self.filter_apply()
-        self.sleep_tiny()
-        return self.get_the_latest_row_data()
+        return self.base_selenium.get_rows_cells_dict_related_to_header()
 
     def get_data_from_row(self):
         user_row = self.get_random_table_row(table_element='general:table')
@@ -244,7 +231,7 @@ class Header(BasePages):
         return self.base_selenium.get_text(element='roles_and_permissions:role_name').split('\n')[0]
 
     def create_new_role(self, sleep=True, role_name=''):
-        self.info(' + Create new role.')
+        self.info('create new role.')
         self.base_selenium.click(element='roles_and_permissions:new_role_btn')
         time.sleep(self.base_selenium.TIME_SMALL)
         role_name = self.set_role_name(role_name)
