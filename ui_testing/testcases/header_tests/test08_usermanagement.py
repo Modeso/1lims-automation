@@ -382,6 +382,10 @@ class LoginRandomUser(BaseTest):
         self.header_page.wait_until_page_is_loaded()
         self.header_page.get_users_page()
 
+    def tearDown(self):
+        self.set_authorization(auth=self.roles_api.AUTHORIZATION_RESPONSE)
+        super().tearDown()
+
     def test016_delete_user_used_in_other_entity(self):
         """
         User management: Make sure that you can't delete any user record If this record used in other entity
