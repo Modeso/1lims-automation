@@ -178,8 +178,6 @@ class ContactsTestCases(BaseTest):
         self.info('acquire contact data to compare it after updating the persons')
         contact_data = self.contact_page.get_full_contact_data()
 
-        self.info('Open contact persons page')
-        self.contact_page.get_contact_persons_page()
         self.info('add new record to contact persons')
         contact_persons_after_update = self.contact_page.create_update_contact_person(save=True)
 
@@ -524,23 +522,18 @@ class ContactsTestCases(BaseTest):
 
         LIMS-6491
         """
-        self.info("create contact with Mr.")
+        self.info("create contact")
         contact_data = self.contact_page.create_update_contact(save=False, contact_persons=False)
+        self.info('Open contact persons page')
         self.contact_page.get_contact_persons_page()
-        self.contact_page.create_update_contact_person(title='Mr.', save=True)
-        self.contacts_page.sleep_small()
-        self.contacts_page.search_find_row_open_edit_page(contact_data['Contact Name'])
-        self.contact_page.get_contact_persons_page()
-        contact_person_data = self.contact_page.get_contact_persons_data()
-        self.info('Asserting the title was saved successfully as Mr.')
+        self.info('Create contact person with Mr.')
+        contact_person_data = self.contact_page.create_update_contact_person(title='Mr.', save=False)
+        self.info('Asserting the title set to  Mr.')
         self.assertEqual(contact_person_data[0]['title'], 'Mr.')
-
-        self.info("update it to be Ms")
-        self.contact_page.create_update_contact_person(create=False, title='Ms', save=True)
+        self.info("update Title to be Ms")
+        self.contact_page.create_update_contact_person(create=False, title='Ms', save=True, indexToEdit=0)
         self.contact_page.sleep_small()
-        self.contacts_page.get_contacts_page()
         self.contacts_page.search_find_row_open_edit_page(contact_data['Contact Name'])
-        self.contact_page.get_contact_persons_page()
         new_contact_person_data = self.contact_page.get_contact_persons_data()
         self.info('Asserting the title was changed successfully to Ms')
         self.assertEqual(new_contact_person_data[0]['title'], 'Ms')

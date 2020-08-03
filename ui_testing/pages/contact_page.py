@@ -286,13 +286,11 @@ class Contact(Contacts):
             self.base_selenium.click(element='contact:add_another_item')
 
         contact_persons_table_records = self.base_selenium.get_table_rows(element='contact:contact_persons_table')
-        
-        if create == False or indexToEdit == -1:
+
+        if not create or indexToEdit == -1:
             indexToEdit = len(contact_persons_table_records)-1
             contact_persons_table_records[indexToEdit].click()
             self.sleep_small()
-
-        contact_persons_table_records = self.base_selenium.get_table_rows(element='contact:contact_persons_table')
 
         row_data = self.base_selenium.get_row_cells_elements_related_to_header(
             row=contact_persons_table_records[indexToEdit], table_element='contact:contact_persons_table')
@@ -329,11 +327,9 @@ class Contact(Contacts):
         
         self.info(' Set contact person info : {}'.format(info))
         self.base_selenium.update_item_value(item=row_data['Info:'], item_text=info)
-        self.sleep_small()
 
         self.info('Acquire contact persons data')
         contact_person_data = self.get_contact_persons_data(navigate_to_person_page=False)
-        self.sleep_small()
         if save:
             self.save(save_btn='contact:save')
 
@@ -342,11 +338,12 @@ class Contact(Contacts):
     def get_contact_persons_data(self, navigate_to_person_page=True):
         if navigate_to_person_page:
             self.get_contact_persons_page()
+
         contact_persons_arr = []
         webdriver.ActionChains(self.base_selenium.driver).send_keys(Keys.ESCAPE).perform()
         self.info('Collecting persons data')
         contact_persons_table_records = self.base_selenium.get_table_rows(element='contact:contact_persons_table')
-        if not self.check_contact_persons_table_is_empty():
+        if len(contact_persons_table_records) >= 1:
             for person in contact_persons_table_records:
                 row_data = self.base_selenium.get_row_cells_elements_related_to_header(
                     row=person, table_element='contact:contact_persons_table')
@@ -359,7 +356,8 @@ class Contact(Contacts):
                     'skype': row_data['Skype:'].text,
                     'info': row_data['Info:'].text
                 })
-                    
+        else:
+            self.info("----- contact persons table is empty")
         return contact_persons_arr
 
     def get_contact_persons_count(self):
