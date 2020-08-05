@@ -270,7 +270,7 @@ elements = {
                   'value': 'field'},
         'field_items': {'method': 'class_name',
                         'value': 'padding',
-                        'order': -1},
+                        'order': -1}
     },
     'test_plans': {
         'test_plans_edit_button': {'method': 'tag_name',

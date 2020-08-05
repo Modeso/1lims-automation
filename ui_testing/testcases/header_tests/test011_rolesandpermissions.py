@@ -31,7 +31,7 @@ class HeaderTestCases(BaseTest):
         LIMS-6400
         """
         self.info("select random rows to archive")
-        selected_roles_and_permissions_data, _ = self.header_page.select_random_multiple_table_rows()
+        selected_roles_and_permissions_data, _ = self.header_page.select_random_multiple_users_table_rows()
         self.info("Archive selected rows")
         self.header_page.archive_entity(menu_element='roles_and_permissions:right_menu',
                                         archive_element='roles_and_permissions:archive')
@@ -54,7 +54,7 @@ class HeaderTestCases(BaseTest):
         self.header_page.get_archived_entities(menu_element='roles_and_permissions:right_menu',
                                                archived_element='roles_and_permissions:archived')
         self.info("select random rows to restore")
-        selected_role_data, _ = self.header_page.select_random_multiple_table_rows()
+        selected_role_data, _ = self.header_page.select_random_multiple_users_table_rows()
         for role in selected_role_data:
             role_names.append(role['Name'])
         self.info("Restore selected roles")
@@ -213,6 +213,7 @@ class HeaderTestCases(BaseTest):
                 self.assertIn(str(item).lower, fixed_sheet_row_data)
 
     @parameterized.expand(['10', '20', '25', '50', '100'])
+    @attr(series=True)
     def test010_testing_table_pagination(self, pagination_limit):
         """
         Header: Active table: Pagination Approach; Make sure that I can set the pagination
@@ -312,6 +313,7 @@ class HeaderTestCases(BaseTest):
         self.info('red border will display that the name already exit'.format(role_random_name))
         self.assertTrue(created_role, 'Name already exit')
 
+    @attr(series=True)
     def test014_create_role_with_master_data_permissions_then_create_user_by_it(self):
         """
         Roles & Permissions: when I create user with master data permissions then create user wit it
@@ -350,6 +352,7 @@ class HeaderTestCases(BaseTest):
         self.info('get the contacts url')
         self.assertTrue('Contacts', Contacts().get_contacts_page())
 
+    @attr(series=True)
     def test015_create_role_with_sample_management_permissions_then_create_user_by_it(self):
         """
         Roles & Permissions: when I create user with sample management permissions then create
@@ -391,11 +394,11 @@ class HeaderTestCases(BaseTest):
         """
         self.info("get random role name")
         random_role = random.choice(self.roles_api.get_random_role())
-        roles_result = self.header_page.filter_user_by(
+        roles_results = self.header_page.filter_user_by(
             filter_element='roles_and_permissions:role_name',
             filter_text=random_role['name'])
-
-        self.assertEqual(random_role['name'], roles_result['Name'])
+        for roles_result in roles_results:
+            self.assertEqual(random_role['name'], roles_result['Name'])
 
     def test017_filter_by_no(self):
         """
@@ -406,7 +409,6 @@ class HeaderTestCases(BaseTest):
         self.info("get random role name")
         random_role = random.choice(self.roles_api.get_random_role())
         roles_result = self.header_page.filter_role_by_no(random_role['id'])
-
         self.assertEqual(str(random_role['id']), roles_result['No'])
 
     def test018_filter_created_on(self):
@@ -417,11 +419,11 @@ class HeaderTestCases(BaseTest):
         """
         self.header_page.set_all_configure_table_columns_to_specific_value()
         role_data = self.header_page.get_role_data_from_fully_checked_headers_random_row()
-        self.header_page.filter_user_by(filter_element='roles_and_permissions:filter_created_on',
-                                        filter_text=role_data['created_on'])
-
-        roles_result = self.header_page.result_table()
-        self.assertIn(str(role_data['created_on']), (roles_result[0].text).replace("'", ""))
+        roles_results = self.header_page.filter_user_by(
+            filter_element='roles_and_permissions:filter_created_on',
+            filter_text=role_data['created_on'])
+        for roles_result in roles_results:
+            self.assertEqual(role_data['created_on'], roles_result['Created On'])
 
     @attr(series=True)
     def test019_filter_by_changed_by(self):
@@ -447,8 +449,8 @@ class HeaderTestCases(BaseTest):
         self.base_selenium.click(element='roles_and_permissions:checked_role_changed_by')
         self.base_selenium.click(element='roles_and_permissions:apply_btn')
         self.header_page.sleep_tiny()
-        self.header_page.filter_user_drop_down(filter_name='roles_and_permissions:filter_changed_by',
-                                               filter_text=payload['username'])
-
-        roles_result = self.header_page.get_table_rows_data()
-        self.assertIn(payload['username'], roles_result[0])
+        roles_results = self.header_page.filter_user_by(
+            filter_element='roles_and_permissions:filter_changed_by',
+            filter_text=payload['username'], field_type='drop_down')
+        for roles_result in roles_results:
+            self.assertIn(payload['username'], roles_result['Changed By'])

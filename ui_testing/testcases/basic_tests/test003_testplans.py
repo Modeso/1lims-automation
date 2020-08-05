@@ -668,6 +668,7 @@ class TestPlansTestCases(BaseTest):
                   'same as the updated iterations')
         self.assertEqual(second_testplan_testunit_iteration, new_iteration)
 
+    @skip('https://modeso.atlassian.net/browse/LIMSA-208')
     def test028_childtable_limits_of_quantification(self):
         """
         Limits of quantification should be viewed in the testplan's child table
@@ -679,7 +680,7 @@ class TestPlansTestCases(BaseTest):
 
         LIMS-4426
         """
-        self.info("Create new quantitative testunit with quantification limits")
+        self.info("Create new quantitative test unit with quantification limits")
         self.test_unit_api = TestUnitAPI()
         oldUpperLimit = self.generate_random_number(lower=50, upper=100)
         oldLowerLimit = self.generate_random_number(lower=1, upper=49)
@@ -696,7 +697,6 @@ class TestPlansTestCases(BaseTest):
             test_plan['testPlanEntity']['name'])
         self.info('Asserting the limits of quantification viewed correctly')
         self.assertIn(testunit_display_old_quantification_limit, testplan_childtable_data[0].values())
-
 
         new_quantification_lower_limit, new_quantification_upper_limit = \
             self.test_plan.update_upper_lower_limits_of_testunit(test_plan['id'])

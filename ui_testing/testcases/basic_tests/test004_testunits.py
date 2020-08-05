@@ -260,6 +260,7 @@ class TestUnitsTestCases(BaseTest):
         self.info('Assert error msg')
         self.assertEqual(validation_result, True)
 
+    @skip('https://modeso.atlassian.net/browse/LIMS-8467')
     def test010_material_type_approach(self):
         """"
         In case I created test unit with 4 materiel type, when I go to test plan,
@@ -273,19 +274,22 @@ class TestUnitsTestCases(BaseTest):
         self.info('Navigate to test plan page')
         self.test_plan.get_test_plans_page()
         self.info('create new test plan')
-        self.test_plan.create_new_test_plan(material_type=testunit['selectedMaterialTypes'][0]['name'], save=False)
+        self.test_plan.create_new_test_plan(material_type=testunit['selectedMaterialTypes'][0]['name'],
+                                            test_unit=testunit['name'], save=False)
+
+        test_unit_data = self.test_plan.get_all_testunits_in_testplan(navigate_to_test_unit_selection=False)
+        self.assertIn(testunit['name'], test_unit_data[0][0])
 
         for i in range(0, len(testunit['selectedMaterialTypes'])-1):
-            self.test_plan.set_test_unit(testunit['name'])
-            test_unit_data = self.test_plan.result_table('test_plan:testunits_table')[0].text
-            self.assertIn(testunit['name'], test_unit_data)
             if i+1 < len(testunit['selectedMaterialTypes']):
                 self.base_selenium.click('test_plan:back_button')
+                self.test_plan.clear_material_types()
                 self.test_plan.set_material_type(testunit['selectedMaterialTypes'][i+1]['name'])
                 self.test_plan.set_article(random=True)
             else:
                 break
 
+            self.assertCountEqual(test_unit_data, self.test_plan.get_all_testunits_in_testplan())
         self.info("test unit displayed according to materiel type.")
 
     @parameterized.expand(['True', 'False'])
@@ -489,6 +493,7 @@ class TestUnitsTestCases(BaseTest):
             self.assertNotEqual(test_unit_found['Specifications'], 'N/A')
             self.assertEqual(test_unit_found['Quantification Limit'], 'N/A')
 
+    @skip('https://modeso.atlassian.net/browse/LIMSA-222')
     def test018_download_test_units_sheet(self):
         """
         I can download all the data in the table view in the excel sheet

@@ -27,6 +27,11 @@ class TstPlan(TestPlans):
         if self.get_article():
             self.base_selenium.clear_items_in_drop_down(element='test_plan:article')
 
+    def clear_material_types(self):
+        if self.get_material_type():
+            self.base_selenium.clear_items_in_drop_down(element='test_plan:material_type')
+            self.sleep_tiny()
+
     def get_material_type(self):
         return self.base_selenium.get_text(element='test_plan:material_type').split('\n')[0]
 
@@ -158,9 +163,10 @@ class TstPlan(TestPlans):
         self.base_selenium.click(element='test_plan:testunits_selection')
         self.sleep_tiny()
 
-    def get_all_testunits_in_testplan(self):
+    def get_all_testunits_in_testplan(self, navigate_to_test_unit_selection=True):
         # returns all testunits in testplan
-        self.navigate_to_testunits_selection_page()
+        if navigate_to_test_unit_selection:
+            self.navigate_to_testunits_selection_page()
         testunits = []
         self.info('Getting the testunits data')
         rows = self.base_selenium.get_table_rows(element='test_plan:testunits_table')

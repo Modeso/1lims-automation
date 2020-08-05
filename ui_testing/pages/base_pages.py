@@ -399,10 +399,11 @@ class BasePages:
 
     def set_all_configure_table_columns_to_specific_value(self, value=True, always_hidden_columns=['']):
         self.open_configure_table()
-        total_columns = self.base_selenium.find_elements_in_element(source_element='general:configure_table_items',
-                                                                    destination_element='general:li')
+        total_columns = self.base_selenium.find_elements_in_element(
+            source_element='general:configure_table_items',
+            destination_element='general:li')
         for column in total_columns:
-            self.change_column_view(column=column, value=True, always_hidden_columns=always_hidden_columns)
+            self.change_column_view(column=column, value=value, always_hidden_columns=always_hidden_columns)
         self.press_apply_in_configure_table()
 
     def deselect_all_configurations(self):

@@ -98,6 +98,10 @@ class ArticleAPIFactory(BaseAPI):
 
 
 class ArticleAPI(ArticleAPIFactory):
+    def get_all_articles_json(self, **kwargs):
+        response, _ = self.get_all_articles(**kwargs)
+        return response['articles']
+
     def delete_active_article(self, id=1):
         response = self.archive_articles(ids=[str(id)])
         if response['status'] == 1 and response['message'] == 'delete_success':
