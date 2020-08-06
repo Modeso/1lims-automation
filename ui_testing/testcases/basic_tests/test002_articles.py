@@ -135,7 +135,7 @@ class ArticlesTestCases(BaseTest):
 
         self.base_selenium.get(
             url=article_url, sleep=self.base_selenium.TIME_MEDIUM)
-
+        self.base_selenium.scroll()
         article_no = self.article_page.get_no()
 
         if 'save' == save:
@@ -171,7 +171,7 @@ class ArticlesTestCases(BaseTest):
 
         self.base_selenium.get(
             url=article_url, sleep=self.base_selenium.TIME_MEDIUM)
-
+        self.base_selenium.scroll()
         article_name = self.article_page.get_name()
         if 'save' == save:
             self.info('Assert {} (new_name) == {} (article_name)'.format(new_name, article_name))
@@ -409,7 +409,7 @@ class ArticlesTestCases(BaseTest):
         LIMS-3575
         """
         self.article_page.create_new_article(full_options=True, material_type='Raw Material')
-        self.article_page.get_articles_page()
+        self.article_page.sleep_tiny()
         article_text = self.article_page.search(value=self.article_page.article_name)[0].text
         self.assertIn(self.article_page.article_unit, article_text)
         self.assertIn(self.article_page.article_comment, article_text)
@@ -479,6 +479,7 @@ class ArticlesTestCases(BaseTest):
         LIMS-6203
         """
         self.info('create new article.')
+        self.article_page.sleep_tiny()
         self.base_selenium.click(element='articles:new_article')
         self.article_page.sleep_tiny()
         # click on Overview, this will display an alert to the user
@@ -651,7 +652,6 @@ class ArticlesTestCases(BaseTest):
 
         LIMS-3595
         """
-        response, payload = self.article_api.create_article()
         # set default material type and field type
         material_type = 'Raw Material'
         field_type = 'text'
@@ -667,6 +667,8 @@ class ArticlesTestCases(BaseTest):
         article = self.article_page.create_new_article(
             material_type=material_type, full_options=full_options)
         # open article table page and open the filter menu
+        self.assertTrue(article, 'article not created')
+        self.article_page.sleep_tiny()
         self.article_page.open_filter_menu()
         # filter the article and get the result
         article_results = self.article_page.filter_article_by(filter_element='article:filter_{}'.format(

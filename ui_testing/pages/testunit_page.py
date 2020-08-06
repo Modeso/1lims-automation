@@ -608,6 +608,7 @@ class TstUnit(TstUnits):
         test_units_url = url_str.format(self.base_selenium.url)
         self.base_selenium.get(url=test_units_url)
         self.wait_until_page_is_loaded()
+        self.sleep_small()
 
     def update_test_unit(self, id):
         test_unit = {}

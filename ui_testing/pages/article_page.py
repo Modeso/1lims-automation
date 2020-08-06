@@ -52,7 +52,7 @@ class Article(Articles):
                 "test_plan": None,
             }
 
-        self.save(sleep)
+        self.save()
         self.info(' + Article name : {}'.format(self.article_name))
 
         return article_data

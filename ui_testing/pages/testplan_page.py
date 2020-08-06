@@ -3,6 +3,7 @@ from ui_testing.pages.testplans_page import TestPlans
 
 class TstPlan(TestPlans):
     def get_no(self):
+        self.base_selenium.wait_until_element_located("test_plan:no")
         return self.base_selenium.get_value(element="test_plan:no")
 
     def set_no(self, no):
@@ -52,7 +53,7 @@ class TstPlan(TestPlans):
 
     def search_test_unit_not_set(self, test_unit=''):
         self.info('navigate to testplan second step')
-        self.base_selenium.click('test_plan:next')
+        self.navigate_to_testunits_selection_page()
         self.sleep_tiny()
         self.base_selenium.click('test_plan:add_new_item')
         self.sleep_small()
@@ -111,7 +112,7 @@ class TstPlan(TestPlans):
         return upper.get_attribute('value'), lower.get_attribute('value')
 
     def get_test_unit_category(self):
-        self.base_selenium.click('test_plan:next')
+        self.navigate_to_testunits_selection_page()
         self.sleep_small()
         return self.base_selenium.get_text(element='test_plan:test_unit_category')
 
@@ -228,7 +229,7 @@ class TstPlan(TestPlans):
                 duplicated_test_plan_name = self.generate_random_text()
                 self.set_test_plan(name=duplicated_test_plan_name)
                 self.sleep_tiny()
-
+        self.sleep_small()
         no = self.get_no()
         self.save(save_btn='test_plan:save_btn')
         self.wait_until_page_is_loaded()
