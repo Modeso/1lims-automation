@@ -184,7 +184,6 @@ class TestPlanAPI(TestPlanAPIFactory):
         return inprogress_test_plans
 
     def get_testplans_with_status(self, status):
-        import ipdb;ipdb.set_trace()
         response, _ = self.get_all_test_plans()
         all_test_plans = response['testPlans']
         test_plans = [test_plan for test_plan in all_test_plans if test_plan['status'] == status]
