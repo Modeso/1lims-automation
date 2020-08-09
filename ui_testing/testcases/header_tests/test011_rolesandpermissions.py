@@ -4,6 +4,7 @@ from ui_testing.pages.article_page import Article
 from ui_testing.pages.testplan_page import TstPlan
 from ui_testing.pages.testunit_page import TstUnit
 from ui_testing.pages.order_page import Order
+from ui_testing.pages.orders_page import Orders
 from ui_testing.pages.contacts_page import Contacts
 from ui_testing.pages.header_page import Header
 from ui_testing.pages.analysis_page import SingleAnalysisPage
@@ -176,10 +177,9 @@ class HeaderTestCases(BaseTest):
 
     def test008_validation_role_name_field(self):
         """
-        Roles & Permissions: Overview button Approach: Make sure after you press on the overview button,
-        it will redirect me to the active table
+        Roles & Permissions: Make sure from the validation of all fields
 
-        LIMS-6404
+        LIMS-6122
         """
         self.info("get random role edit page")
         random_role = random.choice(self.roles_api.get_random_role())
@@ -279,23 +279,20 @@ class HeaderTestCases(BaseTest):
 
     def test012_archived_role_not_displayed_in_the_user_role_drop_down(self):
         """
-        Roles& Permissions: Archived roles shouldn't display in the user role drop down.l
+        Roles& Permissions: Archived roles shouldn't display in the user role drop down
 
         LIMS-6438
         """
-        self.info('create new role with random data')
-        role_random_name = self.generate_random_string()
-        response, payload = self.roles_api.create_role(role_name=role_random_name)
+        self.info('select random archived role')
+        response, payload = self.roles_api.get_all_roles(deleted=1)
         self.assertEqual(response['status'], 1, response)
-        self.info('archive the role that you created')
-        self.header_page.select_all_records()
-        self.header_page.archive_entity(menu_element='roles_and_permissions:right_menu',
-                                        archive_element='roles_and_permissions:archive')
+        role_random_name = random.choice(response['roles'])['name']
+        self.info("archived role name {}".format(role_random_name))
         # go to the user entity to search by it in the user drop down list
         self.header_page.get_users_page()
         self.header_page.get_random_user()
         result = self.header_page.set_user_role(user_role=role_random_name)
-        self.assertFalse(result, 'no results found ')
+        self.assertEqual(result, '')
 
     def test013_cant_create_two_roles_with_the_same_name(self):
         """
@@ -307,11 +304,14 @@ class HeaderTestCases(BaseTest):
         role_random_name = self.generate_random_string()
         response, payload = self.roles_api.create_role(role_name=role_random_name)
         self.assertEqual(response['status'], 1, response)
-
         self.info('create role with the same name')
         created_role = self.header_page.create_new_role(role_name=role_random_name)
         self.info('red border will display that the name already exit'.format(role_random_name))
-        self.assertTrue(created_role, 'Name already exit')
+        self.info('Waiting for error message')
+        validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
+        self.info('Assert error msg')
+        self.assertEqual(validation_result, True)
+        self.assertEqual(created_role['role_name'], None)
 
     @attr(series=True)
     def test014_create_role_with_master_data_permissions_then_create_user_by_it(self):
@@ -384,7 +384,8 @@ class HeaderTestCases(BaseTest):
         self.info('get the order url')
         self.assertTrue('Sample Management', Order().get_orders_page())
         self.info('get the analysis url')
-        self.assertTrue('Sample Management', SingleAnalysisPage().get_analysis_page())
+        Orders().navigate_to_analysis_active_table()
+        self.assertIn('sample/analysis', self.base_selenium.get_url())
 
     def test016_filter_by_role_name(self):
         """
