@@ -11,3 +11,4 @@ xlrd
 loguru
 pyperclip
 pymysql
+nose-reportportal==0.0.6
