@@ -15,6 +15,7 @@ from ui_testing.pages.testplan_page import TstPlan
 from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from ui_testing.pages.contacts_page import Contacts
 from random import randint
+from ui_testing.pages.testunits_page import TstUnits
 import random
 
 
@@ -37,6 +38,8 @@ class OrdersTestCases(BaseTest):
         self.set_authorization(auth=self.contacts_api.AUTHORIZATION_RESPONSE)
         self.order_page.get_orders_page()
         self.orders_api.set_configuration()
+        self.test_units_page = TstUnits()
+
 
     @parameterized.expand(['save_btn', 'cancel'])
     def test001_edit_order_number_with_save_cancel_btn(self, save):
@@ -2296,3 +2299,19 @@ class OrdersTestCases(BaseTest):
                                   f"{str(fixed_sheet_row_data)} : {str(formatted_orders[index])}")
             for item in formatted_orders[index]:
                 self.assertIn(item, fixed_sheet_row_data)
+
+    def test066_search_with_test_unit_name(self):
+        """
+
+        LIMS-6664 Orders:Test unit search approach
+        allow user to search with test unit name in the drop down list of the order form
+        """
+        self.test_units_page.get_test_units_page()
+        self.test_units_page.open_configurations()
+        self.test_units_page.open_testunit_name_configurations_options()
+        old_values = self.test_units_page.select_option_to_view_search_with(view_search_options=['Name'])
+        self.info('go to orders page')
+        self.order_page.get_orders_page()
+        fields = self.order_page.split_test_unit_list()
+        self.info('All fields displayed {} splitted to {}'.format(fields[1], fields[0]))
+        self.assertEqual(fields[0], fields[1])
