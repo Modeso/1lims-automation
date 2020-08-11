@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test_cases: [0, 1, 2, 3]
+        test_cases: [0, 1]
 
     steps:
       - uses: actions/checkout@master
@@ -22,7 +22,7 @@ jobs:
         env:
           TEST_FILE: ui_testing/testcases/header_tests/test011_rolesandpermissions.py
           TEST_REG: test[0-9]{3}
-        run: bash .github/workflows/execution.sh ${{ strategy.job-total }} ${{ matrix.test_cases }} $TEST_REG ${{ github.ref }} ${{ github.run_id }} ${{ github.run_number }}
+        run: bash .github/workflows/execution.sh ${{ strategy.job-total }} ${{ matrix.test_cases }} $TEST_REG ${{ github.ref }} ${{ github.run_id }} ${{ github.run_number }} $(pwd)
 #
 #  test_pull_request_in_series:
 #    runs-on: ubuntu-20.04
