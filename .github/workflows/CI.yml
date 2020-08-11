@@ -16,7 +16,6 @@ jobs:
       image: 0xislamtaha/seleniumchromenose:83
       volumes:
         - /dev/shm:/dev/shm
-        - `pwd`:/1lims-automation
       env:
         PYTHONPATH: '$PYTHONPATH:/1lims-automation'
       options: -w /1lims-automation
