@@ -10,7 +10,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        test_cases: [0, 1]
+        test_cases: [0, 1, 2, 3]
 
     steps:
       - uses: actions/checkout@master
@@ -18,44 +18,21 @@ jobs:
       - name: pull docker image
         run:  docker pull 0xislamtaha/seleniumchromenose:83
 
-      - name: parallel execution
+      - name: parallel execution for each module
+        run: bash .github/workflows/execution.sh ${{ strategy.job-total }} ${{ matrix.test_cases }} ${{ github.ref }} ${{ github.run_id }} ${{ github.run_number }} $(pwd)
+
+  test_pull_request_in_series:
+    runs-on: ubuntu-20.04
+    needs: test_pull_request_in_parallel
+    strategy:
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@master
+      - name: pull docker image
+        run:  docker pull 0xislamtaha/seleniumchromenose:83
+      - name: execute test case in series
         env:
-          TEST_FILE: ui_testing/testcases/header_tests/test011_rolesandpermissions.py
+          TEST_FILE: ui_testing/testcases/
           TEST_REG: test[0-9]{3}
-        run: bash .github/workflows/execution.sh ${{ strategy.job-total }} ${{ matrix.test_cases }} $TEST_REG ${{ github.ref }} ${{ github.run_id }} ${{ github.run_number }} $(pwd)
-#
-#  test_pull_request_in_series:
-#    runs-on: ubuntu-20.04
-#    needs: test_pull_request_in_parallel
-#    strategy:
-#      fail-fast: false
-#
-#    steps:
-#      - uses: actions/checkout@master
-#      - name: pull docker image
-#        run:  docker pull 0xislamtaha/seleniumchromenose:83
-#      - name: execute test case in series
-#        env:
-#          TEST_FILE: ui_testing/testcases/header_tests/test011_rolesandpermissions.py
-#          TEST_REG: test[0-9]{3}
-#        run: docker container run -t --shm-size=2g -v `pwd`:/1lims-automation -e "PYTHONPATH='$PYTHONPATH:/1lims-automation" -w /1lims-automation 0xislamtaha/seleniumchromenose:83 bash -c "nosetests -vs --nologcapture --tc-file=config.ini --tc=browser.headless:True  --with-flaky --force-flaky --max-runs=3 --min-passes=1 -A 'series' -m '$TEST_REG' $TEST_FILE"
-#
-#  test_Company_in_parallel:
-#    runs-on: ubuntu-20.04
-#    needs: [test_pull_request_in_parallel, test_pull_request_in_series]
-#    strategy:
-#      fail-fast: false
-#      matrix:
-#        test_cases: [0, 1, 2, 3]
-#
-#    steps:
-#      - uses: actions/checkout@master
-#
-#      - name: pull docker image
-#        run:  docker pull 0xislamtaha/seleniumchromenose:83
-#
-#      - name: execute test case in parallel
-#        env:
-#          TEST_FILE: ui_testing/testcases/header_tests/test008_company_profile.py
-#          TEST_REG: test[0-9]{3}
-#        run: docker container run -t --shm-size=2g -v `pwd`:/1lims-automation -e "PYTHONPATH='$PYTHONPATH:/1lims-automation" -w /1lims-automation 0xislamtaha/seleniumchromenose:83 bash -c "NODE_TOTAL=${{ strategy.job-total }} NODE_INDEX=${{ matrix.test_cases }} nosetests -vs --nologcapture --tc-file=config.ini --tc=browser.headless:True  --with-flaky --force-flaky --max-runs=3 --min-passes=1 --with-parallel -A 'not series' -m '$TEST_REG' $TEST_FILE"
+        run: docker container run -t --shm-size=2g -v `pwd`:/1lims-automation -e "PYTHONPATH='$PYTHONPATH:/1lims-automation" -w /1lims-automation 0xislamtaha/seleniumchromenose:83 bash -c "nosetests -vs --nologcapture --tc-file=config.ini --tc=browser.headless:True --with-reportportal --rp-config-file rp.ini --rp-launch-description=${{ github.ref }}-${{ github.run_id }}-${{ github.run_number }} --with-flaky --force-flaky --max-runs=3 --min-passes=1 -A 'series' -m '$TEST_REG' $TEST_FILE"
