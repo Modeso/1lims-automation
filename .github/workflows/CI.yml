@@ -12,44 +12,17 @@ jobs:
       matrix:
         test_cases: [0, 1, 2, 3]
 
-    container:
-      image: 0xislamtaha/seleniumchromenose:83
-      volumes:
-        - /dev/shm:/dev/shm
-      env:
-        PYTHONPATH: '$PYTHONPATH:/1lims-automation'
-      options: -w /1lims-automation
-
     steps:
       - uses: actions/checkout@master
-      - name: [rolesandpermissions] parallel execution
+
+      - name: pull docker image
+        run:  docker pull 0xislamtaha/seleniumchromenose:83
+
+      - name: parallel execution
         env:
-          TEST_FILE: ui_testing/testcases/header_tests/test011_rolesandpermissions.py
+          TEST_FILES: ui_testing/testcases/header_tests/test011_rolesandpermissions.py ui_testing/testcases/header_tests/test008_company_profile.py
           TEST_REG: test[0-9]{3}
-        run: NODE_TOTAL=${{ strategy.job-total }} NODE_INDEX=${{ matrix.test_cases }} nosetests -vs --nologcapture --tc-file=config.ini --tc=browser.headless:True --with-flaky --force-flaky --max-runs=3 --min-passes=1 --with-parallel -A 'not series' -m '$TEST_REG' $TEST_FILE
-
-
-#    steps:
-#      - uses: actions/checkout@master
-#
-#      - name: pull docker image
-#        run:  docker pull 0xislamtaha/seleniumchromenose:83
-#
-#      - name: [company_profile] parallel execution
-#        env:
-#          TEST_FILE: ui_testing/testcases/header_tests/test008_company_profile.py
-#          TEST_REG: test[0-9]{3}
-#        run: docker container run -t --shm-size=2g -v `pwd`:/1lims-automation -e "PYTHONPATH='$PYTHONPATH:/1lims-automation" -w /1lims-automation 0xislamtaha/seleniumchromenose:83 bash -c "NODE_TOTAL=${{ strategy.job-total }} NODE_INDEX=${{ matrix.test_cases }} nosetests -vs --nologcapture --with-reportportal --rp-config-file rp.ini --rp-launch=${{ github.ref }} --rp-launch-description=${{ github.ref }}-${{ github.run_id }}-${{ github.run_number }} --tc-file=config.ini --tc=browser.headless:True --with-flaky --force-flaky --max-runs=3 --min-passes=1 --with-parallel -A 'not series' -m '$TEST_REG' $TEST_FILE"
-#
-#      - name: [rolesandpermissions] parallel execution
-#        env:
-#          TEST_FILE: ui_testing/testcases/header_tests/test011_rolesandpermissions.py
-#          TEST_REG: test[0-9]{3}
-#        run: docker container run -t --shm-size=2g -v `pwd`:/1lims-automation -e "PYTHONPATH='$PYTHONPATH:/1lims-automation" -w /1lims-automation 0xislamtaha/seleniumchromenose:83 bash -c "NODE_TOTAL=${{ strategy.job-total }} NODE_INDEX=${{ matrix.test_cases }} nosetests -vs --nologcapture --with-reportportal --rp-config-file rp.ini --rp-launch=${{ github.ref }} --rp-launch-description=${{ github.ref }}-${{ github.run_id }}-${{ github.run_number }} --tc-file=config.ini --tc=browser.headless:True --with-flaky --force-flaky --max-runs=3 --min-passes=1 --with-parallel -A 'not series' -m '$TEST_REG' $TEST_FILE"
-
-
-
-
+        run: docker container run -t --shm-size=2g -v `pwd`:/1lims-automation -e "PYTHONPATH='$PYTHONPATH:/1lims-automation" -w /1lims-automation 0xislamtaha/seleniumchromenose:83 bash -c "for TEST_FILE in $TEST_FILES; do NODE_TOTAL=${{ strategy.job-total }} NODE_INDEX=${{ matrix.test_cases }} nosetests -vs --nologcapture --tc-file=config.ini --tc=browser.headless:True --with-flaky --force-flaky --max-runs=3 --min-passes=1 --with-parallel -A 'not series' -m '$TEST_REG' $TEST_FILE; done"
 #
 #  test_pull_request_in_series:
 #    runs-on: ubuntu-20.04
