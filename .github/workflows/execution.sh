@@ -24,5 +24,5 @@ echo 'WORK_DIR: ' $WORK_DIR;
 
 for TEST_FILE in "${EXECUTION_FILES[@]}"
  do
-   docker container run -t --shm-size=2g -v WORK_DIR:/1lims-automation -e "PYTHONPATH='$PYTHONPATH:/1lims-automation" -w /1lims-automation 0xislamtaha/seleniumchromenose:83 bash -c "NODE_TOTAL=$NODE_TOTAL NODE_INDEX=$NODE_INDEX nosetests -vs --nologcapture --with-reportportal --rp-config-file rp.ini --rp-launch-description=$RUN_REF-$RUN_ID-$RUN_NUMBER --tc-file=config.ini --tc=browser.headless:True --with-flaky --force-flaky --max-runs=3 --min-passes=1 --with-parallel -A 'not series' -m '$TEST_REG' $TEST_FILE"
+   docker container run -t --shm-size=2g -v $WORK_DIR:/1lims-automation -e "PYTHONPATH='$PYTHONPATH:/1lims-automation" -w /1lims-automation 0xislamtaha/seleniumchromenose:83 bash -c "NODE_TOTAL=$NODE_TOTAL NODE_INDEX=$NODE_INDEX nosetests -vs --nologcapture --with-reportportal --rp-config-file rp.ini --rp-launch-description=$RUN_REF-$RUN_ID-$RUN_NUMBER --tc-file=config.ini --tc=browser.headless:True --with-flaky --force-flaky --max-runs=3 --min-passes=1 --with-parallel -A 'not series' -m '$TEST_REG' $TEST_FILE"
  done
