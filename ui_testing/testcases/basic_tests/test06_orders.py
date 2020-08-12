@@ -2300,18 +2300,28 @@ class OrdersTestCases(BaseTest):
             for item in formatted_orders[index]:
                 self.assertIn(item, fixed_sheet_row_data)
 
-    def test066_search_with_test_unit_name(self):
+        def test066_search_with_test_unit_name(self):
         """
 
         LIMS-6664 Orders:Test unit search approach
         allow user to search with test unit name in the drop down list of the order form
         """
+        self.info("get random test unit data to get its material type")
+        response, payload = self.test_unit_api.get_all_test_units()
+        self.assertEqual(response['status'], 1, payload)
+        random_test_unit = random.choice(response['testUnits'])
         self.test_units_page.get_test_units_page()
         self.test_units_page.open_configurations()
         self.test_units_page.open_testunit_name_configurations_options()
         old_values = self.test_units_page.select_option_to_view_search_with(view_search_options=['Name'])
         self.info('go to orders page')
         self.order_page.get_orders_page()
-        fields = self.order_page.split_test_unit_list()
-        self.info('All fields displayed {} splitted to {}'.format(fields[1], fields[0]))
-        self.assertEqual(fields[0], fields[1])
+        if random_test_unit['materialTypes'][0] != 'All':
+            test_unit_suggestion_list = Order().create_new_order_get_test_unit_suggetion_list(
+                material_type=random_test_unit['materialTypes'][0], test_unit_name=' ')
+        else:
+            test_unit_suggestion_list = Order().create_new_order_get_test_unit_suggetion_list(
+                material_type='', test_unit_name=' ')
+        self.info('checking name field only is displayed')
+        for test_unit in test_unit_suggestion_list:
+            self.assertNotIn(':', test_unit)
