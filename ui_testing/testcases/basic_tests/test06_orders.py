@@ -2299,8 +2299,8 @@ class OrdersTestCases(BaseTest):
                                   f"{str(fixed_sheet_row_data)} : {str(formatted_orders[index])}")
             for item in formatted_orders[index]:
                 self.assertIn(item, fixed_sheet_row_data)
-
-        def test066_search_with_test_unit_name(self):
+                
+    def test066_search_with_test_unit_name(self):
         """
 
         LIMS-6664 Orders:Test unit search approach
@@ -2324,4 +2324,4 @@ class OrdersTestCases(BaseTest):
                 material_type='', test_unit_name=' ')
         self.info('checking name field only is displayed')
         for test_unit in test_unit_suggestion_list:
-            self.assertNotIn(':', test_unit)
+            self.assertNotIn(':', test_unit)    
