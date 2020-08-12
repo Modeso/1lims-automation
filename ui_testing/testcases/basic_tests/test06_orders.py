@@ -35,11 +35,6 @@ class OrdersTestCases(BaseTest):
         self.contacts_api = ContactsAPI()
         self.general_utilities_api = GeneralUtilitiesAPI()
         self.contacts_page = Contacts()
-        self.set_authorization(auth=self.contacts_api.AUTHORIZATION_RESPONSE)
-        self.order_page.get_orders_page()
-        self.orders_api.set_configuration()
-        self.test_units_page = TstUnits()
-
 
     @parameterized.expand(['save_btn', 'cancel'])
     def test001_edit_order_number_with_save_cancel_btn(self, save):
@@ -2306,6 +2301,10 @@ class OrdersTestCases(BaseTest):
         LIMS-6664 Orders:Test unit search approach
         allow user to search with test unit name in the drop down list of the order form
         """
+        self.set_authorization(auth=self.contacts_api.AUTHORIZATION_RESPONSE)
+        self.order_page.get_orders_page()
+        self.orders_api.set_configuration()
+        self.test_units_page = TstUnits()
         self.info("get random test unit data to get its material type")
         response, payload = self.test_unit_api.get_all_test_units()
         self.assertEqual(response['status'], 1, payload)
