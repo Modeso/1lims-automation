@@ -668,36 +668,20 @@ class Order(Orders):
             results.append({'test_plan': test_plan, 'test_units': test_units})
         return results
 
-    def create_new_order_get_test_unit_suggetion_list(self, material_type, test_unit_name):
+        def create_new_order_get_test_unit_suggetion_list(self, material_type='', test_unit_name=' '):
         self.info(' Create new order.')
         self.click_create_order_button()
+        self.sleep_small()
         self.set_new_order()
         self.set_contact(contact='')
-        self.sleep_small()
+        self.sleep_tiny()
         self.set_material_type(material_type=material_type)
         self.sleep_small()
         self.set_article(article='')
         self.sleep_small()
         self.info('get test unit suggestion list')
-        test_units = self.base_selenium.get_drop_down_suggestion_list(element='order:test_unit',item_text=test_unit_name)
-
-    def split_test_unit_list(self):
-        self.info(' Create new order.')
-        self.click_create_order_button()
-        self.set_new_order()
-        self.set_contact(contact='')
-        self.sleep_small()
-        self.set_material_type(material_type='')
-        self.sleep_small()
-        self.set_article(article='')
-        self.sleep_small()
-        self.info('get test unit suggestion list')
         test_units = self.base_selenium.get_drop_down_suggestion_list(element='order:test_unit',
-                                                                      item_text=' ')
-        result = []
-        for element in test_units:
-            test_unit_fields = element.split(':')
-            for field in test_unit_fields:
-                result.append(field)
+                                                                      item_text=test_unit_name)
+        return test_units
 
-        return len(result), len(test_units)
+    
