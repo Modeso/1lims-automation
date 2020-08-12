@@ -668,13 +668,13 @@ class ArticlesTestCases(BaseTest):
             material_type=material_type, full_options=full_options)
         # open article table page and open the filter menu
         self.assertTrue(article, 'article not created')
-        self.article_page.sleep_tiny()
+        self.article_page.sleep_medium()
         self.article_page.open_filter_menu()
         # filter the article and get the result
         article_results = self.article_page.filter_article_by(filter_element='article:filter_{}'.format(
             filter_name), filter_text=article[filter_name], field_type=field_type)
         for article_result in article_results:
-            self.assertEqual(article[filter_name], article_result[header].replace("'", ""))
+            self.assertEqual(article[filter_name].replace("'", ""), article_result[header].replace("'", ""))
 
     def test027_filter_article_by_changed_by_filter(self):
         """
