@@ -25,8 +25,6 @@ class OrdersTestCases(BaseTest):
     def setUp(self):
         super().setUp()
         self.order_page = Order()
-        self.test_units_page = TstUnits()
-        self.test_unit_page=TstUnit()
         self.orders_api = OrdersAPI()
         self.testplan_page = TstPlan()
         self.orders_page = Orders()
@@ -2309,7 +2307,8 @@ class OrdersTestCases(BaseTest):
         allow this to display in the unit field drop down list in the analysis form
         LIMS-6675
         """
-
+        self.test_units_page = TstUnits()
+        self.test_unit_page = TstUnit()
         self.test_units_page.get_test_units_page()
         self.test_units_page.open_configurations()
         self.test_units_page.open_testunit_name_configurations_options()
@@ -2330,6 +2329,3 @@ class OrdersTestCases(BaseTest):
         self.order_page.get_orders_page()
         unit=self.order_page.create_new_order_get_test_unit_suggetion_list(material_type='',test_unit_name='m[g]{o}')
         self.assertIn("m[g]{o}",unit)
-
-
-
