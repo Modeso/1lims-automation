@@ -420,7 +420,12 @@ class BasePages:
             if column.text:
                 self.change_column_view(column=column, value=False)
 
-        return self.base_selenium.element_is_displayed(element="general:apply_configure_table")
+        parent_class = self.base_selenium.driver.find_element_by_xpath('//*[contains(text(), "Apply")]//parent::a')
+        class_srting = parent_class.get_attribute('class')
+        if 'disabled' in class_srting:
+            return True
+        else:
+            return False
 
     def click_overview(self):
         # click on Overview, this will display an alert to the user

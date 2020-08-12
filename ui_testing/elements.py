@@ -137,7 +137,7 @@ elements = {
         'configure_table_archive_items': {'method': 'xpath',
                                           'value': '//ul[@class="m-nav sortable sortable-table2 ui-sortable"]'},
         'apply_configure_table': {'method': 'xpath',
-                                  'value': '//span[contains(text(),"Apply")]'},
+                                  'value': "//span[contains(text(),'Apply')]"},
         'overview': {'method': 'xpath',
                      'value': "//span[contains(text(),' Overview ')]"},
         'confirm_overview': {'method': 'xpath',
