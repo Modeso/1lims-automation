@@ -12,6 +12,7 @@ from ui_testing.pages.analysis_page import SingleAnalysisPage
 from api_testing.apis.contacts_api import ContactsAPI
 from api_testing.apis.test_plan_api import TestPlanAPI
 from ui_testing.pages.testplan_page import TstPlan
+from ui_testing.pages.testunits_page import TstUnits
 from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from ui_testing.pages.contacts_page import Contacts
 from random import randint
@@ -37,6 +38,7 @@ class OrdersTestCases(BaseTest):
         self.set_authorization(auth=self.contacts_api.AUTHORIZATION_RESPONSE)
         self.order_page.get_orders_page()
         self.orders_api.set_configuration()
+        self.test_units_page = TstUnits()
 
     @parameterized.expand(['save_btn', 'cancel'])
     def test001_edit_order_number_with_save_cancel_btn(self, save):
@@ -2329,3 +2331,28 @@ class OrdersTestCases(BaseTest):
         self.orders_page.search(order_no)
         self.info('assert main order only displayed no duplicated rows for the suborders')
         self.assertFalse(self.order_page.check_suborders_appear())
+
+    def test067_enter_long_method_should_be_in_multiple_lines_in_order_form(self):
+        """
+
+        In case you select the method to display and you entered long text in it,
+        the method should display into multiple lines in the order form
+
+        LIMS-6663 Orders:Test unit search approach
+        """
+        self.test_units_page.get_test_units_page()
+        self.test_units_page.open_configurations()
+        self.test_units_page.open_testunit_name_configurations_options()
+        old_values = self.test_units_page.select_option_to_view_search_with(view_search_options=['Method'])
+        self.info(' create test unit with long method text ')
+        api, payload = self.test_unit_api.create_test_unit_with_long_text()
+        self.assertEqual(api['status'], 1, payload)
+        self.info('go to orders page')
+        self.order_page.get_orders_page()
+        self.info('create new order with the testunit of long method text')
+        self.order_page.create_new_order_and_with_material_type_and_contact()
+        self.order_page.set_test_unit(test_unit=payload['method'])
+        self.info('assert method text appears in multiple lines')
+        multiple_lines_properties = self.order_page.get_testunit_multiple_line_properties()
+        self.assertEquals(multiple_lines_properties['textOverflow'], 'clip')
+        self.assertEquals(multiple_lines_properties['lineBreak'], 'auto')

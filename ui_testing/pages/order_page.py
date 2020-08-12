@@ -689,3 +689,29 @@ class Order(Orders):
         is_suborder_exist = self.base_selenium.check_element_is_exist(
             element='table_element=general:table_child')
         return is_suborder_exist
+
+    def create_new_order_and_with_material_type_and_contact(self, material_type='', contact=''):
+        self.info(' Create new order.')
+        self.click_create_order_button()
+        self.set_new_order()
+        self.sleep_small()
+        self.set_contact(contact=contact)
+        self.set_material_type(material_type=material_type)
+        self.sleep_small()
+
+    def get_testunit_multiple_line_properties(self):
+        dom_element = self.base_selenium.find_element(element='order:test_unit')
+        multiple_line_properties = dict()
+        multiple_line_properties['textOverflow'] = self.base_selenium.driver.execute_script('return '
+                                                                                            'window'
+                                                                                            '.getComputedStyle('
+                                                                                            'arguments[0], '
+                                                                                            '"None").textOverflow',
+                                                                                            dom_element)
+        multiple_line_properties['lineBreak'] = self.base_selenium.driver.execute_script('return '
+                                                                                         'window'
+                                                                                         '.getComputedStyle('
+                                                                                         'arguments[0], '
+                                                                                         '"None").lineBreak',
+                                                                                         dom_element)
+        return multiple_line_properties
