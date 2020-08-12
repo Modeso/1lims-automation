@@ -123,6 +123,7 @@ class TstPlan(TestPlans):
         self.material_type = material_type
         self.article = article
         self.click_create_test_plan_button()
+        self.sleep_small()
         self.set_test_plan(name=self.test_plan_name)
         if self.material_type:
             self.info(' With {} material type'.format(material_type))
