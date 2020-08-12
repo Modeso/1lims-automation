@@ -297,5 +297,4 @@ class Orders(BasePages):
             if value in results[0].text:
                 return True
             else:
-                return False 
-
+                return False
