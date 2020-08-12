@@ -924,7 +924,7 @@ class TestUnitsTestCases(BaseTest):
             test_unit_suggetion_list = Order().create_new_order_get_test_unit_suggetion_list(
                 material_type='', test_unit_name=archived_test_unit['name'])
 
-        self.assertFalse(test_unit_suggetion_list)
+        self.assertCountEqual(test_unit_suggetion_list, ['No items found'])
 
     def test035_can_not_archive_quantifications_limit_field(self):
         """
