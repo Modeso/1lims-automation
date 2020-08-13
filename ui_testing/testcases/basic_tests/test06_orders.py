@@ -38,7 +38,7 @@ class OrdersTestCases(BaseTest):
         self.set_authorization(auth=self.contacts_api.AUTHORIZATION_RESPONSE)
         self.order_page.get_orders_page()
         self.orders_api.set_configuration()
-        self.test_units_page = TstUnits()
+        
 
     @parameterized.expand(['save_btn', 'cancel'])
     def test001_edit_order_number_with_save_cancel_btn(self, save):
@@ -2298,39 +2298,7 @@ class OrdersTestCases(BaseTest):
                                   f"{str(fixed_sheet_row_data)} : {str(formatted_orders[index])}")
             for item in formatted_orders[index]:
                 self.assertIn(item, fixed_sheet_row_data)
-
-    @skip("https://modeso.atlassian.net/browse/LIMSA-236")
-    def test066_main_orders_only_should_be_displayed_in_the_orders_list(self):
-        """
-        Make sure that user sees the main orders only in the order list
-
-        LIMS-5354
-        """
-        self.info('assert active table is displayed')
-        table_records_count = len(self.order_page.result_table())
-        self.assertGreater(table_records_count, 0)
-        self.info('There is no duplications in the orders numbers')
-        orders, _ = self.orders_api.get_all_orders(limit=20)
-        order = random.choice(orders['orders'])
-        order_no = order['orderNo']
-        self.orders_page.search(order_no)
-        table_duplicate_records = len(self.order_page.result_table())
-        self.assertEqual(1, table_duplicate_records)
-        self.info('click on the random order from the list, Order table with add will be opened')
-        self.orders_page.get_order_edit_page_by_id(order['id'])
-        table_with_add = self.order_page.get_table_with_add()
-        self.assertIsNotNone(table_with_add)
-        self.info('duplicate the first suborder')
-        self.order_page.duplicate_from_table_view()
-        self.info('click on save button')
-        self.order_page.save(save_btn='order:save_btn')
-        self.assertEqual(self.base_selenium.get_text(element='general:alert_confirmation'),
-                         'Successfully Updated')
-        self.info('Go back to the active table')
-        self.order_page.get_orders_page()
-        self.orders_page.search(order_no)
-        self.info('assert main order only displayed no duplicated rows for the suborders')
-        self.assertFalse(self.order_page.check_suborders_appear())
+    
 
     def test067_enter_long_method_should_be_in_multiple_lines_in_order_form(self):
         """
@@ -2340,6 +2308,7 @@ class OrdersTestCases(BaseTest):
 
         LIMS-6663 Orders:Test unit search approach
         """
+        self.test_units_page = TstUnits()
         self.test_units_page.get_test_units_page()
         self.test_units_page.open_configurations()
         self.test_units_page.open_testunit_name_configurations_options()
