@@ -681,14 +681,6 @@ class Order(Orders):
         self.info('get test unit suggestion list')
         test_units = self.base_selenium.get_drop_down_suggestion_list(element='order:test_unit',item_text=test_unit_name)
 
-    def get_table_with_add(self):
-        table = self.base_selenium.find_element(element='order:suborder_table')
-        return table
-
-    def check_suborders_appear(self):
-        is_suborder_exist = self.base_selenium.check_element_is_exist(
-            element='table_element=general:table_child')
-        return is_suborder_exist
 
     def create_new_order_and_with_material_type_and_contact(self, material_type='', contact=''):
         self.info(' Create new order.')
