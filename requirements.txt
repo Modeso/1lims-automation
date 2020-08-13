@@ -1,14 +1,14 @@
-nose
-nose-progressive
-nose-testconfig
-nose_parameterized
-rednose
-selenium
-requests
-flaky
-pandas
-xlrd
-loguru
-pyperclip
-pymysql
-nose-reportportal==0.0.6
+# nose
+# nose-progressive
+# nose-testconfig
+# nose_parameterized
+# rednose
+# selenium
+# requests
+# flaky
+# pandas
+# xlrd
+# loguru
+# pyperclip
+# pymysql
+git+https://github.com/0xIslamTaha/agent-python-nosetests@0.0.7

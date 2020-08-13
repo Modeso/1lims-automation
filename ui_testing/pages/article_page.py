@@ -53,7 +53,7 @@ class Article(Articles):
             }
 
         self.save()
-        self.info(' + Article name : {}'.format(self.article_name))
+        self.info('Article name : {}'.format(self.article_name))
 
         return article_data
 
