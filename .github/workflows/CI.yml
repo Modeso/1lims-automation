@@ -23,7 +23,7 @@ jobs:
 
   test_pull_request_in_series:
     runs-on: ubuntu-20.04
-    needs: test_pull_request_in_series
+    needs: test_pull_request_in_parallel
     strategy:
       fail-fast: false
 
