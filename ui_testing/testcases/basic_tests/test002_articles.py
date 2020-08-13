@@ -481,7 +481,7 @@ class ArticlesTestCases(BaseTest):
         self.info('create new article.')
         self.article_page.sleep_tiny()
         self.base_selenium.click(element='articles:new_article')
-        self.article_page.sleep_tiny()
+        self.article_page.sleep_small()
         # click on Overview, this will display an alert to the user
         self.article_page.click_overview()
         # switch to the alert
