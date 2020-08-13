@@ -21,19 +21,18 @@ jobs:
       - name: parallel execution for each module
         run: bash .github/workflows/execution.sh ${{ strategy.job-total }} ${{ matrix.test_cases }} ${{ github.ref }} ${{ github.run_id }} ${{ github.run_number }} $(pwd) 'not series'
 
+  test_pull_request_in_series:
+    runs-on: ubuntu-20.04
+    needs: test_pull_request_in_parallel
+    if: always()
+    strategy:
+      fail-fast: false
+
+    steps:
+      - uses: actions/checkout@master
+
+      - name: pull docker image
+        run:  docker pull 0xislamtaha/seleniumchromenose:83
+
       - name: sequal execution for series
         run: bash .github/workflows/execution.sh ${{ strategy.job-total }} ${{ matrix.test_cases }} ${{ github.ref }} ${{ github.run_id }} ${{ github.run_number }} $(pwd) 'series'
-
-
-#  test_pull_request_in_series:
-#    runs-on: ubuntu-20.04
-#    needs: test_pull_request_in_parallel
-#    strategy:
-#      fail-fast: false
-#
-#    steps:
-#      - uses: actions/checkout@master
-#      - name: pull docker image
-#        run:  docker pull 0xislamtaha/seleniumchromenose:83
-#      - name: sequal execution for series
-#        run: bash .github/workflows/execution.sh ${{ strategy.job-total }} ${{ matrix.test_cases }} ${{ github.ref }} ${{ github.run_id }} ${{ github.run_number }} $(pwd) 'series'
