@@ -640,7 +640,7 @@ elements = {
         'departments': {'method': 'xpath',
                         'value': '//td//*[@id="departments"]'},
 
-        'auto_fill': {'method': 'xpath', 'value': '//*[@id="field"]/div[2]/div/span'},
+        'auto_fill': {'method': 'xpath', 'value': '// *[@id="field"]/div[3]/div/span'},
         'auto_fill_container': {'method': 'xpath', 'value': '//*[@id="field"]/div[2]'},
 
         'contact': {'method': 'id',
