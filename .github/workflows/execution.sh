@@ -36,8 +36,8 @@ for TEST_FILE in "${EXECUTION_FILES[@]}"
    echo 'TEST_FILE: ' $TEST_FILE;
    if [[ $ATTR = "not series" ]]
     then
-      docker container run -t --shm-size=2g -v $WORK_DIR:/1lims-automation -e "PYTHONPATH='$PYTHONPATH:/1lims-automation" -w /1lims-automation 0xislamtaha/seleniumchromenose:83 bash -c "NODE_TOTAL=$NODE_TOTAL NODE_INDEX=$NODE_INDEX nosetests -vs --nologcapture --with-reportportal --rp-config-file rp.ini --rp-launch-description=$RUN_REF-$RUN_ID-$RUN_NUMBER --tc-file=config.ini --tc=browser.headless:True --with-flaky --force-flaky --max-runs=3 --min-passes=1 --with-parallel -A '$ATTR' -m '$TEST_REG' $TEST_FILE"
+      docker container run -t --shm-size=2g -v $WORK_DIR:/1lims-automation -e "PYTHONPATH='$PYTHONPATH:/1lims-automation" -w /1lims-automation 0xislamtaha/seleniumchromenose:83 bash -c "NODE_TOTAL=$NODE_TOTAL NODE_INDEX=$NODE_INDEX nosetests -vs --nologcapture --with-reportportal --rp-config-file rp.ini --rp-launch-description=$RUN_REF-$RUN_ID-$RUN_NUMBER --rp-logging-level=WARNING --tc-file=config.ini --tc=browser.headless:True --with-flaky --force-flaky --max-runs=3 --min-passes=1 --with-parallel -A '$ATTR' -m '$TEST_REG' $TEST_FILE"
     else
-      docker container run -t --shm-size=2g -v $WORK_DIR:/1lims-automation -e "PYTHONPATH='$PYTHONPATH:/1lims-automation" -w /1lims-automation 0xislamtaha/seleniumchromenose:83 bash -c "nosetests -vs --nologcapture --with-reportportal --rp-config-file rp.ini --rp-launch-description=$RUN_REF-$RUN_ID-$RUN_NUMBER --tc-file=config.ini --tc=browser.headless:True --with-flaky --force-flaky --max-runs=3 --min-passes=1 -A '$ATTR' -m '$TEST_REG' $TEST_FILE"
+      docker container run -t --shm-size=2g -v $WORK_DIR:/1lims-automation -e "PYTHONPATH='$PYTHONPATH:/1lims-automation" -w /1lims-automation 0xislamtaha/seleniumchromenose:83 bash -c "nosetests -vs --nologcapture --with-reportportal --rp-config-file rp.ini --rp-launch-description=$RUN_REF-$RUN_ID-$RUN_NUMBER --rp-logging-level=WARNING --tc-file=config.ini --tc=browser.headless:True --with-flaky --force-flaky --max-runs=3 --min-passes=1 -A '$ATTR' -m '$TEST_REG' $TEST_FILE"
    fi
  done
