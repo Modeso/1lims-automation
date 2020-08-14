@@ -2297,7 +2297,7 @@ class OrdersTestCases(BaseTest):
             for item in formatted_orders[index]:
                 self.assertIn(item, fixed_sheet_row_data)
                 
-    @skip("https://modeso.atlassian.net/browse/LIMSA-236")
+    
     def test067_create_existing_order_change_contact(self):
         """
        LIMS-4293: Orders: Table: Existing order: Create existing order
