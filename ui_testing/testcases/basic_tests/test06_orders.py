@@ -2296,3 +2296,31 @@ class OrdersTestCases(BaseTest):
                                   f"{str(fixed_sheet_row_data)} : {str(formatted_orders[index])}")
             for item in formatted_orders[index]:
                 self.assertIn(item, fixed_sheet_row_data)
+
+    def test068_create_new_existing_order_with_deleted_order_number(self):
+        """
+        create new order :make sure that user can't create a new order with existing order using a deleted order number
+
+        LIMS-2430
+        """
+        response, payload = self.orders_api.create_new_order()
+        order_no = payload[0]['orderNo']
+        order_no_with_year = payload[0]['orderNoWithYear']
+        order_id = response['order']['mainOrderId']
+        material_type = payload[0]['materialType']['text']
+        article = payload[0]['article']['text']
+        self.info("checking that the order number appears in existing orders list before archive/delete")
+        self.assertTrue(self.order_page.create_existing_order_check_no_in_suggestion_list(order_no_with_year))
+        self.orders_api.archive_main_order(mainorder_id=order_id)
+        self.info("checking that the archived order number doesn't appear in the existing order numbers list")
+        self.assertFalse(self.order_page.create_existing_order_check_no_in_suggestion_list(order_no_with_year))
+        self.orders_api.delete_main_order(mainorder_id=order_id)
+        self.info("checking that the deleted order number doesn't appear in the existing order numbers list")
+        self.assertFalse(self.order_page.create_existing_order_check_no_in_suggestion_list(order_no_with_year))
+        self.order_page.get_orders_page()
+        self.order_page.create_new_order(material_type=material_type, article=article, order_no=order_no)
+        self.order_page.get_orders_page()
+        self.order_page.search(order_no_with_year)
+        results = self.order_page.result_table()[0].text
+        self.info('asserting the order with order number {} is created'.format(order_no))
+        self.assertIn(order_no_with_year, results.replace("'", ""))

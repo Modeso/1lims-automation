@@ -116,10 +116,11 @@ class Order(Orders):
             return []
 
     def create_new_order(self, material_type='', article='', contact='', test_plans=[''], test_units=[''],
-                         multiple_suborders=0, departments=''):
+                         multiple_suborders=0, departments='',order_no=''):
         self.info(' Create new order.')
         self.click_create_order_button()
         self.set_new_order()
+        self.set_order_number(order_no)
         self.set_contact(contact=contact)
         self.sleep_small()
         self.set_departments(departments=departments)
@@ -680,3 +681,12 @@ class Order(Orders):
         self.sleep_small()
         self.info('get test unit suggestion list')
         test_units = self.base_selenium.get_drop_down_suggestion_list(element='order:test_unit',item_text=test_unit_name)
+
+    def create_existing_order_check_no_in_suggestion_list(self, no):
+        self.get_orders_page()
+        self.info('Create new order.')
+        self.click_create_order_button()
+        self.set_existing_order()
+        self.sleep_small()
+        self.info('checking if the order number is in the existing order numbers list')
+        return self.base_selenium.is_item_in_drop_down(element='order:order_number_add_form', item_text=no)
