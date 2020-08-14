@@ -1,6 +1,3 @@
-import re
-from unittest import skip
-from parameterized import parameterized
 from ui_testing.testcases.base_test import BaseTest
 from ui_testing.pages.order_page import Order
 from ui_testing.pages.orders_page import Orders
@@ -11,11 +8,11 @@ from api_testing.apis.test_unit_api import TestUnitAPI
 from ui_testing.pages.analysis_page import SingleAnalysisPage
 from api_testing.apis.contacts_api import ContactsAPI
 from api_testing.apis.test_plan_api import TestPlanAPI
-from ui_testing.pages.testplan_page import TstPlan
-from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
-from ui_testing.pages.contacts_page import Contacts
+from parameterized import parameterized
 from random import randint
-import random
+from unittest import skip
+import random, re
+
 
 
 class OrdersTestCases(BaseTest):
@@ -23,33 +20,24 @@ class OrdersTestCases(BaseTest):
         super().setUp()
         self.order_page = Order()
         self.orders_api = OrdersAPI()
-        self.testplan_page = TstPlan()
         self.orders_page = Orders()
         self.analyses_page = AllAnalysesPage()
-        self.article_api = ArticleAPI()
-        self.test_unit_api = TestUnitAPI()
         self.contacts_api = ContactsAPI()
-        self.single_analysis_page = SingleAnalysisPage()
-        self.test_plan_api = TestPlanAPI()
-        self.contacts_api = ContactsAPI()
-        self.general_utilities_api = GeneralUtilitiesAPI()
-        self.contacts_page = Contacts()
         self.set_authorization(auth=self.contacts_api.AUTHORIZATION_RESPONSE)
         self.order_page.get_orders_page()
         self.orders_api.set_configuration()
 
     @parameterized.expand(['save_btn', 'cancel'])
+    @skip('https://modeso.atlassian.net/browse/LIMSA-239')
     def test001_edit_order_number_with_save_cancel_btn(self, save):
         """
         New: Orders: Save/Cancel button: After I edit no field then press on cancel button,
         a pop up will appear that the data will be
+
         LIMS-7200
-        :return:
         """
-        orders, payload = self.orders_api.get_all_orders(limit=40)
-        random_order = random.choice(orders['orders'])
-        self.info(
-            '{}'.format(random_order['orderNo']))
+        random_order = random.choice(self.orders_api.get_all_orders_json())
+        self.info('edit order with No {}'.format(random_order['orderNo']))
         self.orders_page.get_order_edit_page_by_id(random_order['id'])
         order_url = self.base_selenium.get_url()
         self.info(' + order_url : {}'.format(order_url))
@@ -61,78 +49,61 @@ class OrdersTestCases(BaseTest):
         else:
             self.order_page.sleep_medium()
             self.order_page.cancel(force=True)
-
-        self.base_selenium.get(
-            url=order_url, sleep=self.base_selenium.TIME_MEDIUM)
+        self.base_selenium.get(url=order_url, sleep=self.base_selenium.TIME_SMALL)
 
         current_number = self.order_page.get_no()
-        if 'save_btn' == save:
-            self.info(
-                ' + Assert {} (current_number) == {} (new_number)'.format(current_number, new_number))
-            self.assertNotEqual(current_number, new_number)
+        if save == 'save_btn':
+            self.info('Assert {} (current_number) == {} (new_number)'.format(current_number, new_number))
+            self.assertEqual(current_number, new_number)
         else:
-            self.info(
-                ' + Assert {} (current_number) == {} (old_number)'.format(current_number, old_number))
+            self.info('Assert {} (current_number) == {} (old_number)'.format(current_number, old_number))
             self.assertEqual(current_number, old_number)
 
     @parameterized.expand(['save_btn', 'cancel'])
     def test002_update_contact_with_save_cancel_btn(self, save):
         """
-        Orders: In case I update the contact then press on cancel button, a pop up should display with ( ok & cancel )
-        buttons and when I press on cancel button, this update shouldn't submit
+        Orders: In case I update the contact then press on cancel button, a pop up should display with
+        (ok & cancel) buttons and when I press on cancel button, this update shouldn't submit
+
         LIMS-4764
-        LIMS-4764
-        :return:
         """
-        orders, payload = self.orders_api.get_all_orders(limit=20)
-        random_order = random.choice(orders['orders'])
-        self.info(
-            '{}'.format(random_order['orderNo']))
+        random_order = random.choice(self.orders_api.get_all_orders_json())
+        self.info('edit order with No {}'.format(random_order['orderNo']))
         self.orders_page.get_order_edit_page_by_id(random_order['id'])
         order_url = self.base_selenium.get_url()
         self.info(' + order_url : {}'.format(order_url))
-        current_contact = self.order_page.get_contact_field()
-        self.order_page.set_contact()
-        new_contact = self.order_page.get_contact_field()
+        old_contact = self.order_page.get_contact()
+        new_contact = self.order_page.set_contact(remove_old=True)
         if 'save_btn' == save:
             self.order_page.save(save_btn='order:save_btn')
         else:
             self.order_page.sleep_medium()
             self.order_page.cancel(force=True)
-
-        self.base_selenium.get(url=order_url, sleep=5)
-
-        order_contact = self.order_page.get_contact_field()
+        self.base_selenium.get(url=order_url, sleep=self.base_selenium.TIME_SMALL)
+        current_contact = self.order_page.get_contact()
         if 'save_btn' == save:
-            self.info(
-                ' + Assert {} (new_contact) == {} (order_contact)'.format(new_contact, order_contact))
-            self.assertEqual(new_contact, order_contact)
+            self.info('Assert {} (current_contact) == {} (new_contact)'.format(current_contact, new_contact))
+            self.assertEqual(current_contact, new_contact)
         else:
-            self.info(
-                ' + Assert {} (current_contact) == {} (order_contact)'.format(current_contact, order_contact))
-            self.assertEqual(current_contact, order_contact)
+            self.info('Assert {} (current_contact) == {} (old_contact)'.format(current_contact, old_contact))
+            self.assertEqual(current_contact, old_contact)
 
     @parameterized.expand(['save_btn', 'cancel'])
     def test003_cancel_button_edit_departments(self, save):
         """
-        Orders: department Approach: In case I update the department then press on save button ( the department updated successfully) &
-        when I press on cancel button ( this department not updated )
+        Orders: department Approach: In case I update the department then press on save button
+        (the department updated successfully) & when I press on cancel button ( this department not updated )
+
         LIMS-4765
-        LIMS-4765
-        :return:
         """
-        orders, payload = self.orders_api.get_all_orders(limit=40)
-        random_order = random.choice(orders['orders'])
-        self.info(
-            '{}'.format(random_order['orderNo']))
+        random_order = random.choice(self.orders_api.get_all_orders_json())
+        self.info('edit order with No {}'.format(random_order['orderNo']))
         self.orders_page.get_order_edit_page_by_id(random_order['id'])
         order_url = self.base_selenium.get_url()
         self.info(' + order_url : {}'.format(order_url))
-        self.order_page.sleep_tiny()
         self.order_page.open_suborder_edit()
         order_department = self.order_page.get_department()
-        self.order_page.set_departments()
-        new_department = self.order_page.get_department()
+        new_department = self.order_page.set_departments(remove_old=True)
         if 'save_btn' == save:
             self.order_page.save(save_btn='order:save_btn')
         else:
@@ -201,7 +172,7 @@ class OrdersTestCases(BaseTest):
 
         self.orders_page.get_orders_page()
         analysis_no = self.order_page.search(suborders_data[0]['Analysis No.'])
-        self.single_analysis_page.open_child_table(source=analysis_no[0])
+        SingleAnalysisPage().open_child_table(source=analysis_no[0])
         results = self.order_page.result_table(element='general:table_child')[0].text
         self.assertIn(suborders_data[0]['Analysis No.'].replace("'", ""), results.replace("'", ""))
 
@@ -467,7 +438,7 @@ class OrdersTestCases(BaseTest):
         LIMS-4282
         """
         self.info("get material type with test unit ")
-        random_data = self.test_unit_api.get_testunits_with_material_type()[0]
+        random_data = TestUnitAPI().get_testunits_with_material_type()[0]
         order, payload = self.orders_api.create_new_order(materialTypeId=2)
         self.orders_page.get_order_edit_page_by_id(id=order['order']['mainOrderId'])
 
@@ -821,7 +792,7 @@ class OrdersTestCases(BaseTest):
         New: Orders: Create a new order with test units
         LIMS-3267
         """
-        diana, payload = self.test_unit_api.create_qualitative_testunit()
+        diana, payload = TestUnitAPI().create_qualitative_testunit()
 
         self.order_page.get_orders_page()
         created_order_no = self.order_page.create_new_order(material_type='r', article='a', contact='a', test_plans=[],
@@ -851,7 +822,7 @@ class OrdersTestCases(BaseTest):
         New: Orders: Create an existing order with test units
         LIMS-3268
         """
-        random_testunit, payload = self.test_unit_api.get_all_test_units(filter='{"materialTypes":"all"}')
+        random_testunit, payload = TestUnitAPI().get_all_test_units(filter='{"materialTypes":"all"}')
         random_name = random.choice(random_testunit['testUnits'])
 
         self.order_page.get_orders_page()
@@ -985,6 +956,7 @@ class OrdersTestCases(BaseTest):
         LIMS-4264 ( order with test plan )
         LIMS-4267 (order with test unit )
         """
+        self.test_plan_api = TestPlanAPI()
         self.info('create new order')
         response, order_payload = self.orders_api.create_new_order(materialTypeId=2)
         self.assertEqual(response['status'], 1, order_payload)
@@ -1206,8 +1178,9 @@ class OrdersTestCases(BaseTest):
         make sure the record created successfully in the analysis section.
         LIMS-4255
         """
-        article, article_data = self.article_api.create_article()
-        random_testunit, payload = self.test_unit_api.get_all_test_units(filter='{"materialTypes":"all"}')
+        self.single_analysis_page = SingleAnalysisPage()
+        article, article_data = ArticleAPI().create_article()
+        random_testunit, payload = TestUnitAPI().get_all_test_units(filter='{"materialTypes":"all"}')
         testunit_record = random.choice(random_testunit['testUnits'])
         orders, payload = self.orders_api.get_all_orders(limit=20)
         order = random.choice(orders['orders'])
@@ -1261,7 +1234,7 @@ class OrdersTestCases(BaseTest):
          LIMS-6523
         """
         self.info('create contact')
-        response, payload = self.contacts_api.create_contact()
+        response, payload = ContactsAPI().create_contact()
         contact, contact_id = payload, response['company']['companyId']
 
         orders, payload = self.orders_api.get_all_orders(limit=20)
@@ -1319,7 +1292,7 @@ class OrdersTestCases(BaseTest):
         self.orders_page.get_orders_page()
         self.orders_page.navigate_to_analysis_active_table()
         self.analyses_page.search(formated_order_no )
-        analysis_record = self.single_analysis_page.get_the_latest_row_data()
+        analysis_record = SingleAnalysisPage().get_the_latest_row_data()
         self.info('checking order no of each analysis')
         self.assertEqual(analysis_record['Order No.'], formated_order_no)
 
@@ -1340,7 +1313,7 @@ class OrdersTestCases(BaseTest):
                   format(payload[0]['orderNo'], duplicated_order_number))
         self.assertNotEqual(payload[0]['orderNo'], duplicated_order_number)
         self.info('get completed test plan with different material type')
-        selected_test_plan = self.test_plan_api.get_completed_testplans_with_material_and_same_article(material_type='Raw Material',
+        selected_test_plan = TestPlanAPI().get_completed_testplans_with_material_and_same_article(material_type='Raw Material',
                                                                                       article='', articleNo='')[0]
 
         self.info('change material type of first suborder')
@@ -1380,7 +1353,8 @@ class OrdersTestCases(BaseTest):
         LIMS-3710
         :return:
         """
-        re, payload = self.test_unit_api.create_qualitative_testunit()
+        self.test_unit_api = TestUnitAPI()
+        re, payload = TestUnitAPI().create_qualitative_testunit()
         self.test_unit_api.archive_testunits(ids=[str(re['testUnit']['testUnitId'])])
         self.base_selenium.click(element='orders:new_order')
         self.order_page.set_new_order()
@@ -1445,7 +1419,7 @@ class OrdersTestCases(BaseTest):
         self.info("duplicate the sub order of order {} from suborder's options".format(payload[0]['orderNo']))
         self.order_page.duplicate_sub_order_from_table_overview()
         self.info('get completed test plan with different material type')
-        selected_test_plan = self.test_plan_api.get_completed_testplans_with_material_and_same_article(
+        selected_test_plan = TestPlanAPI().get_completed_testplans_with_material_and_same_article(
                                                                                            material_type='Raw Material',
                                                                                            article='',
                                                                                            articleNo='')[0]
@@ -2017,7 +1991,7 @@ class OrdersTestCases(BaseTest):
         LIMS-5204
         """
         self.info("create new test unit edit the suborder by it ( because the test unit name is not a unique ")
-        re, payload1 = self.test_unit_api.create_qualitative_testunit()
+        re, payload1 = TestUnitAPI().create_qualitative_testunit()
 
         order, payload = self.orders_api.create_new_order()
         self.orders_page.get_order_edit_page_by_id(id=order['order']['mainOrderId'])
@@ -2109,8 +2083,7 @@ class OrdersTestCases(BaseTest):
         & units displayed on the test plans & units fields same as in the test plan pop up
         LIMS-4796
         """
-        import ipdb;
-        ipdb.set_trace()
+        self.test_plan_api = TestPlanAPI()
         order, payload = self.orders_api.create_new_order()
         self.info('open the order record in the edit mode')
         self.orders_page.get_order_edit_page_by_id(id=order['order']['mainOrderId'])
@@ -2135,9 +2108,10 @@ class OrdersTestCases(BaseTest):
         & add another ones this update should reflect on the test plan pop up
         LIMS-8256
         """
+        self.test_plan_api = TestPlanAPI()
         self.info('Get completed test plan to upade by it with raw material type')
         testplan = \
-            self.test_plan_api.get_completed_testplans_with_material_and_same_article(material_type='Raw Material',
+            TestPlanAPI().get_completed_testplans_with_material_and_same_article(material_type='Raw Material',
                                                                                       article='', articleNo='')[0]
         order, payload = self.orders_api.create_new_order(materialTypeId=1)
         self.info('open the order record in the edit mode')
@@ -2167,9 +2141,11 @@ class OrdersTestCases(BaseTest):
         deleted from the pop up with it's test units and updated with another one
         LIMS-4802
         """
+        self.test_plan_api = TestPlanAPI()
+
         self.info('Get completed test plan to upade by it with raw material type')
         testplan = \
-            self.test_plan_api.get_completed_testplans_with_material_and_same_article(material_type='Raw Material',
+            TestPlanAPI().get_completed_testplans_with_material_and_same_article(material_type='Raw Material',
                                                                                       article='', articleNo='')[0]
         order, payload = self.orders_api.create_new_order(materialTypeId=1)
         self.info('open the order record in the edit mode')
@@ -2198,6 +2174,7 @@ class OrdersTestCases(BaseTest):
         LIMS-5704 'create mode'
         """
         self.info("get 3 contacts with department contacts")
+        self.contacts_api = ContactsAPI()
         contact_list = random.choices(self.contacts_api.get_contacts_with_department(), k=3)
         self.assertTrue(contact_list, "Can't get 3 contacts with departments")
         contact_names_list = [contact['name'] for contact in contact_list]
@@ -2244,7 +2221,7 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(response['status'], 1, response)
         contact_names_list = [contact['text'] for contact in payload[0]['contact']]
         self.info('selected contacts are {}'.format(contact_names_list))
-        departments_list_with_contacts = self.contacts_api.get_department_contact_list(contact_names_list)
+        departments_list_with_contacts = ContactsAPI().get_department_contact_list(contact_names_list)
         self.info('department contacts list {}'.format(departments_list_with_contacts))
         self.info('open edit page of order no {}'.format(payload[0]['orderNo']))
         self.orders_page.get_order_edit_page_by_id(response['order']['mainOrderId'])

@@ -326,7 +326,9 @@ class Order(Orders):
         suborder_row.click()
         return self.base_selenium.get_text(element='order:departments').split('\n')[0]
 
-    def set_departments(self, departments=''):
+    def set_departments(self, departments='', remove_old=False):
+        if remove_old:
+            self.base_selenium.clear_items_in_drop_down(element='order:departments')
         if departments:
             self.base_selenium.select_item_from_drop_down(element='order:departments', item_text=departments)
         else:
@@ -623,9 +625,6 @@ class Order(Orders):
             self.base_selenium.wait_element(element='general:form_popup_warning_window')
             self.base_selenium.click(element='general:confirmation_button')
         self.sleep_small()
-
-    def get_contact_field(self):
-        return self.base_selenium.get_text(element='order:contact').split('\n')[0]
 
     def get_data_first_row(self, index=0):
         suborders = self.base_selenium.get_table_rows(element='order:suborder_table')
