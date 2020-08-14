@@ -2318,5 +2318,5 @@ class OrdersTestCases(BaseTest):
             analysis_no = response['orders'][i]['analysis']
             self.orders_page.search(analysis_no)
             results = self.analyses_page.get_the_latest_row_data()
-            self.info('checking contact is updated for suborder i - new contact is {} and current contact is {}'.format(new_contact,results['Contact Name']))
+            self.info('checking contact is updated for suborder {} - new contact is {} and current contact is {}'.format(i,new_contact,results['Contact Name']))
             self.assertEqual(new_contact, results['Contact Name'])
