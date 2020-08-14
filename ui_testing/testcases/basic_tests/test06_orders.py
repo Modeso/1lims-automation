@@ -2296,13 +2296,14 @@ class OrdersTestCases(BaseTest):
                                   f"{str(fixed_sheet_row_data)} : {str(formatted_orders[index])}")
             for item in formatted_orders[index]:
                 self.assertIn(item, fixed_sheet_row_data)
-
+                
+    @skip("https://modeso.atlassian.net/browse/LIMSA-236")
     def test067_create_existing_order_change_contact(self):
         """
        LIMS-4293: Orders: Table: Existing order: Create existing order
        then change the contact for this existing one, all old records with the same order number will update its contact.
         """
-        order_no = self.order_page.create_existing_order_with_auto_fill(no='52456-2020')
+        order_no = self.order_page.create_existing_order_with_auto_fill(no='')
         self.order_page.sleep_tiny()
         new_contact = self.order_page.set_contact(remove_old=True)[0]
         self.order_page.save(save_btn='order:save_btn')
@@ -2310,7 +2311,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.navigate_to_analysis_tab()
         self.info('Assert There is an analysis for this new order.')
         self.analyses_page.apply_filter_scenario(
-            filter_element='orders:filter_order_no', filter_text='52456-2020', field_type='drop_down')
+            filter_element='orders:filter_order_no', filter_text=order_no, field_type='drop_down')
 
         latest_order_data = \
             self.base_selenium.get_row_cells_dict_related_to_header(row=self.analyses_page.result_table()[0])
