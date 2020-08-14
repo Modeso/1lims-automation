@@ -2307,15 +2307,16 @@ class OrdersTestCases(BaseTest):
         self.order_page.sleep_tiny()
         new_contact = self.order_page.set_contact(remove_old=True)[0]
         self.order_page.save(save_btn='order:save_btn')
+        self.order_page.sleep_tiny()
+        order_id = self.order_page.get_order_id()
+        response, payload = self.orders_api.get_suborder_by_order_id(id=order_id)
+        self.info('Getting all {} suborders data to get analysis number'.format(len(response['orders'])))
         self.order_page.get_orders_page()
         self.order_page.navigate_to_analysis_tab()
-        self.info('Assert There is an analysis for this new order.')
-        self.analyses_page.apply_filter_scenario(
-            filter_element='orders:filter_order_no', filter_text=order_no, field_type='drop_down')
-
-        latest_order_data = \
-            self.base_selenium.get_row_cells_dict_related_to_header(row=self.analyses_page.result_table()[0])
-        self.info('checking contact is updated; new contact is {}, current contact is {}'.format(new_contact,
-                                                                                                 latest_order_data[
-                                                                                                     'Contact Name']))
-        self.assertEqual(new_contact, latest_order_data['Contact Name'])
+        self.info('Asserting that contact has changed for this order')
+        for i in range(len(response['orders'])):
+            analysis_no = response['orders'][i]['analysis']
+            self.orders_page.search(analysis_no)
+            results = self.analyses_page.get_the_latest_row_data()
+            self.info('checking contact is updated for suborder i - new contact is {} and current contact is {}'.format(new_contact,results['Contact Name']))
+            self.assertEqual(new_contact, results['Contact Name'])
