@@ -11,4 +11,4 @@ xlrd
 loguru
 pyperclip
 pymysql
-nose-reportportal==0.0.6
+git+https://github.com/0xIslamTaha/agent-python-nosetests@0.0.7
