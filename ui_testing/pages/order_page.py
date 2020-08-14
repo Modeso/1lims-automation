@@ -116,10 +116,11 @@ class Order(Orders):
             return []
 
     def create_new_order(self, material_type='', article='', contact='', test_plans=[''], test_units=[''],
-                         multiple_suborders=0, departments=''):
+                         multiple_suborders=0, departments='', order_no=''):
         self.info(' Create new order.')
         self.click_create_order_button()
         self.set_new_order()
+        self.set_order_number(order_no)
         self.set_contact(contact=contact)
         self.sleep_small()
         self.set_departments(departments=departments)
@@ -689,19 +690,3 @@ class Order(Orders):
         self.sleep_small()
         self.info('checking if the order number is in the existing order numbers list')
         return self.base_selenium.is_item_in_drop_down(element='order:order_number_add_form', item_text=no)
-
-    def create_new_order_with_specific_order_no(self,no):
-        self.get_orders_page()
-        self.info(' Create new order.')
-        self.click_create_order_button()
-        self.set_new_order()
-        self.set_order_number(no=no)
-        self.set_contact(contact='')
-        self.sleep_small()
-        self.set_material_type(material_type='Raw Material')
-        self.sleep_small()
-        self.set_article(article='')
-        self.sleep_small()
-        self.set_test_unit('')
-        self.save(save_btn='order:save_btn')
-
