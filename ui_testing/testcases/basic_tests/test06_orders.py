@@ -2321,6 +2321,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.create_new_order(material_type=material_type, article=article, order_no=order_no)
         self.order_page.get_orders_page()
         self.order_page.search(order_no_with_year)
+        self.order_page.sleep_tiny()
         results = self.order_page.result_table()[0].text
         self.info('asserting the order with order number {} is created'.format(order_no))
         self.assertIn(order_no_with_year, results.replace("'", ""))
