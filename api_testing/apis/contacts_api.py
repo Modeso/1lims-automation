@@ -140,7 +140,7 @@ class ContactsAPI(ContactsAPIFactory):
             return False
 
     def get_contacts_with_department(self):
-        api, contacts_data = self.get_all_contacts(limit=50)
+        api, contacts_data = self.get_all_contacts()
         contacts = api['contacts']
         contacts_with_department = [contact for contact in contacts if contact['departments']]
         return contacts_with_department
@@ -175,6 +175,32 @@ class ContactsAPI(ContactsAPIFactory):
                   "email": {"text": "", "recipient": 0},
                   "phone": 0, "skype": 0, "moreInfo": 0}
         payload = {"persons": [person], "departments": []}
+        return self.create_contact(**payload)
+
+    def create_contact_with_multiple_departments(self):
+        random_contact_department1 = self.generate_random_string()
+        random_contact_department2 = self.generate_random_string()
+        random_contact_department3 = self.generate_random_string()
+        dep1 = {
+            "display": random_contact_department1,
+            "value": random_contact_department1,
+            "id": "new",
+            "text": random_contact_department1
+        }
+        dep2 = {
+            "display": random_contact_department2,
+            "value": random_contact_department2,
+            "id": "new",
+            "text": random_contact_department2
+        }
+        dep3 = {
+            "display": random_contact_department3,
+            "value": random_contact_department3,
+            "id": "new",
+            "text": random_contact_department3
+        }
+        payload = {"departments": [dep1, dep2, dep3]}
+
         return self.create_contact(**payload)
 
     def set_configuration(self):
