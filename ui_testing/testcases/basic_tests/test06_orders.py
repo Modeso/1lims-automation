@@ -2296,7 +2296,7 @@ class OrdersTestCases(BaseTest):
                                   f"{str(fixed_sheet_row_data)} : {str(formatted_orders[index])}")
             for item in formatted_orders[index]:
                 self.assertIn(item, fixed_sheet_row_data)
-
+    @skip("https://modeso.atlassian.net/browse/LIMSA-236")
     def test068_create_new_existing_order_with_deleted_order_number(self):
         """
         create new order :make sure that user can't create a new order with existing order using a deleted order number
