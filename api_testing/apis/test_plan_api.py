@@ -86,6 +86,7 @@ class TestPlanAPIFactory(BaseAPI):
         return api, {}
 
     @api_factory('post')
+
     def create_testplan(self, **kwargs):
         """
         NOTE: calling this api without adding testunits, will create an in progress testplan, to create a complete testplan
@@ -143,6 +144,7 @@ class TestPlanAPIFactory(BaseAPI):
         if 'materialType' in kwargs:
             payload['materialType'] = kwargs['materialType']
             payload['materialTypeId'] = [kwargs['materialType'][0]['id']]
+
 
         api = '{}{}'.format(self.url, self.END_POINTS['test_plan_api']['create_testplan'])
         return api, payload
@@ -306,9 +308,37 @@ class TestPlanAPI(TestPlanAPIFactory):
         else:
             self.info(testplan)
 
+
+
+
     def set_configuration(self):
         self.info('set test Plan configuration')
         config_file = os.path.abspath('api_testing/config/test_plan.json')
         with open(config_file, "r") as read_file:
             payload = json.load(read_file)
         super().set_configuration(payload=payload)
+
+
+    def create_testplan_with_multiple_testunits(self):
+
+        self.test_unit_api=TestUnitAPI()
+        testunit1,payload1= TestUnitAPI().create_quantitative_testunit()
+        #print(testunit1)
+        #print(payload1)
+        #print(id[0])
+        #print([(testunit1['testUnit']['testUnitId'])][0])
+
+        testunit2,payload2= TestUnitAPI().create_quantitative_testunit()
+        #print([(testunit2['testUnit']['testUnitId'])][0])
+
+        testunit_data1 = TestUnitAPI().get_testunit_form_data(id=[(testunit1['testUnit']['testUnitId'])][0])
+        #print(testunit_data1)
+        formated_testunit1 = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data1[0])
+
+        testunit_data2 = TestUnitAPI().get_testunit_form_data(id=[(testunit2['testUnit']['testUnitId'])][0])
+        formated_testunit2 = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data2[0])
+
+        testplan, _ = TestPlanAPI().create_testplan(
+           testUnits=[formated_testunit1,formated_testunit2])
+
+        return self.create_testplan(testUnits=[formated_testunit1,formated_testunit2])

@@ -14,8 +14,6 @@ from api_testing.apis.test_plan_api import TestPlanAPI
 from ui_testing.pages.testplan_page import TstPlan
 from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from ui_testing.pages.contacts_page import Contacts
-from ui_testing.pages.testunits_page import TstUnits
-from ui_testing.pages.testunit_page import TstUnit
 
 from random import randint
 import random
@@ -2300,32 +2298,27 @@ class OrdersTestCases(BaseTest):
             for item in formatted_orders[index]:
                 self.assertIn(item, fixed_sheet_row_data)
 
-    @parameterized.expand(['Quantitative' ])
-    def test066_test_unit_with_sub_and_super_unit_name_appears_in_unit_field_drop_down(self, type) :
-        """
-        New: Test unit: Export: In case the unit field with sub & super,
-        allow this to display in the unit field drop down list in the analysis form
-        LIMS-6675
-        """
-        self.test_units_page = TstUnits()
-        self.test_unit_page = TstUnit()
-        self.test_units_page.get_test_units_page()
-        self.test_units_page.open_configurations()
-        self.test_units_page.open_testunit_name_configurations_options()
-        self.test_units_page.select_option_to_view_search_with(view_search_options=['Unit'])
 
-        if type == 'Quantitative':
-            self.info('Create new Quantitative testunit')
-            response, payload = self.test_unit_api.create_quantitative_testunit(unit='m[g]{o}')
-        elif type =='Qualitative':
-            self.info('Create new Qualitative testunit')
-            response, payload = self.test_unit_api.create_qualitative_testunit(unit='m[g]{o}')
-        else:
-            self.info('Create new Quantitative MiBi testunit')
-            response, payload = self.test_unit_api.create_mibi_testunit(unit='m[g]{o}')
 
-        self.assertEqual(response['status'], 1, 'test unit not created {}'.format(payload))
-        self.info('go to orders page')
-        self.order_page.get_orders_page()
-        unit=self.order_page.create_new_order_get_test_unit_suggetion_list(material_type='',test_unit_name='m[g]{o}')
-        self.assertIn("m[g]{o}",unit)
+    def test066_check_order_of_anaylsis_section(self) :
+        """
+        New: Test unit:  In case I put test plans and test units at the same time , the order of the analysis section
+         should be the test units of the test plans then the order test units.
+        LIMS-7416
+        """
+        #import ipdb; ipdb.set_trace()
+        self.info('Create testplan with multiple test units')
+        self.test_plan_api.create_testplan_with_multiple_testunits()
+        self.info('Create new order and add testunit to the same testplan just created')
+        order_number= self.order_page.create_new_order(test_units='')
+
+
+
+        self.info('navigate to analysis page')
+        self.order_page.navigate_to_analysis_tab()
+
+
+
+
+
+
