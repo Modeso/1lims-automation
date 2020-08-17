@@ -97,6 +97,7 @@ class OrdersAPIFactory(BaseAPI):
                 'article': {'id': article_id,
                             'text': article},
                 'articleId': article_id,
+                "withArticle": True,
                 'shipmentDate': shipment_date,
                 'testDate': test_date,
                 'year': current_year,
@@ -108,8 +109,15 @@ class OrdersAPIFactory(BaseAPI):
         return api, payload
 
     @api_factory('get')
-    def get_auto_generated_order_no(self):
-        api = '{}{}'.format(self.url, self.END_POINTS['orders_api']['get_auto_generated_number'])
+    def get_auto_generated_order_no(self, year_option='1'):
+        """
+        year_option = 1 : order no with year after (1668-2020)
+        year_option = 0 : order no with year after (2020-1668)
+
+        :param year_option:
+        :return:
+        """
+        api = '{}{}'.format(self.url, self.END_POINTS['orders_api']['get_auto_generated_number'])+year_option
         return api, {}
 
     @api_factory('put')
@@ -225,8 +233,6 @@ class OrdersAPIFactory(BaseAPI):
             payload['orderNoWithYear'] = "{}-{}".format((payload['orderNo']), payload['year'])
         elif payload['yearOption'] == 2:
             payload['orderNoWithYear'] = "{}-{}".format(payload['year'], payload['orderNo'])
-
-        payload['orderNo'] = payload['orderNoWithYear']
 
         return [payload]
 

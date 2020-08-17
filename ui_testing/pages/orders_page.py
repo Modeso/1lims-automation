@@ -131,6 +131,10 @@ class Orders(BasePages):
         self.info('Filter by order no. : {}'.format(filter_text))
         self.filter_by(filter_element='orders:order_filter', filter_text=filter_text, field_type='text')
         self.filter_apply()
+        self.sleep_tiny()
+        self.base_selenium.scroll()
+        self.sleep_tiny()
+        self.close_filter_menu()
 
     def open_filter_menu(self):
         self.base_selenium.scroll()

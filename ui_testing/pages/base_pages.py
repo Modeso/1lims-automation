@@ -287,9 +287,10 @@ class BasePages:
         childtable_arrow.click()
         self.sleep_medium()
 
-    def get_child_table_data(self, index=0):
+    def get_child_table_data(self, index=0, open_child=True):
         rows = self.result_table()
-        self.open_child_table(source=rows[index])
+        if open_child:
+            self.open_child_table(source=rows[index])
         return self.get_table_data()
 
     def get_table_data(self, table_element='general:table_child'):

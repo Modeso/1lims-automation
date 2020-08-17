@@ -28,7 +28,6 @@ class OrdersTestCases(BaseTest):
         self.orders_api.set_configuration()
 
     @parameterized.expand(['save_btn', 'cancel'])
-    @skip('https://modeso.atlassian.net/browse/LIMSA-239')
     def test001_edit_order_number_with_save_cancel_btn(self, save):
         """
         New: Orders: Save/Cancel button: After I edit no field then press on cancel button,
@@ -41,7 +40,7 @@ class OrdersTestCases(BaseTest):
         self.orders_page.get_order_edit_page_by_id(random_order['id'])
         order_url = self.base_selenium.get_url()
         self.info(' + order_url : {}'.format(order_url))
-        old_number = self.order_page.get_no()
+        old_number = self.order_page.get_no().replace("'", "")
         new_number = self.generate_random_string()
         self.order_page.set_no(new_number)
         if 'save_btn' == save:
@@ -51,7 +50,7 @@ class OrdersTestCases(BaseTest):
             self.order_page.cancel(force=True)
         self.base_selenium.get(url=order_url, sleep=self.base_selenium.TIME_SMALL)
 
-        current_number = self.order_page.get_no()
+        current_number = self.order_page.get_no().replace("'", "")
         if save == 'save_btn':
             self.info('Assert {} (current_number) == {} (new_number)'.format(current_number, new_number))
             self.assertEqual(current_number, new_number)
@@ -131,7 +130,6 @@ class OrdersTestCases(BaseTest):
                       format(current_department, order_department))
             self.assertCountEqual(current_department, order_department)
 
-    @skip('https://modeso.atlassian.net/browse/LIMSA-264')
     def test004_archive_main_order(self):
         """"
         User can archive a main order
@@ -142,7 +140,7 @@ class OrdersTestCases(BaseTest):
         selected_order = self.orders_page.select_random_table_row()
         self.assertTrue(selected_order)
         self.info('selected order : {}'.format(selected_order))
-        order_number = selected_order['Order No.']
+        order_number = selected_order['Order No.'].replace("'","")
         self.info('Archive the selected item and navigating to the archived items table')
         self.orders_page.archive_selected_items()
         self.orders_page.get_archived_items()
@@ -151,7 +149,6 @@ class OrdersTestCases(BaseTest):
         self.assertIn(order_number, archived_row[0].text)
         self.info('Order number: {} is archived correctly'.format(order_number))
 
-    #@skip("https://modeso.atlassian.net/browse/LIMSA-202")
     def test005_restore_archived_orders(self):
         """
         I can restore any sub order successfully
@@ -161,25 +158,22 @@ class OrdersTestCases(BaseTest):
         response, payload = self.orders_api.create_new_order()
         self.assertEqual(response['status'], 1)
         order_no = payload[0]['orderNo']
-        rows = self.orders_page.search(order_no)
-        self.orders_page.click_check_box(rows[0])
+        self.info("archive order no {}".format(order_no))
+        self.orders_page.filter_by_order_no(order_no)
+        import ipdb;ipdb.set_trace()
+        row = self.orders_page.result_table()[0]
+        self.orders_page.click_check_box(row)
         self.orders_page.archive_selected_items()
         self.orders_page.get_archived_items()
-        self.orders_page.search(order_no)
+        self.orders_page.filter_by_order_no(order_no)
         suborders_data = self.order_page.get_child_table_data(index=0)
         self.order_page.restore_table_suborder(index=0)
         self.info('make sure that suborder is restored successfully')
-        if len(suborders_data) > 1:
-            suborder_data_after_restore = self.order_page.get_table_data()
-            self.assertNotEqual(suborder_data_after_restore[0], suborders_data[0])
-        else:
-            table_records_count = len(self.order_page.result_table()) - 1
-            self.assertEqual(table_records_count, 0)
         self.orders_page.get_active_items()
-        self.orders_page.filter_by_analysis_number(suborders_data[0]['Analysis No.'])
-        child_data = self.orders_page.get_child_table_data()
-        self.assertIn(suborders_data[0]['Analysis No.'].replace("'", ""),
-                      child_data[0]['Analysis No.'].replace("'", ""))
+        self.orders_page.filter_by_order_no(order_no)
+        child_data = self.orders_page.get_child_table_data(open_child=False)
+        self.assertEqual(suborders_data[0]['Analysis No.'].replace("'", ""),
+                         child_data[0]['Analysis No.'].replace("'", ""))
     #
     # @skip("https://modeso.atlassian.net/browse/LIMSA-191")
     # def test006_delete_main_order(self):
