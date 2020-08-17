@@ -109,7 +109,7 @@ class TestUnitsTestCases(BaseTest):
         self.info("select random test unit")
         random_test_unit = random.choice(self.test_unit_api.get_all_testunits_json())
         self.assertTrue(random_test_unit, "No test unit selected")
-        update_data = self.test_unit_page.update_test_unit(random_test_unit['id'])
+        update_data = self.test_unit_page.update_test_unit(random_test_unit['id'],save=True)
         self.info('Refresh to make sure that the new data are saved')
         test_unit_after_update = self.test_unit_page.refresh_and_get_updated_data()
         self.assertEqual(update_data, test_unit_after_update)
@@ -1304,3 +1304,27 @@ class TestUnitsTestCases(BaseTest):
         self.test_units_page.sleep_tiny()
         test_unit_found = self.test_units_page.filter_by_user_get_result(payload['username'])
         self.assertTrue(test_unit_found)
+
+    def test050_edit_without_saving_popup_appears(self):
+        """
+        Test unit : click overview from test unit edit page (check pop up)
+
+        -No popup should appear when clicking on overview without changing anything
+        LIMS-6818
+
+        -Popup should appear when editing then clicking on overview without saving <All data will be lost>
+        LIMS-6812
+        """
+        active_table = self.test_unit_page.test_units_url
+        random_test_unit = random.choice(self.test_unit_api.get_all_testunits_json())
+        testunit_id = random_test_unit['id']
+        self.test_unit_page.open_test_unit_edit_page_by_id(id=testunit_id)
+        self.test_unit_page.click_overview()
+        self.test_units_page.sleep_tiny()
+        self.info('Clicked overview without editing - Asserting active table is displayed')
+        self.info('Current URL is {}'.format(self.test_unit_page.get_current_page()))
+        self.assertEqual(active_table, self.test_unit_page.get_current_page())
+        self.test_unit_page.update_test_unit(id=testunit_id, save=False)
+        self.test_unit_page.click_overview()
+        self.info('Clicked overview after editing without saving - Asserting popup appears')
+        self.assertTrue(self.test_unit_page.confirm_popup(check_only=True))
