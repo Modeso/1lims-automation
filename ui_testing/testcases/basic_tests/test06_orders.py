@@ -2296,3 +2296,39 @@ class OrdersTestCases(BaseTest):
                                   f"{str(fixed_sheet_row_data)} : {str(formatted_orders[index])}")
             for item in formatted_orders[index]:
                 self.assertIn(item, fixed_sheet_row_data)
+
+    def test068_choose_test_plans_without_test_units(self):
+        self.info(' Create new order.')
+        self.order_page.click_create_order_button()
+        self.order_page.set_new_order()
+        self.order_page.set_contact(contact='')
+        self.order_page.sleep_small()
+        self.order_page.set_material_type(material_type='Raw Material')
+        self.order_page.sleep_small()
+        order_no = self.order_page.get_no()
+        tst_plan1,tst_plan2,article = TestPlanAPI().create_multiple_test_plan_with_same_article()
+        self.order_page.set_article(article=article)
+        self.order_page.sleep_small()
+        self.order_page.set_test_plan(test_plan=tst_plan1)
+        self.order_page.set_test_plan(test_plan=tst_plan2)
+
+        '''
+        _, test_plan1 = TestPlanAPI().create_testplan()
+        _, test_plan2 = TestPlanAPI().create_testplan()
+        _, test_plan3 = TestPlanAPI().create_testplan()
+        _, test_plan4 = TestPlanAPI().create_testplan()
+        _, test_plan5 = TestPlanAPI().create_testplan()
+        _, test_plan6 = TestPlanAPI().create_testplan()
+        test_plan_name = test_plan1['testPlan']['text']
+        self.order_page.set_article(article='')
+        self.order_page.sleep_small()
+        self.order_page.set_test_plan(test_plan=test_plan1['testPlan']['text'])
+        self.order_page.set_test_plan(test_plan=test_plan2['testPlan']['text'])
+        self.order_page.create_new_suborder(test_plans=[test_plan3,test_plan4])
+        self.order_page.create_new_suborder(test_plans=[test_plan5,test_plan6])
+        self.order_page.save(save_btn='order:save_btn')
+        '''
+
+
+
+

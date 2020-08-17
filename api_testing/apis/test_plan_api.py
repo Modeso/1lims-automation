@@ -306,6 +306,19 @@ class TestPlanAPI(TestPlanAPIFactory):
         else:
             self.info(testplan)
 
+    def create_multiple_test_plan_with_same_article(self):
+        article_data = ArticleAPI().get_formatted_article_with_material_type('Raw Material')
+        print(article_data)
+        article = article_data['name']
+        formatted_article = {'id': article_data['id'], 'text': article}
+        new_test_plan1 = TestPlanAPI().create_completed_testplan(
+            material_type='Raw Material', formatted_article=formatted_article)
+        test_plan1 = new_test_plan1['testPlanEntity']['name']
+        new_test_plan2 = TestPlanAPI().create_completed_testplan(
+            material_type='Raw Material', formatted_article=formatted_article)
+        test_plan2 = new_test_plan2['testPlanEntity']['name']
+        return test_plan1,test_plan2,article
+
     def set_configuration(self):
         self.info('set test Plan configuration')
         config_file = os.path.abspath('api_testing/config/test_plan.json')
