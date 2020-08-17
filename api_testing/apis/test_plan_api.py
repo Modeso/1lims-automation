@@ -320,7 +320,7 @@ class TestPlanAPI(TestPlanAPIFactory):
 
 
     def create_testplan_with_multiple_testunits(self):
-
+        import ipdb;ipdb.set_trace()
         self.test_unit_api=TestUnitAPI()
         testunit1,payload1= TestUnitAPI().create_quantitative_testunit()
         #print(testunit1)
@@ -328,12 +328,12 @@ class TestPlanAPI(TestPlanAPIFactory):
         #print(id[0])
         #print([(testunit1['testUnit']['testUnitId'])][0])
 
-        testunit2,payload2= TestUnitAPI().create_quantitative_testunit()
+        testunit2, payload2 = TestUnitAPI().create_quantitative_testunit()
         #print([(testunit2['testUnit']['testUnitId'])][0])
 
-        testunit_data1 = TestUnitAPI().get_testunit_form_data(id=[(testunit1['testUnit']['testUnitId'])][0])
+        testunit_data1 = TestUnitAPI().get_testunit_form_data(id=testunit1['testUnit']['testUnitId'])[0]['testUnit']
         #print(testunit_data1)
-        formated_testunit1 = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data1[0])
+        formated_testunit1 = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data1)
 
         testunit_data2 = TestUnitAPI().get_testunit_form_data(id=[(testunit2['testUnit']['testUnitId'])][0])
         formated_testunit2 = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data2[0])
