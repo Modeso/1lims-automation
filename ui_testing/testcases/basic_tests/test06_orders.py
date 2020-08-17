@@ -2298,13 +2298,12 @@ class OrdersTestCases(BaseTest):
             for item in formatted_orders[index]:
                 self.assertIn(item, fixed_sheet_row_data)
 
-
-
     @parameterized.expand(['cancel_btn', 'close_btn'])
     def test066_close_testplan_popup(self,button):
-        """ LIMS-4797- Make sure the user can press on the cancel button to close the pop-up or from the ( x ) sign
-                          """
-        order, payload = self.orders_api.create_new_order(materialTypeId=1)
+        """ Make sure the user can press on the cancel button to close the pop-up or from the ( x ) sign
+            LIMS-4797
+        """
+        order, payload = self.orders_api.create_new_order()
         self.info('open the order record in the edit mode')
         self.orders_page.get_order_edit_page_by_id(id=order['order']['mainOrderId'])
         self.base_selenium.click(element='order:testplan_popup_btn')
@@ -2314,5 +2313,5 @@ class OrdersTestCases(BaseTest):
         else:
             self.base_selenium.wait_until_element_clickable(element='order:testplan_close_btn')
             self.base_selenium.click(element='order:testplan_close_btn')
-            self.base_selenium.check_element_is_not_exist(element='order:testplan_popup')
+        self.assertTrue(self.base_selenium.check_element_is_not_exist(element='order:testplan_popup'))
 
