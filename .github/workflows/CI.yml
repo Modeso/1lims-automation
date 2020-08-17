@@ -21,7 +21,7 @@ jobs:
       - name: execute test case in parallel
         env:
           TEST_FILE: ui_testing/testcases/basic_tests/test04_testunits.py
-          TEST_REG: test055
+          TEST_REG: test050
         run: docker container run -t --shm-size=2g -v `pwd`:/1lims-automation -e "PYTHONPATH='$PYTHONPATH:/1lims-automation" -w /1lims-automation 0xislamtaha/seleniumchromenose:83 bash -c "NODE_TOTAL=${{ strategy.job-total }} NODE_INDEX=${{ matrix.test_cases }} nosetests -vs --nologcapture --tc-file=config.ini --tc=browser.headless:True  --with-flaky --force-flaky --max-runs=3 --min-passes=1 --with-parallel -A 'not series' -m '$TEST_REG' $TEST_FILE"
 
 #  test_pull_request_in_series:
