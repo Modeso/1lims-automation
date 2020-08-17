@@ -410,4 +410,12 @@ class TestUnitAPI(TestUnitAPIFactory):
             payload = json.load(read_file)
         super().set_configuration(payload=payload)
 
+    def set_name_configuration(self):
+        self.info('set test unit configuration')
+        config_file = os.path.abspath('api_testing/config/testUnit_unit.json')
+        with open(config_file, "r") as read_file:
+            payload = json.load(read_file)
+        super().set_configuration(payload=payload)
+
+
 

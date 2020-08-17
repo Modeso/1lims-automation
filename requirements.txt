@@ -1,6 +1,6 @@
 nose
 nose-progressive
-nose-testconfig~=0.10
+nose-testconfig
 nose_parameterized
 rednose
 selenium~=3.141.0
