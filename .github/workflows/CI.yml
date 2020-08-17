@@ -19,7 +19,7 @@ jobs:
         run:  docker pull 0xislamtaha/seleniumchromenose:83
 
       - name: parallel execution for each module
-        run: timeout 2h bash .github/workflows/execution.sh ${{ strategy.job-total }} ${{ matrix.test_cases }} ${{ github.ref }} ${{ github.run_id }} ${{ github.run_number }} $(pwd) 'not series'
+        run: timeout 2h bash .github/workflows/execution.sh ${{ strategy.job-total }} ${{ matrix.test_cases }} ${{ github.ref }} ${{ github.run_id }} ${{ github.run_number }} $(pwd) 'not series' ${{ secrets.UUID }}
 
   test_pull_request_in_series:
     runs-on: ubuntu-20.04
@@ -35,4 +35,4 @@ jobs:
         run:  docker pull 0xislamtaha/seleniumchromenose:83
 
       - name: sequal execution for series
-        run: timeout 1h bash .github/workflows/execution.sh ${{ strategy.job-total }} ${{ matrix.test_cases }} ${{ github.ref }} ${{ github.run_id }} ${{ github.run_number }} $(pwd) 'series'
+        run: timeout 1h bash .github/workflows/execution.sh ${{ strategy.job-total }} ${{ matrix.test_cases }} ${{ github.ref }} ${{ github.run_id }} ${{ github.run_number }} $(pwd) 'series' ${{ secrets.UUID }}

@@ -1,8 +1,8 @@
 import IPython
 import requests
 
-BASE_API = "http://35.239.200.77:8080/api/v1"
-AUTHONTICATION = "bearer db2a44e1-5d3d-489b-ad97-602fc1b5035f"
+BASE_API = "http://18.158.202.89:8080/api/v1"
+AUTHONTICATION = "bearer "
 session = requests.Session()
 headers = {'Content-Type': "application/json",
            'Authorization': AUTHONTICATION,
