@@ -339,6 +339,7 @@ class OrdersTestCases(BaseTest):
         self.orders_page.filter_by_order_no(order['orderNo'])
         suborders_data_after = self.orders_page.get_child_table_data()[0]
         #self.assertEqual(suborder_data['Test Plans'], test_plan['testPlanName'])
+        #skipped due to https://modeso.atlassian.net/browse/LIMSA-265
         #self.assertEqual(suborders_data_after['Test Units'], suborder_data['suborders'][-1]['testunits'][0]['name'])
         self.assertEqual(suborders_data_after['Material Type'], test_plan['materialTypes'][0])
         if test_plan['article'][0] != 'all':
