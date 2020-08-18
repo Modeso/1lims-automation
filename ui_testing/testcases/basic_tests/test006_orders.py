@@ -160,7 +160,6 @@ class OrdersTestCases(BaseTest):
         order_no = payload[0]['orderNo']
         self.info("archive order no {}".format(order_no))
         self.orders_page.filter_by_order_no(order_no)
-        import ipdb;ipdb.set_trace()
         row = self.orders_page.result_table()[0]
         self.orders_page.click_check_box(row)
         self.orders_page.archive_selected_items()
