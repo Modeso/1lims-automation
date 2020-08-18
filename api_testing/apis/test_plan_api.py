@@ -229,13 +229,14 @@ class TestPlanAPI(TestPlanAPIFactory):
     def create_completed_testplan(self, material_type, formatted_article):
         material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
         formatted_material = {'id': material_type_id, 'text': material_type}
-        test_unit = TestUnitAPI().get_test_unit_name_with_value_with_material_type(material_type)
+        test_unit = TestUnitAPI().get_testunits_with_material_type(material_type)[0]
+        print(test_unit)
         testunit_data = TestUnitAPI().get_testunit_form_data(id=test_unit['id'])[0]['testUnit']
         formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
 
         testplan, payload = self.create_testplan(testUnits=[formated_testunit],
                                                  selectedArticles=[formatted_article],
-                                                 materialType=formatted_material)
+                                                 materialType=[formatted_material])
 
         if testplan['status'] == 1:
             return (self.get_testplan_form_data(id=testplan['testPlanDetails']['id']))
@@ -307,12 +308,15 @@ class TestPlanAPI(TestPlanAPIFactory):
             self.info(testplan)
 
     def create_multiple_test_plan_with_same_article(self):
-        article_data = ArticleAPI().get_formatted_article_with_material_type('Raw Material')
-        print(article_data)
+        material_type_id = GeneralUtilitiesAPI().get_material_id('Raw Material')
+        materialType = {"id": material_type_id, "name": 'Raw Material'}
+        article_data = ArticleAPI().get_formatted_article_with_formatted_material_type(materialType)
+       # print(article_data)
         article = article_data['name']
         formatted_article = {'id': article_data['id'], 'text': article}
         new_test_plan1 = TestPlanAPI().create_completed_testplan(
             material_type='Raw Material', formatted_article=formatted_article)
+        print('test plaaaaaaaaaaan:____',new_test_plan1)
         test_plan1 = new_test_plan1['testPlanEntity']['name']
         new_test_plan2 = TestPlanAPI().create_completed_testplan(
             material_type='Raw Material', formatted_article=formatted_article)

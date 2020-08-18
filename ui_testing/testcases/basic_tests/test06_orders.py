@@ -1273,19 +1273,6 @@ class OrdersTestCases(BaseTest):
          LIMS-6523
         """
         self.info('create contact')
-        response, payload = self.contacts_api.create_contact()
-        contact, contact_id = payload, response['company']['companyId']
-
-        self.info('open random order record')
-        order = random.choice(self.orders_api.get_all_orders(limit=50)['orders'])
-        order_id = order['id']
-        self.orders_page.get_order_edit_page_by_id(id=order_id)
-        order_data = self.order_page.get_suborder_data()
-        if len(order_data['suborders']) <= 1:
-            self.order_page.duplicate_from_table_view()
-            self.order_page.save(save_btn='order:save_btn')
-
-        self.order_page.set_contact(contact=contact['name'])
         self.order_page.sleep_small()
         self.order_page.save(save_btn='order:save_btn', sleep=True)
         self.base_selenium.refresh()
@@ -2328,6 +2315,9 @@ class OrdersTestCases(BaseTest):
         self.order_page.create_new_suborder(test_plans=[test_plan5,test_plan6])
         self.order_page.save(save_btn='order:save_btn')
         '''
+
+
+
 
 
 
