@@ -44,6 +44,16 @@ class OrdersAPIFactory(BaseAPI):
         api = '{}{}{}'.format(self.url, self.END_POINTS['orders_api']['get_suborder'], str(id) + '&deleted=0')
         return api, {}
 
+    @api_factory('get')
+    def get_suborder_of_archived_order(self, id=0):
+        """
+        param id: order ID
+        deleted '0' for active orders and '1' for archived orders
+        :return: response, payload
+        """
+        api = '{}{}{}'.format(self.url, self.END_POINTS['orders_api']['get_suborder'], str(id) + '&deleted=1')
+        return api, {}
+
     @api_factory('post')
     def create_new_order(self, **kwargs):
         """

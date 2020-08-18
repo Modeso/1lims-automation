@@ -19,7 +19,7 @@ class Orders(BasePages):
         self.sleep_tiny()
 
     def click_create_order_button(self):
-        self.base_selenium.LOGGER.info('Press create order button')
+        self.info('Press create order button')
         self.base_selenium.click(element='orders:new_order')
         self.wait_until_page_is_loaded()
 
@@ -117,7 +117,7 @@ class Orders(BasePages):
             self.cancel()
 
     def get_random_order(self):
-        self.base_selenium.LOGGER.info(' + Get random order.')
+        self.info(' + Get random order.')
         row = self.get_random_order_row()
         order_dict = self.base_selenium.get_row_cells_dict_related_to_header(row=row)
         self.open_edit_page(row=row)
@@ -133,8 +133,8 @@ class Orders(BasePages):
         self.filter_apply()
         self.sleep_tiny()
         self.base_selenium.scroll()
-        self.sleep_tiny()
         self.close_filter_menu()
+        self.sleep_tiny()
 
     def open_filter_menu(self):
         self.base_selenium.scroll()
@@ -157,10 +157,10 @@ class Orders(BasePages):
         self.filter_apply()
 
     def get_orders_duplicate_data(self, order_no):
-        self.base_selenium.LOGGER.info(' + Get orders duplicate data with no : {}.'.format(order_no))
+        self.info(' + Get orders duplicate data with no : {}.'.format(order_no))
         orders = self.search(order_no)[:-1]
         orders_data = [self.base_selenium.get_row_cells_dict_related_to_header(order) for order in orders]
-        self.base_selenium.LOGGER.info(' + {} duplicate orders.'.format(len(orders)))
+        self.info(' + {} duplicate orders.'.format(len(orders)))
         return orders_data, orders
 
     # Return all filter fields used in order
@@ -219,7 +219,7 @@ class Orders(BasePages):
 
         suborders_data = []
 
-        self.base_selenium.LOGGER.info('getting suborders data')
+        self.info('getting suborders data')
 
         for suborder in order_row['suborders']:
             suborder_data = suborder
@@ -278,10 +278,9 @@ class Orders(BasePages):
         return main_order
 
     def get_orders_and_suborders_data(self, order_no):
-        self.base_selenium.LOGGER.info(' + Get orders duplicate data with no : {}.'.format(order_no))
+        self.info(' + Get orders data with no : {}.'.format(order_no))
         orders = self.search(order_no)[:-1]
         orders_data = self.get_child_table_data()
-
         return orders_data, orders
 
     def navigate_to_analysis_active_table(self):
