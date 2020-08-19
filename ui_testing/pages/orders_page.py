@@ -311,5 +311,9 @@ class Orders(BasePages):
             if value in results[0].text:
                 return True
             else:
-                return False 
+                return False
 
+    def get_suborder_options(self, row):
+        self.open_row_options(row)
+        options = self.base_selenium.get_text(element='general:menu_options_value')
+        return options

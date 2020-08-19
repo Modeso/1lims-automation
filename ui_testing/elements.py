@@ -15,6 +15,7 @@ elements = {
         'table_child': {'method': 'class_name', 'value': 'dataTable', 'order': 1},
 
         'table_menu_options': {'method': 'class_name', 'value': 'dropdown', 'order': 0},
+        'menu_options_value': {'method':'tag_name', 'value':'ngb-popover-window', 'order':0},
         'span': {'method': 'tag_name',
                  'value': 'span',
                  'order': 0},
@@ -583,7 +584,7 @@ elements = {
                                  'value': 'materialTypefield'},
         'article_filter': {'method': 'id',
                            'value': 'articlefield'},
-        'test_plans_filter': {'method': 'id',
+        'f_plans_filter': {'method': 'id',
                               'value': 'testPlanfield'},
         'test_units_filter': {'method': 'id',
                               'value': 'testUnitfield'},
