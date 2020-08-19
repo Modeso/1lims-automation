@@ -120,7 +120,7 @@ class Order(Orders):
         self.info(' Create new order.')
         self.click_create_order_button()
         self.set_new_order()
-        import ipdb
+        import ipdb;ipdb.set_trace()
         self.set_order_number(order_no)
         self.set_contact(contact=contact)
         self.sleep_small()
