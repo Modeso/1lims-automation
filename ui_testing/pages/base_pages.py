@@ -376,7 +376,7 @@ class BasePages:
                     checkbox.click()
                     return column_name
             except Exception as e:
-                self.base_selenium.LOGGER.info(
+                self.info(
                     "element with the id '{}' doesn't  exit in the configure table".format(column.get_attribute('id')))
                 self.base_selenium.LOGGER.exception(' * %s Exception ' % (str(e)))
                 return ''
@@ -408,6 +408,8 @@ class BasePages:
 
     def deselect_all_configurations(self):
         self.open_configure_table()
+        import ipdb;
+        ipdb.set_trace()
         active_columns = self.base_selenium.find_elements_in_element(
             source_element='general:configure_table_items', destination_element='general:li')
         for column in active_columns:

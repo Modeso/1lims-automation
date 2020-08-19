@@ -698,6 +698,7 @@ class TestUnitsTestCases(BaseTest):
 
         self.assertEqual(response['status'], 1, 'test unit not created {}'.format(payload))
         test_unit_data, version_data = self.test_units_page.filter_and_get_version(payload['number'])
+
         self.assertEqual(version_data[0]['Test Unit No.'], test_unit_data['Test Unit No.']+'.1')
         for item in version_data[0].keys():
             if item not in ['Test Unit No.', 'Comment', 'Enter Value', 'Quantification Limit Unit']:
@@ -793,6 +794,7 @@ class TestUnitsTestCases(BaseTest):
         LIMS-4160
         """
         self.info('select random quantitative unit with quantification only ')
+        import ipdb; ipdb.set_trace()
         test_unit_id = self.test_unit_api.get_test_unit_with_spec_or_quan_only('quan')
         self.assertTrue(test_unit_id, "No test unit selected")
         self.test_unit_page.open_test_unit_edit_page_by_id(id=test_unit_id)

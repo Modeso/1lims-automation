@@ -107,7 +107,7 @@ def delete_fliky_failed_test_items(project_name, launch_id):
 
 
 
-PROJECT_NAME = 'superadmin_personal'
+PROJECT_NAME = 'onelims'
 LAUNCH_DES = 'refs/pull/304/merge-207400895-397'
 
 print(f'merge all launches with {LAUNCH_DES} description')
