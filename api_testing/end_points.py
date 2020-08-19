@@ -41,12 +41,12 @@ end_points = {
         'get_order_by_id': '/api/orderInformation/get/orders/byId/',
         'create_new_order': '/api/orders',
         'get_auto_generated_number': '/api/orders/auto/generatedOrderNumber/?yearOption=',
-        'archive_main_order': '/api/orderInformation/',
-        'restore_main_order': '/api/orderInformation/',
-        'delete_main_order': '/api/orderInformation/',
-        'archive_suborder': '/api/orderInformation/',
-        'restore_suborder': '/api/orderInformation/',
-        'delete_suborder': '/api/orderInformation/',
+        'archive_main_order': '/api/orders/archive/',
+        'restore_main_order': '/api/orders/restore/',
+        'delete_main_order': '/api/orders/',
+        'archive_suborder': '/api/orders/archive/suborders/',
+        'restore_suborder': '/api/orders/restore/suborders/',
+        'delete_suborder': '/api/orders/suborders/',
         'get_suborder': '/api/orders/suborder/?orderId='
     },
     'analysis_api': {
