@@ -2318,6 +2318,7 @@ class OrdersTestCases(BaseTest):
         self.info("checking that the deleted order number doesn't appear in the existing order numbers list")
         self.assertFalse(self.order_page.create_existing_order_check_no_in_suggestion_list(order_no_with_year))
         self.order_page.get_orders_page()
+        import ipdb;ipdb.set_trace()
         self.order_page.create_new_order(material_type=material_type, article=article, order_no=order_no_with_year)
         self.order_page.get_orders_page()
         self.orders_page.apply_filter_scenario(filter_element='orders:filter_order_no',filter_text=order_no_with_year, field_type='drop_down')
