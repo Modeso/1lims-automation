@@ -185,7 +185,7 @@ class OrdersTestCases(BaseTest):
         LIMS-3257
         """
         response, payload = self.orders_api.get_all_orders(deleted=1)
-        self.assertEqual(response['status'], 1, 'No acrchived orders')
+        self.assertEqual(response['status'], 1, 'No archived orders')
         random_order = random.choice(response['orders'])
         suborders_response, _ = self.orders_api.get_suborder_of_archived_order(random_order['id'])
         self.assertEqual(suborders_response['status'], 1)
@@ -219,6 +219,10 @@ class OrdersTestCases(BaseTest):
         LIMS-3492
         LIMS-3061
         """
+        import ipdb;ipdb.set_trace()
+        response, payload = self.orders_api.create_new_order()
+        self.assertEqual(response['status'], 1, payload)
+        order_no = payload[0]['orderNo']
         response, payload = self.orders_api.get_all_orders(limit=5)
         self.assertEqual(response['status'], 1)
         random_order = random.choice(response['orders'])

@@ -137,7 +137,7 @@ class OrdersAPIFactory(BaseAPI):
         :param mainorder_id:
         :return: response, payload
         """
-        api = '{}{}{}/archive/mainOrder'.format(self.url, self.END_POINTS['orders_api']['archive_main_order'],
+        api = '{}{}{}'.format(self.url, self.END_POINTS['orders_api']['archive_main_order'],
                                                 str(mainorder_id))
         return api, {}
 
@@ -148,7 +148,7 @@ class OrdersAPIFactory(BaseAPI):
         :param mainorder_id:
         :return: response, payload
         """
-        api = '{}{}{}/restore/mainOrder'.format(self.url, self.END_POINTS['orders_api']['restore_main_order'],
+        api = '{}{}{}'.format(self.url, self.END_POINTS['orders_api']['restore_main_order'],
                                                 str(mainorder_id))
         return api, {}
 
@@ -159,7 +159,7 @@ class OrdersAPIFactory(BaseAPI):
         :param mainorder_id:
         :return: response, payload
         """
-        api = '{}{}{}/delete/mainOrder'.format(self.url, self.END_POINTS['orders_api']['delete_main_order'],
+        api = '{}{}{}'.format(self.url, self.END_POINTS['orders_api']['delete_main_order'],
                                                str(mainorder_id))
         return api, {}
 
