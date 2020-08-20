@@ -3,6 +3,10 @@ import requests
 
 BASE_API = "http://18.158.202.89:8080/api/v1"
 AUTHONTICATION = "bearer "
+PROJECT_NAME = 'onelims'
+LAUNCH_DES = 'refs/pull/333/merge-215333969-452'
+
+
 session = requests.Session()
 headers = {'Content-Type': "application/json",
            'Authorization': AUTHONTICATION,
@@ -107,8 +111,7 @@ def delete_fliky_failed_test_items(project_name, launch_id):
 
 
 
-PROJECT_NAME = 'onelims'
-LAUNCH_DES = 'refs/pull/304/merge-207400895-397'
+
 
 print(f'merge all launches with {LAUNCH_DES} description')
 merged_launch = merge_launchs_with_same_description(PROJECT_NAME, LAUNCH_DES)

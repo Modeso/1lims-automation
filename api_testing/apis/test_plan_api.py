@@ -300,8 +300,8 @@ class TestPlanAPI(TestPlanAPIFactory):
         testplan, payload = self.create_testplan(testUnits=[formated_testunit],
                                                  selectedArticles=[formatted_article],
                                                  materialType=[formatted_material])
-        if testplan['status'] == 1:
-            return (self.get_testplan_form_data(id=testplan['testPlanDetails']['id']))
+        if testplan['message'] == 'operation_success':
+            return self.get_testplan_form_data(id= payload['number'])
         else:
             self.info(testplan)
 
