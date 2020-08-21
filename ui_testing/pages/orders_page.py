@@ -147,6 +147,7 @@ class Orders(BasePages):
         self.info('Filter by analysis number : {}'.format(filter_text))
         self.filter_by(filter_element='orders:analysis_filter', filter_text=filter_text, field_type='text')
         self.filter_apply()
+        self.sleep_tiny()
         
     def filter_by_date(self, first_filter_element, first_filter_text, second_filter_element, second_filter_text):
         self.open_filter_menu()
@@ -166,7 +167,8 @@ class Orders(BasePages):
     # Return all filter fields used in order
     def order_filters_element(self, key='all'):
         filter_fileds = {'orderNo': {'element': 'orders:order_filter', 'type': 'text'},
-                         'analysis': {'element': 'orders:analysis_filter', 'type': 'text','result_key': 'Analysis No.'},
+                         'analysis': {'element': 'orders:analysis_filter', 'type': 'text',
+                                      'result_key': 'Analysis No.'},
                          'Contact Name': {'element': 'orders:contact_filter', 'type': 'drop_down'},
                          'lastModifiedUser': {'element': 'orders:changed_by', 'type': 'drop_down',
                                              'result_key':'Changed By'},

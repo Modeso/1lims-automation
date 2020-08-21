@@ -8,6 +8,7 @@ from api_testing.apis.test_unit_api import TestUnitAPI
 from ui_testing.pages.analysis_page import SingleAnalysisPage
 from api_testing.apis.contacts_api import ContactsAPI
 from api_testing.apis.test_plan_api import TestPlanAPI
+from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from parameterized import parameterized
 from random import randint
 from unittest import skip
@@ -252,6 +253,7 @@ class OrdersTestCases(BaseTest):
             self.assertEqual(row_data[column].replace("'", '').split(',')[0],
                              search_data[column].replace("'", '').split(',')[0])
 
+    @skip('duplicated order no always set to 1.2020')
     def test008_duplicate_main_order(self):
         """
         New: Orders with test units: Duplicate an order with test unit 1 copy
@@ -309,13 +311,14 @@ class OrdersTestCases(BaseTest):
                 if item != " ":
                     self.assertIn(item, fixed_sheet_row_data)
 
+    @skip('rounding field')
     def test010_user_can_add_suborder(self):
         """
         New: Orders: Table view: Suborder Approach: User can add suborder from the main order
 
         LIMS-3817
         """
-        self.info("create completed tesp lan")
+        self.info("create completed test plan")
         test_plan = TestPlanAPI().create_completed_testplan_random_data()
         self.assertIsNotNone(test_plan)
         self.info("get random order")
@@ -405,28 +408,55 @@ class OrdersTestCases(BaseTest):
             self.assertEqual(data_before_duplicate_sub_order['Test Units'],
                              data_after_duplicate_sub_order['Test Units'])
 
-    def test012_update_suborder_materialtype(self):
+    def test012_update_suborder_materialtype_cancel_button(self):
         """
-        New: Orders: Edit material type: Make sure that user able to change material type
-        of the second suborder and related test plan & article.
+        New: Orders: Edit material type: Make sure that user can cancel any update successfully
         New: Orders: Materiel type Approach: In case then material type of the second suborder
         updated then press on cancel button, Nothing update when I enter one more time
 
-        LIMS-8281
+        LIMS-4281
         LIMS-4282
+        """
+        response, payload = self.orders_api.create_new_order()
+        self.assertEqual(response['status'], 1, "no new order created")
+        material_type = random.choice(GeneralUtilitiesAPI().
+                                      get_material_types_without_duplicate(payload[0]['materialType']['text']))
+        self.info("update material type of first suborder to {}".format(material_type))
+        self.orders_page.get_order_edit_page_by_id(id=response['order']['mainOrderId'])
+        self.orders_page.sleep_small()
+        suborders_data_before_update = self.order_page.get_suborder_data()
+        self.order_page.update_suborder(material_type=material_type)
+        self.orders_page.sleep_small()
+        self.info("check pop up mssg that all analysis will be deleted")
+        self.assertTrue(self.base_selenium.check_element_is_exist(element='general:confirmation_pop_up'))
+        pop_up_mssg = self.base_selenium.get_text(element='general:confirmation_pop_up')
+        self.assertIn("All analysis created with this order and test plan will be deleted", pop_up_mssg)
+        self.orders_page.confirm_popup()
+        self.info("press on cancel button to cancel changes")
+        self.orders_page.cancel()
+        self.info("Navigate to order edit page and make sure suborder data not changed")
+        self.orders_page.get_order_edit_page_by_id(id=response['order']['mainOrderId'])
+        suborders_data_after_update = self.order_page.get_suborder_data()
+        self.assertCountEqual(suborders_data_after_update, suborders_data_before_update)
+
+    @skip('rounding option')
+    def test012_update_suborder_materialtype(self):
+        """
+        New: Orders: Material type Approach: I can update the material type
+        filed with test units records successfully
+
+        LIMS-4833
         """
         self.info("get material type with test unit ")
         random_data = TestUnitAPI().get_testunits_with_material_type()[0]
         order, payload = self.orders_api.create_new_order(materialTypeId=2)
         self.orders_page.get_order_edit_page_by_id(id=order['order']['mainOrderId'])
-
-        self.info(
-            " Duplicate it to make sure that I have two suborders to update the second one ")
-        self.order_page.duplicate_from_table_view(index_to_duplicate_from=0)
+        self.info("Duplicate it to make sure that I have two suborders to update the second one ")
+        self.order_page.duplicate_from_table_view()
         self.order_page.save(save_btn='order:save_btn')
         self.orders_page.sleep_small()
         suborders_data_before_update = self.order_page.get_suborder_data()
-        materail_type_before_update = suborders_data_before_update['suborders'][1]['material_type']
+        material_type_before_update = suborders_data_before_update['suborders'][1]['material_type']
         article_before_update = suborders_data_before_update['suborders'][1]['article']['name']
         testunit_before_update = suborders_data_before_update['suborders'][1]['testunits'][0]['name']
         self.order_page.update_suborder(sub_order_index=1,
@@ -435,18 +465,19 @@ class OrdersTestCases(BaseTest):
         self.order_page.save(save_btn='order:save_btn')
         self.orders_page.sleep_small()
         suborders_data_after_update = self.order_page.get_suborder_data()
-        materail_type_after_update = suborders_data_after_update['suborders'][1]['material_type']
+        material_type_after_update = suborders_data_after_update['suborders'][1]['material_type']
         article_after_update = suborders_data_after_update['suborders'][1]['article']['name']
         testunit_after_update = suborders_data_after_update['suborders'][1]['testunits'][0]['name']
-        self.assertNotEqual(materail_type_before_update, materail_type_after_update)
+        self.assertNotEqual(material_type_before_update, material_type_after_update)
         self.assertNotEqual(article_before_update, article_after_update)
         self.assertNotEqual(testunit_before_update, testunit_after_update)
 
     @parameterized.expand(['materialType', 'article', 'testPlans',
-                           'testUnit', 'lastModifiedUser', 'analysis'])
+                           'testUnit', 'lastModifiedUser'])
     def test013_filter_by_any_fields(self, key):
         """
         New: Orders: Filter Approach: I can filter by any field in the table view
+
         LIMS-3495
         """
         self.info('select random order using api')
@@ -466,20 +497,50 @@ class OrdersTestCases(BaseTest):
             filter_element=filter_element['element'],
             filter_text=filter_value,
             field_type=filter_element['type'])
+        self.base_selenium.scroll()
+        self.orders_page.close_filter_menu()
+        results = self.order_page.result_table()
+        self.assertGreaterEqual(len(results), 1)
+        for i in range(len(results)-1):
+            suborders = self.orders_page.get_child_table_data(index=i)
+            key_found = False
+            for suborder in suborders:
+                if filter_value in suborder[filter_element['result_key']].split(',\n'):
+                    key_found = True
+                    break
+            self.assertTrue(key_found)
+            # close child table
+            self.orders_page.open_child_table(source=results[i])
 
+    def test013_filter_by_analysis_no(self):
+        """
+        New: Orders: Filter Approach: I can filter by analysis No
+
+        LIMS-3495
+        """
+        self.info('select random order using api')
+        order, suborder = self.orders_api.get_order_with_testunit_testplans()
+        order_data = suborder[0]
+        filter_element = self.order_page.order_filters_element(key='analysis')
+        filter_value = order_data['analysis'][0]
+        self.info('filter by analysis No {}'.format(filter_value))
+        self.orders_page.filter_by_analysis_number(filter_value)
+        self.base_selenium.scroll()
+        self.orders_page.close_filter_menu()
+        self.assertEqual(len(self.order_page.result_table()), 2)
+        self.orders_page.sleep_tiny()
         suborders = self.orders_page.get_child_table_data()
-        filter_key_found = False
+        key_found = False
         for suborder in suborders:
-            if filter_value in suborder[filter_element['result_key']].split(",\n"):
-                filter_key_found = True
+            if filter_value == suborder[filter_element['result_key']].replace("'", ""):
+                key_found = True
                 break
-
-        self.assertTrue(filter_key_found)
-        self.assertGreater(len(self.order_page.result_table()), 1)
+        self.assertTrue(key_found)
 
     def test014_filter_by_order_No(self):
         """
         I can filter by any order No.
+
         LIMS-3495
         """
         self.info('select random order using api')
@@ -487,8 +548,9 @@ class OrdersTestCases(BaseTest):
         order = random.choice(orders['orders'])
         self.info('filter by order No. {}'.format(order['orderNo']))
         self.orders_page.filter_by_order_no(order['orderNo'])
-        result_order = self.orders_page.result_table()[0]
-        self.assertIn(order['orderNo'], result_order.text.replace("'", ""))
+        result_order = self.orders_page.result_table()
+        self.assertEqual(len(self.order_page.result_table()), 2)
+        self.assertIn(order['orderNo'], result_order[0].text.replace("'", ""))
 
     def test015_filter_by_Status(self):
         """
@@ -501,6 +563,7 @@ class OrdersTestCases(BaseTest):
                                                filter_text='Open', field_type='drop_down')
 
         self.info('get random suborder from result table to check that filter works')
+        self.assertGreaterEqual(len(self.order_page.result_table()), 1)
         suborders = self.orders_page.get_child_table_data(index=randint(0, 9))
         filter_key_found = False
         for suborder in suborders:
@@ -509,7 +572,6 @@ class OrdersTestCases(BaseTest):
                 break
 
         self.assertTrue(filter_key_found)
-        self.assertGreater(len(self.order_page.result_table()), 1)
 
     def test016_filter_by_analysis_result(self):
         """
@@ -521,6 +583,7 @@ class OrdersTestCases(BaseTest):
         self.orders_page.apply_filter_scenario(filter_element='orders:analysis_result_filter',
                                                filter_text='Not Recieved', field_type='drop_down')
 
+        self.assertGreaterEqual(len(self.order_page.result_table()), 1)
         self.info('get random suborder from result table to check that filter works')
         suborders = self.orders_page.get_child_table_data(index=randint(0, 3))
         filter_key_found = False
@@ -530,7 +593,6 @@ class OrdersTestCases(BaseTest):
                 break
 
         self.assertTrue(filter_key_found)
-        self.assertGreater(len(self.order_page.result_table()), 1)
 
     def test017_filter_by_contact(self):
         """
@@ -543,8 +605,12 @@ class OrdersTestCases(BaseTest):
         self.info('filter by contact {}'.format(contact))
         self.orders_page.apply_filter_scenario(filter_element='orders:contact_filter',
                                                filter_text=contact, field_type='drop_down')
-        order = self.orders_page.result_table()[0]
-        self.assertIn(contact, order.text)
+        self.orders_page.sleep_tiny()
+        results = self.orders_page.result_table()
+        self.assertGreaterEqual(len(results), 1)
+        for result in results:
+            if result.text:
+                self.assertIn(contact, result.text)
 
     def test018_filter_by_department(self):
         """
@@ -560,15 +626,18 @@ class OrdersTestCases(BaseTest):
         self.orders_page.apply_filter_scenario(filter_element='orders:departments_filter',
                                                filter_text=department, field_type='text')
 
-        suborders = self.orders_page.get_child_table_data()
-        filter_key_found = False
-        for suborder in suborders:
-            if suborder['Departments'] == department:
-                filter_key_found = True
-                break
-
-        self.assertTrue(filter_key_found)
-        self.assertGreater(len(self.order_page.result_table()), 1)
+        results = self.order_page.result_table()
+        self.assertGreater(len(results), 1)
+        for i in range(len(results) - 1):
+            suborders = self.orders_page.get_child_table_data(index=i)
+            key_found = False
+            for suborder in suborders:
+                if department in suborder['Departments'].split(',\n'):
+                    key_found = True
+                    break
+            self.assertTrue(key_found)
+            # close child table
+            self.orders_page.open_child_table(source=results[i])
 
     @parameterized.expand(['testDate', 'shipmentDate', 'createdAt'])
     def test019_filter_by_date(self, key):
@@ -588,7 +657,7 @@ class OrdersTestCases(BaseTest):
                                         first_filter_text=filter_value,
                                         second_filter_element=filter_element['element'][1],
                                         second_filter_text=filter_value)
-
+        self.assertGreater(len(self.order_page.result_table()), 1)
         suborders = self.orders_page.get_child_table_data()
         filter_key_found = False
         for suborder in suborders:
@@ -597,7 +666,6 @@ class OrdersTestCases(BaseTest):
                 break
 
         self.assertTrue(filter_key_found)
-        self.assertGreater(len(self.order_page.result_table()), 1)
 
     def test020_validate_order_test_unit_test_plan(self):
         """
@@ -613,7 +681,7 @@ class OrdersTestCases(BaseTest):
         validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
 
         self.info('Assert the error message to make sure that validation of the test plan & test units fields ? {}'
-            .format(validation_result))
+                  .format(validation_result))
         self.assertTrue(validation_result)
 
     def test021_validate_order_test_unit_test_plan_edit_mode(self):
@@ -624,14 +692,13 @@ class OrdersTestCases(BaseTest):
         self.info(' Running test case to check that '
                   'at least test unit or test plan is mandatory in order')
         # Get random order
-        re, payload = self.orders_api.create_new_order(materialTypeId=1)
-        self.orders_page.get_order_edit_page_by_id(id=re['order']['mainOrderId'])
+        response, payload = self.orders_api.create_new_order()
+        self.assertEqual(response['status'], 1, "order not created ")
+        self.orders_page.get_order_edit_page_by_id(id=response['order']['mainOrderId'])
         # edit suborder
         self.info(' Remove all selected test plans and test units')
         suborder_row = self.base_selenium.get_table_rows(element='order:suborder_table')[0]
         suborder_row.click()
-        self.order_page.sleep_small()
-
         # delete test plan and test unit
         if self.order_page.get_test_plan():
             self.order_page.clear_test_plan()
@@ -639,8 +706,6 @@ class OrdersTestCases(BaseTest):
 
         if self.order_page.get_test_unit():
             self.order_page.clear_test_unit()
-            self.orders_page.sleep_small()
-            self.order_page.confirm_popup(force=True)
 
         self.order_page.save(save_btn='order:save_btn')
         # the red border will display on the test unit only because one of them should be mandatory
@@ -651,8 +716,8 @@ class OrdersTestCases(BaseTest):
     def test022_update_test_date(self, save):
         """
         New: Orders: Test Date: I can update test date successfully with cancel/save buttons
+
         LIMS-4780
-        :return:
         """
         # open random order edit page
         self.order_page.get_random_order()
@@ -694,14 +759,12 @@ class OrdersTestCases(BaseTest):
                 ' + Assert {} (current_test_date) == {} (new_test_date)'.format(new_test_date, saved_test_date))
             self.assertEqual(saved_test_date, new_test_date)
 
-        # will continue with us
     @parameterized.expand(['save_btn', 'cancel'])
     def test023_update_shipment_date(self, save):
         """
         New: Orders: Shipment date Approach: I can update shipment date successfully with save/cancel button
+
         LIMS-4779
-        LIMS-4779
-        :return:
         """
         # open random order edit page
         self.order_page.get_random_order()
@@ -747,27 +810,44 @@ class OrdersTestCases(BaseTest):
     def test024_validate_order_no_exists(self):
         """
         New: Orders: Create new order and change the autogenerated number
+
         LIMS-3406
         """
         orders, payload = self.orders_api.get_all_orders(limit=40)
-        random_order = random.choice(orders['orders'])
-        self.info(
-            '{}'.format(random_order['orderNo']))
-        self.orders_page.get_order_edit_page_by_id(random_order['id'])
-
-        self.order_page.set_order_number(no=random_order['orderNo'].replace("'", ""))
-        self.info(
-            'waiting fo validation message appear when I enter number already exists')
+        random_order = random.choice(orders['orders'])['orderNo'].replace("'", "")
+        archived_orders, _ = self.orders_api.get_all_orders(deleted=1)
+        archived_order = random.choice(archived_orders['orders'])['orderNo'].replace("'", "")
+        archived_order_to_deleted = random.choice(archived_orders['orders'])
+        response, _ = self.orders_api.delete_main_order(archived_order_to_deleted['orderId'])
+        self.assertEqual(response['message'], 'delete_success')
+        self.info('create new order with order no {}'.format(random_order))
+        self.order_page.create_new_order(order_no=random_order, material_type='Raw Material')
+        self.info('waiting fo validation message appear when I enter number already exists')
         validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
-
-        self.info(
-            'Assert the error message to make sure that validation when I enter number already exists? {}'.format(
-                validation_result))
+        self.info('Assert the error message to make sure that validation when '
+                  'I enter number already exists? {}'.format(validation_result))
         self.assertTrue(validation_result)
+        self.order_page.set_no(archived_order)
+        self.orders_page.sleep_tiny()
+        self.info('waiting fo validation message appear when I enter number already exists')
+        validation_result1 = self.base_selenium.wait_element(element='general:oh_snap_msg')
+
+        self.info('Assert the error message to make sure that validation when '
+                  'I enter number already exists? {}'.format(validation_result1))
+        self.assertTrue(validation_result1)
+        self.order_page.set_no(archived_order_to_deleted['orderNo'])
+        self.orders_page.sleep_tiny()
+        self.info('waiting fo validation message appear when I enter number already exists')
+        validation_result2 = self.base_selenium.wait_element(element='general:oh_snap_msg')
+
+        self.info('Assert the error message to make sure that validation when '
+                  'I enter number already exists? {}'.format(validation_result1))
+        self.assertTrue(validation_result2)
 
     def test025_create_new_order_with_test_units(self):
         """
         New: Orders: Create a new order with test units
+
         LIMS-3267
         """
         diana, payload = TestUnitAPI().create_qualitative_testunit()
