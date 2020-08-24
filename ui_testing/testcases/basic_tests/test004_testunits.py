@@ -500,11 +500,11 @@ class TestUnitsTestCases(BaseTest):
 
         LIMS-3672-case of all data
         """
-        self.info(' * Download XSLX sheet')
+        self.info('download XSLX sheet')
         self.test_unit_page.download_xslx_sheet()
-        rows_data = self.test_unit_page.get_table_rows_data()
+        rows_data = list(filter(None, self.test_unit_page.get_table_rows_data()))
         for index in range(len(rows_data)):
-            self.info(' * Comparing the test units with index : {} '.format(index))
+            self.info('comparing the test units with index : {} '.format(index))
             fixed_row_data = self.fix_data_format(rows_data[index].split('\n'))
             values = self.test_unit_page.sheet.iloc[index].values
             fixed_sheet_row_data = self.fix_data_format(values)
@@ -834,7 +834,7 @@ class TestUnitsTestCases(BaseTest):
         self.info('search for value of the unit field: {}'.format(test_unit_found['Unit']))
         self.assertIn(test_unit_found['Unit'], fixed_sheet_row_data)
 
-    @skip('canot acceess test_unit_section in edit test_plan for completed test plan')
+    @skip('need API to take round option ID and returns round option name')
     def test032_edit_category_affects_testplan_step_two(self):
         """
         New: Test unit: Category Approach: Any update in test unit category should

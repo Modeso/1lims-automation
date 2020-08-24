@@ -465,7 +465,7 @@ class ArticlesTestCases(BaseTest):
         """
         self.info(' * Download XSLX sheet')
         self.article_page.download_xslx_sheet()
-        rows_data = self.article_page.get_table_rows_data()
+        rows_data = list(filter(None, self.article_page.get_table_rows_data()))
         for index in range(len(rows_data)):
             self.info(' * Comparing the article no. {} '.format(index))
             fixed_row_data = self.fix_data_format(rows_data[index].split('\n'))
