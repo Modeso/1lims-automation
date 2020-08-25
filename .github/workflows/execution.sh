@@ -13,7 +13,7 @@ EXECUTION_FILES=(
   #  ui_testing/testcases/header_tests/test011_rolesandpermissions.py
   )
 
-TEST_REG='test072'
+TEST_REG='test073'
 
 
 NODE_TOTAL=$1;
