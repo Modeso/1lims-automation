@@ -87,7 +87,7 @@ class RolesAPI(RolesAPIFactory):
         return editable_roles
 
     def get_role_id_from_name(self, name):
-        response, payload = RolesAPI().get_all_roles()
+        response, payload = self.get_all_roles()
         for role in response['roles']:
             if role['name'] == name:
                 return role['id']

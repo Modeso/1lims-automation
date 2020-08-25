@@ -408,8 +408,6 @@ class BasePages:
 
     def deselect_all_configurations(self):
         self.open_configure_table()
-        import ipdb;
-        ipdb.set_trace()
         active_columns = self.base_selenium.find_elements_in_element(
             source_element='general:configure_table_items', destination_element='general:li')
         for column in active_columns:

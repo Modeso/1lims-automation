@@ -112,7 +112,7 @@ class OrdersAPIFactory(BaseAPI):
     def get_auto_generated_order_no(self, year_option="1"):
         """
         year_option = 1 : order no with year after (1668-2020)
-        year_option = 0 : order no with year after (2020-1668)
+        year_option = 0 : order no with year before (2020-1668)
 
         :param year_option:
         :return:
