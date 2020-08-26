@@ -163,6 +163,8 @@ class Order(Orders):
         self.sleep_small()
         self.set_test_unit('')
         self.sleep_small()
+        order_no = self.get_no()
+        return order_no
 
     def get_department_suggestion_lists(self, open_suborder_table=False, contacts=[]):
         """

@@ -2436,3 +2436,22 @@ class OrdersTestCases(BaseTest):
             self.assertEqual(len(results), 2)
             self.assertIn(order_no.replace("'", ""), results[0].text.replace("'", ""))
 
+    def test072_Multiple_contacts_should_appear_in_active_table(self):
+        """
+        Multiple contacts should appear in active table
+
+        LIMS-5773
+        """
+        response, payload = self.contacts_api.create_contact()
+        self.assertEqual(response['status'], 1)
+        contact1, _ = payload, response['company']['companyId']
+        response, payload = self.contacts_api.create_contact()
+        contact2, _ = payload, response['company']['companyId']
+        order_no = self.order_page.create_multiple_contacts_new_order(contacts=[contact1['name'], contact2['name']])
+        self.assertIn('2020', order_no.replace("'", ""))
+        self.order_page.save(save_btn='order:save_btn')
+        self.orders_page.get_orders_page()
+        self.orders_page.search(order_no)
+        results = self.order_page.result_table()[0].text
+        self.assertIn(contact1['name'], results)
+        self.assertIn(contact2['name'], results)
