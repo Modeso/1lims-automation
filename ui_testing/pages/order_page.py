@@ -696,3 +696,16 @@ class Order(Orders):
         test_units = self.base_selenium.get_drop_down_suggestion_list(element='order:test_unit',
                                                                       item_text=test_unit_name)
         return test_units
+
+    def is_contact_existing(self, contact):
+        self.set_contact(contact=contact)
+        return self.base_selenium.check_item_in_items(element='order:contact', item_text=contact)
+
+    def get_table_with_add(self):
+        table = self.base_selenium.find_element(element='order:suborder_table')
+        return table
+
+    def check_suborders_appear(self):
+        is_suborder_exist = self.base_selenium.check_element_is_exist(
+            element='table_element=general:table_child')
+        return is_suborder_exist

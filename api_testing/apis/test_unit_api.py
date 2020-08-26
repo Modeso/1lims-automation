@@ -409,5 +409,3 @@ class TestUnitAPI(TestUnitAPIFactory):
         with open(config_file, "r") as read_file:
             payload = json.load(read_file)
         super().set_configuration(payload=payload)
-
-

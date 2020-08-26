@@ -736,17 +736,18 @@ elements = {
         'uploader_close_btn': {'method': 'id',
                            'value': 'uploaderPopUpClose',
                            },
-
         'attachments_btn': {'method': 'xpath',
-                               'value': '//i[@class="fa fa-cloud-upload"]',
-                               },
-
+                            'value': '//i[@class="fa fa-cloud-upload"]'},
         'testplan_popup_btn': {'method': 'xpath',
-                           'value': '//span[@class="pull-right collapse-long-words"]',
-                           },
+                               'value': '//span[@class="pull-right collapse-long-words"]'},
+        'testplan_cancel_btn': {'method': 'xpath',
+                                'value': '//*[@id="infoModalTable"]/div/div/div[3]/button'},
+        'testplan_close_btn': {'method': 'xpath',
+                               'value': '//*[@id="infoModalTable"]/div/div/div[1]/button'},
+        'testplan_popup': {'method': 'id',
+                           'value': 'infoModalTable'},
         'popup_data': {'method': 'class_name',
-                           'value': 'border-bottom',
-                             },
+                       'value': 'border-bottom'},
         'analysis': {
             'filter_order_no': {
                 'method': 'id',

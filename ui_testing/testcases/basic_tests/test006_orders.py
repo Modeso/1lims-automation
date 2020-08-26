@@ -13,6 +13,8 @@ from parameterized import parameterized
 from random import randint
 from unittest import skip
 import random, re
+from nose.plugins.attrib import attr
+
 
 
 
@@ -40,7 +42,7 @@ class OrdersTestCases(BaseTest):
         self.info('edit order with No {}'.format(random_order['orderNo']))
         self.orders_page.get_order_edit_page_by_id(random_order['id'])
         order_url = self.base_selenium.get_url()
-        self.info(' + order_url : {}'.format(order_url))
+        self.info('order_url : {}'.format(order_url))
         old_number = self.order_page.get_no().replace("'", "")
         new_number = self.generate_random_string()
         self.order_page.set_no(new_number)
@@ -71,7 +73,7 @@ class OrdersTestCases(BaseTest):
         self.info('edit order with No {}'.format(random_order['orderNo']))
         self.orders_page.get_order_edit_page_by_id(random_order['id'])
         order_url = self.base_selenium.get_url()
-        self.info(' + order_url : {}'.format(order_url))
+        self.info('order_url : {}'.format(order_url))
         old_contact = self.order_page.get_contact()
         new_contact = self.order_page.set_contact(remove_old=True)
         if 'save_btn' == save:
@@ -108,7 +110,7 @@ class OrdersTestCases(BaseTest):
         self.info('edit order with No {}'.format(order_payload[0]['orderNo']))
         self.orders_page.get_order_edit_page_by_id(order_response['order']['mainOrderId'])
         order_url = self.base_selenium.get_url()
-        self.info(' + order_url : {}'.format(order_url))
+        self.info('order_url : {}'.format(order_url))
         self.order_page.open_suborder_edit()
         order_department = self.order_page.get_departments()
         new_department = payload['departments'][1]['text']
@@ -290,29 +292,7 @@ class OrdersTestCases(BaseTest):
         results = self.order_page.result_table()[0].text
         self.assertIn(after_duplicate_order['orderNo'].replace("'", ""), results.replace("'", ""))
 
-    @skip('need to be re-implemented to include child table data')
-    def test009_export_order_sheet(self):
-        """
-        New: Orders: XSLX Approach: user can download all data in table view with the same order with table view
-
-        LIMS-3274
-        """
-        self.info(' * Download XSLX sheet')
-        self.order_page.select_all_records()
-        self.order_page.download_xslx_sheet()
-        rows_data = self.order_page.get_table_rows_data()
-        for index in range(len(rows_data) - 1):
-            self.info(
-                ' * Comparing the order no. {} '.format(index + 1))
-            fixed_row_data = self.fix_data_format(rows_data[index].split('\n'))
-            values = self.order_page.sheet.iloc[index].values
-            fixed_sheet_row_data = self.fix_data_format(values)
-            for item in fixed_row_data:
-                if item != " ":
-                    self.assertIn(item, fixed_sheet_row_data)
-
-    @skip('rounding field')
-    def test010_user_can_add_suborder(self):
+    def test009_user_can_add_suborder(self):
         """
         New: Orders: Table view: Suborder Approach: User can add suborder from the main order
 
@@ -355,7 +335,7 @@ class OrdersTestCases(BaseTest):
         latest_order_data = self.orders_page.get_the_latest_row_data()
         self.assertEqual(suborders_data_after['Analysis No.'], latest_order_data['Analysis No.'])
 
-    def test011_duplicate_suborder_multiple_copies(self):
+    def test010_duplicate_suborder_multiple_copies(self):
         """
         Make sure that the user can duplicate suborder with multiple copies ( record with test units )
         Make sure that the user can duplicate suborder with multiple copies ( record with test plans )
@@ -408,7 +388,7 @@ class OrdersTestCases(BaseTest):
             self.assertEqual(data_before_duplicate_sub_order['Test Units'],
                              data_after_duplicate_sub_order['Test Units'])
 
-    def test012_update_suborder_materialtype_cancel_button(self):
+    def test011_update_suborder_materialtype_cancel_button(self):
         """
         New: Orders: Edit material type: Make sure that user can cancel any update successfully
         New: Orders: Materiel type Approach: In case then material type of the second suborder
@@ -439,7 +419,6 @@ class OrdersTestCases(BaseTest):
         suborders_data_after_update = self.order_page.get_suborder_data()
         self.assertCountEqual(suborders_data_after_update, suborders_data_before_update)
 
-    @skip('rounding option')
     def test012_update_suborder_materialtype(self):
         """
         New: Orders: Material type Approach: I can update the material type
@@ -449,7 +428,7 @@ class OrdersTestCases(BaseTest):
         """
         self.info("get material type with test unit ")
         random_data = TestUnitAPI().get_testunits_with_material_type()[0]
-        order, payload = self.orders_api.create_new_order(materialTypeId=2)
+        order, payload = self.orders_api.create_new_order()
         self.orders_page.get_order_edit_page_by_id(id=order['order']['mainOrderId'])
         self.info("Duplicate it to make sure that I have two suborders to update the second one ")
         self.order_page.duplicate_from_table_view()
@@ -512,7 +491,7 @@ class OrdersTestCases(BaseTest):
             # close child table
             self.orders_page.open_child_table(source=results[i])
 
-    def test013_filter_by_analysis_no(self):
+    def test014_filter_by_analysis_no(self):
         """
         New: Orders: Filter Approach: I can filter by analysis No
 
@@ -537,7 +516,7 @@ class OrdersTestCases(BaseTest):
                 break
         self.assertTrue(key_found)
 
-    def test014_filter_by_order_No(self):
+    def test015_filter_by_order_No(self):
         """
         I can filter by any order No.
 
@@ -552,7 +531,7 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(len(self.order_page.result_table()), 2)
         self.assertIn(order['orderNo'], result_order[0].text.replace("'", ""))
 
-    def test015_filter_by_Status(self):
+    def test016_filter_by_Status_or_anlysis_result(self):
         """
         I can filter by status
 
@@ -573,7 +552,7 @@ class OrdersTestCases(BaseTest):
 
         self.assertTrue(filter_key_found)
 
-    def test016_filter_by_analysis_result(self):
+    def test017_filter_by_analysis_result(self):
         """
         I can filter by Analysis result
 
@@ -594,7 +573,7 @@ class OrdersTestCases(BaseTest):
 
         self.assertTrue(filter_key_found)
 
-    def test017_filter_by_contact(self):
+    def test018_filter_by_contact(self):
         """
         New: Orders: Filter Approach: I can filter by contact
 
@@ -612,7 +591,7 @@ class OrdersTestCases(BaseTest):
             if result.text:
                 self.assertIn(contact, result.text)
 
-    def test018_filter_by_department(self):
+    def test019_filter_by_department(self):
         """
         I can filter by department
 
@@ -640,7 +619,7 @@ class OrdersTestCases(BaseTest):
             self.orders_page.open_child_table(source=results[i])
 
     @parameterized.expand(['testDate', 'shipmentDate', 'createdAt'])
-    def test019_filter_by_date(self, key):
+    def test020_filter_by_date(self, key):
         """
          I can filter by testDate, shipmentDate, or createdAt fields
 
@@ -667,7 +646,7 @@ class OrdersTestCases(BaseTest):
 
         self.assertTrue(filter_key_found)
 
-    def test020_validate_order_test_unit_test_plan(self):
+    def test021_validate_order_test_unit_test_plan(self):
         """
         New: orders Test plan /test unit validation
 
@@ -684,9 +663,10 @@ class OrdersTestCases(BaseTest):
                   .format(validation_result))
         self.assertTrue(validation_result)
 
-    def test021_validate_order_test_unit_test_plan_edit_mode(self):
+    def test022_validate_order_test_unit_test_plan_edit_mode(self):
         """
         New: orders Test plan /test unit validation in edit mode
+
         LIMS-4826
         """
         self.info(' Running test case to check that '
@@ -713,7 +693,7 @@ class OrdersTestCases(BaseTest):
         self.assertIn('has-error', test_unit_class_name)
 
     @parameterized.expand(['save_btn', 'cancel'])
-    def test022_update_test_date(self, save):
+    def test023_update_test_date(self, save):
         """
         New: Orders: Test Date: I can update test date successfully with cancel/save buttons
 
@@ -751,16 +731,16 @@ class OrdersTestCases(BaseTest):
 
         # check if the test date changed or not
         if 'cancel' == save:
-            self.info(
-                ' + Assert {} (current_test_date) != {} (new_test_date)'.format(new_test_date, saved_test_date))
+            self.info('Assert {} (current_test_date) != {} (new_test_date)'.
+                      format(new_test_date, saved_test_date))
             self.assertNotEqual(saved_test_date, new_test_date)
         else:
-            self.info(
-                ' + Assert {} (current_test_date) == {} (new_test_date)'.format(new_test_date, saved_test_date))
+            self.info('Assert {} (current_test_date) == {} (new_test_date)'.
+                      format(new_test_date, saved_test_date))
             self.assertEqual(saved_test_date, new_test_date)
 
     @parameterized.expand(['save_btn', 'cancel'])
-    def test023_update_shipment_date(self, save):
+    def test024_update_shipment_date(self, save):
         """
         New: Orders: Shipment date Approach: I can update shipment date successfully with save/cancel button
 
@@ -797,17 +777,15 @@ class OrdersTestCases(BaseTest):
 
         # check if the shipment date changed or not
         if 'cancel' == save:
-            self.info(
-                ' + Assert {} (current_shipment_date) != {} (new_shipment_date)'.format(new_shipment_date,
-                                                                                        saved_shipment_date))
+            self.info('Assert {} (current_shipment_date) != {} (new_shipment_date)'.
+                      format(new_shipment_date, saved_shipment_date))
             self.assertNotEqual(saved_shipment_date, new_shipment_date)
         else:
-            self.info(
-                ' + Assert {} (current_shipment_date) == {} (new_shipment_date)'.format(new_shipment_date,
-                                                                                        saved_shipment_date))
+            self.info('Assert {} (current_shipment_date) == {} (new_shipment_date)'.
+                      format(new_shipment_date, saved_shipment_date))
             self.assertEqual(saved_shipment_date, new_shipment_date)
 
-    def test024_validate_order_no_exists(self):
+    def test025_validate_order_no_exists(self):
         """
         New: Orders: Create new order and change the autogenerated number
 
@@ -844,7 +822,7 @@ class OrdersTestCases(BaseTest):
                   'I enter number already exists? {}'.format(validation_result1))
         self.assertTrue(validation_result2)
 
-    def test025_create_new_order_with_test_units(self):
+    def test026_create_new_order_with_test_units(self):
         """
         New: Orders: Create a new order with test units
 
@@ -853,13 +831,13 @@ class OrdersTestCases(BaseTest):
         diana, payload = TestUnitAPI().create_qualitative_testunit()
 
         self.order_page.get_orders_page()
-        created_order_no = self.order_page.create_new_order(material_type='r', article='a', contact='a', test_plans=[],
-                                                         test_units=[payload['name']])
+        created_order_no = self.order_page.create_new_order(
+            material_type='r', article='a', contact='a', test_plans=[],
+            test_units=[payload['name']])
 
         self.order_page.get_orders_page()
         self.orders_page.navigate_to_analysis_active_table()
-        self.info(
-            'Assert There is an analysis for this new order.')
+        self.info('Assert There is an analysis for this new order.')
         orders_analyess = self.analyses_page.search(value=created_order_no)
         latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(
             row=orders_analyess[0])
@@ -868,15 +846,16 @@ class OrdersTestCases(BaseTest):
         self.analyses_page.open_child_table(source=orders_analyess[0])
         rows_with_childtable = self.analyses_page.result_table(element='general:table_child')
         for row in rows_with_childtable[:-1]:
-            row_with_headers = self.base_selenium.get_row_cells_dict_related_to_header(row=row,
-                                                                                       table_element='general:table_child')
+            row_with_headers = self.base_selenium.get_row_cells_dict_related_to_header(
+                row=row, table_element='general:table_child')
             testunit_name = row_with_headers['Test Unit']
             self.info(" + Test unit : {}".format(testunit_name))
             self.assertIn(testunit_name, payload['name'])
 
-    def test026_create_existing_order_with_test_units(self):
+    def test027_create_existing_order_with_test_units(self):
         """
         New: Orders: Create an existing order with test units
+
         LIMS-3268
         """
         random_testunit, payload = TestUnitAPI().get_all_test_units(filter='{"materialTypes":"all"}')
@@ -898,13 +877,13 @@ class OrdersTestCases(BaseTest):
         self.analyses_page.open_child_table(source=orders_analyess[0])
         rows_with_childtable = self.analyses_page.result_table(element='general:table_child')
         for row in rows_with_childtable[:-1]:
-            row_with_headers = self.base_selenium.get_row_cells_dict_related_to_header(row=row,
-                                                                                       table_element='general:table_child')
+            row_with_headers = self.base_selenium.get_row_cells_dict_related_to_header(
+                row=row, table_element='general:table_child')
             testunit_name = row_with_headers['Test Unit']
             self.info(" + Test unit : {}".format(testunit_name))
             self.assertIn(testunit_name, random_name['name'])
 
-    def test027_create_existing_order_with_test_units_and_change_material_type(self):
+    def test028_create_existing_order_with_test_units_and_change_material_type(self):
         """
         New: Orders with test units: Create a new order from an existing order with
         test units but change the material type
@@ -935,7 +914,7 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(test_unit[0], self.analyses_page.get_child_table_data()[0]['Test Unit'])
         self.assertEqual('Subassembely', latest_order_data['Material Type'])
 
-    def test028_create_existing_order_with_test_units_and_change_article(self):
+    def test029_create_existing_order_with_test_units_and_change_article(self):
         """
         New: Orders with test units: Create a new order from an existing order with
         test units but change the article
@@ -2309,3 +2288,130 @@ class OrdersTestCases(BaseTest):
             for item in formatted_orders[index]:
                 self.assertIn(item, fixed_sheet_row_data)
 
+    @skip('need to be re-implemented to include child table data')
+    def test065_export_order_sheet(self):
+        """
+        New: Orders: XSLX Approach: user can download all data in table view with the same order with table view
+
+        LIMS-3274
+        """
+        self.info(' * Download XSLX sheet')
+        self.order_page.select_all_records()
+        self.order_page.download_xslx_sheet()
+        rows_data = self.order_page.get_table_rows_data()
+        for index in range(len(rows_data) - 1):
+            self.info(
+                ' * Comparing the order no. {} '.format(index + 1))
+            fixed_row_data = self.fix_data_format(rows_data[index].split('\n'))
+            values = self.order_page.sheet.iloc[index].values
+            fixed_sheet_row_data = self.fix_data_format(values)
+            for item in fixed_row_data:
+                if item != " ":
+                    self.assertIn(item, fixed_sheet_row_data)
+
+    def test066_create_order_then_overview(self):
+        """
+        Orders: Create: In case of clicking on the overview button after clicking create new order
+        check it redirects to the active table
+
+        LIMS-6204
+        """
+        self.order_page.click_create_order_button()
+        self.order_page.sleep_tiny()
+        self.order_page.click_overview()
+        self.info('Asserting correct redirection to orders active table ')
+        self.info('Active table url is {} , current url is {}'.format(
+            self.orders_page.orders_url, self.base_selenium.get_url()))
+        self.assertEqual(self.orders_page.orders_url, self.base_selenium.get_url())
+
+    @parameterized.expand(['10', '20', '25', '50', '100'])
+    @attr(series=True)
+    def test067_testing_table_pagination(self, pagination_limit):
+        """
+        Orders: Active table: Pagination Approach; Make sure that I can set the pagination
+        to display 10/20/25/50/100 records in each page
+
+        LIMS-6199
+        """
+        self.order_page.set_page_limit(limit=pagination_limit)
+        table_info = self.order_page.get_table_info_data()
+        self.info('get current table records count')
+        table_records_count = str(len(self.order_page.result_table()) - 1)
+
+        self.info('table records count is {}, and it should be {}'.
+                  format(table_records_count, table_info['page_limit']))
+        self.assertEqual(table_records_count, table_info['page_limit'])
+
+        self.info('current page limit is {}, and it should be {}'.
+                  format(table_info['pagination_limit'], pagination_limit))
+        self.assertEqual(table_info['pagination_limit'], pagination_limit)
+
+        if int(table_info['pagination_limit']) <= int((table_info['count']).replace(",", "")):
+            self.assertEqual(table_info['pagination_limit'], table_records_count)
+
+    def test068_archived_contact_not_retrieved(self):
+        """
+        Make sure that Archived contacts are n't appear in contacts drop down list
+
+        LIMS-5829
+        """
+        api, payload = self.contacts_api.get_all_contacts(deleted=1)
+        archived_contact = random.choice(api['contacts'])['name']
+        self.info("Archived contact {}".format(archived_contact))
+        self.base_selenium.click(element='orders:new_order')
+        self.orders_page.sleep_medium()
+        self.order_page.set_new_order()
+        self.order_page.sleep_small()
+        self.info('Asset that archived contact is not existing in the list')
+        self.assertFalse(self.order_page.is_contact_existing(archived_contact))
+
+    @parameterized.expand(['cancel_btn', 'close_btn'])
+    def test069_close_testplan_popup(self, button):
+        """
+        Make sure the user can press on the cancel button to close the pop-up or from the ( x ) sign
+
+        LIMS-4797
+        """
+        order, payload = self.orders_api.create_new_order()
+        self.assertEqual(order['status'], 1)
+        self.info('open the order record in the edit mode')
+        self.orders_page.get_order_edit_page_by_id(id=order['order']['mainOrderId'])
+        self.orders_page.sleep_small()
+        self.base_selenium.click(element='order:testplan_popup_btn')
+        if button == 'cancel_btn':
+            self.base_selenium.wait_until_element_clickable(element='order:testplan_cancel_btn')
+            self.base_selenium.click(element='order:testplan_cancel_btn')
+        else:
+            self.base_selenium.wait_until_element_clickable(element='order:testplan_close_btn')
+            self.base_selenium.click(element='order:testplan_close_btn')
+
+        self.assertTrue(self.base_selenium.check_element_is_not_exist(element='order:testplan_popup'))
+
+    def test070_main_orders_only_should_be_displayed_in_the_orders_list(self):
+        """
+        Make sure that user sees the main orders only in the order list
+
+        LIMS-5354
+        """
+        self.info('assert active table is displayed')
+        table_records_count = len(self.order_page.result_table())
+        self.assertGreater(table_records_count, 0)
+        self.info('There is no duplications in the orders numbers')
+        order = random.choice(self.orders_api.get_all_orders_json())
+        order_no = order['orderNo']
+        self.info('search by order No'.format(order_no))
+        self.orders_page.filter_by_order_no(order_no)
+        self.assertEqual(len(self.order_page.result_table()), 2)
+        self.info('click on the random order from the list, Order table with add will be opened')
+        self.orders_page.get_order_edit_page_by_id(order['orderId'])
+        table_with_add = self.order_page.get_table_with_add()
+        self.assertIsNotNone(table_with_add)
+        self.info('duplicate the first suborder')
+        self.order_page.duplicate_from_table_view()
+        self.info('click on save button')
+        self.order_page.save(save_btn='order:save_btn')
+        self.info('Go back to the active table')
+        self.order_page.get_orders_page()
+        self.orders_page.filter_by_order_no(order_no)
+        self.info('assert main order only displayed no duplicated rows for the suborders')
+        self.assertFalse(self.order_page.check_suborders_appear())
