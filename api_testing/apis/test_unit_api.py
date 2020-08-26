@@ -403,9 +403,26 @@ class TestUnitAPI(TestUnitAPIFactory):
         else:
             return None
 
+    def create_test_unit_with_long_text(self):
+        self.info('Generate random data for update')
+        long_txt = self.generate_random_string() + \
+                   self.generate_random_string() + \
+                   self.generate_random_string() + \
+                   self.generate_random_string() + \
+                   self.generate_random_string()
+        api, testunit_payload = self.create_qualitative_testunit(method=long_txt)
+        return api, testunit_payload
+
     def set_configuration(self):
         self.info('set test unit configuration')
         config_file = os.path.abspath('api_testing/config/testUnit.json')
+        with open(config_file, "r") as read_file:
+            payload = json.load(read_file)
+        super().set_configuration(payload=payload)
+
+    def set_name_configuration(self):
+        self.info('set test unit configuration')
+        config_file = os.path.abspath('api_testing/config/testUnit_unit.json')
         with open(config_file, "r") as read_file:
             payload = json.load(read_file)
         super().set_configuration(payload=payload)

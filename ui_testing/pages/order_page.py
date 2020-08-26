@@ -1,6 +1,7 @@
 from ui_testing.pages.orders_page import Orders
 from selenium.webdriver.common.keys import Keys
 from selenium import webdriver
+from api_testing.apis.orders_api import OrdersAPI
 from random import randint
 
 
@@ -102,7 +103,9 @@ class Order(Orders):
         if self.get_test_unit():
             self.base_selenium.clear_items_in_drop_down(element='order:test_unit', confirm_popup=confirm)
 
-    def set_test_unit(self, test_unit=''):
+    def set_test_unit(self, test_unit='', remove_old=False):
+        if remove_old:
+            self.base_selenium.clear_items_in_drop_down(element='order:test_unit')
         if test_unit:
             self.base_selenium.select_item_from_drop_down(element='order:test_unit', item_text=test_unit)
         else:
@@ -117,7 +120,7 @@ class Order(Orders):
             return []
 
     def create_new_order(self, material_type='', article='', contact='', test_plans=[''], test_units=[''],
-                         multiple_suborders=0, departments='', order_no=''):
+                         multiple_suborders=0, departments='', order_no='', save=True):
         self.info(' Create new order.')
         self.click_create_order_button()
         self.sleep_small()
@@ -137,6 +140,7 @@ class Order(Orders):
 
         for test_plan in test_plans:
             self.set_test_plan(test_plan=test_plan)
+
         for test_unit in test_units:
             self.set_test_unit(test_unit=test_unit)
             self.sleep_small()
@@ -145,7 +149,8 @@ class Order(Orders):
             self.get_suborder_table()
             self.duplicate_from_table_view(number_of_duplicates=multiple_suborders)
 
-        self.save(save_btn='order:save_btn')
+        if save:
+            self.save(save_btn='order:save_btn')
         self.info(' Order created with no : {} '.format(order_no))
         return order_no
 
@@ -711,3 +716,29 @@ class Order(Orders):
         is_suborder_exist = self.base_selenium.check_element_is_exist(
             element='table_element=general:table_child')
         return is_suborder_exist
+
+    def create_existing_order_check_no_in_suggestion_list(self, no):
+        self.get_orders_page()
+        self.info('Create new order.')
+        self.click_create_order_button()
+        self.set_existing_order()
+        self.sleep_small()
+        self.info('checking if the order number is in the existing order numbers list')
+        return self.base_selenium.is_item_in_drop_down(element='order:order_number_add_form', item_text=no)
+
+    def get_testunit_multiple_line_properties(self):
+        dom_element = self.base_selenium.find_element(element='order:test_unit')
+        multiple_line_properties = dict()
+        multiple_line_properties['textOverflow'] = self.base_selenium.driver.execute_script('return '
+                                                                                            'window'
+                                                                                            '.getComputedStyle('
+                                                                                            'arguments[0], '
+                                                                                            '"None").textOverflow',
+                                                                                            dom_element)
+        multiple_line_properties['lineBreak'] = self.base_selenium.driver.execute_script('return '
+                                                                                         'window'
+                                                                                         '.getComputedStyle('
+                                                                                         'arguments[0], '
+                                                                                         '"None").lineBreak',
+                                                                                         dom_element)
+        return multiple_line_properties

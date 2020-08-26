@@ -1,6 +1,7 @@
 from ui_testing.testcases.base_test import BaseTest
 from ui_testing.pages.order_page import Order
 from ui_testing.pages.orders_page import Orders
+from ui_testing.pages.testunits_page import TstUnits
 from api_testing.apis.orders_api import OrdersAPI
 from ui_testing.pages.analysis_page import AllAnalysesPage
 from api_testing.apis.article_api import ArticleAPI
@@ -28,7 +29,7 @@ class OrdersTestCases(BaseTest):
         self.contacts_api = ContactsAPI()
         self.set_authorization(auth=self.contacts_api.AUTHORIZATION_RESPONSE)
         self.order_page.get_orders_page()
-        #self.orders_api.set_configuration()
+        self.orders_api.set_configuration()
 
     @parameterized.expand(['save_btn', 'cancel'])
     def test001_edit_order_number_with_save_cancel_btn(self, save):
@@ -2436,22 +2437,214 @@ class OrdersTestCases(BaseTest):
             self.assertEqual(len(results), 2)
             self.assertIn(order_no.replace("'", ""), results[0].text.replace("'", ""))
 
+    @skip('new order no set to 2020.1')
     def test072_Multiple_contacts_should_appear_in_active_table(self):
         """
         Multiple contacts should appear in active table
 
         LIMS-5773
         """
-        response, payload = self.contacts_api.create_contact()
-        self.assertEqual(response['status'], 1)
-        contact1, _ = payload, response['company']['companyId']
-        response, payload = self.contacts_api.create_contact()
-        contact2, _ = payload, response['company']['companyId']
+        response1, contact1 = self.contacts_api.create_contact()
+        self.assertEqual(response1['status'], 1)
+        response2, contact2 = self.contacts_api.create_contact()
+        self.assertEqual(response2['status'], 1)
+        import ipdb;ipdb.set_trace()
         order_no = self.order_page.create_multiple_contacts_new_order(contacts=[contact1['name'], contact2['name']])
-        self.assertIn('2020', order_no.replace("'", ""))
         self.order_page.save(save_btn='order:save_btn')
         self.orders_page.get_orders_page()
-        self.orders_page.search(order_no)
+        self.orders_page.filter_by_order_no(order_no)
         results = self.order_page.result_table()[0].text
         self.assertIn(contact1['name'], results)
         self.assertIn(contact2['name'], results)
+
+    def test073_create_new_existing_order_with_deleted_order_number(self):
+        """
+         create new order :make sure that user can't create a new order with
+         existing order using a deleted order number
+
+         LIMS-2430
+        """
+        response, payload = self.orders_api.create_new_order()
+        self.assertEqual(response['status'], 1)
+        order_no = payload[0]['orderNo']
+        order_no_with_year = payload[0]['orderNoWithYear']
+        order_id = response['order']['mainOrderId']
+        self.info("checking that the order number appears in existing orders list before archive/delete")
+        self.assertTrue(self.order_page.create_existing_order_check_no_in_suggestion_list(order_no_with_year))
+        self.orders_api.archive_main_order(mainorder_id=order_id)
+        self.info("checking that the archived order number doesn't appear in the existing order numbers list")
+        self.assertFalse(self.order_page.create_existing_order_check_no_in_suggestion_list(order_no_with_year))
+        self.orders_api.delete_main_order(mainorder_id=order_id)
+        self.info("checking that the deleted order number doesn't appear in the existing order numbers list")
+        self.assertFalse(self.order_page.create_existing_order_check_no_in_suggestion_list(order_no_with_year))
+        self.order_page.get_orders_page()
+        self.order_page.create_new_order(material_type='Raw Material', order_no=order_no_with_year)
+        self.order_page.get_orders_page()
+        self.orders_page.filter_by_order_no(order_no_with_year)
+        self.order_page.sleep_tiny()
+        results = self.orders_page.result_table()
+        self.assertEqual(len(results), 2)
+        self.info('asserting the order with order number {} is created'.format(order_no))
+        self.assertIn(order_no_with_year, results[0].text.replace("'", ""))
+
+    def test074_create_existing_order_change_contact(self):
+        """
+         Create existing order then change the contact for this existing one,
+         all old records with the same order number will update its contact.
+
+         LIMS-4293
+        """
+        res, payload = self.orders_api.create_new_order()
+        self.assertEqual(res['status'], 1)
+        order_no_with_year = payload[0]['orderNoWithYear']
+        order_id = res['order']['mainOrderId']
+        response, _ = self.orders_api.get_suborder_by_order_id(id=order_id)
+        self.info('Getting all {} suborders data to get analysis number'.format(len(response['orders'])))
+        self.info("create existing order with order no {}".format(order_no_with_year))
+        self.order_page.create_existing_order_with_auto_fill(no=order_no_with_year)
+        self.order_page.sleep_tiny()
+        new_contact = self.order_page.set_contact(remove_old=True)[0]
+        self.order_page.save(save_btn='order:save_btn')
+        self.orders_page.get_orders_page()
+        self.order_page.sleep_tiny()
+        self.order_page.navigate_to_analysis_tab()
+        self.info('Asserting that contact has changed for this order')
+        for i in range(len(response['orders'])):
+            analysis_no = response['orders'][i]['analysis']
+            self.analyses_page.filter_by_analysis_number(analysis_no)
+            results = self.analyses_page.get_the_latest_row_data()
+            self.info(
+                'checking contact is updated for suborder {} - new contact is {} and current contact is {}'
+                    .format(i + 1, new_contact, results['Contact Name']))
+            self.assertEqual(new_contact, results['Contact Name'])
+
+    @attr(series=True)
+    @skip('new order no set to 2020.1')
+    def test075_enter_long_method_should_be_in_multiple_lines_in_order_form(self):
+        """
+        In case you select the method to display and you entered long text in it,
+        the method should display into multiple lines in the order form
+
+        LIMS-6663 Orders:Test unit search approach
+        """
+        self.test_units_page = TstUnits()
+        self.orders_page.sleep_tiny()
+        self.test_units_page.get_test_units_page()
+        self.orders_page.sleep_tiny()
+        self.test_units_page.open_configurations()
+        self.orders_page.sleep_tiny()
+        self.test_units_page.open_testunit_name_configurations_options()
+        self.test_units_page.select_option_to_view_search_with(view_search_options=['Method'])
+        self.info(' create test unit with long method text ')
+        api, payload = TestUnitAPI().create_test_unit_with_long_text()
+        self.assertEqual(api['status'], 1, payload)
+        self.info('go to orders page')
+        self.order_page.get_orders_page()
+        self.info('create new order with the test unit of long method text')
+        self.order_page.create_new_order(save=False, material_type='Raw Material')
+        self.order_page.set_test_unit(test_unit=payload['method'], remove_old=True)
+        self.orders_page.save(save_btn='order:save_btn')
+        self.info('assert method text appears in multiple lines')
+        self.order_page.get_table_with_add()
+        multiple_lines_properties = self.order_page.get_testunit_multiple_line_properties()
+        self.assertEquals(multiple_lines_properties['textOverflow'], 'clip')
+        self.assertEquals(multiple_lines_properties['lineBreak'], 'auto')
+
+    @attr(series=True)
+    def test076_search_with_test_unit_name(self):
+        """
+        Orders:Test unit search approach
+        allow user to search with test unit name in the drop down list of the order form
+
+        LIMS-6664
+        """
+        self.test_units_page = TstUnits()
+        self.info("get random test unit data to get its material type")
+        response, payload = TestUnitAPI().get_all_test_units()
+        self.assertEqual(response['status'], 1, payload)
+        random_test_unit = random.choice(response['testUnits'])
+        self.test_units_page.get_test_units_page()
+        self.orders_page.sleep_tiny()
+        self.test_units_page.open_configurations()
+        self.orders_page.sleep_tiny()
+        self.test_units_page.open_testunit_name_configurations_options()
+        self.test_units_page.select_option_to_view_search_with(view_search_options=['Name'])
+        self.info('go to orders page')
+        self.order_page.get_orders_page()
+        if random_test_unit['materialTypes'][0] != 'All':
+            test_unit_suggestion_list = Order().create_new_order_get_test_unit_suggetion_list(
+                material_type=random_test_unit['materialTypes'][0], test_unit_name=' ')
+        else:
+            test_unit_suggestion_list = Order().create_new_order_get_test_unit_suggetion_list(
+                material_type='', test_unit_name=' ')
+        self.info('checking name field only is displayed')
+        for test_unit in test_unit_suggestion_list:
+            self.assertNotIn(':', test_unit)
+
+    @parameterized.expand(['Quantitative', 'Qualitative', 'Quantitative MiBi'])
+    @attr(series=True)
+    def test077_test_unit_with_sub_and_super_unit_name_appears_in_unit_field_drop_down(self, type):
+        """
+        New: Test unit: Export: In case the unit field with sub & super,
+        allow this to display in the unit field drop down list in the analysis form
+
+        LIMS-6675
+        """
+        self.test_unit_api = TestUnitAPI()
+        self.test_unit_api.set_name_configuration()
+        if type == 'Quantitative':
+            self.info('Create new Quantitative testunit')
+            response, payload = self.test_unit_api.create_quantitative_testunit(unit='m[g]{o}')
+        elif type == 'Qualitative':
+            self.info('Create new Qualitative testunit')
+            response, payload = self.test_unit_api.create_qualitative_testunit(unit='m[g]{o}')
+        else:
+            self.info('Create new Quantitative MiBi testunit')
+            response, payload = self.test_unit_api.create_mibi_testunit(unit='m[g]{o}')
+
+        self.assertEqual(response['status'], 1, 'test unit not created {}'.format(payload))
+        self.info('go to orders page')
+        self.order_page.get_orders_page()
+        unit = self.order_page.create_new_order_get_test_unit_suggetion_list(
+            material_type='', test_unit_name='m[g]{o}')
+        self.assertIn("m[g]{o}", unit)
+
+    @parameterized.expand(['sub_script', 'super_script'])
+    @attr(series=True)
+    @skip("https://modeso.atlassian.net/browse/LIMSA-271")
+    def test078_filter_testunit_by_scripts(self, value):
+        """
+         Make sure that user can filter by sub & super scripts in the filter drop down list
+
+         LIMS-7447
+        """
+        self.test_unit_api = TestUnitAPI()
+        self.test_unit_api.set_name_configuration()
+        if value == 'sub_script':
+            api, testunit = self.test_unit_api.create_qualitative_testunit(unit='14[158]')
+        else:
+            api, testunit = self.test_unit_api.create_qualitative_testunit(unit='15{158}')
+        self.assertEqual(api['status'], 1)
+        unit = testunit['unit']
+        self.orders_page.get_orders_page()
+        self.order_page.sleep_small()
+        self.base_selenium.scroll(False)
+        self.orders_page.apply_filter_scenario(filter_element='orders:test_units_filter',
+                                               filter_text=unit, field_type='drop_down')
+        self.assertIsNotNone(
+            self.base_selenium.is_text_included_in_drop_down_items(
+                element='orders:test_units_filter', item_text=unit))
+
+        results = self.order_page.result_table()
+        self.assertGreaterEqual(len(results), 1)
+        for i in range(len(results) - 1):
+            suborders = self.orders_page.get_child_table_data(index=i)
+            key_found = False
+            for suborder in suborders:
+                if unit in suborder['Test Units']:
+                    key_found = True
+                    break
+            self.assertTrue(key_found)
+            # close child table
+            self.orders_page.open_child_table(source=results[i])
+
