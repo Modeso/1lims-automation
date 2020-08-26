@@ -229,16 +229,17 @@ class TestPlanAPI(TestPlanAPIFactory):
     def create_completed_testplan(self, material_type, formatted_article):
         material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
         formatted_material = {'id': material_type_id, 'text': material_type}
-        test_unit = TestUnitAPI().get_test_unit_name_with_value_with_material_type(material_type)
-        testunit_data = TestUnitAPI().get_testunit_form_data(id=test_unit['id'])[0]['testUnit']
+        tu_response, tu_payload = TestUnitAPI().create_qualitative_testunit()
+        testunit_data = TestUnitAPI().get_testunit_form_data(
+            id=tu_response['testUnit']['testUnitId'])[0]['testUnit']
         formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
-
         testplan, payload = self.create_testplan(testUnits=[formated_testunit],
                                                  selectedArticles=[formatted_article],
-                                                 materialType=formatted_material)
+                                                 materialType=[formatted_material],
+                                                 material_type_id=material_type_id)
 
-        if testplan['status'] == 1:
-            return (self.get_testplan_form_data(id=testplan['testPlanDetails']['id']))
+        if testplan['message'] == 'operation_success':
+            return self.get_testplan_form_data(id=payload['number'])
         else:
             self.info(testplan)
 
@@ -296,11 +297,15 @@ class TestPlanAPI(TestPlanAPIFactory):
         else:
             formatted_material = testunit_data['materialTypesObject'][0]
 
+        tu_response, tu_payload = TestUnitAPI().create_qualitative_testunit()
+        testunit_data = TestUnitAPI().get_testunit_form_data(
+            id=tu_response['testUnit']['testUnitId'])[0]['testUnit']
         formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
         formatted_article = ArticleAPI().get_formatted_article_with_formatted_material_type(formatted_material)
         testplan, payload = self.create_testplan(testUnits=[formated_testunit],
                                                  selectedArticles=[formatted_article],
-                                                 materialType=[formatted_material])
+                                                 materialType=[formatted_material],
+                                                 materialTypeId=[material_type_id])
         if testplan['message'] == 'operation_success':
             return self.get_testplan_form_data(id= payload['number'])
         else:

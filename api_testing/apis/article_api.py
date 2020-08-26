@@ -194,11 +194,13 @@ class ArticleAPI(ArticleAPIFactory):
         if api['status'] == 1:
             return api['article']['name']
 
-    def get_formatted_article_with_formatted_material_type(self, material_type):
+    def get_formatted_article_with_formatted_material_type(self, material_type, avoid_article=''):
         articles, payload = self.get_all_articles(limit=500)
         self.info("search for article with material type {}".format(material_type))
         for article in articles['articles']:
-            if article['materialType'] == material_type['name']:
+            if article['name'] == avoid_article:
+                break
+            elif article['materialType'] == material_type['text']:
                 formatted_article = {'id': article['id'], 'name': article['name']}
                 return formatted_article
 

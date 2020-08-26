@@ -15,6 +15,7 @@ elements = {
         'table_child': {'method': 'class_name', 'value': 'dataTable', 'order': 1},
 
         'table_menu_options': {'method': 'class_name', 'value': 'dropdown', 'order': 0},
+        'menu_options_value': {'method': 'tag_name', 'value': 'ngb-popover-window', 'order': 0},
         'span': {'method': 'tag_name',
                  'value': 'span',
                  'order': 0},
@@ -631,19 +632,16 @@ elements = {
     'order': {
         'order': {'method': 'id',
                   'value': 'orderTypefield'},
-        'suborder_table': {'method': 'xpath',
-                           'value': "//table[@id='table-with-add']"},
+        'suborder_table': {'method': 'id',
+                           'value': 'table-with-add'},
         'material_type': {'method': 'xpath',
                           'value': "//td//*[@id='materialType']"},
         'article': {'method': 'xpath',
                     'value': '//td//*[@id="article"]'},
         'departments': {'method': 'xpath',
                         'value': '//td//*[@id="departments"]'},
-
         'auto_fill': {'method': 'xpath', 'value': '//i[@class="flaticon-app"]'},
-
         'auto_fill_container': {'method': 'xpath', 'value': '//*[@id="field"]/div[2]'},
-
         'contact': {'method': 'id',
                     'value': 'contact'},
         'tests': {'method': 'id',
@@ -700,8 +698,7 @@ elements = {
         'suborder_list': {'method': 'class_name',
                           'value': 'flaticon-signs',
                           'order': 0},
-        'suborder_table': {'method': 'id',
-                           'value': 'table-with-add'},
+
         'add_new_item': {'method': 'class_name',
                          'value': 'addNewItem',
                          'order': 0},
@@ -713,9 +710,6 @@ elements = {
         'add_new_item11': {'method': 'class_name',
                          'value': 'addNewItem',
                          'order': 0},
-
-        'add_new_item': {'method': 'link_text',
-                         'value': 'Add another item'},
         'order_no_error_message': {'method': 'xpath',
                                    'value': '//*[@id="field"]/div[3]/div/span'},
         'confirm_pop': {'method': 'class_name',

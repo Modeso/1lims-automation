@@ -643,6 +643,18 @@ class Order(Orders):
             row=suborder_row, table_element='order:suborder_table')
         return suborders_elements
 
+    def update_duplicated_order_article(self, sub_order_index=0, article=''):
+        suborder_table_rows = self.base_selenium.get_table_rows(
+            element='order:suborder_table')
+        suborder_row = suborder_table_rows[sub_order_index]
+        suborder_row.click()
+
+        self.info('clear article data')
+        self.base_selenium.clear_single_select_drop_down(element='order:article')
+        self.info('Set article name : {}'.format(article))
+        self.set_article(article=article)
+        self.sleep_small()
+
     def match_format_to_sheet_format(self, list_of_orders=[]):
         formatted_orders_list = []
         orders_list = []
