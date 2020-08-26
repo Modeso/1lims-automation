@@ -1,42 +1,64 @@
-# import re
-# from unittest import skip
-# from parameterized import parameterized
-# from ui_testing.testcases.base_test import BaseTest
-# from ui_testing.pages.order_page import Order
-# from ui_testing.pages.orders_page import Orders
-# from api_testing.apis.orders_api import OrdersAPI
-# from ui_testing.pages.analysis_page import AllAnalysesPage
-# from api_testing.apis.article_api import ArticleAPI
-# from api_testing.apis.test_unit_api import TestUnitAPI
-# from ui_testing.pages.analysis_page import SingleAnalysisPage
-# from api_testing.apis.contacts_api import ContactsAPI
-# from api_testing.apis.test_plan_api import TestPlanAPI
-# from ui_testing.pages.testplan_page import TstPlan
-# from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
-# from ui_testing.pages.contacts_page import Contacts
-# from random import randint
-# import random
-#
-#
-# class OrdersTestCases(BaseTest):
-#     def setUp(self):
-#         super().setUp()
-#         self.order_page = Order()
-#         self.orders_api = OrdersAPI()
-#         self.testplan_page = TstPlan()
-#         self.orders_page = Orders()
-#         self.analyses_page = AllAnalysesPage()
-#         self.article_api = ArticleAPI()
-#         self.test_unit_api = TestUnitAPI()
-#         self.contacts_api = ContactsAPI()
-#         self.single_analysis_page = SingleAnalysisPage()
-#         self.test_plan_api = TestPlanAPI()
-#         self.contacts_api = ContactsAPI()
-#         self.general_utilities_api = GeneralUtilitiesAPI()
-#         self.contacts_page = Contacts()
-#         self.set_authorization(auth=self.contacts_api.AUTHORIZATION_RESPONSE)
-#         self.order_page.get_orders_page()
-#         self.orders_api.set_configuration()
+import re
+from unittest import skip
+from parameterized import parameterized
+from ui_testing.testcases.base_test import BaseTest
+from ui_testing.pages.order_page import Order
+from ui_testing.pages.orders_page import Orders
+from api_testing.apis.orders_api import OrdersAPI
+from ui_testing.pages.analysis_page import AllAnalysesPage
+from api_testing.apis.article_api import ArticleAPI
+from api_testing.apis.test_unit_api import TestUnitAPI
+from ui_testing.pages.analysis_page import SingleAnalysisPage
+from api_testing.apis.contacts_api import ContactsAPI
+from api_testing.apis.test_plan_api import TestPlanAPI
+from ui_testing.pages.testplan_page import TstPlan
+from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
+from ui_testing.pages.contacts_page import Contacts
+from random import randint
+import random
+
+
+class OrdersTestCases(BaseTest):
+    def setUp(self):
+        super().setUp()
+        self.order_page = Order()
+        self.orders_api = OrdersAPI()
+        self.testplan_page = TstPlan()
+        self.orders_page = Orders()
+        self.analyses_page = AllAnalysesPage()
+        self.article_api = ArticleAPI()
+        self.test_unit_api = TestUnitAPI()
+        self.contacts_api = ContactsAPI()
+        self.single_analysis_page = SingleAnalysisPage()
+        self.test_plan_api = TestPlanAPI()
+        self.contacts_api = ContactsAPI()
+        self.general_utilities_api = GeneralUtilitiesAPI()
+        self.contacts_page = Contacts()
+        self.set_authorization(auth=self.contacts_api.AUTHORIZATION_RESPONSE)
+        self.order_page.get_orders_page()
+        self.orders_api.set_configuration()
+
+    def test068_choose_test_plans_without_test_units(self):
+        self.info(' Create new order.')
+        self.order_page.click_create_order_button()
+        self.order_page.set_new_order()
+        self.order_page.set_contact(contact='')
+        self.order_page.sleep_small()
+        self.order_page.set_material_type(material_type='Raw Material')
+        self.order_page.sleep_small()
+        order_no = self.order_page.get_no()
+        tst_plan1, tst_plan2, article1 = TestPlanAPI().create_multiple_test_plan_with_same_article()
+        self.order_page.set_article(article=article1)
+        self.order_page.sleep_small()
+        self.order_page.set_test_plan(test_plan=tst_plan1)
+        self.order_page.set_test_plan(test_plan=tst_plan2)
+        tst_plan3, tst_plan4, article2 = TestPlanAPI().create_multiple_test_plan_with_same_article()
+        self.order_page.create_new_suborder(material_type='Raw Material', test_plans=[tst_plan3, tst_plan4],
+                                            article_name=article2)
+        tst_plan5, tst_plan6, article3 = TestPlanAPI().create_multiple_test_plan_with_same_article()
+        self.order_page.create_new_suborder(material_type='Raw Material', test_plans=[tst_plan5, tst_plan6],
+                                            article_name=article3)
+        self.order_page.save(save_btn='order:save_btn')
 #
 #     @parameterized.expand(['save_btn', 'cancel'])
 #     def test001_edit_order_number_with_save_cancel_btn(self, save):
