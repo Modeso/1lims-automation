@@ -228,7 +228,7 @@ class TestPlanAPI(TestPlanAPIFactory):
     def create_completed_testplan(self, material_type, formatted_article):
         material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
         formatted_material = {'id': material_type_id, 'text': material_type}
-        import ipdb; ipdb.set_trace()
+
         test_unit = TestUnitAPI().get_test_unit_name_with_value_with_material_type(material_type)
         testunit_data = TestUnitAPI().get_testunit_form_data(id=test_unit['id'])[0]['testUnit']
         formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
