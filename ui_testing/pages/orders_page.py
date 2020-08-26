@@ -68,7 +68,8 @@ class Orders(BasePages):
         self.base_selenium.click(element='general:right_menu')
         self.sleep_tiny()
         self.base_selenium.click(element='orders:duplicate')
-        self.sleep_medium()
+        self.wait_until_page_is_loaded()
+        self.base_selenium.refresh()
 
     def duplicate_main_order_from_order_option(self, index=0):
         self.info('duplicate main order from the order\'s active table')

@@ -273,9 +273,9 @@ class OrdersTestCases(BaseTest):
         row = self.order_page.get_last_order_row()
         self.order_page.click_check_box(source=row)
         self.order_page.duplicate_main_order_from_table_overview()
-        self.orders_page.sleep_small()
-        # make sure that its the duplication page
+
         import ipdb;ipdb.set_trace()
+
         self.assertTrue('duplicateMainOrder' in self.base_selenium.get_url())
         after_duplicate_order = self.order_page.get_suborder_data()
         self.info('duplicated order no {}'.format(after_duplicate_order['orderNo']))
