@@ -194,6 +194,7 @@ class BasePages:
         self.wait_until_page_is_loaded()
 
     def get_archived_items(self):
+        self.sleep_tiny()
         self.base_selenium.scroll()
         self.base_selenium.click(element='general:right_menu')
         self.base_selenium.click(element='general:archived')

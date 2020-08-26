@@ -2415,3 +2415,24 @@ class OrdersTestCases(BaseTest):
         self.orders_page.filter_by_order_no(order_no)
         self.info('assert main order only displayed no duplicated rows for the suborders')
         self.assertFalse(self.order_page.check_suborders_appear())
+
+    def test071_archive_multiple_orders(self):
+        """
+        Orders: Archive Approach: Make sure that you can select multiple records
+        and then archive them at the same time
+
+        LIMS-5364
+        """
+        self.info("select multiple orders and archive them")
+        orders_data, rows = self.order_page.select_random_multiple_table_rows(element='orders:orders_table')
+        self.assertTrue(self.orders_page.archive_selected_orders(check_pop_up=True))
+        self.info("Navigate to archived orders table")
+        self.orders_page.get_archived_items()
+        for i in range(len(orders_data)):
+            order_no = orders_data[i]['Order No.']
+            self.info('Asserting order with order number {} is successfully archived'.format(order_no))
+            self.orders_page.filter_by_order_no(order_no)
+            results = self.order_page.result_table()
+            self.assertEqual(len(results), 2)
+            self.assertIn(order_no.replace("'", ""), results[0].text.replace("'", ""))
+

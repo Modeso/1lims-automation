@@ -27,10 +27,10 @@ class Orders(BasePages):
         self.base_selenium.scroll()
         self.base_selenium.click(element='orders:right_menu')
         self.base_selenium.click(element='orders:archive')
-        self.confirm_popup()
         if check_pop_up:
-            if self.base_selenium.wait_element(element='general:confirmation_pop_up'):
+            if not self.base_selenium.check_element_is_exist(element='general:confirmation_pop_up'):
                 return False
+        self.confirm_popup()
         return True
 
     def is_order_exist(self, value):
