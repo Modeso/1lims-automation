@@ -1299,6 +1299,7 @@ class OrdersTestCases(BaseTest):
         self.info('checking order no of each analysis')
         self.assertEqual(analysis_record['Order No.'], formated_order_no)
 
+    @skip("duplicate order set no to 2020.1")
     def test037_Duplicate_main_order_and_cahange_materiel_type(self):
         """
         duplicate the main order then change the materiel type
@@ -1536,6 +1537,7 @@ class OrdersTestCases(BaseTest):
         self.assertIn(duplicated_suborder_data['Test Units'], test_units)
         self.assertIn(duplicated_suborder_data['Test Plans'], test_plans)
 
+    @skip("duplicate order set no to 2020.1")
     def test044_duplicate_main_order_change_contact(self):
         """
         Duplicate from the main order Approach: Duplicate then change the contact
@@ -1558,6 +1560,7 @@ class OrdersTestCases(BaseTest):
         order = self.orders_page.get_the_latest_row_data()
         self.assertEqual(new_contact[0], order['Contact Name'])
 
+    @skip("duplicate order set no to 2020.1")
     def test045_duplicate_main_order_with_multiple_contacts(self):
         """
         Orders: Duplicate suborder: Multiple contacts Approach: : All contacts are correct in case
@@ -1739,6 +1742,7 @@ class OrdersTestCases(BaseTest):
         self.assertNotEqual(test_units, found_test_units)
 
     @parameterized.expand(['change', 'add'])
+    @skip("duplicate order set no to 2020.1")
     def test050_duplicate_main_order_with_testPlan_and_testUnit_edit_both(self, case):
         """
         Duplicate from the main order Approach: Duplicate then change the test units & test plans
@@ -1938,6 +1942,7 @@ class OrdersTestCases(BaseTest):
         test_date = "{}.{}.{}".format(result_test_date[0], result_test_date[1], result_test_date[2])
         self.assertEqual(first_test_date, test_date)
 
+    @skip("duplicated order set no to 2020.1")
     def test054_duplicate_main_order_with_testPlans_and_testUnits(self):
         """
         Duplicate main order Approach: duplicate order with test plan & test units
@@ -2154,6 +2159,7 @@ class OrdersTestCases(BaseTest):
             testunit_name, testplans_testunits_names_in_popup[0]['test_units'][0]))
         self.assertEqual(testunit_name, testplans_testunits_names_in_popup[0]['test_units'][0])
 
+    @skip("creat new order set no to 2020.1")
     def test062_create_order_with_multiple_contacts_then_add_department(self):
         """
         User should be able to choose more than one contact from drop down menu upon creating a new order
@@ -2413,7 +2419,7 @@ class OrdersTestCases(BaseTest):
             self.assertIn(order_no.replace("'", ""), results[0].text.replace("'", ""))
 
     @skip('new order no set to 2020.1')
-    def test072_Multiple_contacts_should_appear_in_active_table(self):
+    def test072_multiple_contacts_should_appear_in_active_table(self):
         """
         Multiple contacts should appear in active table
 
@@ -2462,6 +2468,7 @@ class OrdersTestCases(BaseTest):
         self.info('asserting the order with order number {} is created'.format(order_no))
         self.assertIn(order_no_with_year, results[0].text.replace("'", ""))
 
+    @skip('create order no always set to 1.2020')
     def test074_create_existing_order_change_contact(self):
         """
          Create existing order then change the contact for this existing one,
@@ -2645,6 +2652,7 @@ class OrdersTestCases(BaseTest):
         values = self.orders_page.get_suborder_options(table_records[0]).split('\n')
         self.assertEqual(values, ['Duplicate', 'CoA', 'Mail', 'Archive'])
 
+    @skip('duplicated order no always set to 1.2020')
     @parameterized.expand(["duplicate", "edit"])
     def test080_Duplicate_or_update_order_with_test_plan_only(self, case):
         """
@@ -2699,6 +2707,7 @@ class OrdersTestCases(BaseTest):
         analyses = self.analyses_page.get_the_latest_row_data()
         self.assertCountEqual([new_test_plan], analyses['Test Plans'].split(', '))
 
+    @skip('duplicated order no always set to 1.2020')
     @parameterized.expand(['main_order', 'sub_order'])
     def test066_Duplicate_order_and_cahange_article(self, case):
         """
