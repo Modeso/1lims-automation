@@ -2301,7 +2301,7 @@ class OrdersTestCases(BaseTest):
         """
         orders :Make sure that by clicking on Archive from Suborder options a confirmation popup will appear
         and user can Archive this suborder with its corresponding analysis
-        LIMS-6518
+        LIMS-5369
         """
         self.info('select random order')
         random_row = self.orders_page.get_random_table_row(table_element='general:table')
