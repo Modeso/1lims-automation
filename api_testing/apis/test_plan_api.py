@@ -111,6 +111,7 @@ class TestPlanAPIFactory(BaseAPI):
         using testunit id, select testunit form data through api call: test_unit_api.get_testunit_form_data(id=#testunit_id)
         and then use the return of this mapping function test_unit_page.map_testunit_to_testplan_format(testunit=formdata_testunit) to add it to the testunits array
         """
+        api = '{}{}'.format(self.url, self.END_POINTS['test_plan_api']['create_testplan'])
         testplan_name = self.generate_random_string()
         _payload = {
             'number': self.generate_random_number(),
@@ -134,8 +135,7 @@ class TestPlanAPIFactory(BaseAPI):
             'selectedTestUnits': [],
             'materialTypeId': [1],
             'dynamicFieldsValues': [],
-            'testUnits': [],
-            'testplan_name': []
+            'testUnits': []
         }
         payload = self.update_payload(_payload, **kwargs)
         if 'testPlan' in kwargs:
@@ -144,7 +144,6 @@ class TestPlanAPIFactory(BaseAPI):
             payload['materialType'] = kwargs['materialType']
             payload['materialTypeId'] = [kwargs['materialType'][0]['id']]
 
-        api = '{}{}'.format(self.url, self.END_POINTS['test_plan_api']['create_testplan'])
         return api, payload
 
     @api_factory('get')
@@ -229,6 +228,7 @@ class TestPlanAPI(TestPlanAPIFactory):
     def create_completed_testplan(self, material_type, formatted_article):
         material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
         formatted_material = {'id': material_type_id, 'text': material_type}
+
         test_unit = TestUnitAPI().get_test_unit_name_with_value_with_material_type(material_type)
         testunit_data = TestUnitAPI().get_testunit_form_data(id=test_unit['id'])[0]['testUnit']
         formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
@@ -279,10 +279,8 @@ class TestPlanAPI(TestPlanAPIFactory):
 
     def get_suborder_data_with_different_material_type(self, material_type):
         test_plans = self.get_completed_testplans(limit=1000)
-        # I need to make sure that material type not equal '47d56b4399' due to this open bug
-        # https://modeso.atlassian.net/browse/LIMS-7710
         test_plans_without_duplicate = [test_plan for test_plan in test_plans if test_plan['materialType']
-                                        not in [material_type, '47d56b4399']]
+                                        not in [material_type]]
         test_plan = random.choice(test_plans_without_duplicate)
         test_unit = self.get_testunits_in_testplan(test_plan['id'])[0]
 
@@ -301,21 +299,40 @@ class TestPlanAPI(TestPlanAPIFactory):
         testplan, payload = self.create_testplan(testUnits=[formated_testunit],
                                                  selectedArticles=[formatted_article],
                                                  materialType=[formatted_material])
-        if testplan['status'] == 1:
-            return (self.get_testplan_form_data(id=testplan['testPlanDetails']['id']))
+        if testplan['message'] == 'operation_success':
+            return self.get_testplan_form_data(id= payload['number'])
         else:
             self.info(testplan)
 
     def create_testplan_with_article_not_all(self):
         response, _ = GeneralUtilitiesAPI().list_all_material_types()
         formatted_material = random.choice(response['materialTypes'])
+
         formatted_article = ArticleAPI().get_formatted_article_with_formatted_material_type(formatted_material)
         testplan, payload = self.create_testplan(selectedArticles=[formatted_article],
                                                  materialType=[formatted_material])
-        if testplan['status'] == 1:
-            return (self.get_testplan_form_data(id=testplan['testPlanDetails']['id']))
+        if testplan['message'] == 'operation_success':
+            return (self.get_testplan_form_data(id=payload['number']))
         else:
-            self.info(testplan)
+            raise Exception(f'cant create the test plan with payload {payload}')
+
+    def create_completed_testplan_random_data(self):
+        random_article = random.choice(ArticleAPI().get_all_articles_json())
+        formatted_article = {'id': random_article['id'], 'text': random_article['name']}
+        material_type_id = GeneralUtilitiesAPI().get_material_id(random_article['materialType'])
+        formatted_material = {'id': material_type_id, 'text': random_article['materialType']}
+        # creates test unit with values in it
+        tu_response, _ = TestUnitAPI().create_quantitative_testunit(selectedMaterialTypes=[formatted_material])
+        testunit_data = TestUnitAPI().get_testunit_form_data(id=tu_response['testUnit']['testUnitId'])[0]['testUnit']
+        formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
+        testplan, payload = self.create_testplan(testUnits=[formated_testunit],
+                                                 selectedArticles=[formatted_article],
+                                                 materialType=[formatted_material],
+                                                 materialTypeId=[material_type_id])
+        if testplan['message'] == 'operation_success':
+            return testplan, payload
+        else:
+            return None
 
     def set_configuration(self):
         self.info('set test Plan configuration')
