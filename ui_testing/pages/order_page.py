@@ -474,6 +474,7 @@ class Order(Orders):
                 self.set_article(article=articles)
                 self.sleep_small()
             self.set_article(article=article)
+            self.confirm_popup(True)
             self.sleep_small()
 
         self.info(' Set test plan : {} for {} time(s)'.format(test_plans, len(test_plans)))
