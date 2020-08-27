@@ -1333,14 +1333,12 @@ class TestUnitsTestCases(BaseTest):
         self.assertEqual(response['status'], 1, 'test unit not created {}'.format(payload))
         self.test_unit_page.click_overview()
         self.test_units_page.sleep_tiny()
-        data = self.test_unit_page.filter_and_get_result(text=response['testUnit']['No'])
-
-        import ipdb; ipdb.set_trace()
+        self.test_unit_page.filter_and_get_result(text=response['testUnit']['No'])
         rows = self.base_selenium.get_table_rows('general:table')
         cells = self.base_selenium.get_row_cells_elements_related_to_header(rows[0])
         span = cells['Unit'].find_element_by_class_name('white-tooltip')
-        requirest_value = span.get_attribute('ng-reflect-ngb-tooltip')
-        
+        required_value = span.get_attribute('ng-reflect-ngb-tooltip')
+        self.assertEqual(payload['unit'],required_value)
 
 
 
