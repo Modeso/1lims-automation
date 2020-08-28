@@ -21,6 +21,8 @@ class Orders(BasePages):
     def click_create_order_button(self):
         self.info('Press create order button')
         self.base_selenium.click(element='orders:new_order')
+        self.sleep_tiny()
+        self.base_selenium.refresh()
         self.wait_until_page_is_loaded()
 
     def archive_selected_orders(self, check_pop_up=False):

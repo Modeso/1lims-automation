@@ -258,7 +258,6 @@ class OrdersTestCases(BaseTest):
             self.assertEqual(row_data[column].replace("'", '').split(',')[0],
                              search_data[column].replace("'", '').split(',')[0])
 
-    @skip('duplicated order no always set to 1.2020')
     def test008_duplicate_main_order(self):
         """
         New: Orders with test units: Duplicate an order with test unit 1 copy
@@ -275,7 +274,6 @@ class OrdersTestCases(BaseTest):
         self.order_page.duplicate_main_order_from_table_overview()
         self.orders_page.sleep_small()
         # make sure that its the duplication page
-        import ipdb;ipdb.set_trace()
         self.assertTrue('duplicateMainOrder' in self.base_selenium.get_url())
         after_duplicate_order = self.order_page.get_suborder_data()
         self.info('duplicated order no {}'.format(after_duplicate_order['orderNo']))
@@ -966,7 +964,7 @@ class OrdersTestCases(BaseTest):
         """
         self.test_plan_api = TestPlanAPI()
         self.info('create new order')
-        response, order_payload = self.orders_api.create_new_order(materialTypeId=2)
+        response, order_payload = self.orders_api.create_new_order()
         self.assertEqual(response['status'], 1, order_payload)
         self.info('get random completed test plan with different material type')
         test_plan = \
@@ -1289,8 +1287,8 @@ class OrdersTestCases(BaseTest):
         self.order_page.sleep_small()
         self.order_page.save_and_wait(save_btn='order:save_btn')
         order_no_after_update = self.order_page.get_no()
-        self.info('order no is {}, and it should be {}'.format(order_no_after_update, formated_order_no ))
-        self.assertEqual(order_no_after_update.replace("'", ""), formated_order_no )
+        self.info('order no is {}, and it should be {}'.format(order_no_after_update, formated_order_no))
+        self.assertEqual(order_no_after_update.replace("'", ""), formated_order_no)
         self.info('navigate to analysis tab to make sure that order no updated correctly')
         self.orders_page.get_orders_page()
         self.orders_page.navigate_to_analysis_active_table()
@@ -1299,14 +1297,13 @@ class OrdersTestCases(BaseTest):
         self.info('checking order no of each analysis')
         self.assertEqual(analysis_record['Order No.'], formated_order_no)
 
-    @skip("duplicate order set no to 2020.1")
     def test037_Duplicate_main_order_and_cahange_materiel_type(self):
         """
         duplicate the main order then change the materiel type
         LIMS-6219
         """
         self.info('get random main order data')
-        orders, payload = self.orders_api.create_new_order(materialTypeId=2)
+        orders, payload = self.orders_api.create_new_order()
         self.order_page.search(payload[0]['orderNo'])
         self.info('duplicate the main order')
         self.order_page.duplicate_main_order_from_order_option()
@@ -1414,7 +1411,7 @@ class OrdersTestCases(BaseTest):
         LIMS-6227
         """
         self.info('get random main order data')
-        orders, payload = self.orders_api.create_new_order(materialTypeId=2)
+        orders, payload = self.orders_api.create_new_order()
         self.order_page.search(payload[0]['orderNo'])
         self.order_page.get_child_table_data()
         self.info("duplicate the sub order of order {} from suborder's options".format(payload[0]['orderNo']))
@@ -1537,7 +1534,6 @@ class OrdersTestCases(BaseTest):
         self.assertIn(duplicated_suborder_data['Test Units'], test_units)
         self.assertIn(duplicated_suborder_data['Test Plans'], test_plans)
 
-    @skip("duplicate order set no to 2020.1")
     def test044_duplicate_main_order_change_contact(self):
         """
         Duplicate from the main order Approach: Duplicate then change the contact
@@ -1560,7 +1556,6 @@ class OrdersTestCases(BaseTest):
         order = self.orders_page.get_the_latest_row_data()
         self.assertEqual(new_contact[0], order['Contact Name'])
 
-    @skip("duplicate order set no to 2020.1")
     def test045_duplicate_main_order_with_multiple_contacts(self):
         """
         Orders: Duplicate suborder: Multiple contacts Approach: : All contacts are correct in case
@@ -1742,7 +1737,6 @@ class OrdersTestCases(BaseTest):
         self.assertNotEqual(test_units, found_test_units)
 
     @parameterized.expand(['change', 'add'])
-    @skip("duplicate order set no to 2020.1")
     def test050_duplicate_main_order_with_testPlan_and_testUnit_edit_both(self, case):
         """
         Duplicate from the main order Approach: Duplicate then change the test units & test plans
@@ -1942,7 +1936,6 @@ class OrdersTestCases(BaseTest):
         test_date = "{}.{}.{}".format(result_test_date[0], result_test_date[1], result_test_date[2])
         self.assertEqual(first_test_date, test_date)
 
-    @skip("duplicated order set no to 2020.1")
     def test054_duplicate_main_order_with_testPlans_and_testUnits(self):
         """
         Duplicate main order Approach: duplicate order with test plan & test units
@@ -1982,6 +1975,7 @@ class OrdersTestCases(BaseTest):
         """
         Orders: Table with add: In case I have two suborders and I update the first one
         then press on the second one the first one should updated according to that
+
         LIMS-5204
         """
         self.info("create new test unit edit the suborder by it ( because the test unit name is not a unique ")
@@ -2106,7 +2100,7 @@ class OrdersTestCases(BaseTest):
         testplan = \
             TestPlanAPI().get_completed_testplans_with_material_and_same_article(material_type='Raw Material',
                                                                                       article='', articleNo='')[0]
-        order, payload = self.orders_api.create_new_order(materialTypeId=1)
+        order, payload = self.orders_api.create_new_order()
         self.info('open the order record in the edit mode')
         self.orders_page.get_order_edit_page_by_id(id=order['order']['mainOrderId'])
         self.info('go to update the test plan by adding the completed one')
@@ -2139,7 +2133,7 @@ class OrdersTestCases(BaseTest):
         testplan = \
             TestPlanAPI().get_completed_testplans_with_material_and_same_article(material_type='Raw Material',
                                                                                       article='', articleNo='')[0]
-        order, payload = self.orders_api.create_new_order(materialTypeId=1)
+        order, payload = self.orders_api.create_new_order()
         self.info('open the order record in the edit mode')
         self.orders_page.get_order_edit_page_by_id(id=order['order']['mainOrderId'])
         self.info('go to update the test plan by adding the completed one')
@@ -2159,7 +2153,6 @@ class OrdersTestCases(BaseTest):
             testunit_name, testplans_testunits_names_in_popup[0]['test_units'][0]))
         self.assertEqual(testunit_name, testplans_testunits_names_in_popup[0]['test_units'][0])
 
-    @skip("creat new order set no to 2020.1")
     def test062_create_order_with_multiple_contacts_then_add_department(self):
         """
         User should be able to choose more than one contact from drop down menu upon creating a new order
@@ -2418,7 +2411,6 @@ class OrdersTestCases(BaseTest):
             self.assertEqual(len(results), 2)
             self.assertIn(order_no.replace("'", ""), results[0].text.replace("'", ""))
 
-    @skip('new order no set to 2020.1')
     def test072_multiple_contacts_should_appear_in_active_table(self):
         """
         Multiple contacts should appear in active table
@@ -2429,7 +2421,6 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(response1['status'], 1)
         response2, contact2 = self.contacts_api.create_contact()
         self.assertEqual(response2['status'], 1)
-        import ipdb;ipdb.set_trace()
         order_no = self.order_page.create_multiple_contacts_new_order(contacts=[contact1['name'], contact2['name']])
         self.order_page.save(save_btn='order:save_btn')
         self.orders_page.get_orders_page()
@@ -2468,7 +2459,6 @@ class OrdersTestCases(BaseTest):
         self.info('asserting the order with order number {} is created'.format(order_no))
         self.assertIn(order_no_with_year, results[0].text.replace("'", ""))
 
-    @skip('create order no always set to 1.2020')
     def test074_create_existing_order_change_contact(self):
         """
          Create existing order then change the contact for this existing one,
@@ -2501,7 +2491,6 @@ class OrdersTestCases(BaseTest):
             self.assertEqual(new_contact, results['Contact Name'])
 
     @attr(series=True)
-    @skip('new order no set to 2020.1')
     def test075_enter_long_method_should_be_in_multiple_lines_in_order_form(self):
         """
         In case you select the method to display and you entered long text in it,
@@ -2652,7 +2641,6 @@ class OrdersTestCases(BaseTest):
         values = self.orders_page.get_suborder_options(table_records[0]).split('\n')
         self.assertEqual(values, ['Duplicate', 'CoA', 'Mail', 'Archive'])
 
-    @skip('duplicated order no always set to 1.2020')
     @parameterized.expand(["duplicate", "edit"])
     def test080_Duplicate_or_update_order_with_test_plan_only(self, case):
         """
@@ -2707,9 +2695,8 @@ class OrdersTestCases(BaseTest):
         analyses = self.analyses_page.get_the_latest_row_data()
         self.assertCountEqual([new_test_plan], analyses['Test Plans'].split(', '))
 
-    @skip('duplicated order no always set to 1.2020')
     @parameterized.expand(['main_order', 'sub_order'])
-    def test066_Duplicate_order_and_cahange_article(self, case):
+    def test081_Duplicate_order_and_cahange_article(self, case):
         """
         Duplicate from the main order Approach: Duplicate then change the article
 
@@ -2754,5 +2741,4 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(duplicated_order_data['Test Plans'], '-')
         self.assertEqual(duplicated_order_data['Article Name'].replace(" ", ""), article['name'].replace(" ", ""))
         self.assertEqual(duplicated_order_data['Test Units'], test_unit_before_duplicate)
-
-
+        self.base_selenium.find_element_in_element()
