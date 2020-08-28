@@ -2306,5 +2306,6 @@ class OrdersTestCases(BaseTest):
         order_data=self.orders_page.get_random_order()
         order_no=self.order_page.get_no(order_row=order_data)
         self.assertEqual(order_no,order_data['Order No.'])
+        self.assertTrue(self.base_selenium.wait_element(element='orders:edit order header'))
 
 
