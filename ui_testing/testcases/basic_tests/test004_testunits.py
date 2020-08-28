@@ -1333,7 +1333,7 @@ class TestUnitsTestCases(BaseTest):
         self.assertEqual(response['status'], 1, 'test unit not created {}'.format(payload))
         self.test_unit_page.click_overview()
         self.test_units_page.sleep_tiny()
-        self.test_unit_page.filter_and_get_result(text=response['testUnit']['No'])
+        self.test_unit_page.apply_filter_scenario(filter_element='test_units:testunit_number_filter',filter_text=payload['number'], field_type='text')
         rows = self.base_selenium.get_table_rows('general:table')
         cells = self.base_selenium.get_row_cells_elements_related_to_header(rows[0])
         span = cells['Unit'].find_element_by_class_name('white-tooltip')
