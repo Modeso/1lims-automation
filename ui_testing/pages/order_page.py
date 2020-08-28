@@ -131,7 +131,6 @@ class Order(Orders):
         if with_testplan:
             for test_plan in test_plans:
                 self.set_test_plan(test_plan=test_plan)
-
         for test_unit in test_units:
             self.set_test_unit(test_unit=test_unit)
         self.sleep_small()
