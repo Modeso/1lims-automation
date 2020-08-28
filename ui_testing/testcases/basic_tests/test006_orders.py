@@ -2304,22 +2304,18 @@ class OrdersTestCases(BaseTest):
 
         LIMS-4249
         """
-        response, payload = self.orders_api.create_new_order()
+        response, payload = self.test_unit_api.get_all_test_units()
+        random_testunit = random.choice(response['testUnits'])
+        testunit_name = random_testunit['name']
+        material_type = random_testunit['materialTypes'][0]
+        if material_type == "All":
+            material_type = ''
+        self.order_page.create_new_order(material_type=material_type,test_units=[testunit_name],multiple_suborders=5,
+                                         with_testplan=False)
+        order_id = self.order_page.get_order_id()
+        suborders= self.orders_api.get_suborder_by_order_id(id=order_id)
         self.info('Asserting api success')
-        self.assertEqual(response['status'], 1)
-        order_id = response['order']['mainOrderId']
-        order_no = payload[0]['orderNo']
-        testunit_name = payload[0]['selectedTestUnits'][0]['name']
-        material_type = payload[0]['materialType']['text']
-        self.order_page.get_order_edit_page_by_id(id=order_id)
-        self.order_page.sleep_tiny()
-        for i in range(5):
-            suborders = self.order_page.create_new_suborder(material_type=material_type, test_unit=testunit_name,
-                                                            article_name=' ', with_testplan=False)
-
-        self.order_page.save(save_btn='order:save_btn')
-
-        suborders = self.orders_api.get_suborder_by_order_id(id=order_id)
+        self.assertEqual(suborders[0]['status'], 1)
         analysis_numbers = [suborder['analysis'][0] for suborder in suborders[0]['orders']]
         self.info('Asserting there are 5 suborders analysis triggered')
         self.assertEqual(len(analysis_numbers), 6)
