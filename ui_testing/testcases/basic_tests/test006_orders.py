@@ -825,8 +825,8 @@ class OrdersTestCases(BaseTest):
                   'I enter number already exists? {}'.format(validation_result1))
         self.assertTrue(validation_result2)
 
-    @attr(series=True)
     @parameterized.expand(['new', 'existing'])
+    @attr(series=True)
     def test026_create_order_with_test_units(self, order):
         """
         New: Orders: Create a new order with test units
@@ -2646,8 +2646,8 @@ class OrdersTestCases(BaseTest):
         values = self.orders_page.get_suborder_options(table_records[0]).split('\n')
         self.assertEqual(values, ['Duplicate', 'CoA', 'Mail', 'Archive'])
 
-    @attr(series=True)
     @parameterized.expand(["duplicate", "edit"])
+    @attr(series=True)
     def test080_Duplicate_or_update_order_with_test_plan_only(self, case):
         """
         Duplicate main order Approach: duplicate order with test plan
