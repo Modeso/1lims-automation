@@ -135,7 +135,6 @@ class Order(Orders):
         for test_unit in test_units:
             self.set_test_unit(test_unit=test_unit)
         self.sleep_small()
-
         if multiple_suborders > 0:
             self.duplicate_from_table_view(number_of_duplicates=multiple_suborders)
 
