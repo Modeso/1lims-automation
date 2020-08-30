@@ -130,8 +130,10 @@ class Orders(BasePages):
     def get_random_order_row(self):
         return self.get_random_table_row(table_element='orders:orders_table')
 
-    def filter_by_order_no(self, filter_text):
+    def filter_by_order_no(self, filter_text, reset=False):
         self.open_filter_menu()
+        if reset:
+            self.filter_reset()
         self.info('Filter by order no. : {}'.format(filter_text))
         self.filter_by(filter_element='orders:order_filter', filter_text=filter_text, field_type='text')
         self.filter_apply()
@@ -203,7 +205,7 @@ class Orders(BasePages):
     def archive_table_suborder(self, index=0):
         self.info('archive suborder from the order\'s active table')
         child_table_records = self.result_table(element='general:table_child')
-        self.open_row_options(row=child_table_records[0])
+        self.open_row_options(row=child_table_records[index])
         self.base_selenium.click('orders:suborder_archive')
         self.confirm_popup()
         self.sleep_small()

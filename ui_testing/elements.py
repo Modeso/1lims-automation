@@ -545,6 +545,8 @@ elements = {
         'orders_edit_button': {'method': 'tag_name',
                                'value': 'a',
                                'order': 4},
+        'edit order header': {'method': 'xpath',
+                              'value': '//span[contains(text(),"Edit Order")]'},
         'analysis_order_tab': {'method': 'xpath',
                                'value': '//span[contains(text(),"Analysis")]'},
         'order_analysis_tab': {'method': 'xpath',
@@ -656,12 +658,13 @@ elements = {
         'test_unit_btn': {'method': 'tag_name',
                           'value': 'span',
                           'order': 1},
-
         'save_btn': {'method': 'id',
                      'value': 'button_save_order'},
-
         'no': {'method': 'id',
                'value': 'orderNoWithYearfield'},
+        'error_in_number_mssg': {'method': 'xpath',
+                    'value': '//span[@class="m-form__help"]',
+                    'order': 0},
 
         'cancel_btn': {'method': 'id',
                        'value': 'button_cancel_order'},

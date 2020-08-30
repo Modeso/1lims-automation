@@ -120,7 +120,7 @@ class Order(Orders):
             return []
 
     def create_new_order(self, material_type='', article='', contact='', test_plans=[''], test_units=[''],
-                         multiple_suborders=0, departments='', order_no='', save=True):
+                         multiple_suborders=0, departments='', order_no='', save=True, with_testplan=True):
         self.info(' Create new order.')
         self.click_create_order_button()
         self.sleep_small()
@@ -138,15 +138,15 @@ class Order(Orders):
 
         order_no = self.get_no()
 
-        for test_plan in test_plans:
-            self.set_test_plan(test_plan=test_plan)
+        if with_testplan:
+            for test_plan in test_plans:
+                self.set_test_plan(test_plan=test_plan)
 
         for test_unit in test_units:
             self.set_test_unit(test_unit=test_unit)
             self.sleep_small()
         
         if multiple_suborders > 0:
-            self.get_suborder_table()
             self.duplicate_from_table_view(number_of_duplicates=multiple_suborders)
 
         if save:
@@ -377,14 +377,14 @@ class Order(Orders):
         return self.get_suborder_data()
 
     def duplicate_from_table_view(self, number_of_duplicates=1, index_to_duplicate_from=0):
-        suborders = self.base_selenium.get_table_rows(element='order:suborder_table')
-        suborders_elements = self.base_selenium.get_row_cells_elements_related_to_header(
-            row=suborders[index_to_duplicate_from],
-            table_element='order:suborder_table')
-
-        duplicate_element = self.base_selenium.find_element_in_element(source=suborders_elements['Options'],
-                                                                       destination_element='order:duplicate_table_view')
         for duplicate in range(0, number_of_duplicates):
+            suborders = self.base_selenium.get_table_rows(element='order:suborder_table')
+            suborders_elements = self.base_selenium.get_row_cells_elements_related_to_header(
+                row=suborders[index_to_duplicate_from],
+                table_element='order:suborder_table')
+
+            duplicate_element = self.base_selenium.find_element_in_element(
+                source=suborders_elements['Options'], destination_element='order:duplicate_table_view')
             duplicate_element.click()
 
     def duplicate_suborder(self):

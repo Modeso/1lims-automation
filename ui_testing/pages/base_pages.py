@@ -289,6 +289,11 @@ class BasePages:
         childtable_arrow.click()
         self.sleep_medium()
 
+    def close_child_table(self, source):
+        childtable_arrow = self.base_selenium.find_element_in_element(
+            destination_element='general:child_table_arrow', source=source)
+        childtable_arrow.click()
+
     def get_child_table_data(self, index=0, open_child=True):
         rows = self.result_table()
         if open_child:
