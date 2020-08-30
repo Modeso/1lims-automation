@@ -47,7 +47,7 @@ class OrdersTestCases(BaseTest):
         """
         orders, payload = self.orders_api.get_all_orders(limit=40)
         self.info('create testplan with random data')
-        testPlan = TestPlanAPI().create_completed_testplan_random_data(no_testplans=7)
+        testPlan = TestPlanAPI().create_completed_testplan_random_data(no_testunits=7)
         self.info('get random order')
         random_order = random.choice(orders['orders'])
         self.orders_page.get_order_edit_page_by_id(random_order['id'])
