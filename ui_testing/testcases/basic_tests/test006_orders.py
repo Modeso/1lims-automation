@@ -39,6 +39,10 @@ class OrdersTestCases(BaseTest):
         self.orders_api.set_configuration()
 
     def test068_choose_test_plans_without_test_units(self):
+        """
+        Orders: Create: Orders Choose test plans without test units
+        LIMS-4350
+        """
         self.info(' Create new order.')
         self.order_page.click_create_order_button()
         self.order_page.set_new_order()
@@ -47,19 +51,36 @@ class OrdersTestCases(BaseTest):
         self.order_page.set_material_type(material_type='Raw Material')
         self.order_page.sleep_small()
         order_no = self.order_page.get_no()
+        self.info('create multiple testplan with same article of each suborder')
         tst_plan1, tst_plan2, article1 = TestPlanAPI().create_multiple_test_plan_with_same_article()
+        tst_plan3, tst_plan4, article2 = TestPlanAPI().create_multiple_test_plan_with_same_article()
+        tst_plan5, tst_plan6, article3 = TestPlanAPI().create_multiple_test_plan_with_same_article()
         self.order_page.set_article(article=article1)
         self.order_page.sleep_small()
         self.order_page.set_test_plan(test_plan=tst_plan1)
         self.order_page.set_test_plan(test_plan=tst_plan2)
-        tst_plan3, tst_plan4, article2 = TestPlanAPI().create_multiple_test_plan_with_same_article()
+        self.info('create 3 suborder')
         self.order_page.create_new_suborder(material_type='Raw Material', test_plans=[tst_plan3, tst_plan4],
-                                            article_name=article2)
-        tst_plan5, tst_plan6, article3 = TestPlanAPI().create_multiple_test_plan_with_same_article()
+                                            article_name=article2,add_tstunit=False)
         self.order_page.create_new_suborder(material_type='Raw Material', test_plans=[tst_plan5, tst_plan6],
-                                            article_name=article3)
+                                            article_name=article3,add_tstunit=False)
+
         self.order_page.save(save_btn='order:save_btn')
-#
+        order_id = self.order_page.get_order_id()
+        suborders_data,_ = self.orders_api.get_suborder_by_order_id(order_id)
+        suborders = suborders_data['orders']
+        analysis_no = []
+        for suborder in suborders:
+            self.assertEqual(len(suborder['analysis']),1)
+            analysis_no.append(suborder['analysis'][0])
+        self.assertEqual(3,len(analysis_no))
+        self.info('assert the 3 analysis numbers are triggered ')
+        self.assertNotEqual(analysis_no[0],analysis_no[1])
+        self.assertNotEqual(analysis_no[0],analysis_no[2])
+        self.assertNotEqual(analysis_no[1],analysis_no[2])
+
+
+
 #     @parameterized.expand(['save_btn', 'cancel'])
 #     def test001_edit_order_number_with_save_cancel_btn(self, save):
 #         """
