@@ -46,13 +46,13 @@ class OrdersTestCases(BaseTest):
 
         """
         orders, payload = self.orders_api.get_all_orders(limit=40)
+        self.info('create testplan with random data')
+        testPlan = TestPlanAPI().create_completed_testplan_random_data(no_testplans=7)
         self.info('get random order')
         random_order = random.choice(orders['orders'])
         self.orders_page.get_order_edit_page_by_id(random_order['id'])
-        self.info('create testplan with random data')
-        payload = TestPlanAPI().create_completed_testplan_random_data(no_testplans=7)
         testunit_names = []
-        for testunit in payload['testUnits']:
+        for testunit in testPlan['testUnits']:
             testunit_names.append(testunit['name'])
         self.info('update first suborder')
         self.order_page.update_suborder(sub_order_index=0, material_type=payload['materialType'][0]['text'],
