@@ -315,3 +315,4 @@ class Orders(BasePages):
         self.open_row_options(row)
         options = self.base_selenium.get_text(element='general:menu_options_value')
         return options
+

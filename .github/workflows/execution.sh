@@ -1,15 +1,7 @@
 #!/bin/bash
 
 EXECUTION_FILES=(
-    ui_testing/testcases/basic_tests/test002_articles.py
-    ui_testing/testcases/basic_tests/test003_testplans.py
-    ui_testing/testcases/basic_tests/test004_testunits.py
-    ui_testing/testcases/basic_tests/test005_contacts.py
-    ui_testing/testcases/header_tests/test007_audit_trail.py
-    ui_testing/testcases/header_tests/test008_company_profile.py
-    ui_testing/testcases/header_tests/test009_usermanagement.py
-    ui_testing/testcases/header_tests/test010_my_profile.py
-    ui_testing/testcases/header_tests/test011_rolesandpermissions.py
+    ui_testing/testcases/basic_tests/test006_orders.py
   )
 
 TEST_REG='test070'
@@ -24,8 +16,8 @@ WORK_DIR=$6;
 ATTR=$7;
 UUID=$8;
 
-echo 'NODE_TOTAL: ' $NODE_INDEX;
-echo 'NODE_INDEX: ' $NODE_TOTAL;
+echo 'NODE_TOTAL: ' $NODE_TOTAL;
+echo 'NODE_INDEX: ' $NODE_INDEX;
 echo 'TEST_REG: ' $TEST_REG;
 echo 'RUN_REF: ' $RUN_REF;
 echo 'RUN_ID: ' $RUN_ID;
