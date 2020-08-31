@@ -315,7 +315,8 @@ class TestPlanAPI(TestPlanAPIFactory):
         else:
             raise Exception(f'cant create the test plan with payload {payload}')
 
-    def create_completed_testplan_random_data(self):
+    def create_random_data_for_testplan(self):
+
         random_article = random.choice(ArticleAPI().get_all_articles_json())
         formatted_article = {'id': random_article['id'], 'text': random_article['name']}
         material_type_id = GeneralUtilitiesAPI().get_material_id(random_article['materialType'])
@@ -324,6 +325,12 @@ class TestPlanAPI(TestPlanAPIFactory):
         tu_response, _ = TestUnitAPI().create_quantitative_testunit(selectedMaterialTypes=[formatted_material])
         testunit_data = TestUnitAPI().get_testunit_form_data(id=tu_response['testUnit']['testUnitId'])[0]['testUnit']
         formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
+        return formated_testunit,formatted_article,formatted_material,material_type_id
+
+    def create_completed_testplan_random_data(self,formated_testunit='', formatted_article='', formatted_material='',material_type_id=''):
+        if formated_testunit=='' and formatted_article=='' and formatted_material=='' and material_type_id=='':
+            formated_testunit, formatted_article, formatted_material, material_type_id = self.create_completed_testplan_random_data()
+
         testplan, payload = self.create_testplan(testUnits=[formated_testunit],
                                                  selectedArticles=[formatted_article],
                                                  materialType=[formatted_material],

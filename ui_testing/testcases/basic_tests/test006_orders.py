@@ -1,43 +1,43 @@
-# import re
-# from unittest import skip
-# from parameterized import parameterized
-# from ui_testing.testcases.base_test import BaseTest
-# from ui_testing.pages.order_page import Order
-# from ui_testing.pages.orders_page import Orders
-# from api_testing.apis.orders_api import OrdersAPI
-# from ui_testing.pages.analysis_page import AllAnalysesPage
-# from api_testing.apis.article_api import ArticleAPI
-# from api_testing.apis.test_unit_api import TestUnitAPI
-# from ui_testing.pages.analysis_page import SingleAnalysisPage
-# from api_testing.apis.contacts_api import ContactsAPI
-# from api_testing.apis.test_plan_api import TestPlanAPI
-# from ui_testing.pages.testplan_page import TstPlan
-# from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
-# from ui_testing.pages.contacts_page import Contacts
-# from random import randint
-# import random
-#
-#
-# class OrdersTestCases(BaseTest):
-#     def setUp(self):
-#         super().setUp()
-#         self.order_page = Order()
-#         self.orders_api = OrdersAPI()
-#         self.testplan_page = TstPlan()
-#         self.orders_page = Orders()
-#         self.analyses_page = AllAnalysesPage()
-#         self.article_api = ArticleAPI()
-#         self.test_unit_api = TestUnitAPI()
-#         self.contacts_api = ContactsAPI()
-#         self.single_analysis_page = SingleAnalysisPage()
-#         self.test_plan_api = TestPlanAPI()
-#         self.contacts_api = ContactsAPI()
-#         self.general_utilities_api = GeneralUtilitiesAPI()
-#         self.contacts_page = Contacts()
-#         self.set_authorization(auth=self.contacts_api.AUTHORIZATION_RESPONSE)
-#         self.order_page.get_orders_page()
-#         self.orders_api.set_configuration()
-#
+import re
+from unittest import skip
+from parameterized import parameterized
+from ui_testing.testcases.base_test import BaseTest
+from ui_testing.pages.order_page import Order
+from ui_testing.pages.orders_page import Orders
+from api_testing.apis.orders_api import OrdersAPI
+from ui_testing.pages.analysis_page import AllAnalysesPage
+from api_testing.apis.article_api import ArticleAPI
+from api_testing.apis.test_unit_api import TestUnitAPI
+from ui_testing.pages.analysis_page import SingleAnalysisPage
+from api_testing.apis.contacts_api import ContactsAPI
+from api_testing.apis.test_plan_api import TestPlanAPI
+from ui_testing.pages.testplan_page import TstPlan
+from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
+from ui_testing.pages.contacts_page import Contacts
+from random import randint
+import random
+
+
+class OrdersTestCases(BaseTest):
+    def setUp(self):
+        super().setUp()
+        self.order_page = Order()
+        self.orders_api = OrdersAPI()
+        self.testplan_page = TstPlan()
+        self.orders_page = Orders()
+        self.analyses_page = AllAnalysesPage()
+        self.article_api = ArticleAPI()
+        self.test_unit_api = TestUnitAPI()
+        self.contacts_api = ContactsAPI()
+        self.single_analysis_page = SingleAnalysisPage()
+        self.test_plan_api = TestPlanAPI()
+        self.contacts_api = ContactsAPI()
+        self.general_utilities_api = GeneralUtilitiesAPI()
+        self.contacts_page = Contacts()
+        self.set_authorization(auth=self.contacts_api.AUTHORIZATION_RESPONSE)
+        self.order_page.get_orders_page()
+        self.orders_api.set_configuration()
+
 #     @parameterized.expand(['save_btn', 'cancel'])
 #     def test001_edit_order_number_with_save_cancel_btn(self, save):
 #         """
@@ -2296,3 +2296,63 @@
 #                                   f"{str(fixed_sheet_row_data)} : {str(formatted_orders[index])}")
 #             for item in formatted_orders[index]:
 #                 self.assertIn(item, fixed_sheet_row_data)
+
+    def test072_same_testunits_in_different_testplans(self):
+        formated_testunit, formatted_article, formatted_material, material_type_id =self.test_plan_api.create_random_data_for_testplan()
+        testplan1=self.test_plan_api.create_completed_testplan_random_data(formated_testunit=formated_testunit,formatted_material=formatted_material,formatted_article=formatted_article,material_type_id=material_type_id)
+        testplan1_name=testplan1['testPlan']['text']
+        testplan2=self.test_plan_api.create_completed_testplan_random_data(formated_testunit=formated_testunit,formatted_material=formatted_material,formatted_article=formatted_article,material_type_id=material_type_id)
+        testplan2_name = testplan2['testPlan']['text']
+        testplans = testplan1_name + ', ' + testplan2_name
+        self.order_page.create_new_order(material_type=formatted_material['text'],article=formatted_article['text'],test_plans=[testplan1_name,testplan2_name],with_testunits=False)
+        self.order_page.sleep_tiny()
+        order_id = self.order_page.get_order_id()
+        suborders = self.orders_api.get_suborder_by_order_id(id=order_id)
+        self.info('Asserting api success')
+        self.assertEqual(suborders[0]['status'], 1)
+        analysis_number = [suborder['analysis'][0] for suborder in suborders[0]['orders']]
+        self.info('Asserting there is only one analysis for this order')
+        self.assertEqual(len(analysis_number), 1)
+        self.info('checking testunit for each suborder ')
+        self.order_page.get_orders_page()
+        self.order_page.navigate_to_analysis_tab()
+        self.analyses_page.apply_filter_scenario(filter_element='analysis_page:analysis_no_filter', filter_text=analysis_number, field_type='text')
+        status=self.analyses_page.get_the_latest_row_data()['Status']
+        self.info('Asserting status of analysis is open')
+        self.assertEqual(status,'Open')
+        self.info('Asserting correct testplans selected')
+        self.assertEqual(self.analyses_page.get_the_latest_row_data()['Test Plans'], testplans)
+        analysis_data = self.analyses_page.get_child_table_data(index=0)
+        self.info('Asserting 2 child records; one for each test plan')
+        self.assertEqual(len(analysis_data),2)
+        self.orders_page.open_child_table(source=self.analyses_page.result_table()[0])
+        for i in range(2):
+           self.info('asserting testunit for testplan {} is {} = selected testunit {}'
+                       .format(i+1,analysis_data[i]['Test Unit'], formated_testunit['name']))
+           self.assertEqual(analysis_data[i]['Test Unit'], formated_testunit['name'])
+
+        # --EDITING part DELETE A TEST PLAN
+
+        #self.orders_page.get_order_edit_page_by_id('266')
+        self.orders_page.get_order_edit_page_by_id(order_id)
+        self.info('Delete one of the testplans from the order - delete the first testplan ')
+        self.order_page.sleep_tiny()
+        self.info('click on first row and update it')
+        self.order_page.open_suborder_edit()
+        import ipdb; ipdb.set_trace()
+        #remove first testplan and set to second one only
+        self.order_page.update_test_plan(testplans=testplan2_name)
+        self.order_page.get_orders_page()
+        self.order_page.navigate_to_analysis_tab()
+        self.analyses_page.apply_filter_scenario(filter_element='analysis_page:analysis_no_filter',
+                                                 filter_text=analysis_number, field_type='text')
+        self.info('Asserting correct testplans selected')
+        self.assertEqual(self.analyses_page.get_the_latest_row_data()['Test Plans'], testplan2_name)
+        analysis_data = self.analyses_page.get_child_table_data(index=0)
+        self.info('Asserting only 1 child record; as only one test plan is now selected')
+        self.assertEqual(len(analysis_data), 1)
+        self.orders_page.open_child_table(source=self.analyses_page.result_table()[0])
+        self.info('asserting testunit for testplan2 is {} = selected testunit {}'
+                      .format(analysis_data[0]['Test Unit'], formated_testunit['name']))
+        self.assertEqual(analysis_data[0]['Test Unit'], formated_testunit['name'])
+

@@ -116,7 +116,7 @@ class Order(Orders):
             return []
 
     def create_new_order(self, material_type='', article='', contact='', test_plans=[''], test_units=[''],
-                         multiple_suborders=0, departments=''):
+                         multiple_suborders=0, departments='',with_testunits=True):
         self.info(' Create new order.')
         self.click_create_order_button()
         self.set_new_order()
@@ -131,16 +131,18 @@ class Order(Orders):
 
         for test_plan in test_plans:
             self.set_test_plan(test_plan=test_plan)
-        for test_unit in test_units:
-            self.set_test_unit(test_unit=test_unit)
-        self.sleep_small()
-        
+        if with_testunits:
+            for test_unit in test_units:
+                self.set_test_unit(test_unit=test_unit)
+            self.sleep_small()
+
         if multiple_suborders > 0:
             self.get_suborder_table()
             self.duplicate_from_table_view(number_of_duplicates=multiple_suborders)
 
         self.save(save_btn='order:save_btn')
         self.info(' Order created with no : {} '.format(order_no))
+
 
     def create_multiple_contacts_new_order(self, contacts):
         self.click_create_order_button()
@@ -354,14 +356,13 @@ class Order(Orders):
         return self.get_suborder_data()
 
     def duplicate_from_table_view(self, number_of_duplicates=1, index_to_duplicate_from=0):
-        suborders = self.base_selenium.get_table_rows(element='order:suborder_table')
-        suborders_elements = self.base_selenium.get_row_cells_elements_related_to_header(
-            row=suborders[index_to_duplicate_from],
-            table_element='order:suborder_table')
-
-        duplicate_element = self.base_selenium.find_element_in_element(source=suborders_elements['Options'],
-                                                                       destination_element='order:duplicate_table_view')
         for duplicate in range(0, number_of_duplicates):
+            suborders = self.base_selenium.get_table_rows(element='order:suborder_table')
+            suborders_elements = self.base_selenium.get_row_cells_elements_related_to_header(
+                row=suborders[index_to_duplicate_from],
+                table_element='order:suborder_table')
+            duplicate_element = self.base_selenium.find_element_in_element(source=suborders_elements['Options'],
+                                                                           destination_element='order:duplicate_table_view')
             duplicate_element.click()
 
     def duplicate_suborder(self):
@@ -517,7 +518,7 @@ class Order(Orders):
     def add_multiple_testplans_suborder(self, row, testplans):
         self.base_selenium.LOGGER.info(' Set test plan : {} for {} time(s)'.format(testplans, len(testplans)))
         for testplan in testplans:
-            self.base_selenium.update_item_value(item=row['testUnits'],
+            self.base_selenium.update_item_value(item=row['testplans'],
                                                  item_text=testplan.replace("'", ''))
 
     def add_multiple_testunits_suborder(self, row, testunits):
@@ -683,3 +684,8 @@ class Order(Orders):
         test_units = self.base_selenium.get_drop_down_suggestion_list(element='order:test_unit',
                                                                       item_text=test_unit_name)
         return test_units
+
+    def update_test_plan(self,remove_old=True, testplans=[]):
+        self.clear_test_plan()
+        self.confirm_popup()
+        self.set_test_plan(test_plan=testplans)
