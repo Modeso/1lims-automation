@@ -1320,7 +1320,7 @@ class TestUnitsTestCases(BaseTest):
         test_unit_found = self.test_units_page.filter_by_user_get_result(payload['username'])
         self.assertTrue(test_unit_found)
 
-    def test050_cancel_test_unit_create(self):
+    def test050_cancel_testunit_name_configuration(self):
         """
         Test unit: Configuration: make sure that when you select from test unit name configuration
         drop down list and press on cancel button, nothing changed
