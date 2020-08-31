@@ -2862,3 +2862,32 @@ class OrdersTestCases(BaseTest):
             # close child table
             self.orders_page.close_child_table(source=results[i])
 
+    def test085_order_of_test_units_in_analysis(self):
+        """
+        Orders: Ordering test units: Test units in the analysis section should display
+        in the same order as in the order section
+        LIMS-7415
+        """
+        self.info('create new order with 3 test units')
+        testunits, payload = self.test_unit_api.get_all_test_units()
+        selected_testunits = []
+        for i in range(0, 3):
+            selected_testunits.append(random.choice(testunits['testUnits'])['name'])
+        print(selected_testunits)
+        order = self.orders_api.create_new_order(selectedTestUnits=selected_testunits, testPlans=[])
+        print(order)
+        print("***********************")
+
+        # self.info('navigate to analysis tab')
+        # self.orders_page.navigate_to_analysis_active_table()
+        # self.analyses_page.filter_by_order_no(order[0]['orderNoWithYear'])
+        # time.sleep(10)
+        # self.analyses_page.open_child_table(source= self.analyses_page.result_table()[0])
+        # table_data= self.analyses_page.get_table_data()
+        # print(table_data)
+        # print((table_data)[1]['Test Unit'])
+        # print(len(table_data))
+        # analysis_testunits=[]
+        # for i in range(0, len(table_data)-1):
+        #     analysis_testunits.append(([table_data][i])['Test Unit'])
+        # print(analysis_testunits)
