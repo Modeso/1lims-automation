@@ -418,7 +418,7 @@ class Order(Orders):
                 {"name": suborder_data['article'].split(' No:')[0], "no": suborder_data['article']
                     .split(' No:')[1]} if len(suborder_data['article'].split(' No:')) > 1 else '-'
 
-            testunits =[]
+            testunits = []
             rawTestunitArr = suborder_data['testUnits'].split(',\n')
             for testunit in rawTestunitArr:
                 if 'Type' in testunit:
