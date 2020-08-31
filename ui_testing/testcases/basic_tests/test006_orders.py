@@ -2258,7 +2258,6 @@ class OrdersTestCases(BaseTest):
     #                     self.assertCountEqual(item['departments'], element['departments'])
     #                     index = index + 1
     #         self.assertEqual(index, len(contact_names_list))
-    #
     #         department = random.choice(departments_only_list)
     #         self.info('set department to {}'.format(department))
     #         self.order_page.set_departments(department)
@@ -2311,7 +2310,6 @@ class OrdersTestCases(BaseTest):
         child_table_records = self.orders_page.result_table(element='general:table_child')
         print(child_table_records)
         sub_orders = self.orders_page.get_table_data(table_element='general:table_child')
-        print(sub_orders)
         selected_sub_order = randint(0, len(sub_orders) - 1)
         analysis_no = sub_orders[selected_sub_order]['Analysis No.']
         self.orders_page.open_row_options(row=child_table_records[selected_sub_order])
