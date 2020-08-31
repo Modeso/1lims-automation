@@ -1,4 +1,6 @@
+import random
 import re
+import time
 from unittest import skip
 from parameterized import parameterized
 from ui_testing.testcases.base_test import BaseTest
@@ -2297,32 +2299,34 @@ class OrdersTestCases(BaseTest):
     #             for item in formatted_orders[index]:
     #                 self.assertIn(item, fixed_sheet_row_data)
 
-    def test070_archive_suborder(self):
+    def test071_order_of_test_units_in_analysis(self):
         """
-        orders :Make sure that by clicking on Archive from Suborder options a confirmation popup will appear
-        and user can Archive this suborder with its corresponding analysis
-        LIMS-5369
+        Orders: Ordering test units: Test units in the analysis section should display
+        in the same order as in the order section
+        LIMS-7415
         """
-        self.info('select random order')
-        random_row = self.orders_page.get_random_table_row(table_element='general:table')
-        self.info('open child table')
-        self.orders_page.open_child_table(source=random_row)
-        self.info('archive suborder from orders active table')
-        child_table_records = self.orders_page.result_table(element='general:table_child')
-        print(child_table_records)
-        sub_orders = self.orders_page.get_table_data(table_element='general:table_child')
-        print(sub_orders)
-        selected_sub_order = randint(0, len(sub_orders) - 1)
-        analysis_no = sub_orders[selected_sub_order]['Analysis No.']
-        self.orders_page.open_row_options(row=child_table_records[selected_sub_order])
-        self.base_selenium.click(element='orders:suborder_archive')
-        self.assertTrue(self.base_selenium.check_element_is_exist(element='general:confirmation_pop_up'))
-        self.orders_page.confirm_popup()
-        self.orders_page.get_archived_items()
-        self.info('make sure that suborder is archived')
-        self.orders_page.filter_by_analysis_number(analysis_no)
-        self.orders_page.open_child_table(source=self.orders_page.result_table()[0])
-        results = self.order_page.result_table(element='general:table_child')[0].text
-        self.assertIn(analysis_no.replace("'", ""), results.replace("'", ""))
+        self.info('create new order with 3 test units')
+        testunits,payload=self.test_unit_api.get_all_test_units()
+        selected_testunits = []
+        for i in range(0, 3):
+            selected_testunits.append(random.choice(testunits['testUnits'])['name'])
+        order = self.orders_api.create_new_order(test_plans=[], test_units=selected_testunits)
+        print(order)
+        print("***********************")
+        print(order[0]['orderNoWithYear'])
+        # self.info('navigate to analysis tab')
+        # self.orders_page.navigate_to_analysis_active_table()
+        # self.analyses_page.filter_by_order_no(order[0]['orderNoWithYear'])
+        # time.sleep(10)
+        # self.analyses_page.open_child_table(source= self.analyses_page.result_table()[0])
+        # table_data= self.analyses_page.get_table_data()
+        # print(table_data)
+        # print((table_data)[1]['Test Unit'])
+        # print(len(table_data))
+        # analysis_testunits=[]
+        # for i in range(0, len(table_data)-1):
+        #     analysis_testunits.append(([table_data][i])['Test Unit'])
+        # print(analysis_testunits)
+
 
 
