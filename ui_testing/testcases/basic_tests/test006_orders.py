@@ -2813,7 +2813,7 @@ class OrdersTestCases(BaseTest):
         order = self.orders_api.create_new_order(test_plans=[], test_units=selected_testunits)
         print(order)
         print("***********************")
-        print(order[0]['orderNoWithYear'])
+        print(order['order'])
         # self.info('navigate to analysis tab')
         # self.orders_page.navigate_to_analysis_active_table()
         # self.analyses_page.filter_by_order_no(order[0]['orderNoWithYear'])
