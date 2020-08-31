@@ -55,13 +55,13 @@ class OrdersTestCases(BaseTest):
         for testunit in testPlan['testUnits']:
             testunit_names.append(testunit['name'])
         self.info('update first suborder')
-        self.order_page.update_suborder(sub_order_index=0, material_type=payload['materialType'][0]['text'],
-                                        articles=[payload['selectedArticles'][0]['text']],
-                                        test_plans=[payload['testPlan']['text']])
+        self.order_page.update_suborder(sub_order_index=0, material_type=testPlan['materialType'][0]['text'],
+                                        articles=[testPlan['selectedArticles'][0]['text']],
+                                        test_plans=[testPlan['testPlan']['text']])
         self.info('get testplan popup')
         results = self.order_page.get_testplan_pop_up()
         for result in results:
-            if result['test_plan'] == payload['testPlan']['text']:
+            if result['test_plan'] == testPlan['testPlan']['text']:
                 for testunit in testunit_names:
                     self.assertIn(testunit,result['test_units'])
 
