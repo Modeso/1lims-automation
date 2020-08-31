@@ -2738,7 +2738,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.update_duplicated_order_article(article=article['name'])
         self.info("assert that test plan is empty and test unit is {}".format(test_unit_before_duplicate))
         self.assertFalse(self.order_page.get_test_plan())
-        self.assertCountEqual([test_unit_before_duplicate], self.order_page.get_test_unit())
+        self.assertEqual(len([test_unit_before_duplicate]), len(self.order_page.get_test_unit()))
         self.order_page.save(save_btn='order:save')
         duplicated_order_no = self.order_page.get_no()
         self.info("navigate to active table")
