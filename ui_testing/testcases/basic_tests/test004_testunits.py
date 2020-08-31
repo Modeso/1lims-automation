@@ -1320,3 +1320,22 @@ class TestUnitsTestCases(BaseTest):
         test_unit_found = self.test_units_page.filter_by_user_get_result(payload['username'])
         self.assertTrue(test_unit_found)
 
+    def test050_cancel_test_unit_create(self):
+        """
+        Test unit: Configuration: make sure that when you select from test unit name configuration
+        drop down list and press on cancel button, nothing changed
+        LIMS-6550
+        """
+        self.info('open test unit configurations')
+        self.test_unit_page.open_configurations()
+        self.info('open test unit name configuration options')
+        self.test_unit_page.open_testunit_name_configurations_options()
+        self.info('get selected value in view& search field')
+        selected_option = self.base_selenium.get_text(element='configurations_page:selected_option').replace('×', '')
+        self.info('select another option and press cancel')
+        self.base_selenium.select_item_from_drop_down(element='configurations_page:view_search_ddl')
+        self.base_selenium.click(element='configurations_page:configuration_popup_cancel_btn')
+        self.info('open test unit configuration pop up to assert that nothing changed ')
+        self.test_unit_page.open_testunit_name_configurations_options()
+        selected_option_after_cancel = self.base_selenium.get_text(element='configurations_page:selected_option').replace('×', '')
+        self.assertEqual(selected_option, selected_option_after_cancel)
