@@ -1324,7 +1324,7 @@ class TestUnitsTestCases(BaseTest):
         """
         Test unit: Configuration: make sure that when you select from test unit name configuration
         drop down list and press on cancel button, nothing changed
-        LIMS-6550
+        LIMS-5650
         """
         self.info('open test unit configurations')
         self.test_unit_page.open_configurations()
