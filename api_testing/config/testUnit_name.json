@@ -47,11 +47,7 @@
          ],
          "optionsComponentId":4,
          "viewByoptions":[
-            {
-               "id":"name",
-               "text":"name",
-               "label":"Name"
-            }
+               "name"
          ],
          "error":false,
          "optionsInUse":[
