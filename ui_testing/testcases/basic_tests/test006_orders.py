@@ -56,10 +56,14 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(3,len(suborders))
         self.orders_page.get_orders_page()
         self.orders_page.filter_by_order_no(filter_text=order_no)
+        self.info('click on arhcive then cancel popup')
         self.orders_page.archive_main_order_from_order_option(check_pop_up=True,confirm=False)
         table_records = self.orders_page.result_table(element='general:table')
         self.assertEqual(1,len(table_records)-1)
+        self.info('go to archived orders')
         self.orders_page.get_archived_items()
+        self.orders_page.search(order_no)
+        self.assertEqual(len(self.order_page.result_table())-1,0)
 
 
 
