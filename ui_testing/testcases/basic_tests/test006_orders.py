@@ -1,42 +1,70 @@
-# import re
-# from unittest import skip
-# from parameterized import parameterized
-# from ui_testing.testcases.base_test import BaseTest
-# from ui_testing.pages.order_page import Order
-# from ui_testing.pages.orders_page import Orders
-# from api_testing.apis.orders_api import OrdersAPI
-# from ui_testing.pages.analysis_page import AllAnalysesPage
-# from api_testing.apis.article_api import ArticleAPI
-# from api_testing.apis.test_unit_api import TestUnitAPI
-# from ui_testing.pages.analysis_page import SingleAnalysisPage
-# from api_testing.apis.contacts_api import ContactsAPI
-# from api_testing.apis.test_plan_api import TestPlanAPI
-# from ui_testing.pages.testplan_page import TstPlan
-# from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
-# from ui_testing.pages.contacts_page import Contacts
-# from random import randint
-# import random
-#
-#
-# class OrdersTestCases(BaseTest):
-#     def setUp(self):
-#         super().setUp()
-#         self.order_page = Order()
-#         self.orders_api = OrdersAPI()
-#         self.testplan_page = TstPlan()
-#         self.orders_page = Orders()
-#         self.analyses_page = AllAnalysesPage()
-#         self.article_api = ArticleAPI()
-#         self.test_unit_api = TestUnitAPI()
-#         self.contacts_api = ContactsAPI()
-#         self.single_analysis_page = SingleAnalysisPage()
-#         self.test_plan_api = TestPlanAPI()
-#         self.contacts_api = ContactsAPI()
-#         self.general_utilities_api = GeneralUtilitiesAPI()
-#         self.contacts_page = Contacts()
-#         self.set_authorization(auth=self.contacts_api.AUTHORIZATION_RESPONSE)
-#         self.order_page.get_orders_page()
-#         self.orders_api.set_configuration()
+import re
+from unittest import skip
+from parameterized import parameterized
+from ui_testing.testcases.base_test import BaseTest
+from ui_testing.pages.order_page import Order
+from ui_testing.pages.orders_page import Orders
+from api_testing.apis.orders_api import OrdersAPI
+from ui_testing.pages.analysis_page import AllAnalysesPage
+from api_testing.apis.article_api import ArticleAPI
+from api_testing.apis.test_unit_api import TestUnitAPI
+from ui_testing.pages.analysis_page import SingleAnalysisPage
+from api_testing.apis.contacts_api import ContactsAPI
+from api_testing.apis.test_plan_api import TestPlanAPI
+from ui_testing.pages.testplan_page import TstPlan
+from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
+from ui_testing.pages.contacts_page import Contacts
+from random import randint
+import random
+
+
+class OrdersTestCases(BaseTest):
+    def setUp(self):
+        super().setUp()
+        self.order_page = Order()
+        self.orders_api = OrdersAPI()
+        self.testplan_page = TstPlan()
+        self.orders_page = Orders()
+        self.analyses_page = AllAnalysesPage()
+        self.article_api = ArticleAPI()
+        self.test_unit_api = TestUnitAPI()
+        self.contacts_api = ContactsAPI()
+        self.single_analysis_page = SingleAnalysisPage()
+        self.test_plan_api = TestPlanAPI()
+        self.contacts_api = ContactsAPI()
+        self.general_utilities_api = GeneralUtilitiesAPI()
+        self.contacts_page = Contacts()
+        self.set_authorization(auth=self.contacts_api.AUTHORIZATION_RESPONSE)
+        self.order_page.get_orders_page()
+        self.orders_api.set_configuration()
+
+    def test070_if_cancel_archive_order_no_order_suborder_analysis_will_archived(self):
+        """
+        [Archiving][MainOrder]Make sure that if user cancel archive order,
+        No order or suborders or analysis of the order will be archived
+        LIMS-5404
+        """
+        self.info('create order')
+        self.order_page.create_new_order(material_type='Raw Material',save=False)
+        self.info('dupliacte the suborder for 2 times')
+        self.order_page.duplicate_from_table_view(number_of_duplicates=2)
+        self.order_page.save(save_btn='order:save_btn')
+        order_no = self.order_page.get_no()
+        order_id = self.order_page.get_order_id()
+        suborders_data, _ = self.orders_api.get_suborder_by_order_id(order_id)
+        suborders = suborders_data['orders']
+        self.assertEqual(3,len(suborders))
+        self.orders_page.get_orders_page()
+        self.orders_page.filter_by_order_no(filter_text=order_no)
+        self.orders_page.archive_main_order_from_order_option(check_pop_up=True,confirm=False)
+        table_records = self.orders_page.result_table(element='general:table')
+        self.assertEqual(1,len(table_records)-1)
+        self.orders_page.get_archived_items()
+
+
+
+
+
 #
 #     @parameterized.expand(['save_btn', 'cancel'])
 #     def test001_edit_order_number_with_save_cancel_btn(self, save):
