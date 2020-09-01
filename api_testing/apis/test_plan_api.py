@@ -365,8 +365,6 @@ class TestPlanAPI(TestPlanAPIFactory):
         formatted_article = {'id': article_data['id'], 'text': article_name}
         new_test_plan1 = TestPlanAPI().create_completed_testplan_with_formatted_article(
             material_type='Raw Material', formatted_article=formatted_article)
-        test_plan1 = new_test_plan1['testPlan']['text']
         new_test_plan2 = TestPlanAPI().create_completed_testplan_with_formatted_article(
             material_type='Raw Material', formatted_article=formatted_article)
-        test_plan2 = new_test_plan2['testPlan']['text']
-        return test_plan1, test_plan2, article_name
+        return new_test_plan1, new_test_plan2, article_name

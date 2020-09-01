@@ -371,7 +371,6 @@ class Order(Orders):
             self.info('Set test plan : {}'.format(test_plan))
             self.set_test_plan(test_plan=test_plan)
         self.sleep_tiny()
-        self.set_test_unit(test_unit)
         if add_tstunit:
             self.set_test_unit(test_unit)
         self.sleep_tiny()
