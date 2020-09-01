@@ -45,23 +45,22 @@ class OrdersTestCases(BaseTest):
         LIMS-4795
 
         """
-        orders, payload = self.orders_api.get_all_orders(limit=40)
+        order = self.orders_api.get_order_with_multiple_sub_orders(no_suborders=2)
         self.info('create testplan with random data')
         testPlan = TestPlanAPI().create_completed_testplan_random_data(no_testunits=7)
         self.info('get random order')
-        random_order = random.choice(orders['orders'])
-        self.orders_page.get_order_edit_page_by_id(random_order['id'])
+        self.orders_page.get_order_edit_page_by_id(order['id'])
         testunit_names = []
-        for testunit in testPlan['testUnits']:
+        for testunit in testPlan[1]['testUnits']:
             testunit_names.append(testunit['name'])
-        self.info('update first suborder')
-        self.order_page.update_suborder(sub_order_index=0, material_type=testPlan['materialType'][0]['text'],
-                                        articles=[testPlan['selectedArticles'][0]['text']],
-                                        test_plans=[testPlan['testPlan']['text']])
+        self.info('update third suborder')
+        self.order_page.update_suborder(sub_order_index=2, material_type=testPlan[1]['materialType'][0]['text'],
+                                        articles=[testPlan[1]['selectedArticles'][0]['text']],
+                                        test_plans=[testPlan[1]['testPlan']['text']])
         self.info('get testplan popup')
         results = self.order_page.get_testplan_pop_up()
         for result in results:
-            if result['test_plan'] == testPlan['testPlan']['text']:
+            if result['test_plan'] == testPlan[1]['testPlan']['text']:
                 for testunit in testunit_names:
                     self.assertIn(testunit,result['test_units'])
 
