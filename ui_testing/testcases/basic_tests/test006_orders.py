@@ -184,6 +184,7 @@ class OrdersTestCases(BaseTest):
                          child_data[0]['Analysis No.'].replace("'", ""))
 
     @attr(series=True)
+    @skip("https://modeso.atlassian.net/browse/LIMSA-299")
     def test006_delete_main_order(self):
         """
         New: Order without/with article: Deleting of orders
@@ -273,8 +274,6 @@ class OrdersTestCases(BaseTest):
         row = self.order_page.get_last_order_row()
         self.order_page.click_check_box(source=row)
         self.order_page.duplicate_main_order_from_table_overview()
-        import ipdb;
-        ipdb.set_trace()
         self.orders_page.sleep_small()
         # make sure that its the duplication page
         self.assertTrue('duplicateMainOrder' in self.base_selenium.get_url())
@@ -350,6 +349,7 @@ class OrdersTestCases(BaseTest):
                              data_after_duplicate_sub_order['Test Units'])
 
     @attr(series=True)
+    @skip("https://modeso.atlassian.net/browse/LIMSA-299")
     def test010_user_can_add_suborder(self):
         """
         New: Orders: Table view: Suborder Approach: User can add suborder from the main order
@@ -379,6 +379,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.save(save_btn='order:save_btn')
 
         self.order_page.get_orders_page()
+        self.orders_page.sleep_small()
         self.orders_page.filter_by_order_no(order['orderNo'])
         suborders_data_after = self.orders_page.get_child_table_data()[0]
         self.assertEqual(suborders_data_after['Material Type'], test_plan['materialType'][0]['text'])
@@ -491,6 +492,7 @@ class OrdersTestCases(BaseTest):
         results = self.order_page.result_table()
         self.assertGreaterEqual(len(results), 1)
         for i in range(len(results) - 1):
+            results = self.order_page.result_table()
             suborders = self.orders_page.get_child_table_data(index=i)
             key_found = False
             for suborder in suborders:
@@ -572,10 +574,10 @@ class OrdersTestCases(BaseTest):
         self.info("filter by analysis_result: Conform")
         self.orders_page.apply_filter_scenario(filter_element='orders:analysis_result_filter',
                                                filter_text='Not Recieved', field_type='drop_down')
-
-        self.assertGreaterEqual(len(self.order_page.result_table()), 1)
+        results = self.order_page.result_table()
+        self.assertGreaterEqual(len(results), 1)
         self.info('get random suborder from result table to check that filter works')
-        suborders = self.orders_page.get_child_table_data(index=randint(0, 3))
+        suborders = self.orders_page.get_child_table_data(index=randint(0, len(results) - 1))
         filter_key_found = False
         for suborder in suborders:
             if suborder['Analysis Results'].split(' (')[0] == 'Not Recieved':
@@ -839,6 +841,7 @@ class OrdersTestCases(BaseTest):
 
     @parameterized.expand(['new', 'existing'])
     @attr(series=True)
+    @skip("https://modeso.atlassian.net/browse/LIMSA-299")
     def test026_create_order_with_test_units(self, order):
         """
         New: Orders: Create a new order with test units
@@ -851,6 +854,7 @@ class OrdersTestCases(BaseTest):
         """
         response, payload = TestUnitAPI().create_qualitative_testunit()
         self.assertEqual(response['status'], 1)
+        self.orders_page.sleep_small()
         self.info("create order with test unit {}".format(payload['name']))
         if order == 'new':
             created_order_no = self.order_page.create_new_order(material_type='Raw Material',
@@ -872,6 +876,7 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(child_data[0]['Test Unit'], payload['name'])
 
     @attr(series=True)
+    @skip("https://modeso.atlassian.net/browse/LIMSA-299")
     def test028_create_existing_order_with_test_units_and_change_material_type(self):
         """
         New: Orders with test units: Create a new order from an existing order with
@@ -904,6 +909,7 @@ class OrdersTestCases(BaseTest):
         self.assertEqual('Subassembely', latest_order_data['Material Type'])
 
     @attr(series=True)
+    @skip("https://modeso.atlassian.net/browse/LIMSA-299")
     def test029_create_existing_order_with_test_units_and_change_article(self):
         """
         New: Orders with test units: Create a new order from an existing order with
@@ -2482,6 +2488,7 @@ class OrdersTestCases(BaseTest):
         self.info('asserting the order with order number {} is created'.format(order_no))
         self.assertIn(order_no_with_year, results[0].text.replace("'", ""))
 
+    @skip("https://modeso.atlassian.net/browse/LIMSA-299")
     def test074_create_existing_order_change_contact(self):
         """
          Create existing order then change the contact for this existing one,
@@ -2666,6 +2673,7 @@ class OrdersTestCases(BaseTest):
 
     @parameterized.expand(["duplicate", "edit"])
     @attr(series=True)
+    @skip("https://modeso.atlassian.net/browse/LIMSA-299")
     def test080_Duplicate_or_update_order_with_test_plan_only(self, case):
         """
         Duplicate main order Approach: duplicate order with test plan
@@ -2774,11 +2782,13 @@ class OrdersTestCases(BaseTest):
          LIMS-5371
         """
         self.info('choose random order and click on edit button')
+        self.orders_page.sleep_tiny()
         order_data = self.orders_page.get_random_order()
         order_no = self.order_page.get_no(order_row=order_data)
         self.assertTrue(self.base_selenium.wait_element(element='orders:edit order header'))
         self.assertEqual(order_no, order_data['Order No.'])
 
+    @skip("https://modeso.atlassian.net/browse/LIMSA-299")
     def test083_create_suborders_same_testunit(self):
         """
         Create 5 suborders with same test units ( single select ) and make sure 5 analysis
@@ -2821,6 +2831,10 @@ class OrdersTestCases(BaseTest):
 
         LIMS-3495
         """
+        response, contact = self.contacts_api.create_contact()
+        self.assertEqual(response['status'], 1)
+        contact_list = [contact['name']]
+        testplan = TestPlanAPI().create_completed_testplan_random_data()
         self.login_page = Login()
         self.info('Calling the users api to create a new user with username')
         response, payload = UsersAPI().create_new_user()
@@ -2832,10 +2846,6 @@ class OrdersTestCases(BaseTest):
         self.info("Navigate to orders page and create new order")
         self.orders_page.get_orders_page()
         self.orders_page.sleep_small()
-        response, contact = self.contacts_api.create_contact()
-        self.assertEqual(response['status'], 1)
-        contact_list = [contact['name']]
-        testplan = TestPlanAPI().create_completed_testplan_random_data()
         order_no = self.order_page.create_multiple_contacts_new_order(
             contacts=contact_list,
             material_type=testplan['materialType'][0]['text'],
