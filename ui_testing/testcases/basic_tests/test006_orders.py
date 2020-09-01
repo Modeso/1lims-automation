@@ -2333,21 +2333,23 @@ class OrdersTestCases(BaseTest):
 
         # --EDITING part DELETE A TEST PLAN
 
-        #self.orders_page.get_order_edit_page_by_id('266')
         self.orders_page.get_order_edit_page_by_id(order_id)
-        self.info('Delete one of the testplans from the order - delete the first testplan ')
+        self.info('Delete one of the testplans from the order ')
         self.order_page.sleep_tiny()
         self.info('click on first row and update it')
         self.order_page.open_suborder_edit()
-        import ipdb; ipdb.set_trace()
+        #import ipdb; ipdb.set_trace()
         #remove first testplan and set to second one only
-        self.order_page.update_test_plan(testplans=testplan2_name)
+        self.base_selenium.clear_items_in_drop_down(element='order:test_plan', confirm_popup=True, one_item_only=True)
+        self.order_page.save(save_btn='order:save')
         self.order_page.get_orders_page()
-        self.order_page.navigate_to_analysis_tab()
+        #self.order_page.navigate_to_analysis_tab()
+        self.order_page.sleep_tiny()
         self.analyses_page.apply_filter_scenario(filter_element='analysis_page:analysis_no_filter',
                                                  filter_text=analysis_number, field_type='text')
         self.info('Asserting correct testplans selected')
-        self.assertEqual(self.analyses_page.get_the_latest_row_data()['Test Plans'], testplan2_name)
+        self.order_page.sleep_tiny()
+        self.assertEqual(self.analyses_page.get_the_latest_row_data()['Test Plans'], testplan1_name)
         analysis_data = self.analyses_page.get_child_table_data(index=0)
         self.info('Asserting only 1 child record; as only one test plan is now selected')
         self.assertEqual(len(analysis_data), 1)

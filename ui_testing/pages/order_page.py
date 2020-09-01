@@ -685,7 +685,4 @@ class Order(Orders):
                                                                       item_text=test_unit_name)
         return test_units
 
-    def update_test_plan(self,remove_old=True, testplans=[]):
-        self.clear_test_plan()
-        self.confirm_popup()
-        self.set_test_plan(test_plan=testplans)
+
