@@ -16,6 +16,7 @@ from parameterized import parameterized
 from random import randint
 from unittest import skip
 import random, re
+import ipdb
 from nose.plugins.attrib import attr
 
 
@@ -2868,15 +2869,15 @@ class OrdersTestCases(BaseTest):
         in the same order as in the order section
         LIMS-7415
         """
-        self.info('create new order with 3 test units')
-        testunits, payload = self.test_unit_api.get_all_test_units()
-        selected_testunits = []
-        for i in range(0, 3):
-            selected_testunits.append(random.choice(testunits['testUnits'])['name'])
-        print(selected_testunits)
-        order = self.orders_api.create_new_order(selectedTestUnits=selected_testunits, testPlans=[])
-        print(order)
-        print("***********************")
+        # self.info('create new order with 3 test units')
+        # testunits, payload = self.test_unit_api.get_all_test_units()
+        # selected_testunits = []
+        # for i in range(0, 2):
+        #     selected_testunits.append(random.choice(testunits['testUnits'])['name'])
+
+        response, order = self.orders_api.create_order_with_test_units()
+       # response, order = self.orders_api.create_new_order(selectedTestUnits=selected_testunits, testPlans=[])
+
 
         # self.info('navigate to analysis tab')
         # self.orders_page.navigate_to_analysis_active_table()
