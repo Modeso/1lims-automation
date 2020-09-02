@@ -10,6 +10,7 @@ from api_testing.apis.orders_api import OrdersAPI
 from api_testing.apis.contacts_api import ContactsAPI
 from api_testing.apis.users_api import UsersAPI
 from parameterized import parameterized
+from nose.plugins.attrib import attr
 import re, random
 
 
@@ -474,6 +475,7 @@ class ContactsTestCases(BaseTest):
                 self.assertIn(data_to_filter_with, row_data[key].split(', '))
             counter = counter + 1
 
+    @attr(series=True)        
     def test020_filter_by_contact_changed_by(self):
         """
         Contacts: Filter Approach: Make sure you can filter by changed by
@@ -545,6 +547,7 @@ class ContactsTestCases(BaseTest):
         self.info('Asserting the title was changed successfully to Ms')
         self.assertEqual(new_contact_person_data[0]['title'], 'Ms')
 
+    @attr(series=True)
     def test023_contact_title_translation(self):
         """
         Contacts: Title translation approach:
