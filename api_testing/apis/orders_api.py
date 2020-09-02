@@ -383,14 +383,14 @@ class OrdersAPI(OrdersAPIFactory):
 
     def create_order_with_test_units(self, no_of_test_units):
         test_units = []
-        custom_payload = {
+        material_type = {
             'selectedMaterialTypes': [{
                 'id': 1,
                 'text': 'Raw Material'
             }]
         }
         for _ in range(no_of_test_units):
-            res, payload = TestUnitAPI().create_qualitative_testunit(**custom_payload)
+            res, payload = TestUnitAPI().create_qualitative_testunit(**material_type)
             res_form, pay_form = TestUnitAPI().get_testunit_form_data(res['testUnit']['testUnitId'])
             test_units.append({'id': res_form['testUnit']['id'],
                                'name': res_form['testUnit']['name']})
@@ -401,24 +401,6 @@ class OrdersAPI(OrdersAPIFactory):
             'materialTypeId': 1
         }
         return self.create_new_order(**payload)
-    #
-    # def create_order_with_test_units(self):
-    #     all_test_units = TestUnitAPI().get_all_test_units()[0]['testUnits']
-    #     testunit = random.choice(all_test_units)
-    #     # testunit_form_data = TestUnitAPI().get_testunit_form_data(id=testunit['id'])
-    #     # testunit[id]=testunit_form_data[0]['testUnit']['id']
-    #     material_type = testunit['materialTypes'][0]
-    #     material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
-    #     api, testunitss = TestUnitAPI().get_all_test_units(filter='{"materialTypes":' + str(material_type_id) + '}')
-    #     testunit_list = [testunit]
-    #     # article=random.choice(ArticleAPI().get_all_articles())
-    #     payload = {
-    #         'testPlans': [],
-    #         'testUnits': testunit_list,
-    #         'materialType': {"id": material_type_id, "text": material_type},
-    #         'materialTypeId': material_type_id,
-    #     }
-    #     return self.create_new_order(**payload)
 
     def create_order_with_department(self):
         contact = random.choice(ContactsAPI().get_contacts_with_department())

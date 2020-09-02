@@ -18,10 +18,10 @@ class AllAnalysesPage(BasePages):
         self.filter_apply()
         self.sleep_tiny()
 
-    # def filter_by_order_no(self, filter_text):
-    #     self.info('Filter by order number : {}'.format(filter_text))
-    #     self.open_filter_menu()
-    #     self.filter_by(filter_element='analysis_page:order_no_filter',
-    #                    filter_text=str(filter_text), field_type='drop_down')
-    #     self.filter_apply()
+    def filter_by_order_no(self, filter_text):
+        self.info('Filter by order number : {}'.format(filter_text))
+        self.open_filter_menu()
+        self.filter_by(filter_element='analysis_page:order_no_filter',
+                       filter_text=str(filter_text), field_type='drop_down')
+        self.filter_apply()
 
