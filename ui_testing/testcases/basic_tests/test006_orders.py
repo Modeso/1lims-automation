@@ -2887,7 +2887,7 @@ class OrdersTestCases(BaseTest):
         self.info(' Create new order.')
         self.order_page.create_new_order(article=article1, material_type='Raw Material',
                                          test_plans=[tst_plan1['testPlan']['text'], tst_plan2['testPlan']['text']],
-                                         save=False)
+                                         set_tstunit= False,save=False)
         order_no = self.order_page.get_no()
         self.info('create 3 suborder')
         self.order_page.create_new_suborder(material_type='Raw Material',
@@ -2920,16 +2920,16 @@ class OrdersTestCases(BaseTest):
         self.orders_page.navigate_to_analysis_active_table()
         self.analyses_page.filter_by_order_no(filter_text=order_no)
         analysis_rows = self.order_page.result_table()
-        self.assertEqual(3, len(analysis_rows) - 1)
+        self.assertEqual(3, len(analysis_rows)-1)
         analysis_data1 = self.order_page.get_child_table_data(index=2)
         self.assertEqual(len(analysis_data1), 2)
         for testunit in analysis_data1:
-            self.assertIn(testunit['Test Unit'].replace("'",""), test_units1)
+            self.assertIn(testunit['Test Unit'].replace("'", ""), test_units1)
         analysis_data2 = self.order_page.get_child_table_data(index=1)
         self.assertEqual(len(analysis_data2), 2)
         for testunit in analysis_data2:
-            self.assertIn(testunit['Test Unit'].replace("'",""), test_units2)
+            self.assertIn(testunit['Test Unit'].replace("'", ""), test_units2)
         analysis_data3 = self.order_page.get_child_table_data(index=0)
         self.assertEqual(len(analysis_data3), 2)
         for testunit in analysis_data3:
-            self.assertIn(testunit['Test Unit'].replace("'",""), test_units3)
+            self.assertIn(testunit['Test Unit'].replace("'", ""), test_units3)
