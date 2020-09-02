@@ -120,7 +120,8 @@ class Order(Orders):
             return []
 
     def create_new_order(self, material_type='', article='', contact='', test_plans=[''], test_units=[''],
-                         multiple_suborders=0, departments='', order_no='', save=True, with_testplan=True):
+                         multiple_suborders=0, departments='', order_no='', save=True, with_testplan=True,
+                         with_testunits=True):
         self.info(' Create new order.')
         self.click_create_order_button()
         self.sleep_small()
@@ -142,8 +143,9 @@ class Order(Orders):
             for test_plan in test_plans:
                 self.set_test_plan(test_plan=test_plan)
 
-        for test_unit in test_units:
-            self.set_test_unit(test_unit=test_unit)
+        if with_testunits:
+            for test_unit in test_units:
+                self.set_test_unit(test_unit=test_unit)
             self.sleep_small()
         
         if multiple_suborders > 0:
