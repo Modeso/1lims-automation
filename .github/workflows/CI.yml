@@ -23,6 +23,3 @@ jobs:
 
 
 
-        run:  python3 fixReport.py ${{ secrets.UUID }} ${{ github.ref }}-${{ github.run_id }}-${{ github.run_number }}
-
-
