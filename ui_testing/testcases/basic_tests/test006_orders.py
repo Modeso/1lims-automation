@@ -2889,6 +2889,9 @@ class OrdersTestCases(BaseTest):
                                                                              formatted_article=formatted_article,
                                                                              material_type_id=material_type_id)
         testplan2_name = testplan2['testPlan']['text']
+        testplans = testplan1_name + ', ' + testplan2_name
+        self.order_page.get_orders_page()
+        self.order_page.sleep_tiny()
         self.order_page.create_new_order(material_type=formatted_material['text'], article=formatted_article['text'],
                                          test_plans=[testplan1_name, testplan2_name], with_testunits=False)
         self.order_page.sleep_tiny()
