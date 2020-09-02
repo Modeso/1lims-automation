@@ -126,7 +126,7 @@ class OrdersAPIFactory(BaseAPI):
         year_option = 0 : order no with year before (2020-1668)
         :return:
         """
-        api = '{}{}'.format(self.url, self.END_POINTS['orders_api']['get_auto_generated_number'])+year_option
+        api = '{}{}'.format(self.url, self.END_POINTS['orders_api']['get_auto_generated_number']) + year_option
         return api, {}
 
     @api_factory('put')
@@ -137,7 +137,7 @@ class OrdersAPIFactory(BaseAPI):
         :return: response, payload
         """
         api = '{}{}{}'.format(self.url, self.END_POINTS['orders_api']['archive_main_order'],
-                                                str(mainorder_id))
+                              str(mainorder_id))
         return api, {}
 
     @api_factory('put')
@@ -148,7 +148,7 @@ class OrdersAPIFactory(BaseAPI):
         :return: response, payload
         """
         api = '{}{}{}'.format(self.url, self.END_POINTS['orders_api']['restore_main_order'],
-                                                str(mainorder_id))
+                              str(mainorder_id))
         return api, {}
 
     @api_factory('delete')
@@ -159,7 +159,7 @@ class OrdersAPIFactory(BaseAPI):
         :return: response, payload
         """
         api = '{}{}{}'.format(self.url, self.END_POINTS['orders_api']['delete_main_order'],
-                                               str(mainorder_id))
+                              str(mainorder_id))
         return api, {}
 
     @api_factory('put')
@@ -215,7 +215,8 @@ class OrdersAPIFactory(BaseAPI):
                 selected_testunits_arr.append({
                     'id': int(testunit['id']),
                     'name': testunit['name'],
-                    'new': True
+                    'new': True,
+                    "conditionalSelectId": 1
                 })
                 payload['selectedTestUnits'] = selected_testunits_arr
                 payload['testUnits'] = selected_testunits_arr
@@ -380,94 +381,44 @@ class OrdersAPI(OrdersAPIFactory):
         }
         return self.create_new_order(**payload)
 
-    def create_order_with_double_test_plans(self, only_test_plans=False):
-        testplan = random.choice(TestPlanAPI().get_completed_testplans())
-        testplan_form_data = TestPlanAPI()._get_testplan_form_data(id=testplan['id'])[0]
-        testplan['id'] = testplan_form_data['testPlan']['testPlanEntity']['id']
-        article = testplan_form_data['testPlan']['selectedArticles'][0]['name']
-        article_id = testplan_form_data['testPlan']['selectedArticles'][0]['id']
-        if article == 'all':
-            article, article_id = ArticleAPI().get_random_article_articleID()
-        material_type = testplan['materialType']
-        material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
-        testunit1 = testplan_form_data['testPlan']['specifications'][0]
-        testunit2 = TestUnitAPI().get_test_unit_name_with_value_with_material_type(
-            material_type=material_type, avoid_duplicate=True, duplicated_test_unit=testunit1['name'])
-        testunit_list = [testunit1, testunit2]
-
-        testunit_data = TestUnitAPI().get_testunit_form_data(id=testunit2['id'])[0]['testUnit']
-        formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
-
-        formatted_article = {'id': article_id, 'text': article}
-
-        formatted_material = {'id': material_type_id, 'text': material_type}
-
-        testplan2, _ = TestPlanAPI().create_testplan(
-            testUnits=[formated_testunit], selectedArticles=[formatted_article], materialType=formatted_material)
-
-        if testplan2['status'] != 1:
-            testplan2, _ = TestPlanAPI().create_testplan(
-                testUnits=[formated_testunit], selectedArticles=[formatted_article], materialType=formatted_material)
-
-        second_testPlan_data = TestPlanAPI()._get_testplan_form_data(id=testplan2['testPlanDetails']['id'])
-        testPlan2 = {
-            'id': int(second_testPlan_data[0]['testPlan']['testPlanEntity']['id']),  # article_test_plan_id
-            'testPlanName': second_testPlan_data[0]['testPlan']['testPlanEntity']['name'],
-            'number': int(second_testPlan_data[0]['testPlan']['number']),
-            'version': 1
+    def create_order_with_test_units(self, no_of_test_units):
+        test_units = []
+        custom_payload = {
+            'selectedMaterialTypes': [{
+                'id': 1,
+                'text': 'Raw Material'
+            }]
         }
-        testplan_list = [testplan, testPlan2]
-
-        payload = {
-            'testPlans': testplan_list,
-            'testUnits': testunit_list,
-            'materialType': {"id": material_type_id, "text": material_type},
-            'materialTypeId': material_type_id,
-            'article': {'id': article_id, 'text': article},
-            'articleId': article_id
-        }
-        return self.create_new_order(**payload)
-
-    def create_order_with_test_units(self):
-        all_test_units = TestUnitAPI().get_all_test_units()[0]['testUnits']
-        testunit = random.choice(all_test_units)
-        # testunit_form_data = TestUnitAPI().get_testunit_form_data(id=testunit['id'])
-        # testunit[id]=testunit_form_data[0]['testUnit']['id']
-        material_type = testunit['materialTypes'][0]
-        material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
-        api, testunitss = TestUnitAPI().get_all_test_units(filter='{"materialTypes":'+str(material_type_id)+'}')
-        testunit_list = [testunit]
-        # article=random.choice(ArticleAPI().get_all_articles())
+        for _ in range(no_of_test_units):
+            res, payload = TestUnitAPI().create_qualitative_testunit(**custom_payload)
+            res_form, pay_form = TestUnitAPI().get_testunit_form_data(res['testUnit']['testUnitId'])
+            test_units.append({'id': res_form['testUnit']['id'],
+                               'name': res_form['testUnit']['name']})
         payload = {
             'testPlans': [],
-            'testUnits': testunit_list,
-            'materialType': {"id": material_type_id, "text": material_type},
-            'materialTypeId': material_type_id,
-         }
-        return self.create_new_order(**payload)
-
-
-    def create_order_with_multiple_contacts(self):
-        contacts = random.choices(ContactsAPI().get_contacts_with_department(), k=3)
-        first_contact = contacts[0]
-        second_contact = contacts[1]
-        third_contact = contacts[2]
-        payload = {
-            'contact': [
-                {"id": first_contact['id'],
-                 "text": first_contact['name'],
-                 'No': first_contact['companyNo']},
-                {"id": second_contact['id'],
-                 "text": second_contact['name'],
-                 'No': second_contact['companyNo']},
-                {"id": third_contact['id'],
-                 "text": third_contact['name'],
-                 'No': third_contact['companyNo']}
-            ]
-
+            'testUnits': test_units,
+            'materialType': {"id": 1, "text": 'Raw Material'},
+            'materialTypeId': 1
         }
         return self.create_new_order(**payload)
-
+    #
+    # def create_order_with_test_units(self):
+    #     all_test_units = TestUnitAPI().get_all_test_units()[0]['testUnits']
+    #     testunit = random.choice(all_test_units)
+    #     # testunit_form_data = TestUnitAPI().get_testunit_form_data(id=testunit['id'])
+    #     # testunit[id]=testunit_form_data[0]['testUnit']['id']
+    #     material_type = testunit['materialTypes'][0]
+    #     material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
+    #     api, testunitss = TestUnitAPI().get_all_test_units(filter='{"materialTypes":' + str(material_type_id) + '}')
+    #     testunit_list = [testunit]
+    #     # article=random.choice(ArticleAPI().get_all_articles())
+    #     payload = {
+    #         'testPlans': [],
+    #         'testUnits': testunit_list,
+    #         'materialType': {"id": material_type_id, "text": material_type},
+    #         'materialTypeId': material_type_id,
+    #     }
+    #     return self.create_new_order(**payload)
 
     def create_order_with_department(self):
         contact = random.choice(ContactsAPI().get_contacts_with_department())

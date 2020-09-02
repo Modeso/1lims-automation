@@ -2876,7 +2876,8 @@ class OrdersTestCases(BaseTest):
         #     selected_testunits.append(random.choice(testunits['testUnits'])['name'])
         import ipdb;
         ipdb.set_trace()
-        response, payload = self.orders_api.create_order_with_test_units()
+        response, payload = self.orders_api.create_order_with_test_units_hamda(3)
+
        # response, order = self.orders_api.create_new_order(selectedTestUnits=selected_testunits, testPlans=[])
 
 
