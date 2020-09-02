@@ -2299,7 +2299,7 @@ class OrdersTestCases(BaseTest):
 #                                   f"{str(fixed_sheet_row_data)} : {str(formatted_orders[index])}")
 #             for item in formatted_orders[index]:
 #                 self.assertIn(item, fixed_sheet_row_data)
-    @attr(series=True)
+    #@attr(series=True)
     @parameterized.expand(['Name', 'Method'])
     def test076_search_with_test_unit_name_method(self, search_by):
         """
