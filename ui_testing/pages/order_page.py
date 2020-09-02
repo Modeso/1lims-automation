@@ -143,7 +143,6 @@ class Order(Orders):
         self.save(save_btn='order:save_btn')
         self.info(' Order created with no : {} '.format(order_no))
 
-
     def create_multiple_contacts_new_order(self, contacts):
         self.click_create_order_button()
         self.sleep_small()
@@ -356,13 +355,14 @@ class Order(Orders):
         return self.get_suborder_data()
 
     def duplicate_from_table_view(self, number_of_duplicates=1, index_to_duplicate_from=0):
+        suborders = self.base_selenium.get_table_rows(element='order:suborder_table')
+        suborders_elements = self.base_selenium.get_row_cells_elements_related_to_header(
+            row=suborders[index_to_duplicate_from],
+            table_element='order:suborder_table')
+
+        duplicate_element = self.base_selenium.find_element_in_element(source=suborders_elements['Options'],
+                                                                       destination_element='order:duplicate_table_view')
         for duplicate in range(0, number_of_duplicates):
-            suborders = self.base_selenium.get_table_rows(element='order:suborder_table')
-            suborders_elements = self.base_selenium.get_row_cells_elements_related_to_header(
-                row=suborders[index_to_duplicate_from],
-                table_element='order:suborder_table')
-            duplicate_element = self.base_selenium.find_element_in_element(source=suborders_elements['Options'],
-                                                                           destination_element='order:duplicate_table_view')
             duplicate_element.click()
 
     def duplicate_suborder(self):
@@ -684,5 +684,3 @@ class Order(Orders):
         test_units = self.base_selenium.get_drop_down_suggestion_list(element='order:test_unit',
                                                                       item_text=test_unit_name)
         return test_units
-
-
