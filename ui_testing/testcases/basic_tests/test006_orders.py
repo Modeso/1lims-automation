@@ -1,43 +1,46 @@
-# import re
-# from unittest import skip
-# from parameterized import parameterized
-# from ui_testing.testcases.base_test import BaseTest
-# from ui_testing.pages.order_page import Order
-# from ui_testing.pages.orders_page import Orders
-# from api_testing.apis.orders_api import OrdersAPI
-# from ui_testing.pages.analysis_page import AllAnalysesPage
-# from api_testing.apis.article_api import ArticleAPI
-# from api_testing.apis.test_unit_api import TestUnitAPI
-# from ui_testing.pages.analysis_page import SingleAnalysisPage
-# from api_testing.apis.contacts_api import ContactsAPI
-# from api_testing.apis.test_plan_api import TestPlanAPI
-# from ui_testing.pages.testplan_page import TstPlan
-# from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
-# from ui_testing.pages.contacts_page import Contacts
-# from random import randint
-# import random
-#
-#
-# class OrdersTestCases(BaseTest):
-#     def setUp(self):
-#         super().setUp()
-#         self.order_page = Order()
-#         self.orders_api = OrdersAPI()
-#         self.testplan_page = TstPlan()
-#         self.orders_page = Orders()
-#         self.analyses_page = AllAnalysesPage()
-#         self.article_api = ArticleAPI()
-#         self.test_unit_api = TestUnitAPI()
-#         self.contacts_api = ContactsAPI()
-#         self.single_analysis_page = SingleAnalysisPage()
-#         self.test_plan_api = TestPlanAPI()
-#         self.contacts_api = ContactsAPI()
-#         self.general_utilities_api = GeneralUtilitiesAPI()
-#         self.contacts_page = Contacts()
-#         self.set_authorization(auth=self.contacts_api.AUTHORIZATION_RESPONSE)
-#         self.order_page.get_orders_page()
-#         self.orders_api.set_configuration()
-#
+import re
+from unittest import skip
+from parameterized import parameterized
+from ui_testing.testcases.base_test import BaseTest
+from ui_testing.pages.order_page import Order
+from ui_testing.pages.orders_page import Orders
+from api_testing.apis.orders_api import OrdersAPI
+from ui_testing.pages.analysis_page import AllAnalysesPage
+from api_testing.apis.article_api import ArticleAPI
+from api_testing.apis.test_unit_api import TestUnitAPI
+from ui_testing.pages.analysis_page import SingleAnalysisPage
+from api_testing.apis.contacts_api import ContactsAPI
+from api_testing.apis.test_plan_api import TestPlanAPI
+from ui_testing.pages.testplan_page import TstPlan
+from ui_testing.pages.testunits_page import TstUnits
+from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
+from ui_testing.pages.contacts_page import Contacts
+from random import randint
+import random
+from nose.plugins.attrib import attr
+
+
+
+class OrdersTestCases(BaseTest):
+    def setUp(self):
+        super().setUp()
+        self.order_page = Order()
+        self.orders_api = OrdersAPI()
+        self.testplan_page = TstPlan()
+        self.orders_page = Orders()
+        self.analyses_page = AllAnalysesPage()
+        self.article_api = ArticleAPI()
+        self.test_unit_api = TestUnitAPI()
+        self.contacts_api = ContactsAPI()
+        self.single_analysis_page = SingleAnalysisPage()
+        self.test_plan_api = TestPlanAPI()
+        self.contacts_api = ContactsAPI()
+        self.general_utilities_api = GeneralUtilitiesAPI()
+        self.contacts_page = Contacts()
+        self.set_authorization(auth=self.contacts_api.AUTHORIZATION_RESPONSE)
+        self.order_page.get_orders_page()
+        self.orders_api.set_configuration()
+
 #     @parameterized.expand(['save_btn', 'cancel'])
 #     def test001_edit_order_number_with_save_cancel_btn(self, save):
 #         """
@@ -2296,3 +2299,44 @@
 #                                   f"{str(fixed_sheet_row_data)} : {str(formatted_orders[index])}")
 #             for item in formatted_orders[index]:
 #                 self.assertIn(item, fixed_sheet_row_data)
+    @attr(series=True)
+    @parameterized.expand(['Name', 'Method'])
+    def test076_search_with_test_unit_name_method(self, search_by):
+        """
+        Orders:Test unit search approach
+        allow user to search with test unit name in the drop down list of the order form
+        LIMS-6664
+        allow user to search with test unit method in the drop down list of order form
+        LIMS-6666
+        """
+        self.test_units_page = TstUnits()
+        self.info("get random test unit data to get its material type")
+        response, payload = TestUnitAPI().get_all_test_units()
+        self.assertEqual(response['status'], 1, payload)
+        random_test_unit = random.choice(response['testUnits'])
+        self.test_units_page.get_test_units_page()
+        self.orders_page.sleep_tiny()
+        self.test_units_page.open_configurations()
+        self.orders_page.sleep_tiny()
+        self.test_units_page.open_testunit_name_configurations_options()
+        self.test_units_page.select_option_to_view_search_with(view_search_options=[search_by])
+        self.base_selenium.refresh()
+        self.test_units_page.open_testunit_name_configurations_options()
+        selected_option=self.base_selenium.get_attribute(element='configurations_page:view_search_ddl',
+                                                                attribute='innerText')
+        self.info('Asserting only one option selected')
+        self.assertEqual(len([selected_option]),1)
+        self.info('Asserting correct option is selected')
+        self.assertIn(search_by, selected_option)
+
+        self.info('go to orders page')
+        self.order_page.get_orders_page()
+        if random_test_unit['materialTypes'][0] != 'All':
+            test_unit_suggestion_list = Order().create_new_order_get_test_unit_suggetion_list(
+                material_type=random_test_unit['materialTypes'][0], test_unit_name=' ')
+        else:
+            test_unit_suggestion_list = Order().create_new_order_get_test_unit_suggetion_list(
+                material_type='', test_unit_name=' ')
+        self.info('checking {} field only is displayed'.format(search_by))
+        for test_unit in test_unit_suggestion_list:
+            self.assertNotIn(':', test_unit)
