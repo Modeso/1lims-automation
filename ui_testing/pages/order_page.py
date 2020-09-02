@@ -685,5 +685,3 @@ class Order(Orders):
         test_units = self.base_selenium.get_drop_down_suggestion_list(element='order:test_unit',
                                                                       item_text=test_unit_name)
         return test_units
-
-
