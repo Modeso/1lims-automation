@@ -2308,7 +2308,6 @@ class OrdersTestCases(BaseTest):
         self.orders_page.open_child_table(source=random_row)
         self.info('archive suborder from orders active table')
         child_table_records = self.orders_page.result_table(element='general:table_child')
-        print(child_table_records)
         sub_orders = self.orders_page.get_table_data(table_element='general:table_child')
         selected_sub_order = randint(0, len(sub_orders) - 1)
         analysis_no = sub_orders[selected_sub_order]['Analysis No.']
