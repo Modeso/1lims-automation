@@ -2877,6 +2877,7 @@ class OrdersTestCases(BaseTest):
         Order: Add Same test units in different test plan
         LIMS-4354
         """
+        self.test_plan_api = TestPlanAPI() 
         formated_testunit, formatted_article, formatted_material, material_type_id = self.test_plan_api.create_random_data_for_testplan()
         testplan1 = self.test_plan_api.create_completed_testplan_random_data(formated_testunit=formated_testunit,
                                                                              formatted_material=formatted_material,
