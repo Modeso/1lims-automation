@@ -239,7 +239,7 @@ class TestPlanAPI(TestPlanAPIFactory):
                                                  material_type_id=material_type_id)
 
         if testplan['message'] == 'operation_success':
-            return self.get_testplan_form_data(id=payload['number'])
+            return self.get_testplan_form_data(id=int(testplan['testPlanDetails']['id']))
         else:
             self.info(testplan)
 

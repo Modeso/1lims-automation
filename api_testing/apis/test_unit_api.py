@@ -405,11 +405,7 @@ class TestUnitAPI(TestUnitAPIFactory):
 
     def create_test_unit_with_long_text(self):
         self.info('Generate random data for update')
-        long_txt = self.generate_random_string() + \
-                   self.generate_random_string() + \
-                   self.generate_random_string() + \
-                   self.generate_random_string() + \
-                   self.generate_random_string()
+        long_txt = ''.join([self.generate_random_string() for _ in range(5)])
         api, testunit_payload = self.create_qualitative_testunit(method=long_txt)
         return api, testunit_payload
 
