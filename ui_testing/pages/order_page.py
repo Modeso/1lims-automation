@@ -350,8 +350,8 @@ class Order(Orders):
         self.info(' Get suborder table list.')
         self.base_selenium.click(element='order:suborder_list')
 
-    def create_new_suborder(self, material_type='', article_name='', test_plan='', test_unit='',
-                            add_new_suborder_btn='order:add_new_item'):
+    def create_new_suborder(self, material_type='', article_name='', test_plans=[''], test_unit='',
+                            add_new_suborder_btn='order:add_new_item',add_tstunit = True):
         # self.get_suborder_table()
         rows_before = self.base_selenium.get_table_rows(element='order:suborder_table')
         self.info('Add new suborder.')
@@ -370,10 +370,12 @@ class Order(Orders):
             self.sleep_tiny()
             self.set_article(article_name)
         self.sleep_tiny()
-        self.info('Set test plan : {}'.format(test_plan))
-        self.set_test_plan(test_plan)
+        for test_plan in test_plans:
+            self.info('Set test plan : {}'.format(test_plan))
+            self.set_test_plan(test_plan=test_plan)
         self.sleep_tiny()
-        self.set_test_unit(test_unit)
+        if add_tstunit:
+            self.set_test_unit(test_unit)
         self.sleep_tiny()
         return self.get_suborder_data()
 
