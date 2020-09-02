@@ -2888,6 +2888,9 @@ class OrdersTestCases(BaseTest):
         suborders_data, _ = self.orders_api.get_suborder_by_order_id(order_id)
         suborders = suborders_data['orders']
         self.assertEqual(3, len(suborders))
+        analysis_no = []
+        for suborder in suborders:
+            analysis_no.append(suborder['analysis'][0])
         self.orders_page.get_orders_page()
         self.orders_page.filter_by_order_no(filter_text=order_no)
         self.info('click on arhcive then cancel popup')
@@ -2896,5 +2899,10 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(1, len(table_records) - 1)
         self.info('go to archived orders')
         self.orders_page.get_archived_items()
-        self.orders_page.search(order_no)
+        self.orders_page.filter_by_order_no(filter_text=order_no)
         self.assertEqual(len(self.order_page.result_table()) - 1, 0)
+        for i in range(0,len(analysis_no)-1):
+            self.base_selenium.refresh()
+            self.orders_page.get_archived_items()
+            self.orders_page.filter_by_analysis_number(filter_text=analysis_no[i])
+            self.assertEqual(len(self.order_page.result_table()) - 1, 0)
