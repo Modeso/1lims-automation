@@ -16,7 +16,6 @@ from parameterized import parameterized
 from random import randint
 from unittest import skip
 import random, re
-import ipdb
 from nose.plugins.attrib import attr
 
 
@@ -274,8 +273,6 @@ class OrdersTestCases(BaseTest):
         row = self.order_page.get_last_order_row()
         self.order_page.click_check_box(source=row)
         self.order_page.duplicate_main_order_from_table_overview()
-        import ipdb;
-        ipdb.set_trace()
         self.orders_page.sleep_small()
         # make sure that its the duplication page
         self.assertTrue('duplicateMainOrder' in self.base_selenium.get_url())
@@ -378,7 +375,6 @@ class OrdersTestCases(BaseTest):
 
         self.assertEqual(suborder_data['orderNo'].replace("'", ""), order['orderNo'])
         self.order_page.save(save_btn='order:save_btn')
-
         self.order_page.get_orders_page()
         self.orders_page.filter_by_order_no(order['orderNo'])
         suborders_data_after = self.orders_page.get_child_table_data()[0]
@@ -573,10 +569,10 @@ class OrdersTestCases(BaseTest):
         self.info("filter by analysis_result: Conform")
         self.orders_page.apply_filter_scenario(filter_element='orders:analysis_result_filter',
                                                filter_text='Not Recieved', field_type='drop_down')
-
-        self.assertGreaterEqual(len(self.order_page.result_table()), 1)
+        results = self.order_page.result_table()
+        self.assertGreaterEqual(len(results), 1)
         self.info('get random suborder from result table to check that filter works')
-        suborders = self.orders_page.get_child_table_data(index=randint(0, 3))
+        suborders = self.orders_page.get_child_table_data(index=randint(0, len(results) - 1))
         filter_key_found = False
         for suborder in suborders:
             if suborder['Analysis Results'].split(' (')[0] == 'Not Recieved':
@@ -2833,10 +2829,6 @@ class OrdersTestCases(BaseTest):
         self.info("Navigate to orders page and create new order")
         self.orders_page.get_orders_page()
         self.orders_page.sleep_small()
-        response, contact = self.contacts_api.create_contact()
-        self.assertEqual(response['status'], 1)
-        contact_list = [contact['name']]
-        testplan = TestPlanAPI().create_completed_testplan_random_data()
         order_no = self.order_page.create_multiple_contacts_new_order(
             contacts=contact_list,
             material_type=testplan['materialType'][0]['text'],
@@ -2869,28 +2861,16 @@ class OrdersTestCases(BaseTest):
         in the same order as in the order section
         LIMS-7415
         """
-        # self.info('create new order with 3 test units')
-        # testunits, payload = self.test_unit_api.get_all_test_units()
-        # selected_testunits = []
-        # for i in range(0, 2):
-        #     selected_testunits.append(random.choice(testunits['testUnits'])['name'])
-        import ipdb;
-        ipdb.set_trace()
-        response, payload = self.orders_api.create_order_with_test_units_hamda(3)
-
-       # response, order = self.orders_api.create_new_order(selectedTestUnits=selected_testunits, testPlans=[])
-
-
-        # self.info('navigate to analysis tab')
-        # self.orders_page.navigate_to_analysis_active_table()
-        # self.analyses_page.filter_by_order_no(order[0]['orderNoWithYear'])
-        # time.sleep(10)
-        # self.analyses_page.open_child_table(source= self.analyses_page.result_table()[0])
-        # table_data= self.analyses_page.get_table_data()
-        # print(table_data)
-        # print((table_data)[1]['Test Unit'])
-        # print(len(table_data))
-        # analysis_testunits=[]
-        # for i in range(0, len(table_data)-1):
-        #     analysis_testunits.append(([table_data][i])['Test Unit'])
-        # print(analysis_testunits)
+        self.info('create new order with 3 test units')
+        response, payload = self.orders_api.create_order_with_test_units(3)
+        self.info('get test units of order')
+        order_testunits = [test_unit[ 'name'] for test_unit in payload[0]['testUnits']]
+        self.info('navigate to analysis tab')
+        self.orders_page.navigate_to_analysis_active_table()
+        self.info('filter by order number')
+        self.analyses_page.filter_by_order_no(payload[0]['orderNoWithYear'])
+        self.info('get child table data')
+        table_data = self.analyses_page.get_child_table_data()
+        analysis_testunits = [test_unit['Test Unit'] for test_unit in table_data]
+        self.assertEqual(order_testunits, analysis_testunits)
+        
