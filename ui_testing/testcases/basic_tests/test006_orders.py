@@ -16,7 +16,6 @@ from parameterized import parameterized
 from random import randint
 from unittest import skip
 import random, re
-import ipdb
 from nose.plugins.attrib import attr
 
 
@@ -274,8 +273,6 @@ class OrdersTestCases(BaseTest):
         row = self.order_page.get_last_order_row()
         self.order_page.click_check_box(source=row)
         self.order_page.duplicate_main_order_from_table_overview()
-        import ipdb;
-        ipdb.set_trace()
         self.orders_page.sleep_small()
         # make sure that its the duplication page
         self.assertTrue('duplicateMainOrder' in self.base_selenium.get_url())
@@ -378,7 +375,6 @@ class OrdersTestCases(BaseTest):
 
         self.assertEqual(suborder_data['orderNo'].replace("'", ""), order['orderNo'])
         self.order_page.save(save_btn='order:save_btn')
-
         self.order_page.get_orders_page()
         self.orders_page.filter_by_order_no(order['orderNo'])
         suborders_data_after = self.orders_page.get_child_table_data()[0]
@@ -573,10 +569,10 @@ class OrdersTestCases(BaseTest):
         self.info("filter by analysis_result: Conform")
         self.orders_page.apply_filter_scenario(filter_element='orders:analysis_result_filter',
                                                filter_text='Not Recieved', field_type='drop_down')
-
-        self.assertGreaterEqual(len(self.order_page.result_table()), 1)
+        results = self.order_page.result_table()
+        self.assertGreaterEqual(len(results), 1)
         self.info('get random suborder from result table to check that filter works')
-        suborders = self.orders_page.get_child_table_data(index=randint(0, 3))
+        suborders = self.orders_page.get_child_table_data(index=randint(0, len(results) - 1))
         filter_key_found = False
         for suborder in suborders:
             if suborder['Analysis Results'].split(' (')[0] == 'Not Recieved':
@@ -2833,10 +2829,6 @@ class OrdersTestCases(BaseTest):
         self.info("Navigate to orders page and create new order")
         self.orders_page.get_orders_page()
         self.orders_page.sleep_small()
-        response, contact = self.contacts_api.create_contact()
-        self.assertEqual(response['status'], 1)
-        contact_list = [contact['name']]
-        testplan = TestPlanAPI().create_completed_testplan_random_data()
         order_no = self.order_page.create_multiple_contacts_new_order(
             contacts=contact_list,
             material_type=testplan['materialType'][0]['text'],
@@ -2881,6 +2873,4 @@ class OrdersTestCases(BaseTest):
         table_data = self.analyses_page.get_child_table_data()
         analysis_testunits = [test_unit['Test Unit'] for test_unit in table_data]
         self.assertEqual(order_testunits, analysis_testunits)
-
-
 

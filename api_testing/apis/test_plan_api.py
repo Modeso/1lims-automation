@@ -239,7 +239,7 @@ class TestPlanAPI(TestPlanAPIFactory):
                                                  material_type_id=material_type_id)
 
         if testplan['message'] == 'operation_success':
-            return self.get_testplan_form_data(id=payload['number'])
+            return self.get_testplan_form_data(id=int(testplan['testPlanDetails']['id']))
         else:
             self.info(testplan)
 
@@ -327,7 +327,7 @@ class TestPlanAPI(TestPlanAPIFactory):
         material_type_id = GeneralUtilitiesAPI().get_material_id(random_article['materialType'])
         formatted_material = {'id': material_type_id, 'text': random_article['materialType']}
         # creates test unit with values in it
-        tu_response, _ = TestUnitAPI().create_quantitative_testunit(selectedMaterialTypes=[formatted_material])
+        tu_response, _ = TestUnitAPI().create_qualitative_testunit(selectedMaterialTypes=[formatted_material])
         testunit_data = TestUnitAPI().get_testunit_form_data(id=tu_response['testUnit']['testUnitId'])[0]['testUnit']
         formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
         testplan, payload = self.create_testplan(testUnits=[formated_testunit],

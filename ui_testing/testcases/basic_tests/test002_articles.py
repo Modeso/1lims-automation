@@ -740,4 +740,5 @@ class ArticlesTestCases(BaseTest):
         LIMS-6288
         """
         self.article_page.sleep_medium()
-        assert (self.article_page.deselect_all_configurations(), False)
+        self.assertFalse(self.article_page.deselect_all_configurations())
+
