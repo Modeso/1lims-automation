@@ -119,7 +119,7 @@ class Order(Orders):
         else:
             return []
 
-        def create_new_order(self, material_type='', article='', contact='', test_plans=[''], test_units=[''],
+    def create_new_order(self, material_type='', article='', contact='', test_plans=[''], test_units=[''],
                          multiple_suborders=0, departments='', order_no='', save=True, with_testplan=True,set_tstunit=True):
         self.info(' Create new order.')
         self.click_create_order_button()
