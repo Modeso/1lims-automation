@@ -2902,7 +2902,7 @@ class OrdersTestCases(BaseTest):
         analysis_number = [suborder['analysis'][0] for suborder in suborders[0]['orders']]
         self.info('Asserting there is only one analysis for this order')
         self.assertEqual(len(analysis_number), 1)
-        self.info('checking testunit for each suborder ')
+        self.info('checking testunit for each testplan record ')
         self.order_page.get_orders_page()
         self.order_page.navigate_to_analysis_tab()
         self.analyses_page.apply_filter_scenario(filter_element='analysis_page:analysis_no_filter',
