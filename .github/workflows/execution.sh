@@ -4,7 +4,7 @@ EXECUTION_FILES=(
     ui_testing/testcases/basic_tests/test005_contacts.py
   )
 
-TEST_REG='test02[2,3]'
+TEST_REG='test[0-9]{3}'
 
 
 NODE_TOTAL=$1;
