@@ -2885,17 +2885,10 @@ class OrdersTestCases(BaseTest):
         test_units2 = [tst_plan3['testUnits'][0]['name'], tst_plan4['testUnits'][0]['name']]
         test_units3 = [tst_plan5['testUnits'][0]['name'], tst_plan6['testUnits'][0]['name']]
         self.info(' Create new order.')
-        self.order_page.click_create_order_button()
-        self.order_page.set_new_order()
-        self.order_page.set_contact(contact='')
-        self.order_page.sleep_small()
-        self.order_page.set_material_type(material_type='Raw Material')
-        self.order_page.sleep_small()
+        self.order_page.create_new_order(article=article1, material_type='Raw Material',
+                                         test_plans=[tst_plan1['testPlan']['text'], tst_plan2['testPlan']['text']],
+                                         save=False)
         order_no = self.order_page.get_no()
-        self.order_page.set_article(article=article1)
-        self.order_page.sleep_small()
-        self.order_page.set_test_plan(test_plan=tst_plan1['testPlan']['text'])
-        self.order_page.set_test_plan(test_plan=tst_plan2['testPlan']['text'])
         self.info('create 3 suborder')
         self.order_page.create_new_suborder(material_type='Raw Material',
                                             test_plans=[tst_plan3['testPlan']['text'], tst_plan4['testPlan']['text']],
