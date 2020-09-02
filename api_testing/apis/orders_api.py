@@ -79,8 +79,6 @@ class OrdersAPIFactory(BaseAPI):
         shipment_date = self.get_current_date()
         current_year = self.get_current_year()
         contacts = random.choice(ContactsAPI().get_all_contacts()[0]['contacts'])
-        import ipdb;
-        ipdb.set_trace()
         _payload = [
             {
                 'orderNo': int(order_no),
@@ -432,13 +430,12 @@ class OrdersAPI(OrdersAPIFactory):
 
     def create_order_with_test_units(self):
         all_test_units = TestUnitAPI().get_all_test_units()[0]['testUnits']
-        import ipdb;
-        ipdb.set_trace()
         testunit = random.choice(all_test_units)
-        testunit_form_data = TestUnitAPI().get_testunit_form_data(id=testunit['id'])
-        testunit[id]=testunit_form_data[0]['testUnit']['id']
-        material_type = '\n'.join(testunit['materialTypes'])
+        # testunit_form_data = TestUnitAPI().get_testunit_form_data(id=testunit['id'])
+        # testunit[id]=testunit_form_data[0]['testUnit']['id']
+        material_type = testunit['materialTypes'][0]
         material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
+        api, testunitss = TestUnitAPI().get_all_test_units(filter='{"materialTypes":'+str(material_type_id)+'}')
         testunit_list = [testunit]
         # article=random.choice(ArticleAPI().get_all_articles())
         payload = {

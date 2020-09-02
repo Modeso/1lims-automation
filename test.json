@@ -1,0 +1,109 @@
+[
+    {
+       "selectedTestPlans":[
+          
+       ],
+       "deletedTestPlans":[
+          
+       ],
+       "deletedAnalysisIds":[
+          
+       ],
+       "analysisNo":[
+          
+       ],
+       "mainOrderDynamicFieldsValues":[
+          
+       ],
+       "shipmentDate":"2020-09-02",
+       "testDate":"2020-09-02",
+       "testDatedateOption":{
+          "year":2020,
+          "month":9,
+          "day":2
+       },
+       "shipmentDatedateOption":{
+          "year":2020,
+          "month":9,
+          "day":2
+       },
+       "selectedDepartments":[
+          
+       ],
+       "selectedTestUnits":[
+          {
+             "id":7,
+             "name":"test unit 1",
+             "new":true,
+             "conditionalSelectId":1
+          },
+          {
+             "id":8,
+             "name":"test unit 2",
+             "new":true,
+             "conditionalSelectId":1
+          },
+          {
+             "id":9,
+             "name":"test unit 3",
+             "new":true,
+             "conditionalSelectId":1
+          }
+       ],
+       "testPlans":[
+          
+       ],
+       "testUnits":[
+          {
+             "id":7,
+             "text":"test unit 1",
+             "textWithHtmlTags":"test unit 1",
+             "conditionalSelectId":1
+          },
+          {
+             "id":8,
+             "text":"test unit 2",
+             "textWithHtmlTags":"test unit 2",
+             "conditionalSelectId":1
+          },
+          {
+             "id":9,
+             "text":"test unit 3",
+             "textWithHtmlTags":"test unit 3",
+             "conditionalSelectId":1
+          }
+       ],
+       "article":{
+          "id":20,
+          "text":"new_article No:1"
+       },
+       "articleId":20,
+       "attachments":null,
+       "orderType":{
+          "id":1,
+          "text":"New Order"
+       },
+       "orderNo":2,
+       "year":2020,
+       "yearOption":1,
+       "orderNoWithYear":"2-2020",
+       "contact":[
+          {
+             "id":4,
+             "text":"contact_me"
+          }
+       ],
+       "materialType":{
+          "id":1,
+          "text":"Raw Material"
+       },
+       "materialTypeId":1,
+       "dynamicFieldsValues":[
+          
+       ],
+       "departments":[
+          
+       ],
+       "withArticle":true
+    }
+ ]

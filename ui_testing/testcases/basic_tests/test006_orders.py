@@ -2874,8 +2874,9 @@ class OrdersTestCases(BaseTest):
         # selected_testunits = []
         # for i in range(0, 2):
         #     selected_testunits.append(random.choice(testunits['testUnits'])['name'])
-
-        response, order = self.orders_api.create_order_with_test_units()
+        import ipdb;
+        ipdb.set_trace()
+        response, payload = self.orders_api.create_order_with_test_units()
        # response, order = self.orders_api.create_new_order(selectedTestUnits=selected_testunits, testPlans=[])
 
 
