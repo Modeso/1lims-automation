@@ -2905,13 +2905,13 @@ class OrdersTestCases(BaseTest):
 
         import ipdb;ipdb.set_trace()
 
-        self.order_page.save('general:save')
+        self.order_page.save('order:save_btn')
         self.order_page.navigate_to_analysis_tab()
         self.assertEqual(self.analysis_page.get_analysis_count(), 4)
         for i in range(4):
             row = self.analysis_page.open_accordion_for_analysis_index(i)
             test_units = self.analysis_page.get_testunits_in_analysis(row)
-            test_units_names = [name['Test Unit Name'].split(':')[0] for name in test_units]
+            test_units_names = [name['Test Unit Name'].split(' ')[0] for name in test_units]
             self.assertEqual(len(test_units_names), 2)
             self.assertEqual(test_units_names[0], testunits_in_testplans[i])
             self.assertEqual(test_units_names[1], testunits[i])
