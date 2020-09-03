@@ -2871,3 +2871,50 @@ class OrdersTestCases(BaseTest):
             self.assertTrue(key_found)
             # close child table
             self.orders_page.close_child_table(source=results[i])
+
+    def test085_add_multiple_suborders_with_testplans_testunits(self):
+        """
+         New: Orders: table/create: Create 4 suborders from the table view with different
+         test plans & units ( single select ) and make sure the correct corresponding analysis records.
+
+         LIMS-4247
+        """
+        self.test_plan_api = TestPlanAPI()
+        self.analysis_page = SingleAnalysisPage()
+        testplans = []
+        testunits_in_testplans = []
+        for i in range(4):
+            testplans.append(self.test_plan_api.create_completed_testplan_random_data())
+            testunits_in_testplans.extend(self.test_plan_api.get_testunits_in_testplan_by_No(testplans[i]['number']))
+        test_units = TestUnitAPI().get_testunits_with_material_type('All')
+        test_units_names_only = [testunit['name'] for testunit in test_units]
+        testunits = random.sample(test_units_names_only, 4)
+        self.info("create new order")
+        self.order_page.create_new_order(material_type=testplans[0]['materialType'][0]['text'],
+                                         article=testplans[0]['selectedArticles'][0]['text'],
+                                         test_plans=[testplans[0]['testPlan']['text']],
+                                         test_units=[testunits[0]], save=False)
+
+        for i in range(1, 4):
+            self.info("add new suborder with test plan {} and test unit {}".
+                      format(testplans[i]['testPlan']['text'], testunits[i]))
+            self.order_page.create_new_suborder(material_type=testplans[i]['materialType'][0]['text'],
+                                                article_name=testplans[i]['selectedArticles'][0]['text'],
+                                                test_plan=testplans[i]['testPlan']['text'],
+                                                test_unit=testunits[i])
+
+        import ipdb;ipdb.set_trace()
+
+        self.order_page.save('general:save')
+        self.order_page.navigate_to_analysis_tab()
+        self.assertEqual(self.analysis_page.get_analysis_count(), 4)
+        for i in range(4):
+            row = self.analysis_page.open_accordion_for_analysis_index(i)
+            test_units = self.analysis_page.get_testunits_in_analysis(row)
+            test_units_names = [name['Test Unit Name'].split(':')[0] for name in test_units]
+            self.assertEqual(len(test_units_names), 2)
+            self.assertEqual(test_units_names[0], testunits_in_testplans[i])
+            self.assertEqual(test_units_names[1], testunits[i])
+
+
+
