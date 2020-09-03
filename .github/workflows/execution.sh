@@ -43,5 +43,5 @@ do
   if [[ $exit_code = 1 ]]
   then
     exit 1;
-  fig
+  fi
 done
