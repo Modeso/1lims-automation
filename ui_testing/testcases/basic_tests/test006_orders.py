@@ -2551,13 +2551,15 @@ class OrdersTestCases(BaseTest):
         self.assertEquals(multiple_lines_properties['textOverflow'], 'clip')
         self.assertEquals(multiple_lines_properties['lineBreak'], 'auto')
 
-    @attr(series=True)
-    def test076_search_with_test_unit_name(self):
+    #@attr(series=True)
+    @parameterized.expand(['Name', 'Method'])
+    def test076_search_with_test_unit_name_method(self, search_by):
         """
         Orders:Test unit search approach
         allow user to search with test unit name in the drop down list of the order form
-
         LIMS-6664
+        allow user to search with test unit method in the drop down list of order form
+        LIMS-6666
         """
         self.test_units_page = TstUnits()
         self.info("get random test unit data to get its material type")
@@ -2569,7 +2571,16 @@ class OrdersTestCases(BaseTest):
         self.test_units_page.open_configurations()
         self.orders_page.sleep_tiny()
         self.test_units_page.open_testunit_name_configurations_options()
-        self.test_units_page.select_option_to_view_search_with(view_search_options=['Name'])
+        self.test_units_page.select_option_to_view_search_with(view_search_options=[search_by])
+        self.base_selenium.refresh()
+        self.test_units_page.open_testunit_name_configurations_options()
+        selected_option = self.base_selenium.get_attribute(element='configurations_page:view_search_ddl',
+                                                           attribute='innerText')
+        self.info('Asserting only one option selected')
+        self.assertEqual(len([selected_option]), 1)
+        self.info('Asserting correct option is selected')
+        self.assertIn(search_by, selected_option)
+
         self.info('go to orders page')
         self.order_page.get_orders_page()
         if random_test_unit['materialTypes'][0] != 'All':
@@ -2578,7 +2589,7 @@ class OrdersTestCases(BaseTest):
         else:
             test_unit_suggestion_list = Order().create_new_order_get_test_unit_suggetion_list(
                 material_type='', test_unit_name=' ')
-        self.info('checking name field only is displayed')
+        self.info('checking {} field only is displayed'.format(search_by))
         for test_unit in test_unit_suggestion_list:
             self.assertNotIn(':', test_unit)
 
