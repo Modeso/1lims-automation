@@ -345,3 +345,31 @@ class TestPlanAPI(TestPlanAPIFactory):
         with open(config_file, "r") as read_file:
             payload = json.load(read_file)
         super().set_configuration(payload=payload)
+
+    def create_completed_testplan_with_formatted_article(self, formatted_article, material_type):
+        material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
+        formatted_material = {'id': material_type_id, 'text': material_type}
+        tu_response, _ = TestUnitAPI().create_quantitative_testunit(selectedMaterialTypes=[formatted_material])
+        testunit_data = TestUnitAPI().get_testunit_form_data(id=tu_response['testUnit']['testUnitId'])[0]['testUnit']
+        formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
+        testplan, payload = self.create_testplan(testUnits=[formated_testunit],
+                                                 selectedArticles=[formatted_article],
+                                                 materialType=[formatted_material],
+                                                 materialTypeId=[material_type_id])
+
+        if testplan['message'] == 'operation_success':
+            return payload
+        else:
+            return None
+
+    def create_multiple_test_plan_with_same_article(self):
+        material_type_id = GeneralUtilitiesAPI().get_material_id('Raw Material')
+        materialType = {"id": material_type_id, "text": 'Raw Material'}
+        article_data = ArticleAPI().get_formatted_article_with_formatted_material_type(materialType)
+        article_name = article_data['name']
+        formatted_article = {'id': article_data['id'], 'text': article_name}
+        new_test_plan1 = TestPlanAPI().create_completed_testplan_with_formatted_article(
+            material_type='Raw Material', formatted_article=formatted_article)
+        new_test_plan2 = TestPlanAPI().create_completed_testplan_with_formatted_article(
+            material_type='Raw Material', formatted_article=formatted_article)
+        return new_test_plan1, new_test_plan2, article_name

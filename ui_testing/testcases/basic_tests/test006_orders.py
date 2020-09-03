@@ -372,7 +372,7 @@ class OrdersTestCases(BaseTest):
         suborder_data = self.order_page.create_new_suborder(
             material_type=test_plan['materialType'][0]['text'],
             article_name=test_plan['selectedArticles'][0]['text'],
-            test_plan=test_plan['testPlan']['text'],
+            test_plan=[test_plan['testPlan']['text']],
             add_new_suborder_btn='order:add_another_suborder')
 
         self.assertEqual(suborder_data['orderNo'].replace("'", ""), order['orderNo'])
@@ -2906,3 +2906,64 @@ class OrdersTestCases(BaseTest):
             self.orders_page.get_archived_items()
             self.orders_page.filter_by_analysis_number(filter_text=analysis_no[i])
             self.assertEqual(len(self.order_page.result_table()) - 1, 0)
+
+    def test091_choose_test_plans_without_test_units(self):
+        """
+        Orders: Create: Orders Choose test plans without test units
+        LIMS-4350
+        """
+        self.info('create multiple testplan with same article of each suborder')
+        tst_plan1, tst_plan2, article1 = TestPlanAPI().create_multiple_test_plan_with_same_article()
+        tst_plan3, tst_plan4, article2 = TestPlanAPI().create_multiple_test_plan_with_same_article()
+        tst_plan5, tst_plan6, article3 = TestPlanAPI().create_multiple_test_plan_with_same_article()
+        test_units1 = [tst_plan2['testUnits'][0]['name'], tst_plan1['testUnits'][0]['name']]
+        test_units2 = [tst_plan3['testUnits'][0]['name'], tst_plan4['testUnits'][0]['name']]
+        test_units3 = [tst_plan5['testUnits'][0]['name'], tst_plan6['testUnits'][0]['name']]
+        self.info(' Create new order.')
+        self.order_page.create_new_order(article=article1, material_type='Raw Material',
+                                         test_plans=[tst_plan1['testPlan']['text'], tst_plan2['testPlan']['text']],
+                                         set_tstunit=False, save=False)
+        order_no = self.order_page.get_no()
+        self.info('create 3 suborder')
+        self.order_page.create_new_suborder(material_type='Raw Material',
+                                            test_plans=[tst_plan3['testPlan']['text'], tst_plan4['testPlan']['text']],
+                                            article_name=article2, add_tstunit=False)
+        self.order_page.create_new_suborder(material_type='Raw Material',
+                                            test_plans=[tst_plan5['testPlan']['text'], tst_plan6['testPlan']['text']],
+                                            article_name=article3, add_tstunit=False)
+
+        self.order_page.save(save_btn='order:save_btn')
+        order_id = self.order_page.get_order_id()
+        suborders_data, _ = self.orders_api.get_suborder_by_order_id(order_id)
+        suborders = suborders_data['orders']
+        analysis_no = []
+        for suborder in suborders:
+            self.assertEqual(len(suborder['analysis']), 1)
+            analysis_no.append(suborder['analysis'][0])
+        self.assertEqual(3, len(analysis_no))
+        self.info('assert the 3 analysis numbers are triggered for each suborder ')
+        self.assertNotEqual(analysis_no[0], analysis_no[1])
+        self.assertNotEqual(analysis_no[0], analysis_no[2])
+        self.assertNotEqual(analysis_no[1], analysis_no[2])
+        self.orders_page.get_orders_page()
+        self.orders_page.filter_by_order_no(filter_text=order_no)
+        suborders_data = self.order_page.get_child_table_data(index=0)
+        analysis_no_list = []
+        for suborder in suborders_data:
+            analysis_no_list.append(suborder['Analysis No.'])
+        self.assertCountEqual(analysis_no, analysis_no_list)
+        self.orders_page.navigate_to_analysis_active_table()
+        self.analyses_page.filter_by_order_no(filter_text=order_no)
+        analysis_rows = self.order_page.result_table()
+        self.assertEqual(3, len(analysis_rows) - 1)
+        for i in range(2,0,-1):
+            if i == 2:
+                tstunits = test_units1
+            elif i == 1:
+                tstunits = test_units2
+            else:
+                tstunits = test_units3
+            analysis_data = self.order_page.get_child_table_data(index=i)
+            self.assertEqual(len(analysis_data), 2)
+            for testunit in analysis_data:
+                self.assertIn(testunit['Test Unit'].replace("'", ""), tstunits)
