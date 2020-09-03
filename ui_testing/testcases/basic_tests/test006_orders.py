@@ -2904,7 +2904,7 @@ class OrdersTestCases(BaseTest):
                                                 test_unit=testunits[i])
 
         import ipdb;ipdb.set_trace()
-        self.order_page.save('order:save_btn')
+        self.order_page.save(save_btn='order:save_btn')
         self.order_page.navigate_to_analysis_tab()
         self.assertEqual(self.analysis_page.get_analysis_count(), 4)
         for i in range(4):
