@@ -2826,7 +2826,7 @@ class OrdersTestCases(BaseTest):
             self.assertEqual(analysis_data[0]['Test Unit'], testunit_name)
 
     def test084_filter_by_changed_by(self):
-        """
+         """
         New: Orders: Filter Approach: I can filter by changed by
 
         LIMS-3495
@@ -2872,7 +2872,7 @@ class OrdersTestCases(BaseTest):
             # close child table
             self.orders_page.close_child_table(source=results[i])
 
-      def test085_select_large_number_of_test_units_in_one_testplan(self):
+    def test085_select_large_number_of_test_units_in_one_testplan(self):
           """
           Orders: Test plan Approach: In case I select large number of test units in one test plan
           , they should display successfully in the pop up
