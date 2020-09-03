@@ -2901,8 +2901,41 @@ class OrdersTestCases(BaseTest):
         self.orders_page.get_archived_items()
         self.orders_page.filter_by_order_no(filter_text=order_no)
         self.assertEqual(len(self.order_page.result_table()) - 1, 0)
-        for i in range(0,len(analysis_no)-1):
+        for i in range(0, len(analysis_no) - 1):
             self.base_selenium.refresh()
             self.orders_page.get_archived_items()
             self.orders_page.filter_by_analysis_number(filter_text=analysis_no[i])
             self.assertEqual(len(self.order_page.result_table()) - 1, 0)
+
+    def test091_add_any_number_of_suborders(self):
+        '''
+        Orders: Table with add: Allow user to add any number of the suborders records not only 5 suborders
+        LIMS-5220
+        :return:
+        '''
+        testPlan = TestPlanAPI().create_completed_testplan_random_data()
+        order = self.orders_api.get_order_with_multiple_sub_orders()
+        self.info('edit order with No {}'.format(order['orderNo']))
+        self.orders_page.get_order_edit_page_by_id(order['id'])
+        suborders_data, _ = self.orders_api.get_suborder_by_order_id(order['id'])
+        suborders = suborders_data['orders']
+        len_before = len(suborders)
+        self.info('create 10 suborders')
+        for i in range(0, 10):
+            self.order_page.create_new_suborder(material_type=testPlan['materialType'][0]['text'],
+                                                article_name=testPlan['selectedArticles'][0]['text'],
+                                                test_plan=testPlan['testPlan']['text'])
+        self.order_page.save(save_btn='order:save_btn')
+        table_after = self.base_selenium.get_table_rows(element='order:suborder_table')
+        len_after = len(table_after)
+        #print('len after111-->',len_after)
+        self.assertEqual(len_after-len_before,10)
+        self.info('duplicate 5 suborders')
+        for i in range(0,5):
+            self.order_page.duplicate_from_table_view()
+        self.order_page.save(save_btn='order:save_btn')
+        self.base_selenium.refresh()
+        table_after2 = self.base_selenium.get_table_rows(element='order:suborder_table')
+        final_len = len(table_after2)
+        #print('final len',final_len)
+        self.assertEqual(final_len-len_before,15)
