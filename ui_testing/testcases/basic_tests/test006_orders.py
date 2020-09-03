@@ -2871,3 +2871,29 @@ class OrdersTestCases(BaseTest):
             self.assertTrue(key_found)
             # close child table
             self.orders_page.close_child_table(source=results[i])
+
+    def test085_add_sub_order_with_multiple_testplans_only(self):
+        """
+        Any new suborder with multiple test plans should create one analysis record
+        only with those test plans and test units that corresponding to them.
+
+        LIMS-4276
+        """
+        self.info('create order with two testplans only')
+        response, payload = self.orders_api.create_order_with_double_test_plans(only_test_plans=True)
+        self.assertEqual(response['status'], 1)
+        test_plans = [payload[0]['selectedTestPlans'][0]['name'], payload[0]['selectedTestPlans'][1]['name']]
+        self.info("created order has test plans {} and {} ".format(test_plans[0], test_plans[1]))
+        test_units = [TestPlanAPI().get_testunits_in_testplan_by_No(payload[0]['testPlans'][0]['number']),
+                      TestPlanAPI().get_testunits_in_testplan_by_No(payload[0]['testPlans'][1]['number'])]
+
+        self.orders_page.navigate_to_analysis_active_table()
+        self.analyses_page.filter_by_order_no(payload[0]['orderNo'])
+        self.assertEqual(len(self.analyses_page.result_table()) - 1, 1)
+        analysis_data = self.analyses_page.get_the_latest_row_data()
+        found_test_plans = analysis_data['Test Plans'].split(', ')
+        self.assertEqual(len(found_test_plans), 2)
+        suborder_data = self.analyses_page.get_child_table_data()
+        found_test_units = [testunit['Test Unit'] for testunit in suborder_data]
+        self.assertCountEqual(test_plans, found_test_plans)
+        self.assertNotEqual(test_units, found_test_units)
