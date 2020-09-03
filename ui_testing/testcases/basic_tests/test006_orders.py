@@ -2871,3 +2871,36 @@ class OrdersTestCases(BaseTest):
             self.assertTrue(key_found)
             # close child table
             self.orders_page.close_child_table(source=results[i])
+            self.analyses_page.get_the_latest_row_data()
+
+    def test087_update_contact_config_to_number_create_form(self):
+        """
+        Sample Management: Contact configuration approach: In case the user configures the
+        contact field to display number this action should reflect on the order form step one
+
+        LIMS-6626
+        """
+        self.info("set contact configuration to be searchable by number only")
+        self.orders_api.set_contact_configuration_to_number_only()
+        response, _ = self.contacts_api.get_all_contacts()
+        self.assertEqual(response['status'], 1)
+        self.assertGreaterEqual(response['count'], 1)
+        random_contact = random.choice(response['contacts'])
+        contact_no = random_contact['companyNo']
+        contact_name = random_contact['name']
+        testplan = TestPlanAPI().create_completed_testplan_random_data()
+        self.info("create new order with contact no {}".format(contact_no))
+        self.order_page.create_new_order(contact=contact_no, save=False,
+                                         material_type=testplan['materialType'][0]['text'],
+                                         article=testplan['selectedArticles'][0]['text'],
+                                         test_plans=[testplan['testPlan']['text']])
+        self.info("assert that contact set to {}".format(str('No: ' + contact_no)))
+        self.assertCountEqual(self.order_page.get_contact(), [str('No: ' + contact_no)])
+        self.order_page.clear_contact()
+        contact_name_result = self.base_selenium.get_drop_down_suggestion_list(element='order:contact',
+                                                                               item_text=contact_name)
+        self.info("assert that suggestion list of contact name {} is {}".format(contact_name, str('No: ' + contact_no)))
+
+        self.assertEqual(contact_name_result[0], str('No: ' + contact_no))
+
+
