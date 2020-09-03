@@ -769,6 +769,16 @@ elements = {
             'method': 'xpath',
             'value': "//a[@class='btn m-btn--pill btn-secondary m-btn m-btn--custom m-btn--label-brand m-btn--bolder']"
         },
+        'modules_configurations': {
+            'method': 'xpath',
+            'value': '//*[@id="dropdown-body"]/div/ul/li[7]/a/span'
+        }
+    },
+    'modules_configurations':{
+        'save':{
+        'method': 'xpath',
+        'value': '//*[@id="modules"]/div/div/div/div/div[5]/div/div/div/button[1]'
+          },
 
     },
     'user_management': {

@@ -1,6 +1,7 @@
 from ui_testing.testcases.base_test import BaseTest
 from ui_testing.pages.order_page import Order
 from ui_testing.pages.orders_page import Orders
+from ui_testing.pages.header_page import Header
 from ui_testing.pages.login_page import Login
 from ui_testing.pages.testunits_page import TstUnits
 from api_testing.apis.orders_api import OrdersAPI
@@ -2871,3 +2872,22 @@ class OrdersTestCases(BaseTest):
             self.assertTrue(key_found)
             # close child table
             self.orders_page.close_child_table(source=results[i])
+
+    def test086(self):
+        displayed_headers=[]
+        self.header_page = Header()
+        self.header_page.click_on_header_button()
+        self.header_page.click_on_modules_configurations()
+        self.order_page.sleep_tiny()
+        self.info('uncheck article checkbox')
+        self.base_selenium.find_element_by_xpath('//*[@id="m_tabs_1"]/div/div[1]/div/div[1]/span/label').click()
+        self.header_page.save(save_btn='modules_configurations:save')
+        self.order_page.get_orders_page()
+        self.orders_page.open_child_table(self.orders_page.result_table()[0])
+        header_row = self.base_selenium.get_table_head_elements(element='general:table_child')
+        for h in header_row:
+            print(h.text)
+            displayed_headers.append(h.text)
+        self.assertNotIn('Article Name', displayed_headers)
+        self.order_page.create_new_order()
+

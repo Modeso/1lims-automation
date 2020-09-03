@@ -418,3 +418,6 @@ class Header(BasePages):
 
         self.info(' No. of selected rows {} '.format(no_of_rows))
         return selected_rows_data, selected_rows
+
+    def click_on_modules_configurations(self):
+        self.base_selenium.click(element='header:modules_configurations')
