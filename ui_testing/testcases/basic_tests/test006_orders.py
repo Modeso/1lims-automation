@@ -2871,7 +2871,6 @@ class OrdersTestCases(BaseTest):
             self.assertTrue(key_found)
             # close child table
             self.orders_page.close_child_table(source=results[i])
-            self.analyses_page.get_the_latest_row_data()
 
     def test087_update_contact_config_to_number_create_form(self):
         """
