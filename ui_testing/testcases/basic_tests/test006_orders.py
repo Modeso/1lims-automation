@@ -2871,3 +2871,22 @@ class OrdersTestCases(BaseTest):
             self.assertTrue(key_found)
             # close child table
             self.orders_page.close_child_table(source=results[i])
+
+    def test085_order_of_test_units_in_analysis(self):
+        """
+        Orders: Ordering test units: Test units in the analysis section should display
+        in the same order as in the order section
+        LIMS-7415
+        """
+        self.info('create new order with 3 test units')
+        response, payload = self.orders_api.create_order_with_test_units(3)
+        self.info('get test units of order')
+        order_testunits = [test_unit['name'] for test_unit in payload[0]['testUnits']]
+        self.info('navigate to analysis tab')
+        self.orders_page.navigate_to_analysis_active_table()
+        self.info('filter by order number')
+        self.analyses_page.filter_by_order_no(payload[0]['orderNoWithYear'])
+        self.info('get child table data')
+        table_data = self.analyses_page.get_child_table_data()
+        analysis_testunits = [test_unit['Test Unit'] for test_unit in table_data]
+        self.assertEqual(order_testunits, analysis_testunits)
