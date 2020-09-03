@@ -711,7 +711,7 @@ class BaseSelenium:
         headers = self.get_table_head_elements(element=table_element)
         headers_text = [header.text for header in headers]
         row_cells = self.get_row_cells(row=row)
-
+        print('row celsssssssssss:-',row_cells)
         for column_value in headers_text:
             cells_elements[column_value] = row_cells[headers_text.index(column_value)]
 
