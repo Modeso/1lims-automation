@@ -1,6 +1,7 @@
 #!/bin/bash
 
 EXECUTION_FILES=(
+
 #    ui_testing/testcases/basic_tests/test002_articles.py
 #    ui_testing/testcases/basic_tests/test003_testplans.py
 #    ui_testing/testcases/basic_tests/test004_testunits.py
@@ -14,6 +15,7 @@ EXECUTION_FILES=(
   )
 
 TEST_REG='test085'
+
 
 
 
