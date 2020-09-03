@@ -216,6 +216,35 @@ class TestPlanAPI(TestPlanAPIFactory):
         else:
             return False
 
+    def create_completed_testplan_multiple_testunits(self) :
+
+        random_article = random.choice(ArticleAPI().get_all_articles_json())
+        formatted_article = {'id' : random_article['id'], 'text' : random_article['name']}
+        material_type_id = GeneralUtilitiesAPI().get_material_id(random_article['materialType'])
+        formatted_material = {'id' : material_type_id, 'text' : random_article['materialType']}
+        # creates test unit with values in it
+        tu_response, _ = TestUnitAPI().create_quantitative_testunit(selectedMaterialTypes=[formatted_material])
+
+        testunit_data = TestUnitAPI().get_testunit_form_data(id=tu_response['testUnit']['testUnitId'])[0]['testUnit']
+        formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
+
+        tu_response2, _ = TestUnitAPI().create_quantitative_testunit(selectedMaterialTypes=[formatted_material])
+        testunit_data2= TestUnitAPI().get_testunit_form_data(id=tu_response2['testUnit']['testUnitId'])[0]['testUnit']
+        formated_testunit2 = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data2)
+
+        testplan, payload = self.create_testplan(testUnits=[formated_testunit,formated_testunit2],
+                                                 selectedArticles=[formatted_article],
+                                                 materialType=[formatted_material],
+                                                 materialTypeId=[material_type_id])
+
+        if testplan['message'] == 'operation_success' :
+            return payload,testplan
+        else :
+            return None
+        
+
+
+
     def get_completed_testplans_with_material_and_same_article(self, material_type, article, articleNo):
         all_test_plans = self.get_completed_testplans(limit=1000)
         completed_test_plans = [test_plan for test_plan in all_test_plans if test_plan['materialType'] == material_type]

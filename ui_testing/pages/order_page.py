@@ -142,6 +142,8 @@ class Order(Orders):
         self.save(save_btn='order:save_btn')
         self.info(' Order created with no : {} '.format(order_no))
 
+        return order_no
+
     def create_multiple_contacts_new_order(self, contacts):
         self.click_create_order_button()
         self.sleep_small()
