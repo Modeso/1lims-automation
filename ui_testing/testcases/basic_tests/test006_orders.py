@@ -2889,7 +2889,7 @@ class OrdersTestCases(BaseTest):
         self.info('get child table data')
         table_data = self.analyses_page.get_child_table_data()
         analysis_testunits = [test_unit['Test Unit'] for test_unit in table_data]
-        self.assertEqual(order_testunits, analysis_testunits)
+        self.assertCountEqual(order_testunits, analysis_testunits)
         
     def test090_if_cancel_archive_order_no_order_suborder_analysis_will_archived(self):
         """
