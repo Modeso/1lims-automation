@@ -631,7 +631,10 @@ class TestUnitsTestCases(BaseTest):
     @parameterized.expand([('unitsub', 'qualitative'),
                            ('unitsub', 'quantitative'),
                            ('unitsuper', 'qualitative'),
-                           ('unitsuper', 'quantitative')])
+                           ('unitsuper', 'quantitative'),
+                           ('unitsub', 'quantitative MiBi'),
+                           ('unitsuper', 'quantitative MiBi')
+                           ])
     def test024_test_unit_with_sub_and_super_scripts_appears_in_exported_sheet(self, unit_with_sub_or_super, type):
         """
         New: Test unit: Export: Sub & Super scripts Approach: Allow user to see the
@@ -652,8 +655,12 @@ class TestUnitsTestCases(BaseTest):
         Test unit: Export: Sub & Super scripts Approach:  Allow user to see the sub &
         super scripts in the export file
 
-        LIMS-5809
+        LIMS-5810
+
+        Test unit: Export: Sub & Super scripts Approach: Allow user to see the sub
+         & super scripts in the export file ( quantitative MiBi )
         """
+        
         if unit_with_sub_or_super == 'unitsub' and type == 'qualitative':
             response, payload = self.test_unit_api.create_qualitative_testunit(unit='[sub]')
             preview_unit = 'sub'
@@ -663,9 +670,16 @@ class TestUnitsTestCases(BaseTest):
         elif unit_with_sub_or_super == 'unitsub' and type == 'quantitative':
             response, payload = self.test_unit_api.create_quantitative_testunit(unit='[sub]')
             preview_unit = 'sub'
-        else:
+        elif unit_with_sub_or_super == 'unitsuper' and type == 'quantitative':
             response, payload = self.test_unit_api.create_quantitative_testunit(unit='{super}')
             preview_unit = 'super'
+        elif unit_with_sub_or_super == 'unitsub' and type == 'quantitative MiBi ':
+            response, payload = self.test_unit_api.create_mibi_testunit(unit='[sub]')
+            preview_unit = 'sub'
+        else :
+            response, payload = self.test_unit_api.create_mibi_testunit(unit='{super}')
+            preview_unit = 'super'
+
 
         self.assertEqual(response['status'], 1, 'test unit not createed {}'.format(payload))
         self.test_unit_page.apply_filter_scenario(
@@ -727,12 +741,15 @@ class TestUnitsTestCases(BaseTest):
             self.assertEqual(self.base_selenium.get_url(), '{}testUnits/add'.format(self.base_selenium.url))
             self.info('clicking on Overview cancelled')
 
-    def test027_edit_approach_overview_button(self):
+    @parameterized.expand(['No-edits', 'With_edits'])
+    def test027_edit_approach_overview_button(self, edit):
         """
         Edit: Overview Approach: Make sure after I press on
         the overview button, it redirects me to the active table
+        LIMS-6202/LIMS-6818
 
-        LIMS-6202
+        -Popup should appear when editing then clicking on overview without saving <All data will be lost>
+        LIMS-6812
         """
         self.info('open edit page of random test unit')
         random_test_unit = random.choice(self.test_unit_api.get_all_testunits_json())
@@ -740,10 +757,17 @@ class TestUnitsTestCases(BaseTest):
         test_units_url = self.base_selenium.get_url()
         self.info('test_units_url: {}'.format(test_units_url))
         self.info("click on Overview, it will redirect you to testunits' page")
-        self.test_unit_page.click_overview()
-        self.test_unit_page.sleep_tiny()
-        self.assertEqual(self.base_selenium.get_url(), '{}testUnits'.format(self.base_selenium.url))
-        self.info('clicking on Overview confirmed')
+        if edit == 'No-edits':
+            self.test_unit_page.click_overview()
+            self.test_unit_page.sleep_tiny()
+            self.info('Clicked overview without editing - Asserting active table is displayed')
+            self.assertEqual(self.base_selenium.get_url(), '{}testUnits'.format(self.base_selenium.url))
+            self.info('clicking on Overview confirmed')
+        else:
+            self.test_unit_page.update_test_unit(id=random_test_unit['id'], save=False)
+            self.test_unit_page.click_overview()
+            self.info('Clicked overview after editing without saving - Asserting popup appears')
+            self.assertTrue(self.test_unit_page.confirm_popup(check_only=True))
 
     @parameterized.expand(['Quantitative', 'Qualitative', 'Quantitative MiBi'])
     def test028_changing_testunit_type_update_fields_accordingly(self, testunit_type):
@@ -1281,7 +1305,6 @@ class TestUnitsTestCases(BaseTest):
     def test048_filter_by_testunit_material_type_returns_only_correct_results(self):
         """
         New: Test units: Filter Approach: Make sure you can filter by material type
-
         LIMS-6433
         """
         data_to_filter_with = self.test_unit_api.get_first_record_with_data_in_attribute(attribute='materialTypes')
@@ -1320,7 +1343,7 @@ class TestUnitsTestCases(BaseTest):
         self.test_units_page.sleep_tiny()
         test_unit_found = self.test_units_page.filter_by_user_get_result(payload['username'])
         self.assertTrue(test_unit_found)
-
+        
     def test050_sub_and_super_scripts_in_active_table(self) :
         """
             New: Test units: Active table/unit: Sub & Super scripts: Allow unit to display with sub & super scripts in the active table
@@ -1339,8 +1362,3 @@ class TestUnitsTestCases(BaseTest):
         span = cells['Unit'].find_element_by_class_name('white-tooltip')
         required_value = span.get_attribute('ng-reflect-ngb-tooltip')
         self.assertEqual(payload['unit'],required_value)
-
-
-
-
-
