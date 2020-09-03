@@ -11,6 +11,7 @@ class Orders(BasePages):
     def get_orders_page(self):
         self.base_selenium.get(url=self.orders_url)
         self.wait_until_page_is_loaded()
+        self.sleep_tiny()
 
     def get_order_edit_page_by_id(self, id):
         url_text = "{}sample/orders/" + str(id)
@@ -23,7 +24,7 @@ class Orders(BasePages):
         self.base_selenium.click(element='orders:new_order')
         self.sleep_tiny()
         self.base_selenium.refresh()
-        self.wait_until_page_is_loaded()
+        self.sleep_small()
 
     def archive_selected_orders(self, check_pop_up=False):
         self.base_selenium.scroll()
@@ -148,8 +149,10 @@ class Orders(BasePages):
                                                             destination_element='general:filter')
         filter.click()
 
-    def filter_by_analysis_number(self, filter_text):
+    def filter_by_analysis_number(self, filter_text, reset=False):
         self.open_filter_menu()
+        if reset:
+            self.filter_reset()
         self.info('Filter by analysis number : {}'.format(filter_text))
         self.filter_by(filter_element='orders:analysis_filter', filter_text=filter_text, field_type='text')
         self.filter_apply()

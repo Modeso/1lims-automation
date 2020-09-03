@@ -15,6 +15,7 @@ class Order(Orders):
     def set_order_number(self, no):
         self.base_selenium.set_text(element="order:order_number", value=no)
 
+
     def set_new_order(self):
         self.info('Set new order.')
         self.base_selenium.select_item_from_drop_down(
@@ -153,7 +154,7 @@ class Order(Orders):
         self.info(' Order created with no : {} '.format(order_no))
         return order_no
 
-    def create_multiple_contacts_new_order(self, contacts):
+    def create_multiple_contacts_new_order(self, contacts, material_type, article, test_plan):
         self.click_create_order_button()
         self.sleep_small()
         self.set_new_order()
@@ -161,13 +162,14 @@ class Order(Orders):
         for contact in contacts:
             self.set_contact(contact)
             self.sleep_tiny()
-        self.set_material_type('Raw Material')
+        self.set_material_type(material_type)
         self.sleep_small()
-        self.set_article('')
+        self.set_article(article)
         self.sleep_small()
-        self.set_test_unit('')
+        self.set_test_plan(test_plan)
         self.sleep_small()
         order_no = self.get_no()
+        self.save(save_btn='order:save_btn', sleep=True)
         return order_no
 
     def get_department_suggestion_lists(self, open_suborder_table=False, contacts=[]):
@@ -494,7 +496,6 @@ class Order(Orders):
 
             self.info('Set article name : {}'.format(articles))
             self.set_article(article=articles[0])
-            self.confirm_popup()
             self.sleep_small()
 
         self.info(' Set test plan : {} for {} time(s)'.format(test_plans, len(test_plans)))
@@ -751,4 +752,5 @@ class Order(Orders):
                                                                                          'arguments[0], '
                                                                                          '"None").lineBreak',
                                                                                          dom_element)
+
         return multiple_line_properties

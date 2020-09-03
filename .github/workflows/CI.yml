@@ -19,7 +19,8 @@ jobs:
         run:  docker pull 0xislamtaha/seleniumchromenose:83
 
       - name: parallel execution for each module
-        run: timeout 2h bash .github/workflows/execution.sh ${{ strategy.job-total }} ${{ matrix.test_cases }} ${{ github.ref }} ${{ github.run_id }} ${{ github.run_number }} $(pwd) 'not series' ${{ secrets.UUID }}
+        run: timeout 2h bash .github/workflows/execution.sh ${{ strategy.job-total }} ${{ matrix.test_cases }} ${{ github.head_ref }} ${{ github.run_id }} ${{ github.run_number }} $(pwd) 'not series' ${{ secrets.UUID }}
+
 
 #  test_pull_request_in_series:
 #    runs-on: ubuntu-20.04
@@ -48,4 +49,4 @@ jobs:
       - uses: actions/checkout@master
 
       - name: merge launches
-        run:  python3 fixReport.py ${{ secrets.UUID }} ${{ github.ref }}-${{ github.run_id }}-${{ github.run_number }}
+        run:  python3 fixReport.py ${{ secrets.UUID }} ${{ github.head_ref }}-${{ github.run_id }}-${{ github.run_number }}
