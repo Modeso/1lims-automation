@@ -3,7 +3,7 @@ from api_testing.apis.test_unit_api import TestUnitAPI
 
 
 class TstUnit(TstUnits):
-    
+
     def set_method(self, method=''):
         self.info('Set testunit method to be: {}'.format(method))
         self.base_selenium.set_text(element='test_unit:method', value=method)
@@ -78,7 +78,7 @@ class TstUnit(TstUnits):
         return testunit_number
 
     def create_quantitative_testunit(self, name='', material_type='', category='', unit='', iteration='1',
-                                    method='', upper_limit='', lower_limit='', spec_or_quan='spec'):
+                                     method='', upper_limit='', lower_limit='', spec_or_quan='spec'):
         self.info('create_quantitative_testunit')
         self.click_create_new_testunit()
         self.set_testunit_name(name=name)
@@ -249,7 +249,8 @@ class TstUnit(TstUnits):
 
     def get_spec_unit_preview(self):
         self.info('Get testunit specification unit preview')
-        return self.base_selenium.get_attribute(element='test_unit:spec_unit_preview',attribute='textContent').split('\n')[0]
+        return \
+        self.base_selenium.get_attribute(element='test_unit:spec_unit_preview', attribute='textContent').split('\n')[0]
 
     def get_quan_upper_limit(self):
         self.info('Get testunit quantification upper limit')
@@ -279,7 +280,7 @@ class TstUnit(TstUnits):
 
     def check_for_quantitative_fields(self):
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:use_specification')
-        
+
         if element_exist:
             self.info('checkbox for specification does exist')
         else:
@@ -287,49 +288,49 @@ class TstUnit(TstUnits):
             return False
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:spec_upper_limit')
-        if element_exist :
+        if element_exist:
             self.info('upper limit for specification does exist')
         else:
             self.info('upper limit for specification is not shown, report a BUG')
             return False
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:spec_lower_limit')
-        if element_exist :
+        if element_exist:
             self.info('lower limit for specification does exist')
         else:
             self.info('lower limit for specification is not shown, report a BUG')
             return False
-        
+
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:spec_unit')
-        if element_exist :
+        if element_exist:
             self.info('unit for specification does exist')
         else:
             self.info('unit for specification is not shown, report a BUG')
             return False
-        
+
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:use_quantification')
-        if element_exist :
+        if element_exist:
             self.info('checkbox for quantification does exist')
         else:
             self.info('checkbox for quantification is not shown, report a BUG')
             return False
-        
+
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:quan_upper_limit')
-        if element_exist :
+        if element_exist:
             self.info('upper limit for quantification does exist')
         else:
             self.info('upper limit for quantification is not shown, report a BUG')
             return False
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:quan_lower_limit')
-        if element_exist :
+        if element_exist:
             self.info('lower limit for quantification does exist')
         else:
             self.info('lower limit for quantification is not shown, report a BUG')
             return False
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:quan_unit')
-        if element_exist :
+        if element_exist:
             self.info('unit for quantification does exist')
         else:
             self.info('unit for quantification is not shown, report a BUG')
@@ -340,37 +341,36 @@ class TstUnit(TstUnits):
         # ------------------------------------------------------------------------------------------------
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:selected_cons')
-        if element_exist :
+        if element_exist:
             self.info('Concentration field for quantitative mibi is shown, report a BUG')
             return False
         else:
             self.info('Concentration field for quantitative mibi does not exist')
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:qualitative_value')
-        if element_exist :
+        if element_exist:
             self.info('Qualitative value is not shown, report a BUG')
             return False
         else:
             self.info('Qualitative value does exist')
 
-            
         return True
 
     def check_for_qualitative_fields(self):
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:spec_unit')
-        if element_exist :
+        if element_exist:
             self.info('checkbox for specification does exist')
         else:
             self.info('unit field for specification is not shown, report a BUG')
             return False
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:qualitative_value')
-        if element_exist :
+        if element_exist:
             self.info('Qualitative value does exist')
         else:
             self.info('Qualitative value is not shown, report a BUG')
             return False
-        
+
         # ------------------------------------------------------------------------------------------------
         self.info('checking for fields that does not suppoe to be shown in qualitative')
         # ------------------------------------------------------------------------------------------------
@@ -383,42 +383,42 @@ class TstUnit(TstUnits):
             self.info('checkbox for specification does not exist')
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:spec_upper_limit')
-        if element_exist :
+        if element_exist:
             self.info('upper limit for specification is shown, report a BUG')
             return False
         else:
             self.info('upper limit for specification does not exist')
-        
+
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:use_quantification')
-        if element_exist :
+        if element_exist:
             self.info('checkbox for quantification is shown, report a BUG')
             return False
         else:
             self.info('checkbox for quantification does not exist')
-        
+
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:quan_upper_limit')
-        if element_exist :
+        if element_exist:
             self.info('upper limit for quantification is shown, report a BUG')
             return False
         else:
             self.info('upper limit for quantification does not exist')
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:quan_lower_limit')
-        if element_exist :
+        if element_exist:
             self.info('lower limit for quantification is shown, report a BUG')
             return False
         else:
             self.info('lower limit for quantification does not exist')
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:quan_unit')
-        if element_exist :
+        if element_exist:
             self.info('unit for quantification is shown, report a BUG')
             return False
         else:
             self.info('unit for quantification does not exist')
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:selected_cons')
-        if element_exist :
+        if element_exist:
             self.info('Concentration field for quantitative mibi is shown, report a BUG')
             return False
         else:
@@ -428,21 +428,21 @@ class TstUnit(TstUnits):
 
     def check_for_quantitative_mibi_fields(self):
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:spec_upper_limit')
-        if element_exist :
+        if element_exist:
             self.info('upper limit field for quantative mibi does exist')
         else:
             self.info('upper limit field for quantitative mibi is not shown, report a BUG')
             return False
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:spec_unit')
-        if element_exist :
+        if element_exist:
             self.info('Unit field for quantitative mibi does exist')
         else:
             self.info('Unit field for quantitative mibi is not shown, report a BUG')
             return False
-        
+
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:selected_cons')
-        if element_exist :
+        if element_exist:
             self.info('Concentration field for quantitative mibi does exist')
         else:
             self.info('Concentration field for quantitative mibi is not shown, report a BUG')
@@ -460,35 +460,35 @@ class TstUnit(TstUnits):
             self.info('checkbox for specification does not exist')
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:spec_lower_limit')
-        if element_exist :
+        if element_exist:
             self.info('lower limit for specification is shown, report a BUG')
             return False
         else:
             self.info('lower limit for specification does not exist')
-        
+
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:use_quantification')
-        if element_exist :
+        if element_exist:
             self.info('checkbox for quantification is shown, report a BUG')
             return False
         else:
             self.info('checkbox for quantification does not exist')
-        
+
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:quan_upper_limit')
-        if element_exist :
+        if element_exist:
             self.info('upper limit for quantification is shown, report a BUG')
             return False
         else:
             self.info('upper limit for quantification does not exist')
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:quan_lower_limit')
-        if element_exist :
+        if element_exist:
             self.info('lower limit for quantification is shown, report a BUG')
             return False
         else:
             self.info('lower limit for quantification does not exist')
 
         element_exist = self.base_selenium.check_element_is_exist(element='test_unit:quan_unit')
-        if element_exist :
+        if element_exist:
             self.info('unit for quantification is shown, report a BUG')
             return False
         else:
@@ -497,10 +497,12 @@ class TstUnit(TstUnits):
         return True
 
     def get_testunit_specification_type(self):
-        
-        specification_checkbox_value = self.base_selenium.find_element(element='test_unit:specification_checkbox').is_selected()
 
-        quantification_checkbox_value = self.base_selenium.find_element(element='test_unit:quantification_checkbox').is_selected()
+        specification_checkbox_value = self.base_selenium.find_element(
+            element='test_unit:specification_checkbox').is_selected()
+
+        quantification_checkbox_value = self.base_selenium.find_element(
+            element='test_unit:quantification_checkbox').is_selected()
 
         self.info(specification_checkbox_value)
         self.info(quantification_checkbox_value)
@@ -513,8 +515,8 @@ class TstUnit(TstUnits):
 
     def switch_from_spec_to_quan(self, lower_limit, upper_limit):
         self.sleep_tiny()
-        self.use_specification_or_quantification(type_to_use='spec') #to deslect spec
-        self.use_specification_or_quantification(type_to_use='quan') #to select quan
+        self.use_specification_or_quantification(type_to_use='spec')  # to deslect spec
+        self.use_specification_or_quantification(type_to_use='quan')  # to select quan
         self.sleep_tiny()
         self.set_quan_lower_limit(value=lower_limit)
         self.sleep_tiny()
@@ -548,7 +550,10 @@ class TstUnit(TstUnits):
         testunit_formated['order'] = order
         testunit_formated['testunitVersion'] = testunit['version']
         if "roundingOption" in testunit.keys():
-            testunit_formated['roundingOption'] = testunit['roundingOption']
+            testunit_formated['roundingOption'] = {
+                "id": 0,
+                "text": "No Rounding"
+            }
         if testunit_formated['testUnitTypeId'] == 1:
             return self.map_qualtiative_testunit(testunit_formated=testunit_formated, testunit=testunit)
         elif testunit_formated['testUnitTypeId'] == 2:
@@ -557,45 +562,45 @@ class TstUnit(TstUnits):
             return self.map_mibi_testunit(testunit_formated=testunit_formated, testunit=testunit)
 
     def map_qualtiative_testunit(self, testunit_formated, testunit):
-            testunit_formated['useSpec'] = False
-            testunit_formated['useQuantification'] = False
-            testunit_formated['upperLimit'] = ''
-            testunit_formated['mibiValue'] = ''
-            testunit_formated['quantificationUpperLimit'] = ''
-            testunit_formated['quantificationLowerLimit'] = ''
-            testunit_formated['concentrations'] = []
-            testunit_formated['textValue'] = testunit['textValue']
-            temp_arr = []
-            for value in testunit['textValue'].split(','):
-                temp_arr.append({
-                    'value': value,
-                    'display': value
-                })
-            testunit_formated['textValueArray'] = temp_arr
-            return testunit_formated
-    
+        testunit_formated['useSpec'] = False
+        testunit_formated['useQuantification'] = False
+        testunit_formated['upperLimit'] = ''
+        testunit_formated['mibiValue'] = ''
+        testunit_formated['quantificationUpperLimit'] = ''
+        testunit_formated['quantificationLowerLimit'] = ''
+        testunit_formated['concentrations'] = []
+        testunit_formated['textValue'] = testunit['textValue']
+        temp_arr = []
+        for value in testunit['textValue'].split(','):
+            temp_arr.append({
+                'value': value,
+                'display': value
+            })
+        testunit_formated['textValueArray'] = temp_arr
+        return testunit_formated
+
     def map_quantiative_testunit(self, testunit_formated, testunit):
-            testunit_formated['useSpec'] = testunit['useSpec']
-            testunit_formated['useQuantification'] = testunit['useQuantification']
-            testunit_formated['mibiValue'] = ''
-            testunit_formated['lowerLimit'] = testunit['lowerLimit']
-            testunit_formated['upperLimit'] = testunit['upperLimit']
-            testunit_formated['quantificationLowerLimit'] = testunit['quantificationLowerLimit']
-            testunit_formated['quantificationUpperLimit'] = testunit['quantificationUpperLimit']
-            testunit_formated['concentrations'] = []
-            testunit_formated['textValue'] = ''
-            return testunit_formated
-    
+        testunit_formated['useSpec'] = testunit['useSpec']
+        testunit_formated['useQuantification'] = testunit['useQuantification']
+        testunit_formated['mibiValue'] = ''
+        testunit_formated['lowerLimit'] = testunit['lowerLimit']
+        testunit_formated['upperLimit'] = testunit['upperLimit']
+        testunit_formated['quantificationLowerLimit'] = testunit['quantificationLowerLimit']
+        testunit_formated['quantificationUpperLimit'] = testunit['quantificationUpperLimit']
+        testunit_formated['concentrations'] = []
+        testunit_formated['textValue'] = ''
+        return testunit_formated
+
     def map_mibi_testunit(self, testunit_formated, testunit):
-            testunit_formated['useSpec'] = False
-            testunit_formated['useQuantification'] = False
-            testunit_formated['upperLimit'] = ''
-            testunit_formated['mibiValue'] = testunit['upperLimit']
-            testunit_formated['quantificationUpperLimit'] = ''
-            testunit_formated['quantificationLowerLimit'] = ''
-            testunit_formated['concentrations'] = testunit['concentrationsNames']
-            testunit_formated['textValue'] = ''
-            return testunit_formated
+        testunit_formated['useSpec'] = False
+        testunit_formated['useQuantification'] = False
+        testunit_formated['upperLimit'] = ''
+        testunit_formated['mibiValue'] = testunit['upperLimit']
+        testunit_formated['quantificationUpperLimit'] = ''
+        testunit_formated['quantificationLowerLimit'] = ''
+        testunit_formated['concentrations'] = testunit['concentrationsNames']
+        testunit_formated['textValue'] = ''
+        return testunit_formated
 
     def open_test_unit_edit_page_by_id(self, id):
         self.info("open edit page of test unit with id {}".format(id))
@@ -626,7 +631,7 @@ class TstUnit(TstUnits):
             self.info('pressing save and create new version')
             self.save_and_create_new_version(confirm=True)
         return test_unit
-    
+
     def refresh_and_get_updated_data(self):
         test_unit = {}
         self.info('Refresh to make sure that the new data are saved')

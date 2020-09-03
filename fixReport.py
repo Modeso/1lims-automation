@@ -1,14 +1,4 @@
-import IPython
-import requests
-
-BASE_API = "http://18.158.202.89:8080/api/v1"
-AUTHONTICATION = "bearer "
-session = requests.Session()
-headers = {'Content-Type': "application/json",
-           'Authorization': AUTHONTICATION,
-           'Connection': "keep-alive",
-           'cache-control': "no-cache"}
-
+import requests, sys, uuid
 
 def get_project_launchs(project_name):
     API = f"{BASE_API}/{project_name}/launch"
@@ -61,7 +51,7 @@ def merge_launchs_with_same_description(project_name, launch_des):
               "start_time": launchs_res.json()['content'][0]['start_time'],
               "end_time": launchs_res.json()['content'][0]['end_time'],
               "name": project_name,
-              "description": launch_des,
+              "description": f"{launch_des}__{str(uuid.uuid4())[:8]}",
               "launches": ids,
               "extendSuitesDescription": False,
               "merge_type": "BASIC"
@@ -105,16 +95,20 @@ def delete_fliky_failed_test_items(project_name, launch_id):
     return delete_test_items(project_name, delete_id[1:])
 
 
+BASE_API = "http://18.158.202.89:8080/api/v1"
+AUTHONTICATION = f"bearer {sys.argv[1]}"
+PROJECT_NAME = 'onelims'
+LAUNCH_DES = f"{sys.argv[2]}"
 
 
-PROJECT_NAME = 'superadmin_personal'
-LAUNCH_DES = 'refs/pull/304/merge-207400895-397'
+session = requests.Session()
+headers = {'Content-Type': "application/json",
+           'Authorization': AUTHONTICATION,
+           'Connection': "keep-alive",
+           'cache-control': "no-cache"}
 
 print(f'merge all launches with {LAUNCH_DES} description')
 merged_launch = merge_launchs_with_same_description(PROJECT_NAME, LAUNCH_DES)
-
-# print(f'delete duplicate fliky test cases in launch : {LAUNCH_DES}')
-# launch_id = get_project_launch_id_by_description(PROJECT_NAME, LAUNCH_DES).json()['content'][0]['id']
 
 print(f'launch ID : {merged_launch.json()["id"]}')
 res = delete_fliky_failed_test_items(PROJECT_NAME, merged_launch.json()["id"])
