@@ -23,7 +23,7 @@ class OrdersTestCases(BaseTest):
     def setUp(self):
         super().setUp()
         self.order_page = Order()
-        self.orders_api = OrdersAPI() 
+        self.orders_api = OrdersAPI()
         self.orders_page = Orders()
         self.analyses_page = AllAnalysesPage()
         self.contacts_api = ContactsAPI()
@@ -2826,7 +2826,7 @@ class OrdersTestCases(BaseTest):
             self.assertEqual(analysis_data[0]['Test Unit'], testunit_name)
 
     def test084_filter_by_changed_by(self):
-         """
+        """
         New: Orders: Filter Approach: I can filter by changed by
 
         LIMS-3495
@@ -2873,27 +2873,27 @@ class OrdersTestCases(BaseTest):
             self.orders_page.close_child_table(source=results[i])
 
     def test085_select_large_number_of_test_units_in_one_testplan(self):
-          """
+        """
           Orders: Test plan Approach: In case I select large number of test units in one test plan
           , they should display successfully in the pop up
           LIMS-4795
 
           """
-          order = self.orders_api.get_order_with_multiple_sub_orders(no_suborders=2)
-          self.info('create testplan with random data')
-          testPlan = TestPlanAPI().create_completed_testplan_random_data(no_testunits=7)
-          self.info('get random order')
-          self.orders_page.get_order_edit_page_by_id(order['id'])
-          testunit_names = []
-          for testunit in testPlan[1]['testUnits']:
-              testunit_names.append(testunit['name'])
-          self.info('update third suborder')
-          self.order_page.update_suborder(sub_order_index=2, material_type=testPlan[1]['materialType'][0]['text'],
-                                          articles=[testPlan[1]['selectedArticles'][0]['text']],
-                                          test_plans=[testPlan[1]['testPlan']['text']])
-          self.info('get testplan popup')
-          results = self.order_page.get_testplan_pop_up()
-          for result in results:
-              if result['test_plan'] == testPlan[1]['testPlan']['text']:
-                  for testunit in testunit_names:
-                      self.assertIn(testunit,result['test_units'])
+        order = self.orders_api.get_order_with_multiple_sub_orders(no_suborders=2)
+        self.info('create testplan with random data')
+        testPlan = TestPlanAPI().create_completed_testplan_random_data(no_testunits=7)
+        self.info('get random order')
+        self.orders_page.get_order_edit_page_by_id(order['id'])
+        testunit_names = []
+        for testunit in testPlan[1]['testUnits']:
+            testunit_names.append(testunit['name'])
+        self.info('update third suborder')
+        self.order_page.update_suborder(sub_order_index=2, material_type=testPlan[1]['materialType'][0]['text'],
+                                        articles=[testPlan[1]['selectedArticles'][0]['text']],
+                                        test_plans=[testPlan[1]['testPlan']['text']])
+        self.info('get testplan popup')
+        results = self.order_page.get_testplan_pop_up()
+        for result in results:
+            if result['test_plan'] == testPlan[1]['testPlan']['text']:
+                for testunit in testunit_names:
+                    self.assertIn(testunit, result['test_units'])
