@@ -40,7 +40,7 @@ jobs:
 
   merge_launches:
     runs-on: ubuntu-20.04
-    needs: [test_pull_request_in_parallel, test_pull_request_in_series]
+    needs: [test_pull_request_in_parallel]
     if: always()
     strategy:
       fail-fast: false
