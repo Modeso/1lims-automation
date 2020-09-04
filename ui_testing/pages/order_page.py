@@ -125,8 +125,6 @@ class Order(Orders):
             self.info("clear test unit")
             self.clear_test_unit()
         self.info("Try to set test unit to {} and check if option exist".format(test_unit))
-        element = self.base_selenium.find_element(element='order:test_unit')
-        element.send_keys()
         is_option_exist = self.base_selenium.select_item_from_drop_down(element='order:test_unit', item_text=test_unit)
         return is_option_exist
 
