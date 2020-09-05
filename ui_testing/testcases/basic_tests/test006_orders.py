@@ -2901,8 +2901,60 @@ class OrdersTestCases(BaseTest):
         self.orders_page.get_archived_items()
         self.orders_page.filter_by_order_no(filter_text=order_no)
         self.assertEqual(len(self.order_page.result_table()) - 1, 0)
-        for i in range(0,len(analysis_no)-1):
+        for i in range(0, len(analysis_no) - 1):
             self.base_selenium.refresh()
             self.orders_page.get_archived_items()
             self.orders_page.filter_by_analysis_number(filter_text=analysis_no[i])
             self.assertEqual(len(self.order_page.result_table()) - 1, 0)
+
+    def test091_delete_archive_order_without_affect_active_order(self):
+        '''
+        [Archiving][MainOrder]Make sure that user able to delete the archived orders with all suborders,
+        and analysis of the order without affecting the active orders
+        LIMS-5405
+        :return:
+        '''
+        self.info('create new order')
+        order_no = self.order_page.create_new_order(material_type='Raw Material', save=False)
+        self.info('dupliacte the suborder for 2 times')
+        self.order_page.duplicate_from_table_view(number_of_duplicates=2)
+        rows = self.base_selenium.get_table_rows(element='order:suborder_table')
+        self.info('assert 3 suborders are created')
+        self.assertEqual(3,len(rows))
+        self.order_page.save(save_btn='order:save_btn')
+        self.orders_page.get_orders_page()
+        self.orders_page.filter_by_order_no(filter_text=order_no)
+        self.info('archive the main order from active table')
+        self.orders_page.archive_main_order_from_order_option(check_pop_up=True)
+        self.assertEqual('Successfully Archived',self.base_selenium.get_text(element='general:alert_confirmation'))
+        self.base_selenium.refresh()
+        self.orders_page.get_archived_items()
+        self.orders_page.filter_by_order_no(order_no)
+        self.assertEqual(len(self.orders_page.result_table())-1,1)
+        self.assertIn(order_no, self.orders_page.result_table()[0].text)
+        self.info('Order number: {} is archived correctly'.format(order_no))
+        self.orders_page.open_child_table(self.orders_page.result_table()[0])
+        suborders = self.orders_page.result_table(element='general:table_child')
+        self.assertEqual(3,len(suborders)-1)
+        self.info('create new order with the same order no of the arhcived one')
+        new_no = self.order_page.create_new_order(material_type='Raw Material', order_no=order_no)
+        print(new_no)
+        self.orders_page.get_orders_page()
+        self.orders_page.filter_by_order_no(filter_text=order_no)
+        self.info('assert that the order no appear in the active table')
+        self.assertIn(order_no, self.orders_page.result_table()[0].text)
+        self.base_selenium.refresh()
+        self.orders_page.get_archived_items()
+        self.orders_page.filter_by_order_no(order_no)
+        '''
+        row = self.orders_page.result_table()[0]
+        self.orders_page.click_check_box(row)
+        self.order_page.delete_selected_item()
+        self.orders_page.confirm_popup()
+        self.info('filter by order no {} to make sure no result found'.format(random_order['orderNo']))
+        self.orders_page.filter_by_order_no(random_order['orderNo'])
+        deleted_order = self.orders_page.result_table()[0]
+        self.assertTrue(deleted_order.get_attribute("textContent"), 'No data available in table')
+        '''
+
+
