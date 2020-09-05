@@ -547,7 +547,7 @@ class ContactsTestCases(BaseTest):
         self.info('Asserting the title was changed successfully to Ms')
         self.assertEqual(new_contact_person_data[0]['title'], 'Ms')
 
-    @attr(series=True)
+    #@attr(series=True)
     def test023_contact_title_translation(self):
         """
         Contacts: Title translation approach:
