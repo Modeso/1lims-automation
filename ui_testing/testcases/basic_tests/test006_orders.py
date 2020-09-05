@@ -2916,7 +2916,7 @@ class OrdersTestCases(BaseTest):
         order = self.orders_api.get_order_with_multiple_sub_orders(no_suborders=2)
         self.info('create testplan with random data')
         testPlan = TestPlanAPI().create_completed_testplan_random_data(no_testunits=7)
-        self.info('get random order')
+        self.info(f'open order edit page : {order["id"]}')
         self.orders_page.get_order_edit_page_by_id(order['id'])
         testunit_names = []
         for testunit in testPlan['testUnits']:

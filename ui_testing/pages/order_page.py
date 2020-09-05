@@ -697,10 +697,8 @@ class Order(Orders):
         suborders_elements = self.base_selenium.get_row_cells_elements_related_to_header(
             row=suborders[index],
             table_element='order:suborder_table')
-        print(suborders_elements)
         popup_element = self.base_selenium.find_element_in_element(
             source=suborders_elements['Test Plan: *'], destination_element='order:testplan_popup_btn')
-        print(popup_element)
         popup_element.click()
         #self.base_selenium.click(element='order:testplan_popup_btn')
         self.sleep_small()
