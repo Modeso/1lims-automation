@@ -2928,7 +2928,6 @@ class OrdersTestCases(BaseTest):
         self.order_page.save(save_btn='order:save_btn')
         table_after = self.base_selenium.get_table_rows(element='order:suborder_table')
         len_after = len(table_after)
-        #print('len after111-->',len_after)
         self.assertEqual(len_after-len_before,10)
         self.info('duplicate 5 suborders')
         for i in range(0,5):
@@ -2937,5 +2936,4 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.refresh()
         table_after2 = self.base_selenium.get_table_rows(element='order:suborder_table')
         final_len = len(table_after2)
-        #print('final len',final_len)
         self.assertEqual(final_len-len_before,15)
