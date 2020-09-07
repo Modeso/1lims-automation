@@ -6,6 +6,7 @@ from ui_testing.pages.testunits_page import TstUnits
 from api_testing.apis.test_unit_api import TestUnitAPI
 from api_testing.apis.article_api import ArticleAPI
 from api_testing.apis.test_plan_api import TestPlanAPI
+from api_testing.apis.orders_api import OrdersAPI
 from ui_testing.pages.order_page import Order
 from ui_testing.pages.login_page import Login
 from api_testing.apis.users_api import UsersAPI
@@ -1363,7 +1364,76 @@ class TestUnitsTestCases(BaseTest):
         required_value = span.get_attribute('ng-reflect-ngb-tooltip')
         self.assertEqual(payload['unit'],required_value)
 
-    def test051_cancel_testunit_name_configuration(self):
+
+    @parameterized.expand([('Name', 'Type'),
+                           ('Name', 'Method'),
+                           ('Name', 'No'),
+                           ('Type', 'Method'),
+                           ('Type', 'No'),
+                           ('Method', 'No')
+                           ])
+    @attr(series=True)
+    def test051_test_unit_name_allow_user_to_search_with_selected_two_options_order(self, search_view_option1,
+                                                                                       search_view_option2):
+        """
+        Test Unit: Configuration: Test units Name Approach: When the user select any two options f
+        rom the test unit configuration, this action should reflect on the order form
+
+        LIMS-6672
+        """
+        self.order_page = Order()
+        self.test_unit_page.open_configurations()
+        self.test_unit_page.open_testunit_name_configurations_options()
+        self.test_unit_page.select_option_to_view_search_with(
+            view_search_options=[search_view_option1, search_view_option2])
+        self.info('Create new test unit with qualitative and random generated data')
+        response, payload = self.test_unit_api.create_qualitative_testunit()
+        self.assertEqual(response['status'], 1, payload)
+        self.info('new test unit created with number  {}'.format(payload['number']))
+        self.info('get random order')
+        radndom_order = random.choice(OrdersAPI().get_all_orders_json())
+        self.assertTrue(radndom_order, 'No order selected')
+        self.info('Navigate to order edit page')
+        self.order_page.get_order_edit_page_by_id(radndom_order['orderId'])
+        self.order_page.sleep_small()
+        self.info("select first suborder")
+        is_name_exist = self.order_page.search_test_unit_not_set(test_unit=payload['name'])
+        is_number_exist = self.order_page.search_test_unit_not_set(test_unit=str(payload['number']))
+        is_type_exist = self.order_page.search_test_unit_not_set(test_unit='Qualitative')
+        is_method_exist = self.order_page.search_test_unit_not_set(test_unit=payload['method'])
+
+        if search_view_option1 == 'Name' and search_view_option2 == 'Type':
+            self.assertTrue(is_name_exist)
+            self.assertFalse(is_number_exist)
+            self.assertTrue(is_type_exist)
+            self.assertFalse(is_method_exist)
+        elif search_view_option1 == 'Name' and search_view_option2 == 'Method':
+            self.assertTrue(is_name_exist)
+            self.assertFalse(is_number_exist)
+            self.assertFalse(is_type_exist)
+            self.assertTrue(is_method_exist)
+        elif search_view_option1 == 'Name' and search_view_option2 == 'No':
+            self.assertTrue(is_name_exist)
+            self.assertTrue(is_number_exist)
+            self.assertFalse(is_type_exist)
+            self.assertFalse(is_method_exist)
+        elif search_view_option1 == 'Type' and search_view_option2 == 'Method':
+            self.assertFalse(is_name_exist)
+            self.assertFalse(is_number_exist)
+            self.assertTrue(is_type_exist)
+            self.assertTrue(is_method_exist)
+        elif search_view_option1 == 'Type' and search_view_option2 == 'No':
+            self.assertFalse(is_name_exist)
+            self.assertTrue(is_number_exist)
+            self.assertTrue(is_type_exist)
+            self.assertFalse(is_method_exist)
+        elif search_view_option1 == 'Method' and search_view_option2 == 'No':
+            self.assertFalse(is_name_exist)
+            self.assertTrue(is_number_exist)
+            self.assertFalse(is_type_exist)
+            self.assertTrue(is_method_exist)
+            
+     def test052_cancel_testunit_name_configuration(self):
         """
         Test unit: Configuration: make sure that when you select from test unit name configuration
         drop down list and press on cancel button, nothing changed
@@ -1377,4 +1447,5 @@ class TestUnitsTestCases(BaseTest):
         self.test_unit_page.set_view_and_search_option(save=False)
         self.info('open test unit configuration pop up to assert that nothing changed ')
         selected_option_after_cancel = self.test_unit_page.get_view_and_search_options()
-        self.assertEqual(selected_option, selected_option_after_cancel)
+        self.assertEqual(selected_option, selected_option_after_cancel)        
+
