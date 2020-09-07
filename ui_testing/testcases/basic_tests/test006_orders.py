@@ -3082,7 +3082,6 @@ class OrdersTestCases(BaseTest):
         '''
         Orders: Table with add: Allow user to add any number of the suborders records not only 5 suborders
         LIMS-5220
-        :return:
         '''
         testPlan = TestPlanAPI().create_completed_testplan_random_data()
         order = self.orders_api.get_order_with_multiple_sub_orders(no_suborders=4)
