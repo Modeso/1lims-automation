@@ -3078,3 +3078,27 @@ class OrdersTestCases(BaseTest):
             self.orders_page.filter_by_analysis_number(filter_text=analysis_no[i])
             self.assertEqual(len(self.order_page.result_table()) - 1, 0)
 
+    def test091_select_large_number_of_test_units_in_one_testplan(self):
+        """
+          Orders: Test plan Approach: In case I select large number of test units in one test plan
+          , they should display successfully in the pop up
+          LIMS-4795
+          """
+        order = self.orders_api.get_order_with_multiple_sub_orders(no_suborders=2)
+        self.info('create testplan with random data')
+        testPlan = TestPlanAPI().create_completed_testplan_random_data(no_testunits=7)
+        self.info(f'open order edit page : {order["id"]}')
+        self.orders_page.get_order_edit_page_by_id(order['id'])
+        testunit_names = []
+        for testunit in testPlan['testUnits']:
+            testunit_names.append(testunit['name'])
+        self.info('update third suborder')
+        self.order_page.update_suborder(sub_order_index=2, material_type=testPlan['materialType'][0]['text'],
+                                        articles=[testPlan['selectedArticles'][0]['text']],
+                                        test_plans=[testPlan['testPlan']['text']], confirm_pop_up=True)
+        self.info('get testplan popup')
+        results = self.order_page.get_testplan_pop_up(index=2)
+        for result in results:
+            if result['test_plan'] == testPlan['testPlan']['text']:
+                for testunit in testunit_names:
+                    self.assertIn(testunit, result['test_units'])
