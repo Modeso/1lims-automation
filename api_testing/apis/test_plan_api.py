@@ -354,13 +354,8 @@ class TestPlanAPI(TestPlanAPIFactory):
         article_data = ArticleAPI().get_formatted_article_with_formatted_material_type(materialType)
         article_name = article_data['name']
         formatted_article = {'id': article_data['id'], 'text': article_name}
-        # new_test_plan1 = TestPlanAPI().create_completed_testplan_random_data(
-        #     material_type='Raw Material', formatted_article=formatted_article)
-        # new_test_plan2 = TestPlanAPI().create_completed_testplan_random_data(
-        #     material_type='Raw Material', formatted_article=formatted_article)
         tst1 = TestPlanAPI().create_completed_testplan(
                     material_type='Raw Material', formatted_article=formatted_article)
         tst2 = TestPlanAPI().create_completed_testplan(
                     material_type='Raw Material', formatted_article=formatted_article)
-        print(tst1)
         return tst1, tst2, article_name
