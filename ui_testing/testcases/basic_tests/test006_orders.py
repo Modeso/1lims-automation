@@ -2897,3 +2897,106 @@ class OrdersTestCases(BaseTest):
         found_test_units = [testunit['Test Unit'] for testunit in suborder_data]
         self.assertCountEqual(test_plans, found_test_plans)
         self.assertNotEqual(test_units, found_test_units)
+
+    def test086_add_multiple_suborders_with_diff_departments(self):
+        """
+        Orders: table: Departments Approach: In case I created multiple suborders
+        the departments should open drop down list with the options that I can
+        select different departments in each one.
+
+        LIMS-4258
+        """
+        self.info('create contact with multiple departments')
+        response, payload = self.contacts_api.create_contact_with_multiple_departments()
+        self.assertEqual(response['status'], 1, "contact with {} Not created".format(payload))
+        department_list = [dep['text'] for dep in payload['departments']]
+        self.info('create order with contact {} and first department {}'.
+                  format(response['company']['name'], payload['departments'][0]['text']))
+        order_response, order_payload = \
+            self.orders_api.create_order_with_department_by_contact_id(
+                response['company']['companyId'])
+        self.assertEqual(order_response['status'], 1, "order with {} Not created".format(order_payload))
+        self.info('edit order with No {}'.format(order_payload[0]['orderNo']))
+        self.orders_page.get_order_edit_page_by_id(order_response['order']['mainOrderId'])
+        self.order_page.sleep_tiny()
+        self.order_page.create_new_suborder(material_type=order_payload[0]['materialType']['text'],
+                                            article_name=order_payload[0]['article']['text'],
+                                            test_plan=order_payload[0]['testPlans'][0]['name'])
+        self.order_page.sleep_tiny()
+        self.info("get departments suggestion list for first suborder")
+        _, department_suggestion_list1 = self.order_page.get_department_suggestion_lists(
+            open_suborder_table=True, index=1)
+        self.assertCountEqual(department_suggestion_list1, department_list)
+        self.info("set department to {}".format(payload['departments'][1]['text']))
+        self.order_page.set_departments(payload['departments'][1]['text'])
+        self.order_page.sleep_tiny()
+        self.order_page.create_new_suborder(material_type=order_payload[0]['materialType']['text'],
+                                            article_name=order_payload[0]['article']['text'],
+                                            test_plan=order_payload[0]['testPlans'][0]['name'])
+        self.order_page.sleep_tiny()
+        self.info("get departments suggestion list for second suborder")
+        _, department_suggestion_list2 = self.order_page.get_department_suggestion_lists(
+            open_suborder_table=True, index=2)
+        self.assertCountEqual(department_suggestion_list2, department_list)
+        self.info("set department to {}".format(payload['departments'][2]['text']))
+        self.order_page.set_departments(payload['departments'][2]['text'])
+        self.order_page.save_and_wait('order:save_btn')
+        self.info("assert that department of each suborder in department lis")
+        suborder_data = self.order_page.get_suborder_data()["suborders"]
+        for suborder in suborder_data:
+            self.assertIn(suborder['departments'][0], department_list)
+
+    def test087_order_of_test_units_in_analysis(self):
+        """
+        Orders: Ordering test units: Test units in the analysis section should display
+        in the same order as in the order section
+        LIMS-7415
+        """
+        self.info('create new order with 3 test units')
+        response, payload = self.orders_api.create_order_with_test_units(3)
+        self.info('get test units of order')
+        order_testunits = [test_unit['name'] for test_unit in payload[0]['testUnits']]
+        self.info('navigate to analysis tab')
+        self.orders_page.navigate_to_analysis_active_table()
+        self.info('filter by order number')
+        self.analyses_page.filter_by_order_no(payload[0]['orderNoWithYear'])
+        self.info('get child table data')
+        table_data = self.analyses_page.get_child_table_data()
+        analysis_testunits = [test_unit['Test Unit'] for test_unit in table_data]
+        self.assertCountEqual(order_testunits, analysis_testunits)
+        
+    def test088_if_cancel_archive_order_no_order_suborder_analysis_will_archived(self):
+        """
+        [Archiving][MainOrder]Make sure that if user cancel archive order,
+        No order or suborders or analysis of the order will be archived
+        LIMS-5404
+        """
+        self.info('create order')
+        self.order_page.create_new_order(material_type='Raw Material', save=False)
+        self.info('dupliacte the suborder for 2 times')
+        self.order_page.duplicate_from_table_view(number_of_duplicates=2)
+        self.order_page.save(save_btn='order:save_btn')
+        order_no = self.order_page.get_no()
+        order_id = self.order_page.get_order_id()
+        suborders_data, _ = self.orders_api.get_suborder_by_order_id(order_id)
+        suborders = suborders_data['orders']
+        self.assertEqual(3, len(suborders))
+        analysis_no = []
+        for suborder in suborders:
+            analysis_no.append(suborder['analysis'][0])
+        self.orders_page.get_orders_page()
+        self.orders_page.filter_by_order_no(filter_text=order_no)
+        self.info('click on arhcive then cancel popup')
+        self.orders_page.archive_main_order_from_order_option(check_pop_up=True, confirm=False)
+        table_records = self.orders_page.result_table(element='general:table')
+        self.assertEqual(1, len(table_records) - 1)
+        self.info('go to archived orders')
+        self.orders_page.get_archived_items()
+        self.orders_page.filter_by_order_no(filter_text=order_no)
+        self.assertEqual(len(self.order_page.result_table()) - 1, 0)
+        for i in range(0,len(analysis_no)-1):
+            self.base_selenium.refresh()
+            self.orders_page.get_archived_items()
+            self.orders_page.filter_by_analysis_number(filter_text=analysis_no[i])
+            self.assertEqual(len(self.order_page.result_table()) - 1, 0)
+
