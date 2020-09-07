@@ -1433,7 +1433,7 @@ class TestUnitsTestCases(BaseTest):
             self.assertFalse(is_type_exist)
             self.assertTrue(is_method_exist)
             
-     def test052_cancel_testunit_name_configuration(self):
+    def test052_cancel_testunit_name_configuration(self):
         """
         Test unit: Configuration: make sure that when you select from test unit name configuration
         drop down list and press on cancel button, nothing changed
