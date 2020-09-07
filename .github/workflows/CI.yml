@@ -1,16 +1,16 @@
-# name: CI
+ name: CI
 
-# on:
-#   pull_request:
-#     branches: [ master ]
+ on:
+   pull_request:
+     branches: [ master ]
 
-# jobs:
-#   test_pull_request_in_parallel:
-#     runs-on: ubuntu-20.04
-#     strategy:
-#       fail-fast: false
-#       matrix:
-#         test_cases: [0]
+ jobs:
+   test_pull_request_in_parallel:
+     runs-on: ubuntu-20.04
+     strategy:
+       fail-fast: false
+       matrix:
+         test_cases: [0]
 
 #     steps:
 #       - uses: actions/checkout@master

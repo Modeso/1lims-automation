@@ -2494,13 +2494,15 @@ class OrdersTestCases(BaseTest):
         self.info('asserting the order with order number {} is created'.format(order_no))
         self.assertIn(order_no_with_year, results[0].text.replace("'", ""))
 
-    @skip("https://modeso.atlassian.net/browse/LIMSA-299")
+    #@skip("https://modeso.atlassian.net/browse/LIMSA-299")
     def test074_create_existing_order_change_contact(self):
         """
          Create existing order then change the contact for this existing one,
          all old records with the same order number will update its contact.
 
          LIMS-4293
+
+         LIMS-5818 - added departments assertion
         """
         res, payload = self.orders_api.create_new_order()
         self.assertEqual(res['status'], 1)
@@ -2512,6 +2514,15 @@ class OrdersTestCases(BaseTest):
         self.order_page.create_existing_order_with_auto_fill(no=order_no_with_year)
         self.order_page.sleep_tiny()
         new_contact = self.order_page.set_contact(remove_old=True)[0]
+        departments = self.contacts_api.get_departments_in_contact(contact_name=new_contact)
+        contact_dep_list, departments_only_list = self.order_page.get_department_suggestion_lists(open_suborder_table=True)
+        if departments == ['']:
+            self.info('Asserting no departments displayed as selected contact has no departments')
+            self.assertEqual(['No items found'],departments_only_list)
+        else:
+            self.info('Asserting departments of selected contact are correctly displayed')
+            for department in departments_only_list:
+                self.assertIn(department,departments)
         self.order_page.save(save_btn='order:save_btn')
         self.orders_page.get_orders_page()
         self.order_page.sleep_tiny()
@@ -2525,6 +2536,7 @@ class OrdersTestCases(BaseTest):
                 'checking contact is updated for suborder {} - new contact is {} and current contact is {}'
                     .format(i + 1, new_contact, results['Contact Name']))
             self.assertEqual(new_contact, results['Contact Name'])
+
 
     @attr(series=True)
     def test075_enter_long_method_should_be_in_multiple_lines_in_order_form(self):
