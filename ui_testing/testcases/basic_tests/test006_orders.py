@@ -2874,14 +2874,13 @@ class OrdersTestCases(BaseTest):
             self.orders_page.close_child_table(source=results[i])
 
     def test086(self):
+        self.testplan_api=TestPlanAPI()
+        testunits_material=[]
+        testplans_material=[]
         displayed_headers=[]
         self.header_page = Header()
         self.header_page.click_on_header_button()
-        self.header_page.click_on_modules_configurations()
-        self.order_page.sleep_tiny()
-        self.info('uncheck article checkbox')
-        self.base_selenium.find_element_by_xpath('//*[@id="m_tabs_1"]/div/div[1]/div/div[1]/span/label').click()
-        self.header_page.save(save_btn='modules_configurations:save')
+        self.header_page.click_article_checkbox()
         self.order_page.get_orders_page()
         self.orders_page.open_child_table(self.orders_page.result_table()[0])
         header_row = self.base_selenium.get_table_head_elements(element='general:table_child')
@@ -2889,5 +2888,28 @@ class OrdersTestCases(BaseTest):
             print(h.text)
             displayed_headers.append(h.text)
         self.assertNotIn('Article Name', displayed_headers)
-        self.order_page.create_new_order()
+        order_no,testunits,testplans= self.order_page.create_new_order(with_article=False,check_testunits_testplans=True)
+        order_id=self.order_page.get_order_id()
+        order_data=self.orders_api.get_suborder_by_order_id(id=order_id)
+        material_type=order_data[0]['orders'][0]['materialType']
+        filter_text = '{"' + 'materialTypes' + '":"' + material_type + '"}'
+        tus=self.test_unit_api.get_all_test_units(filter=filter_text)
+        tps=self.testplan_api.get_all_test_plans(filter=filter_text)
+        for i in range(len(tus[0]['testUnits'])):
+            testunits_material.append(tus[0]['testUnits'][i]['name'])
+        for i in range(len(tps[0]['testPlans'])):
+            testplans_material.append(tps[0]['testPlans'][i]['testPlanName'])
+        self.info('Asserting testunits are correctly displayed according to selected material type {}'.format(material_type))
+        for testunit in testunits:
+            self.assertIn(testunit,testunits_material)
+        self.info('Asserting testplans are correctly displayed according to selected material type {}'.format(material_type))
+        for testplan in testplans:
+            self.assertIn(testplan,testplans_material)
+        self.order_page.get_orders_page()
+        self.order_page.filter_by_order_no(filter_text=order_no)
+        latest_order_data = \
+             self.base_selenium.get_row_cells_dict_related_to_header(row=self.order_page.result_table()[0])
+        self.info('Asserting the order is successfully created')
+        self.assertEqual(order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
+
 

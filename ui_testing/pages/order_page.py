@@ -120,7 +120,7 @@ class Order(Orders):
             return []
 
     def create_new_order(self, material_type='', article='', contact='', test_plans=[''], test_units=[''],
-                         multiple_suborders=0, departments='', order_no='', save=True, with_testplan=True):
+                         multiple_suborders=0, departments='', order_no='', save=True, with_testplan=True,with_article=True,check_testunits_testplans=False):
         self.info(' Create new order.')
         self.click_create_order_button()
         self.sleep_small()
@@ -131,18 +131,26 @@ class Order(Orders):
         self.set_departments(departments=departments)
         self.set_material_type(material_type=material_type)
         self.sleep_small()
-        self.set_article(article=article)
-        self.sleep_small()
+        if with_article:
+            self.set_article(article=article)
+            self.sleep_small()
+
         if order_no:
             self.set_no(order_no)
 
         order_no = self.get_no()
 
         if with_testplan:
+            if check_testunits_testplans:
+                testplans= self.base_selenium.get_drop_down_suggestion_list(element='order:test_plan',
+                                                                              item_text=' ')
             for test_plan in test_plans:
                 self.set_test_plan(test_plan=test_plan)
 
         for test_unit in test_units:
+            if check_testunits_testplans:
+                test_units = self.base_selenium.get_drop_down_suggestion_list(element='order:test_unit',
+                                                                              item_text=' ')
             self.set_test_unit(test_unit=test_unit)
             self.sleep_small()
         
@@ -152,7 +160,11 @@ class Order(Orders):
         if save:
             self.save(save_btn='order:save_btn')
         self.info(' Order created with no : {} '.format(order_no))
-        return order_no
+
+        if check_testunits_testplans:
+            return order_no,test_units,testplans
+        else:
+            return order_no
 
     def create_multiple_contacts_new_order(self, contacts, material_type, article, test_plan):
         self.click_create_order_button()
