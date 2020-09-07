@@ -5,7 +5,7 @@ EXECUTION_FILES=(
      ui_testing/testcases/basic_tests/test004_testunits.py
   )
 
-TEST_REG='test051'
+TEST_REG='test052'
 
 
 # NODE_TOTAL=$1;
