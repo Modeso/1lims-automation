@@ -98,6 +98,10 @@ class Order(Orders):
         if self.get_test_plan():
             self.base_selenium.clear_items_in_drop_down(element='order:test_plan')
 
+    def clear_contact(self):
+        if self.get_contact():
+            self.base_selenium.clear_items_in_drop_down(element='order:contact')
+
     def clear_test_unit(self, confirm=True):
         if self.get_test_unit():
             self.base_selenium.clear_items_in_drop_down(element='order:test_unit', confirm_popup=confirm)
@@ -181,7 +185,7 @@ class Order(Orders):
         self.save(save_btn='order:save_btn', sleep=True)
         return order_no
 
-    def get_department_suggestion_lists(self, open_suborder_table=False, contacts=[]):
+    def get_department_suggestion_lists(self, open_suborder_table=False, contacts=[], index=0):
         """
         :param open_suborder_table:
 
@@ -190,7 +194,7 @@ class Order(Orders):
         :return: 2 lists , departments with contacts and departments only
         """
         if open_suborder_table:
-            suborder_row = self.base_selenium.get_table_rows(element='order:suborder_table')[0]
+            suborder_row = self.base_selenium.get_table_rows(element='order:suborder_table')[index]
             suborder_row.click()
         department = self.base_selenium.find_element(element='order:departments')
         department.click()
