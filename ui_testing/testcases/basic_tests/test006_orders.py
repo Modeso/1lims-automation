@@ -945,26 +945,32 @@ class OrdersTestCases(BaseTest):
 
     @skip("https://modeso.atlassian.net/browse/LIMSA-281")
     @skip("https://modeso.atlassian.net/browse/LIMSA-280")
-    def test029_archive_sub_order(self):
+    def test030_archive_sub_order(self):
         """
-        Orders: Table:  Suborder/Archive Approach: User can archive any suborder successfully
-
+        orders :Make sure that by clicking on Archive from Suborder options a confirmation popup will appear
+        and user can Archive this suborder with its corresponding analysis
         LIMS-3739
+        LIMS-5369
         """
-        self.info("select random order with multiple suborders")
-        order = self.orders_api.get_order_with_multiple_sub_orders()
-        order_no = order['orderNo']
-        suborders = self.orders_api.get_suborder_by_order_id(order['orderId'])[0]['orders']
-        self.order_page.filter_by_order_no(order_no)
-        self.info('archive first suborder of order no: {}'.format(order_no))
-        self.orders_page.open_child_table(self.orders_page.result_table()[0])
-        self.order_page.archive_table_suborder()
+        self.info('select random order')
+        random_row = self.orders_page.get_random_table_row(table_element='general:table')
+        self.info('open child table')
+        self.orders_page.open_child_table(source=random_row)
+        self.info('archive suborder from orders active table')
+        child_table_records = self.orders_page.result_table(element='general:table_child')
+        sub_orders = self.orders_page.get_table_data(table_element='general:table_child')
+        selected_sub_order = randint(0, len(sub_orders) - 1)
+        analysis_no = sub_orders[selected_sub_order]['Analysis No.']
+        self.orders_page.open_row_options(row=child_table_records[selected_sub_order])
+        self.base_selenium.click(element='orders:suborder_archive')
+        self.assertTrue(self.base_selenium.check_element_is_exist(element='general:confirmation_pop_up'))
+        self.orders_page.confirm_popup()
         self.orders_page.get_archived_items()
-        self.order_page.filter_by_order_no(filter_text=order_no, reset=True)
-        self.orders_page.sleep_tiny()
-        self.assertEqual(len(self.order_page.result_table()), 2)
-        results = self.order_page.get_child_table_data()
-        self.assertIn(suborders[0]['analysis'], results.replace("'", ""))
+        self.info('make sure that suborder is archived')
+        self.orders_page.filter_by_analysis_number(analysis_no)
+        self.orders_page.open_child_table(source=self.orders_page.result_table()[0])
+        results = self.order_page.result_table(element='general:table_child')[0].text
+        self.assertIn(analysis_no.replace("'", ""), results.replace("'", ""))
 
     # @parameterized.expand(['testPlans', 'testUnit'])
     # def test030_update_material_type(self, case):
@@ -2872,6 +2878,171 @@ class OrdersTestCases(BaseTest):
             # close child table
             self.orders_page.close_child_table(source=results[i])
 
+    def test085_update_contact_config_to_number_create_form(self):
+        """
+        Sample Management: Contact configuration approach: In case the user configures the
+        contact field to display number this action should reflect on the order form step one
+
+        LIMS-6626
+        """
+        self.info("set contact configuration to be searchable by number only")
+        self.orders_api.set_contact_configuration_to_number_only()
+        response, _ = self.contacts_api.get_all_contacts()
+        self.assertEqual(response['status'], 1)
+        self.assertGreaterEqual(response['count'], 1)
+        random_contact = random.choice(response['contacts'])
+        contact_no = random_contact['companyNo']
+        contact_name = random_contact['name']
+        testplan = TestPlanAPI().create_completed_testplan_random_data()
+        self.info("create new order with contact no {}".format(contact_no))
+        self.order_page.create_new_order(contact=contact_no, save=False,
+                                         material_type=testplan['materialType'][0]['text'],
+                                         article=testplan['selectedArticles'][0]['text'],
+                                         test_plans=[testplan['testPlan']['text']])
+        self.info("assert that contact set to {}".format(str('No: ' + contact_no)))
+        self.assertCountEqual(self.order_page.get_contact(), [str('No: ' + contact_no)])
+        self.order_page.clear_contact()
+        contact_name_result = self.base_selenium.get_drop_down_suggestion_list(element='order:contact',
+                                                                               item_text=contact_name)
+        self.info("assert that suggestion list of contact name {} is {}".format(contact_name, str('No: ' + contact_no)))
+
+        self.assertEqual(contact_name_result[0], str('No: ' + contact_no))
+
+    def test086_add_multiple_suborders_with_testplans_testunits(self):
+        """
+         New: Orders: table/create: Create 4 suborders from the table view with different
+         test plans & units ( single select ) and make sure the correct corresponding analysis records.
+
+         LIMS-4247
+        """
+        self.test_plan_api = TestPlanAPI()
+        self.analysis_page = SingleAnalysisPage()
+        testplans = []
+        testunits_in_testplans = []
+        for i in range(4):
+            testplans.append(self.test_plan_api.create_completed_testplan_random_data())
+            testunits_in_testplans.extend(self.test_plan_api.get_testunits_in_testplan_by_No(testplans[i]['number']))
+        test_units = TestUnitAPI().get_testunits_with_material_type('All')
+        test_units_names_only = [testunit['name'] for testunit in test_units]
+        testunits = random.sample(test_units_names_only, 4)
+        self.info("create new order")
+        self.order_page.create_new_order(material_type=testplans[0]['materialType'][0]['text'],
+                                         article=testplans[0]['selectedArticles'][0]['text'],
+                                         test_plans=[testplans[0]['testPlan']['text']],
+                                         test_units=[testunits[0]], save=False)
+
+        for i in range(1, 4):
+            self.info("add new suborder with test plan {} and test unit {}".
+                      format(testplans[i]['testPlan']['text'], testunits[i]))
+            self.order_page.create_new_suborder(material_type=testplans[i]['materialType'][0]['text'],
+                                                article_name=testplans[i]['selectedArticles'][0]['text'],
+                                                test_plan=testplans[i]['testPlan']['text'],
+                                                test_unit=testunits[i])
+
+        self.order_page.save(save_btn='order:save_btn')
+        self.order_page.navigate_to_analysis_tab()
+        self.assertEqual(self.analysis_page.get_analysis_count(), 4)
+        for i in range(4):
+            row = self.analysis_page.open_accordion_for_analysis_index(i)
+            test_units = self.analysis_page.get_testunits_in_analysis(row)
+            test_units_names = [name['Test Unit Name'].split(' ')[0] for name in test_units]
+            self.assertEqual(len(test_units_names), 2)
+            self.assertEqual(test_units_names[0], testunits_in_testplans[i])
+            self.assertEqual(test_units_names[1], testunits[i])
+
+    def test087_add_sub_order_with_multiple_testplans_only(self):
+        """
+        Any new suborder with multiple test plans should create one analysis record
+        only with those test plans and test units that corresponding to them.
+
+        LIMS-4276
+        """
+        self.info('create order with two testplans only')
+        response, payload = self.orders_api.create_order_with_double_test_plans(only_test_plans=True)
+        self.assertEqual(response['status'], 1)
+        test_plans = [payload[0]['selectedTestPlans'][0]['name'], payload[0]['selectedTestPlans'][1]['name']]
+        self.info("created order has test plans {} and {} ".format(test_plans[0], test_plans[1]))
+        test_units = [TestPlanAPI().get_testunits_in_testplan_by_No(payload[0]['testPlans'][0]['number']),
+                      TestPlanAPI().get_testunits_in_testplan_by_No(payload[0]['testPlans'][1]['number'])]
+
+        self.orders_page.navigate_to_analysis_active_table()
+        self.analyses_page.filter_by_order_no(payload[0]['orderNo'])
+        self.assertEqual(len(self.analyses_page.result_table()) - 1, 1)
+        analysis_data = self.analyses_page.get_the_latest_row_data()
+        found_test_plans = analysis_data['Test Plans'].split(', ')
+        self.assertEqual(len(found_test_plans), 2)
+        suborder_data = self.analyses_page.get_child_table_data()
+        found_test_units = [testunit['Test Unit'] for testunit in suborder_data]
+        self.assertCountEqual(test_plans, found_test_plans)
+        self.assertNotEqual(test_units, found_test_units)
+
+    def test088_add_multiple_suborders_with_diff_departments(self):
+        """
+        Orders: table: Departments Approach: In case I created multiple suborders
+        the departments should open drop down list with the options that I can
+        select different departments in each one.
+
+        LIMS-4258
+        """
+        self.info('create contact with multiple departments')
+        response, payload = self.contacts_api.create_contact_with_multiple_departments()
+        self.assertEqual(response['status'], 1, "contact with {} Not created".format(payload))
+        department_list = [dep['text'] for dep in payload['departments']]
+        self.info('create order with contact {} and first department {}'.
+                  format(response['company']['name'], payload['departments'][0]['text']))
+        order_response, order_payload = \
+            self.orders_api.create_order_with_department_by_contact_id(
+                response['company']['companyId'])
+        self.assertEqual(order_response['status'], 1, "order with {} Not created".format(order_payload))
+        self.info('edit order with No {}'.format(order_payload[0]['orderNo']))
+        self.orders_page.get_order_edit_page_by_id(order_response['order']['mainOrderId'])
+        self.order_page.sleep_tiny()
+        self.order_page.create_new_suborder(material_type=order_payload[0]['materialType']['text'],
+                                            article_name=order_payload[0]['article']['text'],
+                                            test_plan=order_payload[0]['testPlans'][0]['name'])
+        self.order_page.sleep_tiny()
+        self.info("get departments suggestion list for first suborder")
+        _, department_suggestion_list1 = self.order_page.get_department_suggestion_lists(
+            open_suborder_table=True, index=1)
+        self.assertCountEqual(department_suggestion_list1, department_list)
+        self.info("set department to {}".format(payload['departments'][1]['text']))
+        self.order_page.set_departments(payload['departments'][1]['text'])
+        self.order_page.sleep_tiny()
+        self.order_page.create_new_suborder(material_type=order_payload[0]['materialType']['text'],
+                                            article_name=order_payload[0]['article']['text'],
+                                            test_plan=order_payload[0]['testPlans'][0]['name'])
+        self.order_page.sleep_tiny()
+        self.info("get departments suggestion list for second suborder")
+        _, department_suggestion_list2 = self.order_page.get_department_suggestion_lists(
+            open_suborder_table=True, index=2)
+        self.assertCountEqual(department_suggestion_list2, department_list)
+        self.info("set department to {}".format(payload['departments'][2]['text']))
+        self.order_page.set_departments(payload['departments'][2]['text'])
+        self.order_page.save_and_wait('order:save_btn')
+        self.info("assert that department of each suborder in department lis")
+        suborder_data = self.order_page.get_suborder_data()["suborders"]
+        for suborder in suborder_data:
+            self.assertIn(suborder['departments'][0], department_list)
+
+    def test089_order_of_test_units_in_analysis(self):
+        """
+        Orders: Ordering test units: Test units in the analysis section should display
+        in the same order as in the order section
+        LIMS-7415
+        """
+        self.info('create new order with 3 test units')
+        response, payload = self.orders_api.create_order_with_test_units(3)
+        self.info('get test units of order')
+        order_testunits = [test_unit['name'] for test_unit in payload[0]['testUnits']]
+        self.info('navigate to analysis tab')
+        self.orders_page.navigate_to_analysis_active_table()
+        self.info('filter by order number')
+        self.analyses_page.filter_by_order_no(payload[0]['orderNoWithYear'])
+        self.info('get child table data')
+        table_data = self.analyses_page.get_child_table_data()
+        analysis_testunits = [test_unit['Test Unit'] for test_unit in table_data]
+        self.assertCountEqual(order_testunits, analysis_testunits)
+    
     def test090_if_cancel_archive_order_no_order_suborder_analysis_will_archived(self):
         """
         [Archiving][MainOrder]Make sure that if user cancel archive order,
@@ -2906,6 +3077,7 @@ class OrdersTestCases(BaseTest):
             self.orders_page.get_archived_items()
             self.orders_page.filter_by_analysis_number(filter_text=analysis_no[i])
             self.assertEqual(len(self.order_page.result_table()) - 1, 0)
+
 
     def test091_choose_test_plans_without_test_units(self):
         """
@@ -2966,3 +3138,4 @@ class OrdersTestCases(BaseTest):
             self.assertEqual(len(analysis_data), 2)
             for testunit in analysis_data:
                 self.assertIn(testunit['Test Unit'].replace("'", ""), tstunits)
+

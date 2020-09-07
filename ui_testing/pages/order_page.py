@@ -15,7 +15,6 @@ class Order(Orders):
     def set_order_number(self, no):
         self.base_selenium.set_text(element="order:order_number", value=no)
 
-
     def set_new_order(self):
         self.info('Set new order.')
         self.base_selenium.select_item_from_drop_down(
@@ -99,6 +98,10 @@ class Order(Orders):
         if self.get_test_plan():
             self.base_selenium.clear_items_in_drop_down(element='order:test_plan')
 
+    def clear_contact(self):
+        if self.get_contact():
+            self.base_selenium.clear_items_in_drop_down(element='order:contact')
+
     def clear_test_unit(self, confirm=True):
         if self.get_test_unit():
             self.base_selenium.clear_items_in_drop_down(element='order:test_unit', confirm_popup=confirm)
@@ -118,6 +121,16 @@ class Order(Orders):
             return test_units.replace("×", "").split("\n")
         else:
             return []
+
+    def search_test_unit_not_set(self, test_unit=''):
+        webdriver.ActionChains(self.base_selenium.driver).send_keys(Keys.ESCAPE).perform()
+        self.open_suborder_edit()
+        if self.get_test_unit():
+            self.info("clear test unit")
+            self.clear_test_unit()
+        self.info("Try to set test unit to {} and check if option exist".format(test_unit))
+        is_option_exist = self.base_selenium.select_item_from_drop_down(element='order:test_unit', item_text=test_unit)
+        return is_option_exist
 
     def create_new_order(self, material_type='', article='', contact='', test_plans=[''], test_units=[''],
                          multiple_suborders=0, departments='', order_no='', save=True, with_testplan=True,set_tstunit=True):
@@ -173,7 +186,7 @@ class Order(Orders):
         self.save(save_btn='order:save_btn', sleep=True)
         return order_no
 
-    def get_department_suggestion_lists(self, open_suborder_table=False, contacts=[]):
+    def get_department_suggestion_lists(self, open_suborder_table=False, contacts=[], index=0):
         """
         :param open_suborder_table:
 
@@ -182,7 +195,7 @@ class Order(Orders):
         :return: 2 lists , departments with contacts and departments only
         """
         if open_suborder_table:
-            suborder_row = self.base_selenium.get_table_rows(element='order:suborder_table')[0]
+            suborder_row = self.base_selenium.get_table_rows(element='order:suborder_table')[index]
             suborder_row.click()
         department = self.base_selenium.find_element(element='order:departments')
         department.click()
