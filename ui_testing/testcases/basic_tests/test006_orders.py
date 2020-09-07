@@ -2871,3 +2871,40 @@ class OrdersTestCases(BaseTest):
             self.assertTrue(key_found)
             # close child table
             self.orders_page.close_child_table(source=results[i])
+
+    def test085_order_of_testunits_in_analysis_section(self) :
+        """
+        Ordering test units Approach: In case I put test plans and test units at the same time , the order of
+        the analysis section should be the test units of the test plans then the order test units
+
+        LIMS-7416
+        """
+
+        self.test_plan_api = TestPlanAPI()
+        payload, testplan = self.test_plan_api.create_completed_testplan_multiple_testunits()
+        testplan_name = (payload['testPlan']['text'])
+        articletype = payload['selectedArticles'][0]['text']
+        materialtype = (payload['materialType'][0]['text'])
+        testunit_name1 = (payload['testUnits'][0]['name'])
+        testunit_name2 = (payload['testUnits'][1]['name'])
+        self.order_page.create_new_order(material_type=materialtype, article=articletype, contact='',
+                                                            test_plans=[testplan_name],
+                                                            test_units=['new_test_unit'])
+
+        order_id = self.order_page.get_order_id()
+        suborders = self.orders_api.get_suborder_by_order_id(id=order_id)
+        analysis_number = [suborder['analysis'][0] for suborder in suborders[0]['orders']]
+        self.order_page.get_orders_page()
+        self.info('Navigating to analysis page')
+        self.order_page.navigate_to_analysis_tab()
+        self.analyses_page.open_filter_menu()
+        for analysis in analysis_number:
+            self.analyses_page.filter_by(
+                filter_element='analysis_page:analysis_no_filter', filter_text=analysis, field_type='text')
+            self.analyses_page.filter_apply()
+            analysis_data = self.analyses_page.get_child_table_data(index=0)
+            self.orders_page.open_child_table(source=self.analyses_page.result_table()[0])
+            self.info('checking order of testunits in analysis section')
+            self.assertEqual(analysis_data[0]['Test Unit'], testunit_name1)
+            self.assertEqual(analysis_data[1]['Test Unit'],testunit_name2)
+            self.assertEqual(analysis_data[2]['Test Unit'],'new_test_unit')
