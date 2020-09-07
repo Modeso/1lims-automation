@@ -2936,8 +2936,7 @@ class OrdersTestCases(BaseTest):
         self.orders_page.open_child_table(self.orders_page.result_table()[0])
         suborders = self.orders_page.result_table(element='general:table_child')
         self.assertEqual(3,len(suborders)-1)
-        self.info('create new order with the same order no of the arhcived one')
-        new_no = self.order_page.create_new_order(material_type='Raw Material', order_no=order_no)
+        '''
         print(new_no)
         self.orders_page.get_orders_page()
         self.orders_page.filter_by_order_no(filter_text=order_no)
@@ -2951,10 +2950,14 @@ class OrdersTestCases(BaseTest):
         self.orders_page.click_check_box(row)
         self.order_page.delete_selected_item()
         self.orders_page.confirm_popup()
-        self.info('filter by order no {} to make sure no result found'.format(random_order['orderNo']))
-        self.orders_page.filter_by_order_no(random_order['orderNo'])
+        self.info('filter by order no {} to make sure no result found'.format(order_no))
+        self.orders_page.filter_by_order_no(order_no)
         deleted_order = self.orders_page.result_table()[0]
         self.assertTrue(deleted_order.get_attribute("textContent"), 'No data available in table')
-        '''
+        self.info('assert active table isnt affected by deleted order')
+        self.orders_page.get_orders_page()
+        self.assertGreater(len(self.orders_page.result_table()),1)
+        self.orders_page.filter_by_order_no(filter_text=order_no)
+        self.assertEqual(len(self.orders_page.result_table())-1,0)
 
 
