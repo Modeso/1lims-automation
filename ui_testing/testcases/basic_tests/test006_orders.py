@@ -3078,3 +3078,78 @@ class OrdersTestCases(BaseTest):
             self.orders_page.filter_by_analysis_number(filter_text=analysis_no[i])
             self.assertEqual(len(self.order_page.result_table()) - 1, 0)
 
+    def test091_same_testunits_in_different_testplans(self):
+        """
+        Order: Add Same test units in different test plan
+        LIMS-4354
+        """
+        self.test_plan_api = TestPlanAPI()
+        formated_testunit, formatted_article, formatted_material, material_type_id = self.test_plan_api.create_random_data_for_testplan()
+        response1, testplan1 = self.test_plan_api.create_testplan(testUnits=[formated_testunit],
+                                                                  selectedArticles=[formatted_article],
+                                                                  materialType=[formatted_material],
+                                                                  materialTypeId=[material_type_id])
+        self.info('Asserting api success')
+        self.assertEqual(response1['message'], 'operation_success')
+        testplan1_name = testplan1['testPlan']['text']
+        response2, testplan2 = self.test_plan_api.create_testplan(testUnits=[formated_testunit],
+                                                                  selectedArticles=[formatted_article],
+                                                                  materialType=[formatted_material],
+                                                                  materialTypeId=[material_type_id])
+        self.info('Asserting api success')
+        self.assertEqual(response2['message'], 'operation_success')
+        testplan2_name = testplan2['testPlan']['text']
+        testplans = testplan1_name + ', ' + testplan2_name
+        self.order_page.get_orders_page()
+        self.order_page.sleep_tiny()
+        self.order_page.create_new_order(material_type=formatted_material['text'], article=formatted_article['text'],
+                                         test_plans=[testplan1_name, testplan2_name], with_testunits=False)
+        self.order_page.sleep_tiny()
+        order_id = self.order_page.get_order_id()
+        suborders = self.orders_api.get_suborder_by_order_id(id=order_id)
+        self.info('Asserting api success')
+        self.assertEqual(suborders[0]['status'], 1)
+        analysis_number = [suborder['analysis'][0] for suborder in suborders[0]['orders']]
+        self.info('Asserting there is only one analysis for this order')
+        self.assertEqual(len(analysis_number), 1)
+        self.info('checking testunit for each testplan record ')
+        self.order_page.get_orders_page()
+        self.order_page.navigate_to_analysis_tab()
+        self.analyses_page.sleep_tiny()
+        self.analyses_page.apply_filter_scenario(filter_element='analysis_page:analysis_no_filter',
+                                                 filter_text=analysis_number, field_type='text')
+        status = self.analyses_page.get_the_latest_row_data()['Status']
+        self.info('Asserting status of analysis is open')
+        self.assertEqual(status, 'Open')
+        self.info('Asserting correct testplans selected')
+        self.assertEqual(self.analyses_page.get_the_latest_row_data()['Test Plans'], testplans)
+        analysis_data = self.analyses_page.get_child_table_data(index=0)
+        self.info('Asserting 2 child records; one for each test plan')
+        self.assertEqual(len(analysis_data), 2)
+        self.orders_page.open_child_table(source=self.analyses_page.result_table()[0])
+        for i in range(2):
+            self.info('asserting testunit for testplan {} is {} = selected testunit {}'
+                      .format(i + 1, analysis_data[i]['Test Unit'], formated_testunit['name']))
+            self.assertEqual(analysis_data[i]['Test Unit'], formated_testunit['name'])
+
+        self.orders_page.get_order_edit_page_by_id(order_id)
+        self.info('Delete one of the testplans from the order ')
+        self.order_page.sleep_tiny()
+        self.info('click on first row and remove a testplan')
+        self.order_page.open_suborder_edit()
+        self.base_selenium.clear_items_in_drop_down(element='order:test_plan', confirm_popup=True, one_item_only=True)
+        self.order_page.save(save_btn='order:save')
+        self.order_page.get_orders_page()
+        self.order_page.sleep_tiny()
+        self.analyses_page.apply_filter_scenario(filter_element='analysis_page:analysis_no_filter',
+                                                 filter_text=analysis_number, field_type='text')
+        self.info('Asserting correct testplans selected')
+        self.order_page.sleep_tiny()
+        self.assertEqual(self.analyses_page.get_the_latest_row_data()['Test Plans'], testplan1_name)
+        analysis_data = self.analyses_page.get_child_table_data(index=0)
+        self.info('Asserting only 1 child record; as only one test plan is now selected')
+        self.assertEqual(len(analysis_data), 1)
+        self.orders_page.open_child_table(source=self.analyses_page.result_table()[0])
+        self.info('asserting testunit for testplan2 is {} = selected testunit {}'
+                  .format(analysis_data[0]['Test Unit'], formated_testunit['name']))
+        self.assertEqual(analysis_data[0]['Test Unit'], formated_testunit['name'])
