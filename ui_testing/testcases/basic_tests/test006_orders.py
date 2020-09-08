@@ -2926,7 +2926,7 @@ class OrdersTestCases(BaseTest):
             self.orders_page.filter_by_analysis_number(filter_text=analysis_no[i])
             self.assertEqual(len(self.order_page.result_table()) - 1, 0)
 
-    def test091_order_of_testunits_in_analysis_section(self) :
+    def test091_order_of_testunits_in_analysis_section(self):
         """
         Ordering test units Approach: In case I put test plans and test units at the same time , the order of
         the analysis section should be the test units of the test plans then the order test units
@@ -2935,13 +2935,13 @@ class OrdersTestCases(BaseTest):
         """
 
         self.test_plan_api = TestPlanAPI()
-        payload, testplan = self.test_plan_api.create_completed_testplan_multiple_testunits()
+        payload = self.test_plan_api.create_completed_testplan_random_data(no_testunits=2)
         testplan_name = (payload['testPlan']['text'])
         articletype = payload['selectedArticles'][0]['text']
-        materialtype = (payload['materialType'][0]['text'])
-        testunit_name1 = (payload['testUnits'][0]['name'])
-        testunit_name2 = (payload['testUnits'][1]['name'])
-        self.order_page.create_new_order(material_type=materialtype, article=articletype, contact='',
+        materialtype = payload['materialType'][0]['text']
+        testunit_name1 = payload['testUnits'][0]['name']
+        testunit_name2 = payload['testUnits'][1]['name']
+        self.order_page.create_new_order(material_type=materialtype, article=articletype,
                                          test_plans=[testplan_name],
                                          test_units=['new_test_unit'])
 
@@ -2952,10 +2952,8 @@ class OrdersTestCases(BaseTest):
         self.info('Navigating to analysis page')
         self.order_page.navigate_to_analysis_tab()
         self.analyses_page.open_filter_menu()
-        for analysis in analysis_number :
-            self.analyses_page.filter_by(
-                filter_element='analysis_page:analysis_no_filter', filter_text=analysis, field_type='text')
-            self.analyses_page.filter_apply()
+        for analysis in analysis_number:
+            self.analyses_page.filter_by_analysis_number(analysis)
             analysis_data = self.analyses_page.get_child_table_data(index=0)
             self.orders_page.open_child_table(source=self.analyses_page.result_table()[0])
             self.info('checking order of testunits in analysis section')
