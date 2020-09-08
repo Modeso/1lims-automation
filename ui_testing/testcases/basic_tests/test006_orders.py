@@ -372,7 +372,7 @@ class OrdersTestCases(BaseTest):
         suborder_data = self.order_page.create_new_suborder(
             material_type=test_plan['materialType'][0]['text'],
             article_name=test_plan['selectedArticles'][0]['text'],
-            test_plan=[test_plan['testPlan']['text']],
+            test_plans=[test_plan['testPlan']['text']],
             add_new_suborder_btn='order:add_another_suborder')
 
         self.assertEqual(suborder_data['orderNo'].replace("'", ""), order['orderNo'])
@@ -2936,8 +2936,8 @@ class OrdersTestCases(BaseTest):
                       format(testplans[i]['testPlan']['text'], testunits[i]))
             self.order_page.create_new_suborder(material_type=testplans[i]['materialType'][0]['text'],
                                                 article_name=testplans[i]['selectedArticles'][0]['text'],
-                                                test_plan=[testplans[i]['testPlan']['text']],
-                                                test_unit=testunits[i])
+                                                test_plans=[testplans[i]['testPlan']['text']],
+                                                test_units=[testunits[i]])
 
         self.order_page.save(save_btn='order:save_btn')
         self.order_page.navigate_to_analysis_tab()
@@ -2999,7 +2999,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.sleep_tiny()
         self.order_page.create_new_suborder(material_type=order_payload[0]['materialType']['text'],
                                             article_name=order_payload[0]['article']['text'],
-                                            test_plan=[order_payload[0]['testPlans'][0]['name']])
+                                            test_plans=[order_payload[0]['testPlans'][0]['name']])
         self.order_page.sleep_tiny()
         self.info("get departments suggestion list for first suborder")
         _, department_suggestion_list1 = self.order_page.get_department_suggestion_lists(
@@ -3010,7 +3010,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.sleep_tiny()
         self.order_page.create_new_suborder(material_type=order_payload[0]['materialType']['text'],
                                             article_name=order_payload[0]['article']['text'],
-                                            test_plan=[order_payload[0]['testPlans'][0]['name']])
+                                            test_plans=[order_payload[0]['testPlans'][0]['name']])
         self.order_page.sleep_tiny()
         self.info("get departments suggestion list for second suborder")
         _, department_suggestion_list2 = self.order_page.get_department_suggestion_lists(
@@ -3042,7 +3042,7 @@ class OrdersTestCases(BaseTest):
         table_data = self.analyses_page.get_child_table_data()
         analysis_testunits = [test_unit['Test Unit'] for test_unit in table_data]
         self.assertCountEqual(order_testunits, analysis_testunits)
-    
+
     def test090_if_cancel_archive_order_no_order_suborder_analysis_will_archived(self):
         """
         [Archiving][MainOrder]Make sure that if user cancel archive order,
@@ -3072,7 +3072,7 @@ class OrdersTestCases(BaseTest):
         self.orders_page.get_archived_items()
         self.orders_page.filter_by_order_no(filter_text=order_no)
         self.assertEqual(len(self.order_page.result_table()) - 1, 0)
-        for i in range(0,len(analysis_no)-1):
+        for i in range(0, len(analysis_no) - 1):
             self.base_selenium.refresh()
             self.orders_page.get_archived_items()
             self.orders_page.filter_by_analysis_number(filter_text=analysis_no[i])
@@ -3084,25 +3084,27 @@ class OrdersTestCases(BaseTest):
         LIMS-4350
         """
         self.info('create multiple testplan with same article of each suborder')
-        tst_plan1, tst_plan2, article1 = TestPlanAPI().create_multiple_test_plan_with_same_article()
-        tst_plan3, tst_plan4, article2 = TestPlanAPI().create_multiple_test_plan_with_same_article()
-        tst_plan5, tst_plan6, article3 = TestPlanAPI().create_multiple_test_plan_with_same_article()
-        test_units1 = [tst_plan2['specifications'][0]['name'], tst_plan1['specifications'][0]['name']]
-        test_units2 = [tst_plan3['specifications'][0]['name'], tst_plan4['specifications'][0]['name']]
-        test_units3 = [tst_plan5['specifications'][0]['name'], tst_plan6['specifications'][0]['name']]
-        self.info(' Create new order.')
-        order_no = self.order_page.create_new_order(article=article1, material_type='Raw Material',
-                                                    test_plans=[tst_plan1['testPlanEntity']['name'],
-                                                                tst_plan2['testPlanEntity']['name']],
-                                                    set_tstunit=False, save=False)
-        self.info('create 3 suborder')
-        self.order_page.create_new_suborder(material_type='Raw Material',
-                                            test_plans=[tst_plan3['testPlanEntity']['name'], tst_plan4['testPlanEntity']['name']],
-                                            article_name=article2, add_tstunit=False)
-        self.order_page.create_new_suborder(material_type='Raw Material',
-                                            test_plans=[tst_plan5['testPlanEntity']['name'], tst_plan6['testPlanEntity']['name']],
-                                            article_name=article3, add_tstunit=False)
-
+        created_data_list = []
+        for _ in range(3):
+            tp_1, tp_2, article = TestPlanAPI().create_multiple_test_plan_with_same_article()
+            created_data = {'tp_1': tp_1,
+                            'tp_2': tp_2,
+                            'article': article,
+                            'test_units': [tp_1['specifications'][0]['name'],
+                                           tp_2['specifications'][0]['name']]}
+            created_data_list.append(created_data)
+        self.info('create new order.')
+        order_no = self.order_page.create_new_order(article=created_data_list[0]['article'],
+                                                    material_type='Raw Material',
+                                                    test_plans=[created_data_list[0]['tp_1']['testPlanEntity']['name'],
+                                                                created_data_list[0]['tp_2']['testPlanEntity']['name']],
+                                                    test_units=[], save=False)
+        self.info('add two more suborders')
+        for i in range(1, 3):
+            self.order_page.create_new_suborder(material_type='Raw Material',
+                                                test_plans=[created_data_list[i]['tp_1']['testPlanEntity']['name'],
+                                                            created_data_list[i]['tp_2']['testPlanEntity']['name']],
+                                                test_units=[], article_name=created_data_list[i]['article'])
         self.order_page.save(save_btn='order:save_btn')
         order_id = self.order_page.get_order_id()
         suborders_data, _ = self.orders_api.get_suborder_by_order_id(order_id)
@@ -3112,29 +3114,22 @@ class OrdersTestCases(BaseTest):
             self.assertEqual(len(suborder['analysis']), 1)
             analysis_no.append(suborder['analysis'][0])
         self.assertEqual(3, len(analysis_no))
-        self.info('assert the 3 analysis numbers are triggered for each suborder ')
-        self.assertNotEqual(analysis_no[0], analysis_no[1])
-        self.assertNotEqual(analysis_no[0], analysis_no[2])
-        self.assertNotEqual(analysis_no[1], analysis_no[2])
         self.orders_page.get_orders_page()
         self.orders_page.filter_by_order_no(filter_text=order_no)
         suborders_data = self.order_page.get_child_table_data(index=0)
         analysis_no_list = []
         for suborder in suborders_data:
             analysis_no_list.append(suborder['Analysis No.'])
+        self.info('assert the analysis table has been updated')
         self.assertCountEqual(analysis_no, analysis_no_list)
+
         self.orders_page.navigate_to_analysis_active_table()
         self.analyses_page.filter_by_order_no(filter_text=order_no)
         analysis_rows = self.order_page.result_table()
         self.assertEqual(3, len(analysis_rows) - 1)
-        for i in range(2, 0, -1):
-            if i == 2:
-                tstunits = test_units1
-            elif i == 1:
-                tstunits = test_units2
-            else:
-                tstunits = test_units3
-            analysis_data = self.order_page.get_child_table_data(index=i)
+
+        for i in range(3):
+            analysis_data = self.order_page.get_child_table_data(index=2 - i)
             self.assertEqual(len(analysis_data), 2)
-            for testunit in analysis_data:
-                self.assertIn(testunit['Test Unit'].replace("'", ""), tstunits)
+            analysis_tus = [ad['Test Unit'].replace("'", "") for ad in analysis_data]
+            self.assertCountEqual(analysis_tus, created_data_list[i]['test_units'])
