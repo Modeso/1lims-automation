@@ -3091,10 +3091,11 @@ class OrdersTestCases(BaseTest):
         articletype = payload['selectedArticles'][0]['text']
         materialtype = payload['materialType'][0]['text']
         response, _ = self.test_unit_api.get_all_test_units()
+        self.assertEqual(response['status'], 1)
         random_testunit = random.choice(response['testUnits'])
         testunits = [payload['testUnits'][0]['name'], payload['testUnits'][1]['name'], random_testunit['name']]
         self.order_page.create_new_order(material_type=materialtype, article=articletype,
-                                         test_plans=[testplan_name], test_units=[testunits[2]])
+                                         test_plans=[testplan_name], test_units=[random_testunit['name']])
 
         order_id = self.order_page.get_order_id()
         suborders = self.orders_api.get_suborder_by_order_id(id=order_id)[0]['orders']
