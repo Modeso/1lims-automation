@@ -3078,3 +3078,33 @@ class OrdersTestCases(BaseTest):
             self.orders_page.filter_by_analysis_number(filter_text=analysis_no[i])
             self.assertEqual(len(self.order_page.result_table()) - 1, 0)
 
+    def test091_year_format_in_suborder_sheet(self):
+        """
+         Analysis number format: In case the analysis number displayed with full year,
+         this should reflect on the export file
+
+         LIMS-7424
+
+         Order number format: In case the order number displayed with full year,
+         this should reflect on the export file
+
+         LIMS-7423
+        """
+        self.info('select random order')
+        order = random.choice(self.orders_api.get_all_orders_json())
+        order_no = order['orderNo']
+        self.assertIn('-2020', order_no)
+        response, _ = self.orders_api.get_suborder_by_order_id(order['orderId'])
+        self.assertEqual(response['status'], 1)
+        analysis_no = response['orders'][0]['analysis'][0]
+        self.assertIn('-2020', analysis_no)
+        self.orders_page.filter_by_order_no(order_no)
+        row = self.orders_page.result_table()[0]
+        self.assertTrue(row)
+        self.orders_page.click_check_box(source=row)
+        self.order_page.download_xslx_sheet()
+        self.info('Comparing the downloaded  order ')
+        values = self.order_page.sheet.iloc[0].values
+        fixed_sheet_row_data = self.reformat_data(values)
+        self.assertIn(order_no, fixed_sheet_row_data)
+        self.assertIn(analysis_no, fixed_sheet_row_data)
