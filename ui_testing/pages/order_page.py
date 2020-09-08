@@ -147,10 +147,10 @@ class Order(Orders):
             for test_plan in test_plans:
                 self.set_test_plan(test_plan=test_plan)
 
-        for test_unit in test_units:
-            if check_testunits_testplans:
-                test_units = self.base_selenium.get_drop_down_suggestion_list(element='order:test_unit',
+        if check_testunits_testplans:
+             test_units = self.base_selenium.get_drop_down_suggestion_list(element='order:test_unit',
                                                                               item_text=' ')
+        for test_unit in test_units:
             self.set_test_unit(test_unit=test_unit)
             self.sleep_small()
         

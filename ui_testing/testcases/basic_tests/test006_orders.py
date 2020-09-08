@@ -2873,36 +2873,42 @@ class OrdersTestCases(BaseTest):
             # close child table
             self.orders_page.close_child_table(source=results[i])
 
-    def test086(self):
+    def test086_create_order_without_article(self):
         self.testplan_api=TestPlanAPI()
+        self.header_page = Header()
         testunits_material=[]
         testplans_material=[]
         displayed_headers=[]
-        self.header_page = Header()
+        created_testplan=self.testplan_api.create_completed_testplan_random_data()
+        testplan_material=created_testplan['materialType'][0]['text']
+        material_type_id = GeneralUtilitiesAPI().get_material_id(testplan_material)
+        formatted_material = {'id': material_type_id, 'text': testplan_material}
+        created_testunit=self.test_unit_api.create_qualitative_testunit(selectedMaterialTypes=[formatted_material])
         self.header_page.click_on_header_button()
         self.header_page.click_article_checkbox()
         self.order_page.get_orders_page()
         self.orders_page.open_child_table(self.orders_page.result_table()[0])
         header_row = self.base_selenium.get_table_head_elements(element='general:table_child')
         for h in header_row:
-            print(h.text)
             displayed_headers.append(h.text)
         self.assertNotIn('Article Name', displayed_headers)
-        order_no,testunits,testplans= self.order_page.create_new_order(with_article=False,check_testunits_testplans=True)
-        order_id=self.order_page.get_order_id()
-        order_data=self.orders_api.get_suborder_by_order_id(id=order_id)
-        material_type=order_data[0]['orders'][0]['materialType']
-        filter_text = '{"' + 'materialTypes' + '":"' + material_type + '"}'
-        tus=self.test_unit_api.get_all_test_units(filter=filter_text)
-        tps=self.testplan_api.get_all_test_plans(filter=filter_text)
-        for i in range(len(tus[0]['testUnits'])):
-            testunits_material.append(tus[0]['testUnits'][i]['name'])
-        for i in range(len(tps[0]['testPlans'])):
-            testplans_material.append(tps[0]['testPlans'][i]['testPlanName'])
-        self.info('Asserting testunits are correctly displayed according to selected material type {}'.format(material_type))
+        order_no,testunits,testplans= self.order_page.create_new_order(material_type=testplan_material,
+                                                                       test_plans=[created_testplan['testPlan']['text']]
+                                                                       , test_units=[created_testunit[1]['name']],
+                                                                      with_article=False,check_testunits_testplans=True)
+        #getting all testunits and testplans with the same selected material type
+        filter_text = '{"' + 'materialTypes' + '":"' + testplan_material + '"}'
+        all_testunits_same_material=self.test_unit_api.get_all_test_units(filter=filter_text)
+        all_testplans_same_material=self.testplan_api.get_all_test_plans(filter=filter_text)
+        for i in range(len(all_testunits_same_material[0]['testUnits'])):
+             testunits_material.append(all_testunits_same_material[0]['testUnits'][i]['name'])
+        for i in range(len(all_testplans_same_material[0]['testPlans'])):
+            testplans_material.append(all_testplans_same_material[0]['testPlans'][i]['testPlanName'])
+
+        self.info('Asserting testunits are correctly displayed according to selected material type {}'.format(testplan_material))
         for testunit in testunits:
             self.assertIn(testunit,testunits_material)
-        self.info('Asserting testplans are correctly displayed according to selected material type {}'.format(material_type))
+        self.info('Asserting testplans are correctly displayed according to selected material type {}'.format(testplan_material))
         for testplan in testplans:
             self.assertIn(testplan,testplans_material)
         self.order_page.get_orders_page()
