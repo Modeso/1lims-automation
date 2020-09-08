@@ -7,6 +7,7 @@ from selenium.webdriver.support.wait import WebDriverWait
 from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
+from selenium.webdriver.common.action_chains import ActionChains
 from ui_testing.elements import elements
 import random, time, os, json
 import pandas as pd
@@ -788,3 +789,9 @@ class BaseSelenium:
     def set_local_storage(self, key, value):
         self.driver.execute_script("window.localStorage.setItem(arguments[0], arguments[1]);", key,
                                    json.dumps(value))
+
+    def drag_and_drop(self, source, destination):
+        source_element = self.find_element(element=source)
+        destination_element = self.find_element(element=destination)
+        ActionChains(self.driver).drag_and_drop(source_element, destination_element).perform()
+
