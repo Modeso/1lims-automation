@@ -2504,25 +2504,26 @@ class OrdersTestCases(BaseTest):
 
          LIMS-5818 - added departments assertion
         """
-        res, payload = self.orders_api.create_new_order()
+        new_contact_departments=[]
+        res, payload = self.orders_api.create_order_with_department()
         self.assertEqual(res['status'], 1)
         order_no_with_year = payload[0]['orderNoWithYear']
         order_id = res['order']['mainOrderId']
         response, _ = self.orders_api.get_suborder_by_order_id(id=order_id)
+        response2, payload2 = ContactsAPI().create_contact_with_multiple_departments()
+        self.assertEqual(response2['status'], 1)
+        new_contact = response2['company']['name']
+        for department in payload2['departments']:
+            new_contact_departments.append(department['text'])
         self.info('Getting all {} suborders data to get analysis number'.format(len(response['orders'])))
         self.info("create existing order with order no {}".format(order_no_with_year))
         self.order_page.create_existing_order_with_auto_fill(no=order_no_with_year)
         self.order_page.sleep_tiny()
-        new_contact = self.order_page.set_contact(remove_old=True)[0]
-        departments = self.contacts_api.get_departments_in_contact(contact_name=new_contact)
+        self.order_page.set_contact(contact=new_contact, remove_old=True)
         contact_dep_list, departments_only_list = self.order_page.get_department_suggestion_lists(open_suborder_table=True)
-        if departments == ['']:
-            self.info('Asserting no departments displayed as selected contact has no departments')
-            self.assertEqual(['No items found'],departments_only_list)
-        else:
-            self.info('Asserting departments of selected contact are correctly displayed')
-            for department in departments_only_list:
-                self.assertIn(department,departments)
+        self.info('Asserting departments of selected contact are correctly displayed')
+        for department in departments_only_list:
+            self.assertIn(department, new_contact_departments)
         self.order_page.save(save_btn='order:save_btn')
         self.orders_page.get_orders_page()
         self.order_page.sleep_tiny()
