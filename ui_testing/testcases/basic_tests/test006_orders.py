@@ -2933,30 +2933,27 @@ class OrdersTestCases(BaseTest):
 
         LIMS-7416
         """
-
         self.test_plan_api = TestPlanAPI()
         payload = self.test_plan_api.create_completed_testplan_random_data(no_testunits=2)
-        testplan_name = (payload['testPlan']['text'])
+        testplan_name = payload['testPlan']['text']
         articletype = payload['selectedArticles'][0]['text']
         materialtype = payload['materialType'][0]['text']
-        testunit_name1 = payload['testUnits'][0]['name']
-        testunit_name2 = payload['testUnits'][1]['name']
+        response, _ = self.test_unit_api.get_all_test_units()
+        random_testunit = random.choice(response['testUnits'])
+        testunits = [payload['testUnits'][0]['name'], payload['testUnits'][1]['name'], random_testunit['name']]
         self.order_page.create_new_order(material_type=materialtype, article=articletype,
-                                         test_plans=[testplan_name],
-                                         test_units=['new_test_unit'])
+                                         test_plans=[testplan_name], test_units=[testunits[2]])
 
         order_id = self.order_page.get_order_id()
-        suborders = self.orders_api.get_suborder_by_order_id(id=order_id)
-        analysis_number = [suborder['analysis'][0] for suborder in suborders[0]['orders']]
+        suborders = self.orders_api.get_suborder_by_order_id(id=order_id)[0]['orders']
+        self.assertEqual(len(suborders), 1)
+        analysis_number = suborders[0]['analysis'][0]
         self.order_page.get_orders_page()
         self.info('Navigating to analysis page')
         self.order_page.navigate_to_analysis_tab()
-        self.analyses_page.open_filter_menu()
-        for analysis in analysis_number:
-            self.analyses_page.filter_by_analysis_number(analysis)
-            analysis_data = self.analyses_page.get_child_table_data(index=0)
-            self.orders_page.open_child_table(source=self.analyses_page.result_table()[0])
-            self.info('checking order of testunits in analysis section')
-            self.assertEqual(analysis_data[0]['Test Unit'], testunit_name1)
-            self.assertEqual(analysis_data[1]['Test Unit'], testunit_name2)
-            self.assertEqual(analysis_data[2]['Test Unit'], 'new_test_unit')
+        self.analyses_page.filter_by_analysis_number(analysis_number)
+        analysis_data = self.analyses_page.get_child_table_data(index=0)
+        self.info('checking order of testunits in analysis section')
+        test_units_list_in_analysis = [analysis['Test Unit'] for analysis in analysis_data]
+        self.assertCountEqual(testunits, test_units_list_in_analysis)
+
