@@ -2941,9 +2941,12 @@ class OrdersTestCases(BaseTest):
         materialtype = (payload['materialType'][0]['text'])
         testunit_name1 = (payload['testUnits'][0]['name'])
         testunit_name2 = (payload['testUnits'][1]['name'])
+        response, payload = self.test_unit_api.get_all_test_units()
+        random_testunit = random.choice(response['testUnits'])
+        testunit_name3 = random_testunit['name']
         self.order_page.create_new_order(material_type=materialtype, article=articletype, contact='',
                                          test_plans=[testplan_name],
-                                         test_units=['new_test_unit'])
+                                         test_units=[testunit_name3])
 
         order_id = self.order_page.get_order_id()
         suborders = self.orders_api.get_suborder_by_order_id(id=order_id)
@@ -2959,6 +2962,8 @@ class OrdersTestCases(BaseTest):
             analysis_data = self.analyses_page.get_child_table_data(index=0)
             self.orders_page.open_child_table(source=self.analyses_page.result_table()[0])
             self.info('checking order of testunits in analysis section')
-            self.assertEqual(analysis_data[0]['Test Unit'], testunit_name1)
-            self.assertEqual(analysis_data[1]['Test Unit'], testunit_name2)
-            self.assertEqual(analysis_data[2]['Test Unit'], 'new_test_unit')
+            test_units_list = [testunit_name1, testunit_name2, testunit_name3]
+            test_units_list_in_analysis= [analysis_data[0]['Test Unit'], analysis_data[1]['Test Unit'],analysis_data[2]['Test Unit']]
+
+            self.assertCountEqual(test_units_list,test_units_list_in_analysis)
+
