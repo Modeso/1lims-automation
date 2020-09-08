@@ -3090,10 +3090,15 @@ class OrdersTestCases(BaseTest):
         order_no = self.order_page.create_new_order(material_type='Raw Material', save=False)
         self.info('dupliacte the suborder for 2 times')
         self.order_page.duplicate_from_table_view(number_of_duplicates=2)
-        rows = self.base_selenium.get_table_rows(element='order:suborder_table')
-        self.info('assert 3 suborders are created')
-        self.assertEqual(3,len(rows))
         self.order_page.save(save_btn='order:save_btn')
+        self.order_page.sleep_small()
+        self.base_selenium.refresh()
+        rows = self.base_selenium.get_table_rows(element='order:suborder_table')
+        analysis_list=[]
+        for i in range(len(rows)):
+          suborder_element = self.base_selenium.get_row_cells_id_dict_related_to_header(
+            row=rows[i], table_element='order:suborder_table')
+          analysis_list.append(suborder_element['analysisNo'])
         self.orders_page.get_orders_page()
         self.orders_page.filter_by_order_no(filter_text=order_no)
         self.info('archive the main order from active table')
@@ -3102,23 +3107,12 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.refresh()
         self.orders_page.get_archived_items()
         self.orders_page.filter_by_order_no(order_no)
-        self.assertEqual(len(self.orders_page.result_table())-1,1)
-        self.assertIn(order_no, self.orders_page.result_table()[0].text)
-        self.info('Order number: {} is archived correctly'.format(order_no))
-        self.orders_page.open_child_table(self.orders_page.result_table()[0])
-        suborders = self.orders_page.result_table(element='general:table_child')
-        self.assertEqual(3,len(suborders)-1)
-        '''
-        print(new_no)
-        self.orders_page.get_orders_page()
-        self.orders_page.filter_by_order_no(filter_text=order_no)
-        self.info('assert that the order no appear in the active table')
-        self.assertIn(order_no, self.orders_page.result_table()[0].text)
-        self.base_selenium.refresh()
-        self.orders_page.get_archived_items()
-        self.orders_page.filter_by_order_no(order_no)
-        '''
         row = self.orders_page.result_table()[0]
+        self.orders_page.open_child_table(row)
+        self.info('assert main orders with its suborders in arhcived table')
+        suborders = self.orders_page.result_table(element='general:table_child')
+        for i in range(len(suborders)-1):
+            self.assertIn(analysis_list[2-i],suborders[i].text)
         self.orders_page.click_check_box(row)
         self.order_page.delete_selected_item()
         self.orders_page.confirm_popup()
