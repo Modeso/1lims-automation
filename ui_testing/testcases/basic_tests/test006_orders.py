@@ -3087,19 +3087,19 @@ class OrdersTestCases(BaseTest):
         """
         order = self.orders_api.get_order_with_multiple_sub_orders(no_suborders=2)
         self.info('create testplan with random data')
-        testPlan = TestPlanAPI().create_completed_testplan_random_data(no_testunits=7)
+        testPlan = TestPlanAPI().create_completed_testplan_random_data(no_testunits=3)
         self.info(f'open order edit page : {order["id"]}')
         self.orders_page.get_order_edit_page_by_id(order['id'])
         testunit_names = []
         for testunit in testPlan['testUnits']:
             testunit_names.append(testunit['name'])
-        self.info('update third suborder')
-        self.order_page.update_suborder(sub_order_index=2, material_type=testPlan['materialType'][0]['text'],
+        self.info('update 2nd suborder')
+        self.order_page.update_suborder(sub_order_index=1, material_type=testPlan['materialType'][0]['text'],
                                         articles=[testPlan['selectedArticles'][0]['text']],
                                         test_plans=[testPlan['testPlan']['text']],
                                         remove_old=True, confirm_pop_up=True)
         self.info('get testplan popup')
-        results = self.order_page.get_testplan_pop_up(index=2)
+        results = self.order_page.get_testplan_pop_up(index=1)
         for result in results:
             if result['test_plan'] == testPlan['testPlan']['text']:
                 for testunit in testunit_names:

@@ -329,6 +329,8 @@ class TestPlanAPI(TestPlanAPIFactory):
         formated_testunits = []
         for testunit in range(no_testunits):
             tu_response, _ = TestUnitAPI().create_quantitative_testunit(selectedMaterialTypes=[formatted_material])
+            if tu_response['status'] == 2:
+                continue
             testunit_data = TestUnitAPI().get_testunit_form_data(id=tu_response['testUnit']['testUnitId'])[0][
                 'testUnit']
             formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
