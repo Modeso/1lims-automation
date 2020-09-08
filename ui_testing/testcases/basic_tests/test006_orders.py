@@ -3078,3 +3078,26 @@ class OrdersTestCases(BaseTest):
             self.orders_page.filter_by_analysis_number(filter_text=analysis_no[i])
             self.assertEqual(len(self.order_page.result_table()) - 1, 0)
 
+    def test091_filter_by_analysis_number_with_year(self):
+        """
+         Filter: Analysis number format: In case the analysis number displayed with full year, I can filter by it
+         LIMS-7425
+        """
+        self.info('open analysis configuration')
+        self.analyses_page.open_analysis_configuration()
+        self.info('set analysis number format to be Year before number')
+        self.analyses_page.set_analysis_no_with_year()
+        self.info('select random order and get analysis no of its suborder')
+        orders, _ = self.orders_api.get_all_orders(limit=20)
+        order = random.choice(orders['orders'])
+        suborder, _ = self.orders_api.get_suborder_by_order_id(id=order['id'])
+        analysis_no = suborder['orders'][0]['analysis'][0]
+        self.info('navigate to analysis active table')
+        self.orders_page.get_orders_page()
+        self.orders_page.navigate_to_analysis_active_table()
+        self.info('filter by analysis no')
+        self.analyses_page.filter_by_analysis_number(filter_text=analysis_no)
+        analysis = self.analyses_page.get_the_latest_row_data()
+        result_analysis_no = analysis['Analysis No.']
+        self.assertEqual(analysis_no, result_analysis_no)
+
