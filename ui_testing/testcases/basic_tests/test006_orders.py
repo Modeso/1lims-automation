@@ -3197,6 +3197,7 @@ class OrdersTestCases(BaseTest):
          the drop down list in the filter section to be same as in the form
 
          LIMS-7411
+         LIMS-7414
         """
         self.test_unit_page = TstUnit()
         TstUnits().get_test_units_page()
