@@ -3224,6 +3224,7 @@ class OrdersTestCases(BaseTest):
         self.header_page = Header()
         displayed_headers = []
         testplan_materials = []
+        testunit_materials = []
         fields_text = []
         created_testplan = self.testplan_api.create_completed_testplan_random_data()
         selected_material_type = created_testplan['materialType'][0]['text']
