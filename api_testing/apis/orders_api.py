@@ -118,8 +118,8 @@ class OrdersAPIFactory(BaseAPI):
         api = '{}{}'.format(self.url, self.END_POINTS['orders_api']['create_new_order'])
         return api, payload
     
-     @api_factory('post')
-    def create_order_with_multiple_suborders(self, **kwargs):
+       @api_factory('post')
+    def create_order_with_multiple_suborders(self,no_suborders=0 ,**kwargs):
         """
         Create an order
         :param kwargs:
@@ -156,59 +156,26 @@ class OrdersAPIFactory(BaseAPI):
                                                    'No': contacts['companyNo']}],
                      "materialType": {"id": material_type_id, "text": material_type},
                      "materialTypeId": material_type_id,
-                     "dynamicFieldsValues": [], "departments": [], "withArticle": True},
-                    {"40":[], "analysisNo": [], "departments": [],
-                     "materialType": {"id": material_type_id, "text": material_type},
-                     "article": {"id": article_id, "text": article},
-                     "testPlans": [testplan],
-                     "testUnits": [testunit], "shipmentDate": shipment_date, "testDate": test_date, "attachments": [],
-                     "articleId": article_id,
-                     "dynamicFieldsValues": [], "mainOrderDynamicFieldsValues": [],
-                     "selectedTestPlans": [],
-                     "contact": [{"id": contacts['id'],
-                                  "text": contacts['name'],
-                                  'No': contacts['companyNo']}], "materialTypeId": material_type_id,
-                     "year": current_year, "yearOption": 1, "withArticle": True},
-                    {"40": [], "analysisNo": [], "departments": [],
-                     "materialType": {"id": material_type_id, "text": material_type},
-                     "article": {"id": article_id, "text": article},
-                     "testPlans": [testplan], "testUnits": [testunit],
-                     "shipmentDate": shipment_date,
-                     "testDate": test_date, "attachments": [], "articleId": article_id,
-                     "dynamicFieldsValues": [], "mainOrderDynamicFieldsValues": [],
-                     "selectedTestPlans": [],
-                     "contact": [{"id": contacts['id'],
-                                  "text": contacts['name'],
-                                  'No': contacts['companyNo']}], "materialTypeId": material_type_id,
-                     "year": current_year, "yearOption": 1, "withArticle": True},
-                    {"40": [], "analysisNo": [], "departments": [],
-                     "materialType": {"id": material_type_id, "text": material_type},
-                     "article": {"id": article_id, "text": article},
-                     "testPlans": [testplan],
-                     "testUnits": [], "shipmentDate": shipment_date, "testDate": test_date, "attachments": [],
-                     "articleId": article_id,
-                     "dynamicFieldsValues": [], "mainOrderDynamicFieldsValues": [],
-                     "selectedTestPlans": [],
-                     "contact": [{"id": contacts['id'],
-                                  "text": contacts['name'],
-                                  'No': contacts['companyNo']}], "materialTypeId": material_type_id,
-                     "year": current_year, "yearOption": 1, "withArticle": True},
-                    {"40": [], "analysisNo": [], "departments": [],
-                     "materialType": {"id": material_type_id, "text": material_type},
-                     "article": {"id": article_id, "text": article},
-                     "testPlans": [testplan],
-                     "testUnits": [testunit], "shipmentDate": shipment_date, "testDate": test_date, "attachments": [],
-                     "articleId": article_id,
-                     "dynamicFieldsValues": [], "mainOrderDynamicFieldsValues": [],
-                     "selectedTestPlans": [],
-                     "contact": [{"id": contacts['id'],
-                                  "text": contacts['name'],
-                                  'No': contacts['companyNo']}], "materialTypeId": material_type_id,
-                     "year": current_year, "yearOption": 1, "withArticle": True}]
-        payload = self.update_payload(_payload, **kwargs)
-        payload = self._format_payload(payload)
+                     "dynamicFieldsValues": [], "departments": [], "withArticle": True},]
+        suborder = {"analysisNo": [], "departments": [],
+                    "materialType": {"id": material_type_id, "text": material_type},
+                    "article": {"id": article_id, "text": article},
+                    "testPlans": [testplan],
+                    "testUnits": [testunit], "shipmentDate": shipment_date, "testDate": test_date, "attachments": [],
+                    "articleId": article_id,
+                    "dynamicFieldsValues": [], "mainOrderDynamicFieldsValues": [],
+                    "selectedTestPlans": [],
+                    "contact": [{"id": contacts['id'],
+                                 "text": contacts['name'],
+                                 'No': contacts['companyNo']}], "materialTypeId": material_type_id,
+                    "year": current_year, "yearOption": 1, "withArticle": True}
+        for _ in range(len(no_suborders)):
+            _payload.append(suborder)
+
+        # payload = self.update_payload(_payload, **kwargs)
+        payload = self._format_payload(_payload)
         api = '{}{}'.format(self.url, self.END_POINTS['orders_api']['create_new_order'])
-        return api, payload
+        return api, payloadd
 
     @api_factory('get')
     def get_auto_generated_order_no(self, year_option="1"):
@@ -286,54 +253,55 @@ class OrdersAPIFactory(BaseAPI):
 
     @staticmethod
     def _format_payload(payload):
-        payload = payload[0]
-        if payload['testPlans']:
-            selected_testplan_arr = []
-            for testplan in payload['testPlans']:
-                selected_testplan_arr.append({
-                    'id': int(testplan['id']),
-                    'name': testplan['testPlanName'],
-                    'version': testplan['version']
-                })
-            payload['selectedTestPlans'] = selected_testplan_arr
-            payload['testPlans'] = selected_testplan_arr
-        else:
-            payload['testPlans'] = []
-            payload['selectedTestPlans'] = []
+        # payload = payload[0]
+        for i in range(len(payload)):
+            if payload[i]['testPlans']:
+                selected_testplan_arr = []
+                for testplan in payload[i]['testPlans']:
+                    selected_testplan_arr.append({
+                        'id': int(testplan['id']),
+                        'name': testplan['testPlanName'],
+                        'version': testplan['version']
+                    })
+                payload[i]['selectedTestPlans'] = selected_testplan_arr
+                payload[i]['testPlans'] = selected_testplan_arr
+            else:
+                payload[i]['testPlans'] = []
+                payload[i]['selectedTestPlans'] = []
 
-        if 'testUnits' in payload:
-            selected_testunits_arr = []
-            for testunit in payload['testUnits']:
-                selected_testunits_arr.append({
-                    'id': int(testunit['id']),
-                    'name': testunit['name'],
-                    'new': True
-                })
-                payload['selectedTestUnits'] = selected_testunits_arr
-                payload['testUnits'] = selected_testunits_arr
-        else:
-            payload['testUnits'] = []
-            payload['selectedTestUnits'] = []
+            if 'testUnits' in payload[i]:
+                selected_testunits_arr = []
+                for testunit in payload[i]['testUnits']:
+                    selected_testunits_arr.append({
+                        'id': int(testunit['id']),
+                        'name': testunit['name'],
+                        'new': True
+                    })
+                    payload[i]['selectedTestUnits'] = selected_testunits_arr
+                    payload[i]['testUnits'] = selected_testunits_arr
+            else:
+                payload[i]['testUnits'] = []
+                payload[i]['selectedTestUnits'] = []
 
-        if 'shipmentDate' in payload and payload['shipmentDate'] != '':
-            shipment_date_arr = payload['shipmentDate'].split('-')
-            payload['shipmentDatedateOption'] = {
-                'year': shipment_date_arr[0],
-                'month': shipment_date_arr[1],
-                'day': shipment_date_arr[2]
+            if 'shipmentDate' in payload[i] and payload[i]['shipmentDate'] != '':
+                shipment_date_arr = payload[i]['shipmentDate'].split('-')
+                payload[i]['shipmentDatedateOption'] = {
+                    'year': shipment_date_arr[0],
+                    'month': shipment_date_arr[1],
+                    'day': shipment_date_arr[2]
+                }
+
+            test_date_arr = payload[i]['testDate'].split('-')
+            payload[i]['testDatedateOption'] = {
+                'year': test_date_arr[0],
+                'month': test_date_arr[1],
+                'day': test_date_arr[2]
             }
 
-        test_date_arr = payload['testDate'].split('-')
-        payload['testDatedateOption'] = {
-            'year': test_date_arr[0],
-            'month': test_date_arr[1],
-            'day': test_date_arr[2]
-        }
-
-        if payload['yearOption'] == 1:
-            payload['orderNoWithYear'] = "{}-{}".format((payload['orderNo']), payload['year'])
-        elif payload['yearOption'] == 2:
-            payload['orderNoWithYear'] = "{}-{}".format(payload['year'], payload['orderNo'])
+            if payload[i]['yearOption'] == 1:
+                payload[i]['orderNoWithYear'] = "{}-{}".format((payload[0]['orderNo']), payload[i]['year'])
+            elif payload[i]['yearOption'] == 2:
+                payload[i]['orderNoWithYear'] = "{}-{}".format(payload[i]['year'], payload[0]['orderNo'])
 
         return [payload]
 
