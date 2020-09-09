@@ -5,6 +5,7 @@ from ui_testing.pages.login_page import Login
 from ui_testing.pages.testunits_page import TstUnits
 from api_testing.apis.orders_api import OrdersAPI
 from ui_testing.pages.analysis_page import AllAnalysesPage
+from ui_testing.pages.header_page import Header
 from api_testing.apis.article_api import ArticleAPI
 from api_testing.apis.test_unit_api import TestUnitAPI
 from ui_testing.pages.analysis_page import SingleAnalysisPage
@@ -3214,4 +3215,65 @@ class OrdersTestCases(BaseTest):
                 for testunit in testunit_names:
                     self.assertIn(testunit, result['test_units'])
 
+    def test094_create_order_without_article(self):
+        """
+        orders without articles: check that user can create order without article
+        LIMS-3253
+        """
+        self.testplan_api = TestPlanAPI()
+        self.header_page = Header()
+        displayed_headers = []
+        testplan_materials = []
+        fields_text = []
+        created_testplan = self.testplan_api.create_completed_testplan_random_data()
+        selected_material_type = created_testplan['materialType'][0]['text']
+        material_type_id = GeneralUtilitiesAPI().get_material_id(selected_material_type)
+        formatted_material = {'id': material_type_id, 'text': selected_material_type}
+        created_testunit = self.test_unit_api.create_qualitative_testunit(selectedMaterialTypes=[formatted_material])
+        self.header_page.click_on_header_button()
+        self.header_page.click_article_checkbox()
+        self.order_page.get_orders_page()
+        self.orders_page.open_child_table(self.orders_page.result_table()[0])
+        header_row = self.base_selenium.get_table_head_elements(element='general:table_child')
+        for h in header_row:
+            displayed_headers.append(h.text)
+        self.info('asserting article is not displayed in orders table')
+        self.assertNotIn('Article Name', displayed_headers)
+        order_no, testunits, testplans = self.order_page.create_new_order(material_type=selected_material_type,
+                                                                          test_plans=[
+                                                                              created_testplan['testPlan']['text']]
+                                                                          , test_units=[created_testunit[1]['name']],
+                                                                          with_article=False,
+                                                                          check_testunits_testplans=True)
+        fields = self.base_selenium.get_table_head_elements(element='order:suborder_table')
+        for f in fields:
+            fields_text.append(f.text)
+        self.info('asserting article isnot displayed in new order page')
+        self.assertNotIn('Article: *', fields_text)
+        self.info(
+            'asserting All displayed testunits are loaded correctly according to selected material type {}'.format(
+                selected_material_type))
+        for testunit in testunits:
+            testunit_info = self.test_unit_api.get_testunit_with_quicksearch(quickSearchText=testunit)
+            if testunit_info is not None:
+                self.assertIn(testunit_info[0]['materialTypes'][0], ('All', selected_material_type))
+
+        self.info(
+            'asserting All displayed testplans are loaded correctly according to selected material type {}'.format(
+                selected_material_type))
+        for testplan in testplans:
+            testplan_info = self.testplan_api.get_testplan_with_quicksearch(quickSearchText=testplan)
+            if testplan_info is not None:
+                for tp in testplan_info:
+                    testplan_materials.append(tp['materialTypes'][0])
+                self.assertTrue(any(material in ['All', selected_material_type] for material in testplan_materials))
+
+        self.order_page.sleep_tiny()
+        self.order_page.get_orders_page()
+        self.order_page.sleep_tiny()
+        self.order_page.filter_by_order_no(filter_text=order_no)
+        latest_order_data = \
+            self.base_selenium.get_row_cells_dict_related_to_header(row=self.order_page.result_table()[0])
+        self.info('asserting the order is successfully created')
+        self.assertEqual(order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
 

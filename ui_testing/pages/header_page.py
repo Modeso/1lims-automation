@@ -418,3 +418,13 @@ class Header(BasePages):
 
         self.info(' No. of selected rows {} '.format(no_of_rows))
         return selected_rows_data, selected_rows
+
+    def click_on_modules_configurations(self):
+        self.base_selenium.click(element='header:modules_configurations')
+
+    def click_article_checkbox(self):
+        self.click_on_modules_configurations()
+        self.sleep_tiny()
+        self.info('check/uncheck article checkbox')
+        self.base_selenium.find_element_by_xpath('//*[@id="m_tabs_1"]/div/div[1]/div/div[1]/span/label').click()
+        self.save(save_btn='modules_configurations:save')
