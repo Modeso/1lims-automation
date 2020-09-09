@@ -3192,12 +3192,11 @@ class OrdersTestCases(BaseTest):
     @attr(series=True)
     def test093_test_unit_name_allow_user_to_filter_with_selected_two_options_order(self, search_view_option1,
                                                                                     search_view_option2):
-        """
-         Orders: Filter test unit Approach: Allow the search criteria in
+         """
+          Orders: Filter test unit Approach: Allow the search criteria in
          the drop down list in the filter section to be same as in the form
 
-         LIMS-7411
-         LIMS-7414
+          LIMS-7411
         """
         self.test_unit_page = TstUnit()
         TstUnits().get_test_units_page()
