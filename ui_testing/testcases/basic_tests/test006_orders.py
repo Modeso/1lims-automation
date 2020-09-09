@@ -3256,7 +3256,9 @@ class OrdersTestCases(BaseTest):
         for testunit in testunits:
             testunit_info = self.test_unit_api.get_testunit_with_quicksearch(quickSearchText=testunit)
             if testunit_info is not None:
-                self.assertIn(testunit_info[0]['materialTypes'][0], ('All', selected_material_type))
+                for tu in testunit_info:
+                    testunit_materials.append(tu['materialTypes'][0])
+                self.assertTrue(any(material in ['All', selected_material_type] for material in testunit_materials))
 
         self.info(
             'asserting All displayed testplans are loaded correctly according to selected material type {}'.format(
