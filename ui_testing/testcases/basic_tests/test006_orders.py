@@ -3107,7 +3107,8 @@ class OrdersTestCases(BaseTest):
 
     def test092_add_dynamic_field_in_order_section1(self):
         """
-        order : create new order: check that added dynamic field will be displayed in create new order screen
+        order : create new order: check that dynamic field added in order section 1 will be displayed
+        in create new order screen
         LIMS-7870
         """
         section1_fields=[]
