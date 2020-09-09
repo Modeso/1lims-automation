@@ -3042,7 +3042,7 @@ class OrdersTestCases(BaseTest):
         table_data = self.analyses_page.get_child_table_data()
         analysis_testunits = [test_unit['Test Unit'] for test_unit in table_data]
         self.assertCountEqual(order_testunits, analysis_testunits)
-    
+
     def test090_if_cancel_archive_order_no_order_suborder_analysis_will_archived(self):
         """
         [Archiving][MainOrder]Make sure that if user cancel archive order,
@@ -3072,7 +3072,7 @@ class OrdersTestCases(BaseTest):
         self.orders_page.get_archived_items()
         self.orders_page.filter_by_order_no(filter_text=order_no)
         self.assertEqual(len(self.order_page.result_table()) - 1, 0)
-        for i in range(0,len(analysis_no)-1):
+        for i in range(0, len(analysis_no) - 1):
             self.base_selenium.refresh()
             self.orders_page.get_archived_items()
             self.orders_page.filter_by_analysis_number(filter_text=analysis_no[i])
@@ -3085,19 +3085,17 @@ class OrdersTestCases(BaseTest):
 
         LIMS-7416
         """
-        self.test_plan_api = TestPlanAPI()
-        payload = self.test_plan_api.create_completed_testplan_random_data(no_testunits=2)
-        testplan_name = payload['testPlan']['text']
-        articletype = payload['selectedArticles'][0]['text']
-        materialtype = payload['materialType'][0]['text']
         response, _ = self.test_unit_api.get_all_test_units()
-        self.assertEqual(response['status'], 1)
         random_testunit = random.choice(response['testUnits'])
-        testunits = [payload['testUnits'][0]['name'], payload['testUnits'][1]['name'], random_testunit['name']]
-        self.order_page.create_new_order(material_type=materialtype, article=articletype,
-                                         test_plans=[testplan_name], test_units=[random_testunit['name']])
+        testunits_formated = [{'id': random_testunit['id'],
+                               'name': random_testunit['name']}]
+        res, payload = self.orders_api.create_new_order(testUnits=testunits_formated)
 
-        order_id = self.order_page.get_order_id()
+        testunit_of_test_plan = TestPlanAPI().get_testunits_in_testplan(payload[0]['testPlans'][0]['id'])
+        testunits = [tu['name'] for tu in testunit_of_test_plan]
+        testunits.append(testunits_formated[0]['name'])
+
+        order_id = res['order']['mainOrderId']
         suborders = self.orders_api.get_suborder_by_order_id(id=order_id)[0]['orders']
         self.assertEqual(len(suborders), 1)
         analysis_number = suborders[0]['analysis'][0]
@@ -3109,4 +3107,3 @@ class OrdersTestCases(BaseTest):
         self.info('checking order of testunits in analysis section')
         test_units_list_in_analysis = [analysis['Test Unit'] for analysis in analysis_data]
         self.assertCountEqual(testunits, test_units_list_in_analysis)
-
