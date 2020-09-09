@@ -3104,3 +3104,26 @@ class OrdersTestCases(BaseTest):
             if result['test_plan'] == testPlan['testPlan']['text']:
                 for testunit in testunit_names:
                     self.assertIn(testunit, result['test_units'])
+
+    def test092_filter_configuration_fields(self):
+        """
+          Orders: Make sure that user can filter order TestUnit that exist
+          on order only(TestUnit in Analysis not Included)
+
+          LIMS-5379
+        """
+        self.info("open filter menu")
+        self.orders_page.open_filter_menu()
+        self.info("open filter configuration")
+        found_fields = self.orders_page.list_filter_feilds()
+        self.info("fields in filter are {}".format(found_fields))
+        required_fields = ['Analysis Results', 'Test Units', 'Material Type', 'Analysis No.',
+                           'Departments', 'Test Plans', 'Changed By', 'Created On', 'Shipment Date',
+                           'Test Date', 'Contact Name', 'Article Name', 'Order No.']
+
+        self.assertGreaterEqual(len(found_fields), len(required_fields))
+        for field in required_fields:
+            self.assertIn(field, found_fields)
+
+
+
