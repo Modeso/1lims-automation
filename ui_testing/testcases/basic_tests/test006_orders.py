@@ -3143,11 +3143,9 @@ class OrdersTestCases(BaseTest):
         for testplan in testplans:
             if testplan is not None:
                 testplan_info = TestPlanAPI().get_testplan_with_quicksearch(quickSearchText=testplan)
-                print(testplan_info)
                 if len(testplan_info) != 0:
                     for tp in testplan_info:
                         testplan_materials.append(tp['materialTypes'][0])
-                        print(tp['materialTypes'])
                     self.assertTrue(any(material in ['All', material_type] for material in testplan_materials))
 
         self.order_page.set_test_unit()
