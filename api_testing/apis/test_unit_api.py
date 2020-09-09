@@ -199,6 +199,7 @@ class TestUnitAPIFactory(BaseAPI):
             'name': self.generate_random_string(),
             'number': self.generate_random_number(),
             'selectedConcs': [],
+            'unit': '',
             'dynamicFieldsValues': [],
             'type': {
                 'id': 2,
