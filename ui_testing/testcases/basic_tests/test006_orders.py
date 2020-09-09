@@ -3111,6 +3111,11 @@ class OrdersTestCases(BaseTest):
           on order only(TestUnit in Analysis not Included)
 
           LIMS-5379
+
+          Orders: Filter Approach: Make sure that the user can filter from the
+          default filter ( with status & dynamic fields )
+
+          LIMS-5486
         """
         self.info("open filter menu")
         self.orders_page.open_filter_menu()
@@ -3119,7 +3124,8 @@ class OrdersTestCases(BaseTest):
         self.info("fields in filter are {}".format(found_fields))
         required_fields = ['Analysis Results', 'Test Units', 'Material Type', 'Analysis No.',
                            'Departments', 'Test Plans', 'Changed By', 'Created On', 'Shipment Date',
-                           'Test Date', 'Contact Name', 'Article Name', 'Order No.']
+                           'Test Date', 'Contact Name', 'Article Name', 'Order No.',
+                           'Additional Field', 'Forwarding', 'Status']
 
         self.assertGreaterEqual(len(found_fields), len(required_fields))
         for field in required_fields:
