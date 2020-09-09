@@ -1,4 +1,4 @@
-#!/bin/bash
+!/bin/bash
 
 EXECUTION_FILES=(
    ui_testing/testcases/basic_tests/test006_orders.py
