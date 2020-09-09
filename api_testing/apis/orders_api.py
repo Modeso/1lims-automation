@@ -117,6 +117,98 @@ class OrdersAPIFactory(BaseAPI):
         payload = self._format_payload(payload)
         api = '{}{}'.format(self.url, self.END_POINTS['orders_api']['create_new_order'])
         return api, payload
+    
+     @api_factory('post')
+    def create_order_with_multiple_suborders(self, **kwargs):
+        """
+        Create an order
+        :param kwargs:
+        :return: response, payload
+        """
+        order_no = self.get_auto_generated_order_no()[0]['id']
+        testplan = random.choice(TestPlanAPI().get_completed_testplans(limit=1000))
+        material_type = testplan['materialTypes'][0]
+        material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
+        testplan_form_data = TestPlanAPI()._get_testplan_form_data(id=testplan['id'])[0]
+        article = testplan_form_data['testPlan']['selectedArticles'][0]['name']
+        article_id = testplan_form_data['testPlan']['selectedArticles'][0]['id']
+        if article == 'all':
+            article, article_id = ArticleAPI().get_random_article_articleID()
+
+        # modify_test_plan_ID
+        testplan['id'] = testplan_form_data['testPlan']['testPlanEntity']['id']
+        testunit = testplan_form_data['testPlan']['specifications'][0]
+
+        test_date = self.get_current_date()
+        shipment_date = self.get_current_date()
+        current_year = self.get_current_year()
+        contacts = random.choice(ContactsAPI().get_all_contacts()[0]['contacts'])
+        _payload = [{"selectedTestPlans": [], "deletedTestPlans": [],
+                     "deletedAnalysisIds": [], "analysisNo": [], "mainOrderDynamicFieldsValues": [],
+                     "shipmentDate": shipment_date, "testDate": test_date, "selectedDepartments": [],
+                     "selectedTestUnits": [],
+                     "testPlans": [testplan],
+                     "testUnits": [], "article": {"id": article_id, "text": article}, "articleId": article_id,
+                     "attachments": [], "orderType": {"id": 1, "text": "New Order"}, "orderNo": int(order_no),
+                     "year": current_year,
+                     "yearOption": 1, "contact": [{"id": contacts['id'],
+                                                   "text": contacts['name'],
+                                                   'No': contacts['companyNo']}],
+                     "materialType": {"id": material_type_id, "text": material_type},
+                     "materialTypeId": material_type_id,
+                     "dynamicFieldsValues": [], "departments": [], "withArticle": True},
+                    {"40":[], "analysisNo": [], "departments": [],
+                     "materialType": {"id": material_type_id, "text": material_type},
+                     "article": {"id": article_id, "text": article},
+                     "testPlans": [testplan],
+                     "testUnits": [testunit], "shipmentDate": shipment_date, "testDate": test_date, "attachments": [],
+                     "articleId": article_id,
+                     "dynamicFieldsValues": [], "mainOrderDynamicFieldsValues": [],
+                     "selectedTestPlans": [],
+                     "contact": [{"id": contacts['id'],
+                                  "text": contacts['name'],
+                                  'No': contacts['companyNo']}], "materialTypeId": material_type_id,
+                     "year": current_year, "yearOption": 1, "withArticle": True},
+                    {"40": [], "analysisNo": [], "departments": [],
+                     "materialType": {"id": material_type_id, "text": material_type},
+                     "article": {"id": article_id, "text": article},
+                     "testPlans": [testplan], "testUnits": [testunit],
+                     "shipmentDate": shipment_date,
+                     "testDate": test_date, "attachments": [], "articleId": article_id,
+                     "dynamicFieldsValues": [], "mainOrderDynamicFieldsValues": [],
+                     "selectedTestPlans": [],
+                     "contact": [{"id": contacts['id'],
+                                  "text": contacts['name'],
+                                  'No': contacts['companyNo']}], "materialTypeId": material_type_id,
+                     "year": current_year, "yearOption": 1, "withArticle": True},
+                    {"40": [], "analysisNo": [], "departments": [],
+                     "materialType": {"id": material_type_id, "text": material_type},
+                     "article": {"id": article_id, "text": article},
+                     "testPlans": [testplan],
+                     "testUnits": [], "shipmentDate": shipment_date, "testDate": test_date, "attachments": [],
+                     "articleId": article_id,
+                     "dynamicFieldsValues": [], "mainOrderDynamicFieldsValues": [],
+                     "selectedTestPlans": [],
+                     "contact": [{"id": contacts['id'],
+                                  "text": contacts['name'],
+                                  'No': contacts['companyNo']}], "materialTypeId": material_type_id,
+                     "year": current_year, "yearOption": 1, "withArticle": True},
+                    {"40": [], "analysisNo": [], "departments": [],
+                     "materialType": {"id": material_type_id, "text": material_type},
+                     "article": {"id": article_id, "text": article},
+                     "testPlans": [testplan],
+                     "testUnits": [testunit], "shipmentDate": shipment_date, "testDate": test_date, "attachments": [],
+                     "articleId": article_id,
+                     "dynamicFieldsValues": [], "mainOrderDynamicFieldsValues": [],
+                     "selectedTestPlans": [],
+                     "contact": [{"id": contacts['id'],
+                                  "text": contacts['name'],
+                                  'No': contacts['companyNo']}], "materialTypeId": material_type_id,
+                     "year": current_year, "yearOption": 1, "withArticle": True}]
+        payload = self.update_payload(_payload, **kwargs)
+        payload = self._format_payload(payload)
+        api = '{}{}'.format(self.url, self.END_POINTS['orders_api']['create_new_order'])
+        return api, payload
 
     @api_factory('get')
     def get_auto_generated_order_no(self, year_option="1"):
