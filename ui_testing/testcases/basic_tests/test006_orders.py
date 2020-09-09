@@ -1,6 +1,7 @@
 from ui_testing.testcases.base_test import BaseTest
 from ui_testing.pages.order_page import Order
 from ui_testing.pages.orders_page import Orders
+from ui_testing.pages.header_page import Header
 from ui_testing.pages.login_page import Login
 from ui_testing.pages.testunits_page import TstUnits
 from api_testing.apis.orders_api import OrdersAPI
@@ -3104,3 +3105,10 @@ class OrdersTestCases(BaseTest):
             if result['test_plan'] == testPlan['testPlan']['text']:
                 for testunit in testunit_names:
                     self.assertIn(testunit, result['test_units'])
+
+    def test092_tst(self):
+        self.header_page = Header()
+        self.header_page.click_on_header_button()
+        self.header_page.click_on_modules_config_btn()
+        self.header_page.disable_article_option()
+

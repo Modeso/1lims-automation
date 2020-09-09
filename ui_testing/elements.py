@@ -83,7 +83,7 @@ elements = {
                   'order': 0},
 
         'close_uploader_popup': {'method': 'id',
-                        'value': 'uploaderPopUpClose'},
+                                 'value': 'uploaderPopUpClose'},
         'right_menu': {'method': 'xpath',
                        'value': '//a[@data-toggle="dropdown"]'},
         'archive': {'method': 'link_text',
@@ -153,7 +153,7 @@ elements = {
             'method': 'id',
             'value': 'table_last'
         },
-        'file_input_field': {'method': 'css_selector', 'value':'[type="file"]'},
+        'file_input_field': {'method': 'css_selector', 'value': '[type="file"]'},
         'file_upload_success_flag': {'method': 'class_name', 'value': 'dz-complete', 'order': 0},
         'files_upload_success_flags': {'method': 'class_name', 'value': 'dz-complete', 'order': -1},
         'remove_file': {'method': 'class_name', 'value': 'dz-remove', 'order': 0},
@@ -220,7 +220,6 @@ elements = {
         'unit_field_archive': {'method': 'xpath', 'value': '//*[@id="5_field"]//li[1]/a'},
         'unit_field_restore': {'method': 'xpath', 'value': '//*[@id="5_field"]//li[2]/a'},
 
-
         'comment_field_options': {'method': 'xpath', 'value': '//*[@id="7_field"]//a'},
         'comment_field_archive': {'method': 'xpath', 'value': '//*[@id="7_field"]//li[1]/a'},
         'comment_field_restore': {'method': 'xpath', 'value': '//*[@id="7_field"]//li[2]/a'},
@@ -228,7 +227,6 @@ elements = {
         'related_article_field_options': {'method': 'xpath', 'value': '//*[@id="12_field"]//a'},
         'related_article_field_archive': {'method': 'xpath', 'value': '//*[@id="12_field"]//li[1]/a'},
         'related_article_field_restore': {'method': 'xpath', 'value': '//*[@id="12_field"]//li[2]/a'},
-
 
     },
     'article': {
@@ -337,7 +335,7 @@ elements = {
         'testunit_name_filter': {'method': 'id',
                                  'value': 'namefield'},
         'testunit_number_filter': {'method': 'id',
-                                 'value': 'numberfield'},
+                                   'value': 'numberfield'},
         'filter_material_type': {'method': 'id',
                                  'value': 'materialTypesfield'},
         'filter_created_at': {'method': 'id', 'value': 'start_createdAt'},
@@ -370,11 +368,11 @@ elements = {
         'test_units': {'method': 'id',
                        'value': 'selectedTestUnitsfield'},
         'test_unit': {'method': 'id',
-                       'value': 'selectedTestUnits'},
+                      'value': 'selectedTestUnits'},
         'add': {'method': 'id',
                 'value': 'new_testunit_add_button'},
         'check_btn': {'method': 'xpath',
-                'value': '//i[@class="la la-check"]'},
+                      'value': '//i[@class="la la-check"]'},
         'save_btn': {'method': 'id',
                      'value': 'save_btn'},
         'save_and_complete': {'method': 'id',
@@ -412,15 +410,15 @@ elements = {
         'back_button': {'method': 'id',
                         'value': 'back_btn'},
         'testunit_title': {'method': 'class_name',
-                              'value': 'testunitCell-positioning',
-                               'order': 0},
+                           'value': 'testunitCell-positioning',
+                           'order': 0},
         'remove_testunit': {'method': 'id',
                             'value': 'remove_testunit'},
         'test_unit_category': {'method': 'class_name',
-                              'value': 'testunitCell-positioning',
+                               'value': 'testunitCell-positioning',
                                'order': 1},
         'test_unit_iteration': {'method': 'xpath',
-                               'value': '//input[@placeholder="Iterations"]'},
+                                'value': '//input[@placeholder="Iterations"]'},
         'testunit_unit': {'method': 'id',
                           'value': 'testunit_unit'},
         'testunit_quantification_upper_limit': {
@@ -558,9 +556,9 @@ elements = {
         'archive': {'method': 'link_text',
                     'value': 'Archive'},
         'active': {'method': 'link_text',
-                    'value': 'Active'},
+                   'value': 'Active'},
         'archived': {'method': 'link_text',
-                    'value': 'Archived'},
+                     'value': 'Archived'},
         'analysis-confirmation': {
             'method': 'class_name',
             'value': 'swal2-header'},
@@ -577,7 +575,7 @@ elements = {
         'analysis_filter': {'method': 'id',
                             'value': 'analysisfield'},
         'analysis_result_filter': {'method': 'id',
-                            'value': 'analysisResultsfield'},
+                                   'value': 'analysisResultsfield'},
         'order_filter': {'method': 'id',
                          'value': 'orderNofield'},
         'contact_filter': {'method': 'id',
@@ -614,18 +612,18 @@ elements = {
             'value': "//label[@class='btn tab']"},
         'mainorder_duplicate': {'method': 'id',
                                 'value': 'main_table_duplicate'},
-        'mainorder-archive' : {'method' : 'id',
-                               'value' : 'main_table_archive'
-        },
-        'cancel_popup' : {'method' : 'xpath',
-                          'value' : '//button[@class="swal2-cancel btn btn-secondary m-btn m-btn--custom"]'
-        },
+        'mainorder-archive': {'method': 'id',
+                              'value': 'main_table_archive'
+                              },
+        'cancel_popup': {'method': 'xpath',
+                         'value': '//button[@class="swal2-cancel btn btn-secondary m-btn m-btn--custom"]'
+                         },
         'suborder_duplicate': {'method': 'id', 'value': 'child_table_duplicate'},
         'suborder_archive': {'method': 'id', 'value': 'child_table_archive'},
         'suborder_restore': {'method': 'id', 'value': 'child_table_restore'},
         'suborder_delete': {'method': 'id',
-                             'value': 'child_table_delete'},
-        'confirm_delete': {'method':'xpath',
+                            'value': 'child_table_delete'},
+        'confirm_delete': {'method': 'xpath',
                            'value': '//h2[@id="swal2-title"]'}
     },
 
@@ -669,8 +667,8 @@ elements = {
         'no': {'method': 'id',
                'value': 'orderNoWithYearfield'},
         'error_in_number_mssg': {'method': 'xpath',
-                    'value': '//span[@class="m-form__help"]',
-                    'order': 0},
+                                 'value': '//span[@class="m-form__help"]',
+                                 'order': 0},
 
         'cancel_btn': {'method': 'id',
                        'value': 'button_cancel_order'},
@@ -717,8 +715,8 @@ elements = {
             'order': 0
         },
         'add_new_item11': {'method': 'class_name',
-                         'value': 'addNewItem',
-                         'order': 0},
+                           'value': 'addNewItem',
+                           'order': 0},
         'order_no_error_message': {'method': 'xpath',
                                    'value': '//*[@id="field"]/div[3]/div/span'},
         'confirm_pop': {'method': 'class_name',
@@ -731,12 +729,12 @@ elements = {
                            'value': '//i[@class="la la-cloud-upload"]',
                            },
         'uploader_zone': {'method': 'id',
-                           'value': 'fieldUploaderComponent',
-                           },
+                          'value': 'fieldUploaderComponent',
+                          },
 
         'uploader_close_btn': {'method': 'id',
-                           'value': 'uploaderPopUpClose',
-                           },
+                               'value': 'uploaderPopUpClose',
+                               },
         'attachments_btn': {'method': 'xpath',
                             'value': '//i[@class="fa fa-cloud-upload"]'},
         'testplan_popup_btn': {'method': 'tag_name',
@@ -768,6 +766,8 @@ elements = {
                                    'value': '//*[contains(text(),"User Management")]'},
         'roles_and_permissions_button': {'method': 'xpath',
                                          'value': '//span[@class="m-menu__link-text"][contains(text(),"Role & Permissions")]'},
+        'modules_configuration_button': {'method': 'xpath',
+                                         'value': '//span[@class="m-menu__link-text"][contains(text()," Modules Configurations")]'},
         'myprofile_button': {'method': 'xpath',
                              'value': '//*[contains(text(),"My Profile")]'},
         'companyprofile_button': {'method': 'xpath',
@@ -897,7 +897,7 @@ elements = {
         'email': {'method': 'id',
                   'value': 'emailfield_email'},
         'email_filter': {'method': 'id',
-                  'value': 'emailfield'},
+                         'value': 'emailfield'},
         'phone': {'method': 'id',
                   'value': 'phonefield'},
         'skype': {'method': 'id',
@@ -1093,7 +1093,7 @@ elements = {
         'confirm_password_field': {'method': 'id', 'value': 'confirmPassword'},
         'language_field': {'method': 'id', 'value': 'languagefield'},
         'signature_field': {'method': 'id', 'value': 'signiture'},
-        'cancel_button':  {'method': 'class_name', 'value': 'btn-secondary', 'order': 2},
+        'cancel_button': {'method': 'class_name', 'value': 'btn-secondary', 'order': 2},
         'save_button': {'method': 'class_name', 'value': 'btn-primary', 'order': 1},
         'username': {'method': 'class_name', 'value': 'm-card-profile__name', 'order': 0},
         'email': {'method': 'class_name', 'value': 'm-card-profile__email', 'order': 0},
@@ -1144,5 +1144,10 @@ elements = {
         'username': {'method': 'class_name', 'value': 'm-card-profile__name', 'order': 0},
         'email': {'method': 'class_name', 'value': 'm-card-profile__email', 'order': 0},
         'validation_error': {'method': 'id', 'value': 'ohSnapMsg'}
+    },
+    'modules_config': {
+        'save_btn': {'method': 'xpath',
+                     'value': '//button[@class="btn btn-primary mb-md-0 mr-md-3"]'}
+
     },
 }
