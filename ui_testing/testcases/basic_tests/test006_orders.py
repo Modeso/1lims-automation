@@ -3105,13 +3105,13 @@ class OrdersTestCases(BaseTest):
                 for testunit in testunit_names:
                     self.assertIn(testunit, result['test_units'])
 
-    def test092_add_dynamic_field(self):
+    def test092_add_dynamic_field_in_order_section1(self):
         """
         order : create new order: check that added dynamic field will be displayed in create new order screen
         LIMS-7870
         """
-        headers = []
-        self.order_page.add_dynamic_text_field()
+        section1_fields=[]
+        self.order_page.add_dynamic_text_field_to_section1()
         self.order_page.sleep_tiny()
         self.info('Asserting successfully updated popup')
         self.assertTrue(self.base_selenium.check_element_is_exist(element='orders:save_popup'))
@@ -3123,8 +3123,8 @@ class OrdersTestCases(BaseTest):
         self.base_selenium.click(element='orders:save_config')
         self.order_page.get_orders_page()
         self.order_page.click_create_order_button()
-        visible_fields = self.base_selenium.get_table_head_elements(element='order:suborder_table')
+        visible_fields =self.base_selenium.find_elements(element='order:section1_titles')
         for field in visible_fields:
-            headers.append(field.text)
+            section1_fields.append((field.text))
         self.info('Assert the added field is visible in create new order page')
-        self.assertIn('Additional Field:', headers)
+        self.assertIn('Additional Field:', section1_fields)

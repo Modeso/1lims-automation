@@ -559,8 +559,8 @@ elements = {
                           'value':'//*[@id="custom-accordion-panel"]/div/div/a[6]'},
         'text_new_field':{'method':'xpath',
                           'value':'//*[@id="draggableTextField"]/span'},
-        'fields_area':{'method':'xpath',
-                       'value':'//*[@id="sortableLeft"]'},
+        'orders_section1':{'method':'xpath',
+                       'value':'//*[@id="sampleManagementSectionI"]'},
         'text_field_dragged':{'method':'xpath',
                               'value': '//*[contains(concat( " ", @class, " " ), concat( " ", "color-label", " " ))]'},
         'save_popup': {'method': 'xpath',
@@ -770,6 +770,10 @@ elements = {
         'filter_analysis_no': {
             'method': 'id',
             'value': 'nofield'
+        },
+        'section1_titles':{
+            'method':'class_name',
+            'value':'field-title-limitations'
         }
     },
 
