@@ -3043,7 +3043,7 @@ class OrdersTestCases(BaseTest):
         table_data = self.analyses_page.get_child_table_data()
         analysis_testunits = [test_unit['Test Unit'] for test_unit in table_data]
         self.assertCountEqual(order_testunits, analysis_testunits)
-    
+
     def test090_if_cancel_archive_order_no_order_suborder_analysis_will_archived(self):
         """
         [Archiving][MainOrder]Make sure that if user cancel archive order,
@@ -3073,7 +3073,7 @@ class OrdersTestCases(BaseTest):
         self.orders_page.get_archived_items()
         self.orders_page.filter_by_order_no(filter_text=order_no)
         self.assertEqual(len(self.order_page.result_table()) - 1, 0)
-        for i in range(0,len(analysis_no)-1):
+        for i in range(0, len(analysis_no) - 1):
             self.base_selenium.refresh()
             self.orders_page.get_archived_items()
             self.orders_page.filter_by_analysis_number(filter_text=analysis_no[i])
@@ -3106,9 +3106,55 @@ class OrdersTestCases(BaseTest):
                 for testunit in testunit_names:
                     self.assertIn(testunit, result['test_units'])
 
-    def test092_tst(self):
+    def test092_create__order_from_existing_order_without_article(self):
         self.header_page = Header()
+        self.info('go to Modules Configurations')
         self.header_page.click_on_header_button()
         self.header_page.click_on_modules_config_btn()
+        self.info('disable article check box')
         self.header_page.disable_article_option()
+        self.order_page.get_orders_page()
+        self.info('create order from an existing one')
+        order_no = self.order_page.create_existing_order_with_auto_fill()
+        self.assertFalse(self.base_selenium.check_element_is_exist(element='order:article'))
+        old_materialtype = self.order_page.get_material_type()
+        material_type = random.choice(GeneralUtilitiesAPI().
+                                      get_material_types_without_duplicate(old_materialtype))
+        self.info('switch to material type {}'.format(material_type))
+        self.order_page.set_material_type(material_type=material_type)
+        self.assertEqual(self.base_selenium.get_value(element='order:test_unit'), None)
+        self.assertEqual(self.base_selenium.get_value(element='order:test_plan'), None)
+        testunits = self.base_selenium.get_drop_down_suggestion_list(element='order:test_unit',
+                                                                     item_text=' ')
+        testplans = self.base_selenium.get_drop_down_suggestion_list(element='order:test_plan',
+                                                                     item_text=' ')
+        testplan_materials = []
+        testunit_materials = []
+        for testunit in testunits:
+            testunit_info = self.test_unit_api.get_testunit_with_quicksearch(quickSearchText=testunit)
+            if testunit_info is not None:
+                for tu in testunit_info:
+                    testunit_materials.append(tu['materialTypes'][0])
+                self.assertTrue(any(material in ['All', material_type] for material in testunit_materials))
 
+        self.info(
+            'asserting All displayed testplans are loaded correctly according to selected material type {}'.format(
+                material_type))
+        for testplan in testplans:
+            if testplan is not None:
+                testplan_info = TestPlanAPI().get_testplan_with_quicksearch(quickSearchText=testplan)
+                print(testplan_info)
+                if len(testplan_info) != 0:
+                    for tp in testplan_info:
+                        testplan_materials.append(tp['materialTypes'][0])
+                        print(tp['materialTypes'])
+                    self.assertTrue(any(material in ['All', material_type] for material in testplan_materials))
+
+        self.order_page.set_test_unit()
+        self.order_page.set_test_plan()
+        self.order_page.save(save_btn='order:save_btn')
+        self.info('assert order is created successfully')
+        self.orders_page.get_orders_page()
+        self.orders_page.filter_by_order_no(filter_text=order_no)
+        results = self.order_page.result_table()[0].text
+        self.assertIn(order_no.replace("'", ""), results.replace("'", ""))

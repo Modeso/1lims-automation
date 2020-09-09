@@ -427,4 +427,4 @@ class Header(BasePages):
     def disable_article_option(self):
         check_box = self.base_selenium.find_element(element='general:checkbox')
         check_box.click()
-        self..save(save_btn='modules_config:save_btn')
+        self.save(save_btn='modules_config:save_btn')
