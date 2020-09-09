@@ -555,6 +555,18 @@ elements = {
                       'value': 'add-btn'},
         'right_menu': {'method': 'xpath',
                        'value': '//*[@id="custom-accordion-panel"]/div/a/i'},
+        'configurations':{'method':'xpath',
+                          'value':'//*[@id="custom-accordion-panel"]/div/div/a[6]'},
+        'text_new_field':{'method':'xpath',
+                          'value':'//*[@id="draggableTextField"]/span'},
+        'orders_section1':{'method':'xpath',
+                       'value':'//*[@id="sampleManagementSectionI"]'},
+        'text_field_dragged':{'method':'xpath',
+                              'value': '//*[contains(concat( " ", @class, " " ), concat( " ", "color-label", " " ))]'},
+        'save_popup': {'method': 'xpath',
+                               'value': '//*[@id="noty_layout__topCenter"]'},
+        'save_config' :{'method':'xpath',
+                        'value':'//button[@class="btn btn-primary mb-md-0 mr-md-3"]'},
         'archive': {'method': 'link_text',
                     'value': 'Archive'},
         'active': {'method': 'link_text',
@@ -758,6 +770,10 @@ elements = {
         'filter_analysis_no': {
             'method': 'id',
             'value': 'nofield'
+        },
+        'section1_titles':{
+            'method':'class_name',
+            'value':'field-title-limitations'
         }
     },
 
