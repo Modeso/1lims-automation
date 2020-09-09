@@ -1,13 +1,12 @@
-#!/bin/bash
-
-EXECUTION_FILES=(
-
-     ui_testing/testcases/basic_tests/test004_testunits.py
-  )
-
-TEST_REG='test052'
-
-
+##!/bin/bash
+#
+#EXECUTION_FILES=(
+#   ui_testing/testcases/basic_tests/test006_orders.py
+#  )
+#
+# TEST_REG='test091'
+#
+#
 # NODE_TOTAL=$1;
 # NODE_INDEX=$2;
 # RUN_REF=$3;
@@ -16,7 +15,7 @@ TEST_REG='test052'
 # WORK_DIR=$6;
 # ATTR=$7;
 # UUID=$8;
-
+#
 # echo 'NODE_TOTAL: ' $NODE_TOTAL;
 # echo 'NODE_INDEX: ' $NODE_INDEX;
 # echo 'TEST_REG: ' $TEST_REG;
@@ -25,7 +24,7 @@ TEST_REG='test052'
 # echo 'RUN_NUMBER: ' $RUN_NUMBER;
 # echo 'WORK_DIR: ' $WORK_DIR;
 # EXECUTION_RESULT=()
-
+#
 # for TEST_FILE in "${EXECUTION_FILES[@]}"
 #  do
 #    echo 'TEST_FILE: ' $TEST_FILE;
@@ -38,7 +37,7 @@ TEST_REG='test052'
 #       EXECUTION_RESULT+=($?)
 #    fi
 #  done
-
+#
 # for exit_code in "${EXECUTION_RESULT[@]}"
 # do
 #   if [[ $exit_code = 1 ]]
