@@ -3194,12 +3194,12 @@ class OrdersTestCases(BaseTest):
                                                                                     search_view_option2):
          """
           Orders: Filter test unit Approach: Allow the search criteria in
-         the drop down list in the filter section to be same as in the form
+          the drop down list in the filter section to be same as in the form
 
           LIMS-7411
         """
-        self.test_unit_page = TstUnit()
         TstUnits().get_test_units_page()
+        self.test_unit_page = TstUnit()
         self.test_unit_page.open_configurations()
         self.test_unit_page.open_testunit_name_configurations_options()
         self.test_unit_page.select_option_to_view_search_with(
