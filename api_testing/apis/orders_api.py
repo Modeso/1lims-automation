@@ -253,11 +253,11 @@ class OrdersAPI(OrdersAPIFactory):
 
     def get_order_with_multiple_sub_orders(self, no_suborders=1):
         api, payload = self.get_all_orders(limit=100)
-        all_orders = api['orders']
-        for order in all_orders:
-            suborder = self.get_suborder_by_order_id(id=order['orderId'])[0]['orders']
+        while True:
+            random_order = random.choice(api['orders'])
+            suborder = self.get_suborder_by_order_id(id=random_order['orderId'])[0]['orders']
             if len(suborder) > no_suborders:
-                return order
+                return random_order
 
     def get_order_with_field_name(self, field, no_of_field):
         """
