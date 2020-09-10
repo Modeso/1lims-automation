@@ -112,20 +112,6 @@ class OrdersAPIFactory(BaseAPI):
                 'testDate': test_date,
                 'year': current_year,
                 'yearOption': 1,
-                'testPlans': [testplan],
-                'selectedTestPlans': [],
-                'testUnits': [testunit],
-                'selectedTestUnits': [],
-                'materialType': {"id": material_type_id, "text": material_type},
-                'materialTypeId': material_type_id,
-                'article': {'id': article_id,
-                            'text': article},
-                'articleId': article_id,
-                "withArticle": True,
-                'shipmentDate': shipment_date,
-                'testDate': test_date,
-                'year': current_year,
-                'yearOption': 1
             }]
         payload = self.update_payload(_payload, **kwargs)
         payload = self._format_payload(payload)
