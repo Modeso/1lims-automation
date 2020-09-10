@@ -357,8 +357,7 @@ class TestPlanAPI(TestPlanAPIFactory):
         super().set_configuration(payload=payload)
 
     def create_multiple_test_plan_with_same_article(self):
-        material_type_id = GeneralUtilitiesAPI().get_material_id('Raw Material')
-        materialType = {"id": material_type_id, "text": 'Raw Material'}
+        materialType = {"id": 1, "text": 'Raw Material'}
         article_data = ArticleAPI().get_formatted_article_with_formatted_material_type(materialType)
         article_name = article_data['name']
         formatted_article = {'id': article_data['id'], 'text': article_name}

@@ -118,6 +118,64 @@ class OrdersAPIFactory(BaseAPI):
         api = '{}{}'.format(self.url, self.END_POINTS['orders_api']['create_new_order'])
         return api, payload
 
+    @api_factory('post')
+    def create_multiple_suborders_with_double_test_plans_only(self, no_suborders=3):
+        order_no = self.get_auto_generated_order_no()[0]['id']
+        test_date = self.get_current_date()
+        test_date_arr = test_date.split('-')
+        shipment_date = self.get_current_date()
+        shipment_date_arr = shipment_date.split('-')
+        current_year = self.get_current_year()
+        orderNoWithYear = "{}-{}".format(current_year, order_no)
+        contacts = random.choice(ContactsAPI().get_all_contacts()[0]['contacts'])
+        suborders_common_data = {
+            'orderNo': int(order_no),
+            'orderNoWithYear': orderNoWithYear,
+            'contact': [{"id": contacts['id'], "text": contacts['name'], 'No': contacts['companyNo']}],
+            'deletedTestPlans': [],
+            'deletedAnalysisIds': [],
+            'dynamicFieldsValues': [],
+            'analysisNo': [],
+            'selectedDepartments': [],
+            'orderType': {'id': 1, 'text': 'New Order'},
+            'departments': [],
+            'attachments': [],
+            'testUnits': [],
+            'selectedTestUnits': [],
+            "withArticle": True,
+            'shipmentDate': shipment_date,
+            'testDate': test_date,
+            'year': current_year,
+            'yearOption': 1,
+            'shipmentDatedateOption': {'year': shipment_date_arr[0], 'month': shipment_date_arr[1],
+                                       'day': shipment_date_arr[2]},
+            'testDatedateOption': {'year': test_date_arr[0], 'month': test_date_arr[1], 'day': test_date_arr[2]}
+        }
+        suborders = []
+        import ipdb;ipdb.set_trace()
+        for i in range(no_suborders):
+            sub_order_dict = suborders_common_data
+            tp_1, tp_2, article = TestPlanAPI().create_multiple_test_plan_with_same_article()
+            article = tp_1['selectedArticles'][0]['name']
+            article_id = tp_1['selectedArticles'][0]['id']
+            if article == 'all':
+                article, article_id = ArticleAPI().get_random_article_articleID()
+            formatted_article = {'id': article_id, 'text': article}
+            formatted_material_type = {'id': tp_1['materialType'][0]['id'], 'text': tp_1['materialType'][0]['name']}
+            formatted_testPlan1 = {'id': int(tp_1['id']), 'name': tp_1['testPlanEntity']['name'], 'version': 1}
+            formatted_testPlan2 = {'id': int(tp_2['id']), 'name': tp_2['testPlanEntity']['name'], 'version': 1}
+            testplan_list = [formatted_testPlan1, formatted_testPlan2]
+            sub_order_dict['testPlans'] = testplan_list
+            sub_order_dict['selectedTestPlans'] = testplan_list
+            sub_order_dict['materialType'] = formatted_material_type
+            sub_order_dict['materialTypeId'] = formatted_material_type['id']
+            sub_order_dict['article'] = formatted_article
+            sub_order_dict['articleId'] = article_id
+            suborders.append(sub_order_dict)
+        payload = self.update_payload(suborders)
+        api = '{}{}'.format(self.url, self.END_POINTS['orders_api']['create_new_order'])
+        return api, payload
+
     @api_factory('get')
     def get_auto_generated_order_no(self, year_option="1"):
         """
