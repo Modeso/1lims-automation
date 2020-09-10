@@ -3136,13 +3136,13 @@ class OrdersTestCases(BaseTest):
         self.order_page.sleep_tiny()
         order_id = self.order_page.get_order_id()
         suborders = self.orders_api.get_suborder_by_order_id(id=order_id)
-        
+
         self.info('asserting api success')
         self.assertEqual(suborders[0]['status'], 1)
         analysis_number = [suborder['analysis'][0] for suborder in suborders[0]['orders']]
         self.info('asserting there is only one analysis for this order')
         self.assertEqual(len(analysis_number), 1)
-        
+
         self.info('checking testunit for each testplan record ')
         self.order_page.get_orders_page()
         self.order_page.navigate_to_analysis_tab()
@@ -3214,4 +3214,16 @@ class OrdersTestCases(BaseTest):
                 for testunit in testunit_names:
                     self.assertIn(testunit, result['test_units'])
 
-
+    def test094_check_list_menu(self):
+        '''
+        [Orders][Active table] Make sure that list menu will contain ( COA,Archive , XSLX - Archived - Configurations) Only
+        LIMS-5358
+        :return:
+        '''
+        self.base_selenium.click(element='orders:right_menu')
+        options = ['Duplicate', 'CoA', 'Archive', 'XSLX', 'Archived', 'Configurations']
+        self.info('get right menu drop down options ')
+        items = self.base_selenium.find_elements(element='orders:dropdown_options')
+        list = items[0].text.split('\n')
+        self.assertEqual(len(list), 6)
+        self.assertCountEqual(list,options)
