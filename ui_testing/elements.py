@@ -624,9 +624,18 @@ elements = {
         'suborder_archive': {'method': 'id', 'value': 'child_table_archive'},
         'suborder_restore': {'method': 'id', 'value': 'child_table_restore'},
         'suborder_delete': {'method': 'id',
-                             'value': 'child_table_delete'},
+                            'value': 'child_table_delete'},
         'confirm_delete': {'method':'xpath',
-                           'value': '//h2[@id="swal2-title"]'}
+                           'value': '//h2[@id="swal2-title"]'},
+        'configurations_options': {
+            'method': 'id',
+            'value': 'config'
+        },
+        'child_config':{'method':'xpath',
+                        'value':'//*[@id="container"]/div/div/div/div/div[1]/div[1]/div/span[2]'},
+        'configurations_options_values':
+            {'method' :'xpath',
+             'value':'//*[@id="container"]/div/div/div/div/div[1]/div[1]'}
     },
 
     'audit_trail': {

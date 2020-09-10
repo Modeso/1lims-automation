@@ -3,6 +3,8 @@ from ui_testing.pages.order_page import Order
 from ui_testing.pages.orders_page import Orders
 from ui_testing.pages.login_page import Login
 from ui_testing.pages.testunits_page import TstUnits
+from ui_testing.pages.my_profile_page import MyProfile
+from ui_testing.pages.my_profile_page import MyProfile
 from api_testing.apis.orders_api import OrdersAPI
 from ui_testing.pages.analysis_page import AllAnalysesPage
 from api_testing.apis.article_api import ArticleAPI
@@ -3214,4 +3216,45 @@ class OrdersTestCases(BaseTest):
                 for testunit in testunit_names:
                     self.assertIn(testunit, result['test_units'])
 
+    @parameterized.expand(['child_table', 'configurations'])
+    def test094_new_fields_are_displayed(self, page_to_check):
+        """
+        Orders : child table: check that new fields of "Report sent" , "Report sent by", "validation date" and
+        "validation by"have been added to order's child table.
+        LIMS-7714
 
+        Orders :configuration :check that new fields of "Report sent" , "Report sent by", "validation date" and
+        "validation by"have been added to order's child table
+        LIMSA-316
+        """
+
+        displayed_headers_en = []
+        displayed_headers_de = []
+        required_headers_en = ['Report sent by', 'Validation by', 'Validation date']
+        required_headers_de = ['Bericht Versand duch', 'Probenfreigabe Datum', 'Probenfreigabe durch']
+        self.my_profile_page = MyProfile()
+        if page_to_check == 'child_table':
+            self.orders_page.open_child_table(self.orders_page.result_table()[0])
+            header_row_en = self.base_selenium.get_table_head_elements(element='general:table_child')
+            for h in header_row_en:
+                displayed_headers_en.append(h.text)
+
+        else:
+            displayed_headers_en = self.orders_page.get_configurations_options(child=True).split('\n')
+
+        for header in required_headers_en:
+            self.info('asserting {} is displayed '.format(header))
+            self.assertIn(header, displayed_headers_en)
+        self.my_profile_page.get_my_profile_page()
+        self.my_profile_page.chang_lang(lang='DE')
+        self.order_page.get_orders_page()
+        if page_to_check == 'child_table':
+            self.orders_page.open_child_table(self.orders_page.result_table()[0])
+            header_row_de = self.base_selenium.get_table_head_elements(element='general:table_child')
+            for h in header_row_de:
+                displayed_headers_de.append(h.text)
+        else:
+            displayed_headers_de = self.orders_page.get_configurations_options(child=True).split('\n')
+        for header in required_headers_de:
+            self.info('asserting {} is displayed '.format(header))
+            self.assertIn(header, displayed_headers_de)

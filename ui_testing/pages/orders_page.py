@@ -319,6 +319,14 @@ class Orders(BasePages):
         options = self.base_selenium.get_text(element='general:menu_options_value')
         return options
 
+    def get_configurations_options(self,child=False):
+        self.base_selenium.click(element='orders:configurations_options')
+        if child:
+            self.base_selenium.click(element='orders:child_config')
+            self.sleep_tiny()
+        options = self.base_selenium.get_text(element='orders:configurations_options_values')
+        return options
+
     def archive_main_order_from_order_option(self, index=0, check_pop_up=False, confirm=True):
         self.info('archive main order from the order\'s active table')
         table_records = self.result_table(element='general:table')
