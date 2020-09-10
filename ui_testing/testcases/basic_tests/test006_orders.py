@@ -2504,40 +2504,37 @@ class OrdersTestCases(BaseTest):
 
          LIMS-5818 - added departments assertion
         """
-        new_contact_departments=[]
+        self.info("create order with departments")
         res, payload = self.orders_api.create_order_with_department()
         self.assertEqual(res['status'], 1)
         order_no_with_year = payload[0]['orderNoWithYear']
         order_id = res['order']['mainOrderId']
         response, _ = self.orders_api.get_suborder_by_order_id(id=order_id)
+        analysis_no = response['orders'][0]['analysis']
+        self.info("create new contact with departments")
         response2, payload2 = ContactsAPI().create_contact_with_multiple_departments()
         self.assertEqual(response2['status'], 1)
         new_contact = response2['company']['name']
-        for department in payload2['departments']:
-            new_contact_departments.append(department['text'])
-        self.info('Getting all {} suborders data to get analysis number'.format(len(response['orders'])))
-        self.info("create existing order with order no {}".format(order_no_with_year))
+        new_contact_departments = [dep['text'] for dep in payload2['departments']]
+        self.info("create existing order from order with No {}".format(order_no_with_year))
         self.order_page.create_existing_order_with_auto_fill(no=order_no_with_year)
         self.order_page.sleep_tiny()
+        self.info("update contact to {}".format(new_contact))
         self.order_page.set_contact(contact=new_contact, remove_old=True)
-        contact_dep_list, departments_only_list = self.order_page.get_department_suggestion_lists(open_suborder_table=True)
         self.info('Asserting departments of selected contact are correctly displayed')
-        for department in departments_only_list:
-            self.assertIn(department, new_contact_departments)
+        _, departments_only_list = self.order_page.get_department_suggestion_lists(open_suborder_table=True)
+        self.assertCountEqual(departments_only_list, new_contact_departments)
         self.order_page.save(save_btn='order:save_btn')
         self.orders_page.get_orders_page()
         self.order_page.sleep_tiny()
         self.order_page.navigate_to_analysis_tab()
         self.info('Asserting that contact has changed for this order')
-        for i in range(len(response['orders'])):
-            analysis_no = response['orders'][i]['analysis']
-            self.analyses_page.filter_by_analysis_number(analysis_no)
-            results = self.analyses_page.get_the_latest_row_data()
-            self.info(
-                'checking contact is updated for suborder {} - new contact is {} and current contact is {}'
-                    .format(i + 1, new_contact, results['Contact Name']))
-            self.assertEqual(new_contact, results['Contact Name'])
-
+        self.analyses_page.filter_by_analysis_number(analysis_no)
+        results = self.analyses_page.get_the_latest_row_data()
+        self.info('checking contact is updated to {}'.format(new_contact))
+        self.assertEqual(new_contact, results['Contact Name'])
+        self.info('checking old department removed{}'.format(new_contact))
+        self.assertNotEqual(results['Departments'], response['orders'][0]['departments'])
 
     @attr(series=True)
     def test075_enter_long_method_should_be_in_multiple_lines_in_order_form(self):
