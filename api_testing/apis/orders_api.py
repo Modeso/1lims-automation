@@ -111,7 +111,7 @@ class OrdersAPIFactory(BaseAPI):
                 'shipmentDate': shipment_date,
                 'testDate': test_date,
                 'year': current_year,
-                'yearOption': 1,
+                'yearOption': 1
             }]
         payload = self.update_payload(_payload, **kwargs)
         payload = self._format_payload(payload)
