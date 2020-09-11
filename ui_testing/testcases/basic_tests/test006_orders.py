@@ -3234,7 +3234,7 @@ class OrdersTestCases(BaseTest):
         required_fields = ['Analysis Results', 'Test Units', 'Material Type', 'Analysis No.',
                            'Departments', 'Test Plans', 'Changed By', 'Created On', 'Shipment Date',
                            'Test Date', 'Contact Name', 'Article Name', 'Order No.',
-                           'Additional Field', 'Forwarding', 'Status']
+                           'Forwarding', 'Status']
 
         self.assertGreaterEqual(len(found_fields), len(required_fields))
         for field in required_fields:
