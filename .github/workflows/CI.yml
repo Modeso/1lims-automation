@@ -23,7 +23,7 @@
 #
   test_pull_request_in_series:
     runs-on: ubuntu-20.04
-    needs: test_pull_request_in_parallel
+    #needs: test_pull_request_in_parallel
     if: always()
     strategy:
       fail-fast: false
