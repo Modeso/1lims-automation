@@ -3219,7 +3219,7 @@ class OrdersTestCases(BaseTest):
                            ('Unit', 'No'),
                            ('Quantification Limit', '')])
     @attr(series=True)
-    def test093_test_unit_name_allow_user_to_filter_with_selected_two_options_order(self, search_view_option1,
+    def test100_test_unit_name_allow_user_to_filter_with_selected_two_options_order(self, search_view_option1,
                                                                                     search_view_option2):
          """
           Orders: Filter test unit Approach: Allow the search criteria in
