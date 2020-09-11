@@ -4,7 +4,6 @@ from ui_testing.pages.orders_page import Orders
 from ui_testing.pages.login_page import Login
 from ui_testing.pages.testunits_page import TstUnits
 from ui_testing.pages.my_profile_page import MyProfile
-from ui_testing.pages.my_profile_page import MyProfile
 from api_testing.apis.orders_api import OrdersAPI
 from ui_testing.pages.analysis_page import AllAnalysesPage
 from api_testing.apis.article_api import ArticleAPI
