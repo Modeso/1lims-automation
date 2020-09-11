@@ -3,7 +3,6 @@ from ui_testing.pages.order_page import Order
 from ui_testing.pages.orders_page import Orders
 from ui_testing.pages.login_page import Login
 from ui_testing.pages.testunits_page import TstUnits
-from ui_testing.pages.testunit_page import TstUnit
 from api_testing.apis.orders_api import OrdersAPI
 from ui_testing.pages.analysis_page import AllAnalysesPage
 from api_testing.apis.article_api import ArticleAPI
@@ -3228,11 +3227,11 @@ class OrdersTestCases(BaseTest):
 
           LIMS-7411
         """
-        TstUnits().get_test_units_page()
-        self.test_unit_page = TstUnit()
-        self.test_unit_page.open_configurations()
-        self.test_unit_page.open_testunit_name_configurations_options()
-        self.test_unit_page.select_option_to_view_search_with(
+        self.test_units_page = TstUnits()
+        self.test_units_page.get_test_units_page()
+        self.test_units_page.open_configurations()
+        self.test_units_page.open_testunit_name_configurations_options()
+        self.test_units_page.select_option_to_view_search_with(
             view_search_options=[search_view_option1, search_view_option2])
 
         upperLimit = self.generate_random_number(lower=50, upper=100)
