@@ -3215,7 +3215,7 @@ class OrdersTestCases(BaseTest):
                 for testunit in testunit_names:
                     self.assertIn(testunit, result['test_units'])
 
-    def test092_create__order_from_existing_order_without_article(self):
+    def test094_create__order_from_existing_order_without_article(self):
         self.header_page = Header()
         self.info('go to Modules Configurations')
         self.header_page.click_on_header_button()
