@@ -167,7 +167,7 @@ class Order(Orders):
         self.info(' Order created with no : {} '.format(order_no))
         return order_no
 
-    def create_multiple_contacts_new_order(self, contacts, material_type, article, test_plan):
+    def create_multiple_contacts_new_order(self, contacts='', material_type='', article='', test_plan='', departments='',check_departments=False):
         self.click_create_order_button()
         self.sleep_small()
         self.set_new_order()
@@ -182,6 +182,12 @@ class Order(Orders):
         self.set_test_plan(test_plan)
         self.sleep_small()
         order_no = self.get_no()
+        if check_departments:
+            contact_dep_dict,displayed_departments = self.get_department_suggestion_lists()
+            for dep in departments:
+                self.set_departments(departments=dep)
+            self.save(save_btn='order:save_btn', sleep=True)
+            return order_no, displayed_departments
         self.save(save_btn='order:save_btn', sleep=True)
         return order_no
 
@@ -565,10 +571,17 @@ class Order(Orders):
             self.base_selenium.update_item_value(item=row['testUnits'],
                                                  item_text=testunit.replace("'", ''))
 
-    def update_departments_suborder(self, row, departments):
+    def update_departments_suborder(self, sub_order_index=0, departments='',remove_old=False):
         self.info(' Set departments : {}'.format(departments))
+        suborder_table_rows = self.base_selenium.get_table_rows(
+            element='order:suborder_table')
+        suborder_row = suborder_table_rows[sub_order_index]
+        suborder_row.click()
+        if remove_old:
+            self.base_selenium.clear_items_in_drop_down(element='order:departments')
         for department in departments:
-            self.base_selenium.update_item_value(item=row['departments'], item_text=department)
+            self.set_departments(departments=department)
+        self.save(save_btn='order:save_btn')
 
     def archive_suborder(self, index, check_pop_up=False):
         self.get_suborder_table()

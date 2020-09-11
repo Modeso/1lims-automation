@@ -3231,3 +3231,48 @@ class OrdersTestCases(BaseTest):
                     self.assertIn(testunit, result['test_units'])
 
 
+    def test095_update_department_multiple_contacts(self):
+        """
+        Orders: Child table: Department Approach:  Any update in the order field should be reflected on the order
+        child table In case I have multiple contacts.
+        LIMS-5774
+        """
+        self.info('create 3 contacts with multiple departments')
+        contacts = []
+        contacts_departments = []
+        for i in range(3):
+            response1, payload1 = ContactsAPI().create_contact_with_multiple_departments()
+            self.assertEqual(response1['status'], 1)
+            contacts.append(response1['company']['name'])
+            contacts_departments.append([dep['text'] for dep in payload1['departments']])
+        self.info('create new order with multiple contacts and choose multiple departments related to the '
+                  'different contacts selected')
+        order_no, departments_list = self.order_page.create_multiple_contacts_new_order(contacts=contacts,
+                                                                                        departments=[
+                                                                                            contacts_departments[0][0],
+                                                                                            contacts_departments[1][0],
+                                                                                            contacts_departments[2][0]],
+                                                                                        check_departments=True)
+        total_number_of_departments = sum([len(elements) for elements in contacts_departments])
+        self.info('asserting all departments belonging to selected contacts are displayed')
+        self.assertEqual(len(departments_list), total_number_of_departments)
+        self.info('asserting all departments shown are correctly related to the selected contacts')
+        for department in departments_list:
+            self.assertIn(department, (item for sublist in contacts_departments for item in sublist))
+        self.order_page.get_orders_page()
+        self.order_page.filter_by_order_no(filter_text=order_no)
+        row = self.orders_page.result_table()[0]
+        self.info('asserting all departments selected are correctly displayed when expanding the order')
+        suborders_data = self.order_page.get_child_table_data(index=0)
+        saved_departments = suborders_data[0]['Departments'].split(', ')
+        for dep in saved_departments:
+            self.assertIn(dep, [contacts_departments[0][0], contacts_departments[1][0], contacts_departments[2][0]])
+        self.order_page.open_edit_page(row=row)
+        self.order_page.update_departments_suborder(departments=[contacts_departments[0][1], contacts_departments[1][1],
+                                                                 contacts_departments[2][1]], remove_old=True)
+        self.order_page.get_orders_page()
+        self.info('asserting all departments selected are correctly updated when expanding the order')
+        suborders_data = self.order_page.get_child_table_data(index=0)
+        saved_departments = suborders_data[0]['Departments'].split(', ')
+        for dep in saved_departments:
+            self.assertIn(dep, [contacts_departments[0][1], contacts_departments[1][1], contacts_departments[2][1]])
