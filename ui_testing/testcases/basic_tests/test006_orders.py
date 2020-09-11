@@ -3190,21 +3190,14 @@ class OrdersTestCases(BaseTest):
         in create new order screen
         LIMS-7870
         """
-        section1_fields=[]
-        self.order_page.add_dynamic_text_field_to_section1()
-        self.order_page.sleep_tiny()
-        self.info('Asserting successfully updated popup')
-        self.assertTrue(self.base_selenium.check_element_is_exist(element='orders:save_popup'))
-        pop_up_msg = self.base_selenium.get_text(element='orders:save_popup')
-        self.assertIn("Successfully Updated", pop_up_msg)
+        section1_fields = []
+        self.orders_api.order_with_added_dynamic_field()
         self.info('Rename the added field ')
-        self.base_selenium.click(element='orders:text_field_dragged')
-        self.base_selenium.set_text(element='orders:text_field_dragged', value='Additional Field')
-        self.base_selenium.click(element='orders:save_config')
+        self.order_page.rename_dynamic_field(field='orders:text_field_dragged',value='Additional Field')
         self.order_page.get_orders_page()
         self.order_page.click_create_order_button()
-        visible_fields =self.base_selenium.find_elements(element='order:section1_titles')
+        visible_fields = self.base_selenium.find_elements(element='order:section1_titles')
         for field in visible_fields:
-            section1_fields.append((field.text))
+            section1_fields.append(field.text)
         self.info('Assert the added field is visible in create new order page')
         self.assertIn('Additional Field:', section1_fields)

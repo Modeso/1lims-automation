@@ -790,8 +790,4 @@ class BaseSelenium:
         self.driver.execute_script("window.localStorage.setItem(arguments[0], arguments[1]);", key,
                                    json.dumps(value))
 
-    def drag_and_drop(self, source, destination):
-        source_element = self.find_element(element=source)
-        destination_element = self.find_element(element=destination)
-        ActionChains(self.driver).drag_and_drop(source_element, destination_element).perform()
 
