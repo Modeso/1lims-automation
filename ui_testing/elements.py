@@ -133,10 +133,14 @@ elements = {
         },
         'configure_table': {'method': 'xpath',
                             'value': '//a[@class="m-dropdown__toggle btn no-padding"]'},
+        'configure_child_table': {'method': 'xpath',
+                                  'value': "//a[contains(text(),'Child')]"},
         'configure_table_items': {'method': 'xpath',
                                   'value': '//ul[@class="m-nav sortable sortable-table1 ui-sortable"]'},
         'configure_table_archive_items': {'method': 'xpath',
                                           'value': '//ul[@class="m-nav sortable sortable-table2 ui-sortable"]'},
+        'configure_child_table_items': {'method': 'xpath',
+                                        'value': '//ul[@class="m-nav sortable sortable-table3 ui-sortable"]'},
         'apply_configure_table': {'method': 'xpath',
                                   'value': "//span[contains(text(),'Apply')]"},
         'overview': {'method': 'xpath',
@@ -772,6 +776,8 @@ elements = {
                              'value': '//*[contains(text(),"My Profile")]'},
         'companyprofile_button': {'method': 'xpath',
                                   'value': '//*[contains(text(),"Company Profile")]'},
+        'modules_configurations_button':{'method': 'xpath',
+                                         'value': "//span[contains(text(),'Modules Configurations')]"},
         'logout': {
             'method': 'xpath',
             'value': "//a[@class='btn m-btn--pill btn-secondary m-btn m-btn--custom m-btn--label-brand m-btn--bolder']"
@@ -1134,7 +1140,6 @@ elements = {
         'order_no_filter': {'method': 'id', 'value': 'orderNofield'}
 
     },
-
     'company_profile': {
         'country_field': {'method': 'id', 'value': 'selectedCountryfield'},
         'name_field': {'method': 'id', 'value': 'namefield'},

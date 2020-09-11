@@ -17,6 +17,20 @@ class GeneralUtilitiesAPIFactory(BaseAPI):
         api = '{}{}'.format(self.url, self.END_POINTS['materialTypes']['list_material_types']) 
         return api, {}
 
+    @api_factory('put')
+    def enable_article(self, **kwargs):
+        payload = {
+               "entityId": 2,
+               "status": True,
+               "id": 1
+            }
+        api = '{}{}'.format(self.url, self.END_POINTS['modules']['disable_article'])
+        return api, payload
+
+    @api_factory('get')
+    def has_articles(self, **kwargs):
+        api = '{}{}'.format(self.url, self.END_POINTS['modules']['has_articles'])
+        return api, {}
 
 class GeneralUtilitiesAPI(GeneralUtilitiesAPIFactory):
     @staticmethod

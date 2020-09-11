@@ -131,6 +131,9 @@ def api_factory(method):
             if method in ["post"]:
                 response_json = base_api.session.post(api, json=payload, headers=base_api.headers,
                                                       verify=False).json()
+            elif method in ["put"]:
+                response_json = base_api.session.__getattribute__(method)(api, json=payload, headers=base_api.headers,
+                                                                          verify=False).json()
             else:
                 response_json = base_api.session.__getattribute__(method)(api, params=payload, headers=base_api.headers,
                                                                           verify=False).json()

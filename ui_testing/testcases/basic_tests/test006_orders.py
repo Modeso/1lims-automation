@@ -3132,7 +3132,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.sleep_tiny()
         self.order_page.create_new_order(material_type=tp1_pd['materialType'][0]['text'],
                                          article=tp1_pd['selectedArticles'][0]['text'],
-                                         test_plans=[testplan1_name, testplan2_name], with_testunits=False)
+                                         test_plans=[testplan1_name, testplan2_name], test_units=[])
         self.order_page.sleep_tiny()
         order_id = self.order_page.get_order_id()
         suborders = self.orders_api.get_suborder_by_order_id(id=order_id)
@@ -3213,5 +3213,3 @@ class OrdersTestCases(BaseTest):
             if result['test_plan'] == testPlan['testPlan']['text']:
                 for testunit in testunit_names:
                     self.assertIn(testunit, result['test_units'])
-
-
