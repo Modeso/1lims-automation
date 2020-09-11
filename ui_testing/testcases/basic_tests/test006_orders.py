@@ -3230,7 +3230,7 @@ class OrdersTestCases(BaseTest):
                 for testunit in testunit_names:
                     self.assertIn(testunit, result['test_units'])
 
-    def test093_add_dynamic_field_in_order_section1(self):
+    def test094_add_dynamic_field_in_order_section1(self):
         """
         order : create new order: check that dynamic field added in order section 1 will be displayed
         in create new order screen
