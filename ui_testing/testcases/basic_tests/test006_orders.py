@@ -3273,7 +3273,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.get_orders_page()
         self.order_page.filter_by_order_no(filter_text=order_no)
         self.info('asserting all departments selected are correctly updated when expanding the order')
-        suborders_data = self.order_page.get_child_table_data(index=0)
-        updated_departments = suborders_data[0]['Departments'].split(', ')
+        suborders_data_after = self.order_page.get_child_table_data(index=0)
+        updated_departments = suborders_data_after[0]['Departments'].split(', ')
         for dep in updated_departments:
             self.assertIn(dep, [contacts_departments[0][1], contacts_departments[1][1], contacts_departments[2][1]])
