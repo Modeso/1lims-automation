@@ -3256,7 +3256,6 @@ class OrdersTestCases(BaseTest):
         self.orders_page.get_orders_page()
         self.orders_page.sleep_tiny()
         self.orders_page.open_filter_menu()
-        self.orders_page.sleep_tiny()
         self.base_selenium.wait_element(element='orders:test_units_filter')
         self.orders_page.filter_by(filter_element='orders:test_units_filter', filter_text=filter_text)
         found_filter_text = self.base_selenium.get_text('orders:test_units_filter').replace("\n×", "")
@@ -3268,7 +3267,7 @@ class OrdersTestCases(BaseTest):
             self.assertEqual(found_filter_text, filter_text)
 
         self.orders_page.filter_apply()
-        self.orders_page.close_filter_menu()
+        self.orders_page.sleep_tiny()
         results = self.order_page.result_table()
         self.assertGreaterEqual(len(results), 1)
         for i in range(len(results) - 1):
@@ -3281,6 +3280,3 @@ class OrdersTestCases(BaseTest):
             self.assertTrue(key_found)
             # close child table
             self.orders_page.close_child_table(source=results[i])
-
-
-
