@@ -3219,19 +3219,19 @@ class OrdersTestCases(BaseTest):
     @parameterized.expand(['child_table', 'configurations'])
     def test094_new_fields_are_displayed(self, page_to_check):
         """
-        Orders : child table: check that new fields of "Report sent" , "Report sent by", "validation date" and
+        Orders : child table: check that new fields of "Forwarding" , "Report sent by", "validation date" and
         "validation by"have been added to order's child table.
         LIMS-7714
 
-        Orders :configuration :check that new fields of "Report sent" , "Report sent by", "validation date" and
+        Orders :configuration :check that new fields of "Forwarding" , "Report sent by", "validation date" and
         "validation by"have been added to order's child table
-        LIMSA-316
+        LIMS-7715
         """
 
         displayed_headers_en = []
         displayed_headers_de = []
-        required_headers_en = ['Report sent by', 'Validation by', 'Validation date']
-        required_headers_de = ['Bericht Versand duch', 'Probenfreigabe Datum', 'Probenfreigabe durch']
+        required_headers_en = ['Forwarding','Report sent by', 'Validation by', 'Validation date']
+        required_headers_de = ['Versand','Bericht Versand duch', 'Probenfreigabe Datum', 'Probenfreigabe durch']
         self.my_profile_page = MyProfile()
         if page_to_check == 'child_table':
             self.orders_page.open_child_table(self.orders_page.result_table()[0])
