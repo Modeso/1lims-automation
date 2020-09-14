@@ -35,6 +35,10 @@ class Orders(BasePages):
                 return False
         self.confirm_popup()
         return True
+    def open_order_configuartions(self):
+        self.base_selenium.scroll()
+        self.base_selenium.click(element='orders:right_menu')
+        self.base_selenium.click(element='orders:configurations')
 
     def is_order_exist(self, value):
         results = self.search(value=value)
