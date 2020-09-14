@@ -3220,55 +3220,35 @@ class OrdersTestCases(BaseTest):
 
         LIMS-4350
         """
-        import ipdb;ipdb.set_trace()
-        self.orders_api.create_multiple_suborders_with_double_test_plans_only()
-        self.info('create multiple testplan with same article of each suborder')
-        created_data_list = []
-        for _ in range(3):
-            tp_1, tp_2, article = TestPlanAPI().create_multiple_test_plan_with_same_article()
-            created_data = {'tp_1': tp_1,
-                            'tp_2': tp_2,
-                            'article': article,
-                            'test_units': [tp_1['specifications'][0]['name'],
-                                           tp_2['specifications'][0]['name']]}
-            created_data_list.append(created_data)
-        self.info('create new order.')
-        order_no = self.order_page.create_new_order(article=created_data_list[0]['article'],
-                                                    material_type='Raw Material',
-                                                    test_plans=[created_data_list[0]['tp_1']['testPlanEntity']['name'],
-                                                                created_data_list[0]['tp_2']['testPlanEntity']['name']],
-                                                    test_units=[], save=False)
-        self.info('add two more suborders')
-        for i in range(1, 3):
-            self.order_page.create_new_suborder(material_type='Raw Material',
-                                                test_plans=[created_data_list[i]['tp_1']['testPlanEntity']['name'],
-                                                            created_data_list[i]['tp_2']['testPlanEntity']['name']],
-                                                test_units=[], article_name=created_data_list[i]['article'])
-        self.order_page.save(save_btn='order:save_btn')
-        order_id = self.order_page.get_order_id()
-        suborders_data, _ = self.orders_api.get_suborder_by_order_id(order_id)
-        suborders = suborders_data['orders']
-        analysis_no = []
-        for suborder in suborders:
-            self.assertEqual(len(suborder['analysis']), 1)
-            analysis_no.append(suborder['analysis'][0])
-        self.assertEqual(3, len(analysis_no))
-        self.orders_page.get_orders_page()
+        self.test_plan_api = TestPlanAPI()
+        response, payload = self.orders_api.create_multiple_suborders_with_double_test_plans_only()
+        self.assertEqual(response['message'], 'created_success')
+        order_no = response['order']['orderNo']
+        suborders_data, _ = self.orders_api.get_suborder_by_order_id(response['order']['mainOrderId'])
+        self.assertEqual(len(suborders_data['orders']), 3)
+        analysis_no = [suborder['analysis'][0] for suborder in suborders_data['orders']]
+        test_units = []
+        for i in range(3):
+            for j in range(2):
+             test_units.extend(self.test_plan_api.get_testunits_in_testplan(payload[i]['testPlans'][j]['id']))
+        test_units_names = [tu['name'] for tu in test_units]
+        self.orders_page.sleep_tiny()
         self.orders_page.filter_by_order_no(filter_text=order_no)
-        suborders_data = self.order_page.get_child_table_data(index=0)
-        analysis_no_list = []
-        for suborder in suborders_data:
-            analysis_no_list.append(suborder['Analysis No.'])
-        self.info('assert the analysis table has been updated')
+        self.orders_page.sleep_tiny()
+        suborders_data = self.order_page.get_child_table_data()
+        analysis_no_list = [suborder['Analysis No.'].replace("'", "") for suborder in suborders_data]
+        self.info('assert the order table has been updated')
         self.assertCountEqual(analysis_no, analysis_no_list)
-
         self.orders_page.navigate_to_analysis_active_table()
         self.analyses_page.filter_by_order_no(filter_text=order_no)
-        analysis_rows = self.order_page.result_table()
-        self.assertEqual(3, len(analysis_rows) - 1)
-
+        analysis_data = self.base_selenium.get_rows_cells_dict_related_to_header()
+        self.assertEqual(len(analysis_data), 3)
+        found_analysis_no = [analysis['Analysis No.'].replace("'", "") for analysis in analysis_data]
+        self.info('assert the analysis table has been updated')
+        self.assertCountEqual(analysis_no, found_analysis_no)
         for i in range(3):
-            analysis_data = self.order_page.get_child_table_data(index=2 - i)
-            self.assertEqual(len(analysis_data), 2)
-            analysis_tus = [ad['Test Unit'].replace("'", "") for ad in analysis_data]
-            self.assertCountEqual(analysis_tus, created_data_list[i]['test_units'])
+            child_data = self.orders_page.get_child_table_data(index=i)
+            self.orders_page.sleep_tiny()
+            test_units = [item['Test Unit'] for item in child_data]
+            self.assertCountEqual(test_units, test_units_names[i*2:(i*2)+2])
+            self.orders_page.close_child_table()

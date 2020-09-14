@@ -152,7 +152,6 @@ class OrdersAPIFactory(BaseAPI):
             'testDatedateOption': {'year': test_date_arr[0], 'month': test_date_arr[1], 'day': test_date_arr[2]}
         }
         suborders = []
-        import ipdb;ipdb.set_trace()
         for i in range(no_suborders):
             sub_order_dict = suborders_common_data
             tp_1, tp_2, article = TestPlanAPI().create_multiple_test_plan_with_same_article()
@@ -172,7 +171,7 @@ class OrdersAPIFactory(BaseAPI):
             sub_order_dict['article'] = formatted_article
             sub_order_dict['articleId'] = article_id
             suborders.append(sub_order_dict)
-        payload = self.update_payload(suborders)
+        payload = suborders
         api = '{}{}'.format(self.url, self.END_POINTS['orders_api']['create_new_order'])
         return api, payload
 
