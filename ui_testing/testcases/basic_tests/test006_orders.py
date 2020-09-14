@@ -3234,6 +3234,8 @@ class OrdersTestCases(BaseTest):
         """
         check that added dynamic fields will be displayed in edit order screen
         LIMS-7871
+        check that added dynamic field will be displayed in order main table
+        LIMS-7865
         """
 
         section1_fields = []
