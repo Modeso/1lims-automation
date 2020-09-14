@@ -3247,7 +3247,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.click_create_order_button()
 
         self.orders_page.click_overview()
-        additional_field = self.base_selenium.find_element(element='order:additional_field')
+        additional_field = self.base_selenium.check_element_is_exist(element='order:additional_field')
         self.info('Assert the added field is visible in overview page')
         self.assertTrue(additional_field)
 
