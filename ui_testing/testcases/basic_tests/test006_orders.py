@@ -3231,3 +3231,25 @@ class OrdersTestCases(BaseTest):
                     self.assertIn(testunit, result['test_units'])
 
 
+	    def test091_if_cancel_archive_order_no_order_suborder_analysis_will_archived(self) :
+        """
+        Table: Existing/Auto fill Approach: I can create exiting order from the table view
+        #and in case I duplicate from the first suborder all others suborders should created from the exiting one.
+        LIMS-4259
+        """
+
+        orders, payload = self.orders_api.get_all_orders()
+        order_no = random.choice(orders['orders'])['orderNo']
+        self.info('filter by order no {}'.format(order_no))
+        self.order_page.filter_by_order_no(order_no)
+        data_before_duplicate_sub_order = self.order_page.get_child_table_data()[0]
+        #print(data_before_duplicate_sub_order)
+        self.info('adding suborder to existing order ')
+        self.order_page.create_existing_order_with_auto_fill(no=order_no)
+        test_unit = self.order_page.get_test_unit()
+        material_type = self.order_page.get_material_type()
+        article_name=self.order_page.get_article()
+        test_plan=self.order_page.get_test_plan()
+
+
+
