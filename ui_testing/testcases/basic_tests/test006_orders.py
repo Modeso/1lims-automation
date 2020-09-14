@@ -1,6 +1,5 @@
 from ui_testing.testcases.base_test import BaseTest
 from ui_testing.pages.order_page import Order
-from ui_testing.pages.article_page import Article
 from ui_testing.pages.orders_page import Orders
 from ui_testing.pages.login_page import Login
 from ui_testing.pages.testunits_page import TstUnits
