@@ -3247,8 +3247,9 @@ class OrdersTestCases(BaseTest):
         self.info('assert the analysis table has been updated')
         self.assertCountEqual(analysis_no, found_analysis_no)
         for i in range(3):
+            rows = self.orders_page.result_table()
             child_data = self.orders_page.get_child_table_data(index=i)
             self.orders_page.sleep_tiny()
             test_units = [item['Test Unit'] for item in child_data]
             self.assertCountEqual(test_units, test_units_names[i*2:(i*2)+2])
-            self.orders_page.close_child_table()
+            self.orders_page.close_child_table(rows[i])
