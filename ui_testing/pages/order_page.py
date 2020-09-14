@@ -133,7 +133,7 @@ class Order(Orders):
         return is_option_exist
 
     def create_new_order(self, material_type='', article='', contact='', test_plans=[''], test_units=[''],
-                         multiple_suborders=0, departments='', order_no='', save=True, with_testplan=True):
+                         multiple_suborders=0, departments='', order_no='', save=True, with_testplan=True,with_testunits=True):
         self.info(' Create new order.')
         self.click_create_order_button()
         self.sleep_small()
@@ -154,10 +154,10 @@ class Order(Orders):
         if with_testplan:
             for test_plan in test_plans:
                 self.set_test_plan(test_plan=test_plan)
-
-        for test_unit in test_units:
-            self.set_test_unit(test_unit=test_unit)
-            self.sleep_small()
+        if with_testunits:
+            for test_unit in test_units:
+                self.set_test_unit(test_unit=test_unit)
+                self.sleep_small()
         
         if multiple_suborders > 0:
             self.duplicate_from_table_view(number_of_duplicates=multiple_suborders)
@@ -240,13 +240,13 @@ class Order(Orders):
         return order_no
 
     def create_existing_order_with_auto_fill(self, no=''):
-        self.info(' Create new order.')
+        self.info('Create order from existing order')
         self.click_create_order_button()
         self.set_existing_order()
         order_no = self.set_existing_number(no)
         self.sleep_tiny()
         self.click_auto_fill()
-        self.info(' Order Auto filled with data from order no : {} '.format(order_no))
+        self.info('Order Auto filled with data from order no : {} '.format(order_no))
         return order_no
 
     def get_no(self, order_row=None):
@@ -511,6 +511,8 @@ class Order(Orders):
 
             self.info('Set article name : {}'.format(articles))
             self.set_article(article=articles[0])
+            if confirm_pop_up:
+                self.confirm_popup(True)
             self.sleep_small()
 
         self.info(' Set test plan : {} for {} time(s)'.format(test_plans, len(test_plans)))
@@ -704,8 +706,14 @@ class Order(Orders):
             self.base_selenium.click('order:uploader_close_btn')
             self.cancel(True)
             
-    def get_testplan_pop_up(self):
-        self.base_selenium.click(element='order:testplan_popup_btn')
+    def get_testplan_pop_up(self,index=0):
+        suborders = self.base_selenium.get_table_rows(element='order:suborder_table')
+        suborders_elements = self.base_selenium.get_row_cells_elements_related_to_header(
+            row=suborders[index],
+            table_element='order:suborder_table')
+        popup_element = self.base_selenium.find_element_in_element(
+            source=suborders_elements['Test Plan:'], destination_element='order:testplan_popup_btn')
+        popup_element.click()
         self.sleep_small()
         results = []
         elements = self.base_selenium.find_elements('order:popup_data')
@@ -714,8 +722,8 @@ class Order(Orders):
             results.append({'test_plan': test_plan, 'test_units': test_units})
         return results
 
-    def create_new_order_get_test_unit_suggetion_list(self, material_type='', test_unit_name=' '):
-        self.info(' Create new order.')
+    def create_new_order_get_test_unit_suggetion_list(self, material_type='', test_unit_name=' ',check_option=False):
+        self.info('Create new order.')
         self.click_create_order_button()
         self.sleep_small()
         self.set_new_order()
@@ -726,9 +734,14 @@ class Order(Orders):
         self.set_article(article='')
         self.sleep_small()
         self.info('get test unit suggestion list')
-        test_units = self.base_selenium.get_drop_down_suggestion_list(element='order:test_unit',
+        if check_option:
+            is_option_exist = self.base_selenium.select_item_from_drop_down(element='order:test_unit',
+                                                                            item_text=test_unit_name)
+            return is_option_exist
+        else:
+            test_units = self.base_selenium.get_drop_down_suggestion_list(element='order:test_unit',
                                                                       item_text=test_unit_name)
-        return test_units
+            return test_units
 
     def is_contact_existing(self, contact):
         self.set_contact(contact=contact)
