@@ -533,17 +533,23 @@ class OrdersTestCases(BaseTest):
         I can filter by any order No.
 
         LIMS-3495
+
+        Filter: Order number format: In case the order number displayed with full year, I can filter by it
+
+        LIMS-7426
         """
         self.info('select random order using api')
         orders, _ = self.orders_api.get_all_orders()
         order = random.choice(orders['orders'])
+        self.assertIn('-2020', order['orderNo'], 'selected order with format {}'.format(order['orderNo']))
         self.info('filter by order No. {}'.format(order['orderNo']))
         self.orders_page.filter_by_order_no(order['orderNo'])
         result_order = self.orders_page.result_table()
         self.assertEqual(len(self.order_page.result_table()), 2)
         self.assertIn(order['orderNo'], result_order[0].text.replace("'", ""))
+        self.assertIn('-2020', result_order[0].text.replace("'", ""))
 
-    def test016_filter_by_Status_or_anlysis_result(self):
+    def test016_filter_by_status(self):
         """
         I can filter by status
 
@@ -2494,37 +2500,47 @@ class OrdersTestCases(BaseTest):
         self.info('asserting the order with order number {} is created'.format(order_no))
         self.assertIn(order_no_with_year, results[0].text.replace("'", ""))
 
-    @skip("https://modeso.atlassian.net/browse/LIMSA-299")
+    #@skip("https://modeso.atlassian.net/browse/LIMSA-299")
     def test074_create_existing_order_change_contact(self):
         """
          Create existing order then change the contact for this existing one,
          all old records with the same order number will update its contact.
 
          LIMS-4293
+
+         LIMS-5818 - added departments assertion
         """
-        res, payload = self.orders_api.create_new_order()
+        self.info("create order with departments")
+        res, payload = self.orders_api.create_order_with_department()
         self.assertEqual(res['status'], 1)
         order_no_with_year = payload[0]['orderNoWithYear']
         order_id = res['order']['mainOrderId']
         response, _ = self.orders_api.get_suborder_by_order_id(id=order_id)
-        self.info('Getting all {} suborders data to get analysis number'.format(len(response['orders'])))
-        self.info("create existing order with order no {}".format(order_no_with_year))
+        analysis_no = response['orders'][0]['analysis']
+        self.info("create new contact with departments")
+        response2, payload2 = ContactsAPI().create_contact_with_multiple_departments()
+        self.assertEqual(response2['status'], 1)
+        new_contact = response2['company']['name']
+        new_contact_departments = [dep['text'] for dep in payload2['departments']]
+        self.info("create existing order from order with No {}".format(order_no_with_year))
         self.order_page.create_existing_order_with_auto_fill(no=order_no_with_year)
         self.order_page.sleep_tiny()
-        new_contact = self.order_page.set_contact(remove_old=True)[0]
+        self.info("update contact to {}".format(new_contact))
+        self.order_page.set_contact(contact=new_contact, remove_old=True)
+        self.info('Asserting departments of selected contact are correctly displayed')
+        _, departments_only_list = self.order_page.get_department_suggestion_lists(open_suborder_table=True)
+        self.assertCountEqual(departments_only_list, new_contact_departments)
         self.order_page.save(save_btn='order:save_btn')
         self.orders_page.get_orders_page()
         self.order_page.sleep_tiny()
         self.order_page.navigate_to_analysis_tab()
-        self.info('asserting that contact has changed for this order')
-        for i in range(len(response['orders'])):
-            analysis_no = response['orders'][i]['analysis']
-            self.analyses_page.filter_by_analysis_number(analysis_no)
-            results = self.analyses_page.get_the_latest_row_data()
-            self.info(
-                'checking contact is updated for suborder {} - new contact is {} and current contact is {}'
-                    .format(i + 1, new_contact, results['Contact Name']))
-            self.assertEqual(new_contact, results['Contact Name'])
+        self.info('Asserting that contact has changed for this order')
+        self.analyses_page.filter_by_analysis_number(analysis_no)
+        results = self.analyses_page.get_the_latest_row_data()
+        self.info('checking contact is updated to {}'.format(new_contact))
+        self.assertEqual(new_contact, results['Contact Name'])
+        self.info('checking old department removed{}'.format(new_contact))
+        self.assertNotEqual(results['Departments'], response['orders'][0]['departments'])
 
     @attr(series=True)
     def test075_enter_long_method_should_be_in_multiple_lines_in_order_form(self):
@@ -2557,36 +2573,45 @@ class OrdersTestCases(BaseTest):
         self.assertEquals(multiple_lines_properties['textOverflow'], 'clip')
         self.assertEquals(multiple_lines_properties['lineBreak'], 'auto')
 
-    @attr(series=True)
-    def test076_search_with_test_unit_name(self):
+    # @attr(series=True)
+    @parameterized.expand(['Name', 'Method', 'Unit', 'No'])
+    def test076_search_with_test_unit_name_method(self, search_by):
         """
         Orders:Test unit search approach
         allow user to search with test unit name in the drop down list of the order form
-
         LIMS-6664
+        allow user to search with test unit method in the drop down list of order form
+        LIMS-6666
+        allow user to search with test unit type in the drop down list of order form
+        LIMS-6668
+        allow user to search with test unit number in the drop down list of order form
+        LIMS-6665
+
         """
         self.test_units_page = TstUnits()
-        self.info("get random test unit data to get its material type")
-        response, payload = TestUnitAPI().get_all_test_units()
-        self.assertEqual(response['status'], 1, payload)
-        random_test_unit = random.choice(response['testUnits'])
+        response, payload = TestUnitAPI().create_quantitative_testunit(unit="RandomUnit")
+        self.assertEqual(response['status'], 1)
         self.test_units_page.get_test_units_page()
         self.orders_page.sleep_tiny()
         self.test_units_page.open_configurations()
         self.orders_page.sleep_tiny()
         self.test_units_page.open_testunit_name_configurations_options()
-        self.test_units_page.select_option_to_view_search_with(view_search_options=['Name'])
-        self.info('go to orders page')
+        self.test_units_page.select_option_to_view_search_with(view_search_options=[search_by])
         self.order_page.get_orders_page()
-        if random_test_unit['materialTypes'][0] != 'All':
-            test_unit_suggestion_list = Order().create_new_order_get_test_unit_suggetion_list(
-                material_type=random_test_unit['materialTypes'][0], test_unit_name=' ')
-        else:
-            test_unit_suggestion_list = Order().create_new_order_get_test_unit_suggetion_list(
-                material_type='', test_unit_name=' ')
-        self.info('checking name field only is displayed')
-        for test_unit in test_unit_suggestion_list:
-            self.assertNotIn(':', test_unit)
+
+        if search_by == 'Name':
+            testunit_search = payload['name']
+        elif search_by == 'Method':
+            testunit_search = payload['method']
+        elif search_by == 'Unit':
+            testunit_search = payload['unit']
+        elif search_by == 'No':
+            testunit_search = str(payload['number'])
+
+        testunits = self.order_page.create_new_order_get_test_unit_suggetion_list(test_unit_name=testunit_search)
+
+        self.info('checking {} field only is displayed'.format(search_by))
+        self.assertGreater(len(testunits), 0)
 
     @parameterized.expand(['Quantitative', 'Qualitative', 'Quantitative MiBi'])
     @attr(series=True)
