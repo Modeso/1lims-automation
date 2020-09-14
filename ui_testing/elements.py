@@ -555,6 +555,12 @@ elements = {
                       'value': 'add-btn'},
         'right_menu': {'method': 'xpath',
                        'value': '//*[@id="custom-accordion-panel"]/div/a/i'},
+        'configurations':{'method':'xpath',
+                          'value':'//*[@id="custom-accordion-panel"]/div/div/a[6]'},
+        'text_field_dragged':{'method':'xpath',
+                              'value': '//*[contains(concat( " ", @class, " " ), concat( " ", "color-label", " " ))]'},
+        'save_config' :{'method':'xpath',
+                        'value':'//button[@class="btn btn-primary mb-md-0 mr-md-3"]'},
         'archive': {'method': 'link_text',
                     'value': 'Archive'},
         'active': {'method': 'link_text',
@@ -664,8 +670,8 @@ elements = {
         'test_unit_btn': {'method': 'tag_name',
                           'value': 'span',
                           'order': 1},
-        'save_btn': {'method': 'id',
-                     'value': 'button_save_order'},
+        'save_btn': {'method': 'xpath',
+                     'value': '//button[@id="button_save_order"]'},
         'no': {'method': 'id',
                'value': 'orderNoWithYearfield'},
         'error_in_number_mssg': {'method': 'xpath',
@@ -739,8 +745,9 @@ elements = {
                            },
         'attachments_btn': {'method': 'xpath',
                             'value': '//i[@class="fa fa-cloud-upload"]'},
-        'testplan_popup_btn': {'method': 'xpath',
-                               'value': '//span[@class="pull-right collapse-long-words"]'},
+        'testplan_popup_btn': {'method': 'tag_name',
+                               'value': 'i',
+                               'order': 0},
         'testplan_cancel_btn': {'method': 'xpath',
                                 'value': '//*[@id="infoModalTable"]/div/div/div[3]/button'},
         'testplan_close_btn': {'method': 'xpath',
@@ -757,6 +764,14 @@ elements = {
         'filter_analysis_no': {
             'method': 'id',
             'value': 'nofield'
+        },
+        'additional_field' : {
+            'method' : 'xpath',
+            'value' : '//*[@id="59"]/span/span'
+        },
+        'section1_titles':{
+            'method':'class_name',
+            'value':'field-title-limitations'
         }
     },
 
@@ -1010,6 +1025,9 @@ elements = {
         'view_search_ddl': {'method': 'tag_name',
                             'value': 'ng-select',
                             'order': 2},
+        'selected_option': {'method': 'css_selector', 'value': '#optionsModal .ng-select.ng-select-multiple'},
+        'configuration_popup_save_btn': {'method': 'css_selector', 'value': '#optionsModal .btn-primary'},
+        'configuration_popup_cancel_btn': {'method': 'css_selector', 'value': '#optionsModal .btn-secondary'},
         'popup_save_button': {'method': 'class_name',
                               'value': 'btn-primary',
                               'order': 0},
