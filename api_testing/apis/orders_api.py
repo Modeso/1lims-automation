@@ -119,7 +119,7 @@ class OrdersAPIFactory(BaseAPI):
         return api, payload
 
     @api_factory('post')
-    def create_multiple_suborders_with_double_test_plans_only(self, no_suborders=3):
+    def create_order_with_multiple_suborders(self, no_suborders=3, suborders_feilds=[]):
         order_no = self.get_auto_generated_order_no()[0]['id']
         test_date = self.get_current_date()
         test_date_arr = test_date.split('-')
@@ -128,6 +128,7 @@ class OrdersAPIFactory(BaseAPI):
         current_year = self.get_current_year()
         orderNoWithYear = "{}-{}".format(current_year, order_no)
         contacts = random.choice(ContactsAPI().get_all_contacts()[0]['contacts'])
+        test_plan = TestPlanAPI().create_completed_testplan_random_data()
         suborders_common_data = {
             'orderNo': int(order_no),
             'orderNoWithYear': orderNoWithYear,
@@ -142,6 +143,16 @@ class OrdersAPIFactory(BaseAPI):
             'attachments': [],
             'testUnits': [],
             'selectedTestUnits': [],
+            'testPlans': [{'id': int(test_plan['selectedTestPlan']['id']),
+                           'name': test_plan['selectedTestPlan']['text'],
+                           'version': 1}],
+            'selectedTestPlans': [{'id': int(test_plan['selectedTestPlan']['id']),
+                                   'name': test_plan['selectedTestPlan']['text'],
+                                   'version': 1}],
+            'materialType': test_plan['materialType'][0],
+            'materialTypeId': test_plan['materialType'][0]['id'],
+            'article': test_plan['selectedArticles'][0],
+            'articleId': test_plan['selectedArticles'][0]['id'],
             "withArticle": True,
             'shipmentDate': shipment_date,
             'testDate': test_date,
@@ -152,25 +163,14 @@ class OrdersAPIFactory(BaseAPI):
             'testDatedateOption': {'year': test_date_arr[0], 'month': test_date_arr[1], 'day': test_date_arr[2]}
         }
         suborders = []
+        sub_order_dict = {}
         for i in range(no_suborders):
-            sub_order_dict = suborders_common_data
-            tp_1, tp_2, article = TestPlanAPI().create_multiple_test_plan_with_same_article()
-            article = tp_1['selectedArticles'][0]['name']
-            article_id = tp_1['selectedArticles'][0]['id']
-            if article == 'all':
-                article, article_id = ArticleAPI().get_random_article_articleID()
-            formatted_article = {'id': article_id, 'text': article}
-            formatted_material_type = {'id': tp_1['materialType'][0]['id'], 'text': tp_1['materialType'][0]['name']}
-            formatted_testPlan1 = {'id': int(tp_1['id']), 'name': tp_1['testPlanEntity']['name'], 'version': 1}
-            formatted_testPlan2 = {'id': int(tp_2['id']), 'name': tp_2['testPlanEntity']['name'], 'version': 1}
-            testplan_list = [formatted_testPlan1, formatted_testPlan2]
-            sub_order_dict['testPlans'] = testplan_list
-            sub_order_dict['selectedTestPlans'] = testplan_list
-            sub_order_dict['materialType'] = formatted_material_type
-            sub_order_dict['materialTypeId'] = formatted_material_type['id']
-            sub_order_dict['article'] = formatted_article
-            sub_order_dict['articleId'] = article_id
+            sub_order_dict = {** suborders_common_data}
+            if suborders_feilds[i]:
+                for dict_key in suborders_feilds[i].keys():
+                    sub_order_dict[dict_key] = suborders_feilds[i][dict_key]
             suborders.append(sub_order_dict)
+            sub_order_dict = {}
         payload = suborders
         api = '{}{}'.format(self.url, self.END_POINTS['orders_api']['create_new_order'])
         return api, payload
@@ -498,3 +498,26 @@ class OrdersAPI(OrdersAPIFactory):
         with open(config_file, "r") as read_file:
             payload = json.load(read_file)
         super().set_configuration(payload=payload)
+
+    def create_order_with_multiple_suborders_double_tp(self, no_suborders=3):
+        suborders = []
+        for i in range(no_suborders):
+            suborder = {}
+            tp_1, tp_2, article = TestPlanAPI().create_multiple_test_plan_with_same_article()
+            article = tp_1['selectedArticles'][0]['name']
+            article_id = tp_1['selectedArticles'][0]['id']
+            if article == 'all':
+                article, article_id = ArticleAPI().get_random_article_articleID()
+            formatted_article = {'id': article_id, 'text': article}
+            formatted_material_type = {'id': tp_1['materialType'][0]['id'], 'text': tp_1['materialType'][0]['name']}
+            formatted_testPlan1 = {'id': int(tp_1['id']), 'name': tp_1['testPlanEntity']['name'], 'version': 1}
+            formatted_testPlan2 = {'id': int(tp_2['id']), 'name': tp_2['testPlanEntity']['name'], 'version': 1}
+            testplan_list = [formatted_testPlan1, formatted_testPlan2]
+            suborder['testPlans'] = testplan_list
+            suborder['selectedTestPlans'] = testplan_list
+            suborder['materialType'] = formatted_material_type
+            suborder['materialTypeId'] = formatted_material_type['id']
+            suborder['article'] = formatted_article
+            suborder['articleId'] = article_id
+            suborders.append(suborder)
+        return self.create_order_with_multiple_suborders(suborders_feilds=suborders, no_suborders=3)

@@ -3221,7 +3221,7 @@ class OrdersTestCases(BaseTest):
         LIMS-4350
         """
         self.test_plan_api = TestPlanAPI()
-        response, payload = self.orders_api.create_multiple_suborders_with_double_test_plans_only()
+        response, payload = self.orders_api.create_order_with_multiple_suborders_double_tp()
         self.assertEqual(response['message'], 'created_success')
         order_no = response['order']['orderNo']
         suborders_data, _ = self.orders_api.get_suborder_by_order_id(response['order']['mainOrderId'])
@@ -3247,9 +3247,7 @@ class OrdersTestCases(BaseTest):
         self.info('assert the analysis table has been updated')
         self.assertCountEqual(analysis_no, found_analysis_no)
         for i in range(3):
-            rows = self.orders_page.result_table()
-            child_data = self.orders_page.get_child_table_data(index=i)
+            child_data = self.orders_page.get_child_table_data(index=2-i)
             self.orders_page.sleep_tiny()
             test_units = [item['Test Unit'] for item in child_data]
             self.assertCountEqual(test_units, test_units_names[i*2:(i*2)+2])
-            self.orders_page.close_child_table(rows[i])

@@ -85,7 +85,6 @@ class BaseAPI:
     @staticmethod
     def update_payload(payload, **kwargs):
         if type(payload) == list:
-            import ipdb;ipdb.set_trace()
             return [BaseAPI._update_payload(_payload, **kwargs) for _payload in payload]
         return BaseAPI._update_payload(payload, **kwargs)
 
