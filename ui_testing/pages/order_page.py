@@ -723,7 +723,7 @@ class Order(Orders):
         return results
 
     def create_new_order_get_test_unit_suggetion_list(self, material_type='', test_unit_name=' ',check_option=False):
-        self.info(' Create new order.')
+        self.info('Create new order.')
         self.click_create_order_button()
         self.sleep_small()
         self.set_new_order()

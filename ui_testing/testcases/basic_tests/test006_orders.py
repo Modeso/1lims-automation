@@ -2558,8 +2558,8 @@ class OrdersTestCases(BaseTest):
         self.assertEquals(multiple_lines_properties['lineBreak'], 'auto')
 
     # @attr(series=True)
-    @parameterized.expand(['Name','Method','Unit','No'])
-    def test076_search_with_test_unit_name_method(self,search_by):
+    @parameterized.expand(['Name', 'Method', 'Unit', 'No'])
+    def test076_search_with_test_unit_name_method(self, search_by):
         """
         Orders:Test unit search approach
         allow user to search with test unit name in the drop down list of the order form
@@ -2573,10 +2573,8 @@ class OrdersTestCases(BaseTest):
 
         """
         self.test_units_page = TstUnits()
-        self.info("get random test unit data to get its material type")
-        response, payload = TestUnitAPI().get_all_test_units()
-        self.assertEqual(response['status'], 1, payload)
-        random_test_unit = random.choice(response['testUnits'])
+        response, payload = TestUnitAPI().create_quantitative_testunit(unit="RandomUnit")
+        self.assertEqual(response['status'], 1)
         self.test_units_page.get_test_units_page()
         self.orders_page.sleep_tiny()
         self.test_units_page.open_configurations()
@@ -2586,23 +2584,18 @@ class OrdersTestCases(BaseTest):
         self.order_page.get_orders_page()
 
         if search_by == 'Name':
-            testunit_search = random_test_unit['name']
+            testunit_search = payload['name']
         elif search_by == 'Method':
-            testunit_search = random_test_unit['method']
+            testunit_search = payload['method']
         elif search_by == 'Unit':
-            testunit_search = random_test_unit['unit']
+            testunit_search = payload['unit']
         elif search_by == 'No':
-            testunit_search = str(random_test_unit['number'])
+            testunit_search = str(payload['number'])
 
-        if random_test_unit['materialTypes'][0] != 'All':
-            option_exists = Order().create_new_order_get_test_unit_suggetion_list(
-                material_type=random_test_unit['materialTypes'][0], test_unit_name=testunit_search, check_option=True)
-        else:
-            option_exists = Order().create_new_order_get_test_unit_suggetion_list(
-                material_type='', test_unit_name=testunit_search, check_option=True)
+        testunits = self.order_page.create_new_order_get_test_unit_suggetion_list(test_unit_name=testunit_search)
 
         self.info('checking {} field only is displayed'.format(search_by))
-        self.assertTrue(option_exists)
+        self.assertGreater(len(testunits), 0)
 
     @parameterized.expand(['Quantitative', 'Qualitative', 'Quantitative MiBi'])
     @attr(series=True)
