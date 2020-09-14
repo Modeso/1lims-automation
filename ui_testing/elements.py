@@ -545,6 +545,13 @@ elements = {
         'orders_edit_button': {'method': 'tag_name',
                                'value': 'a',
                                'order': 4},
+        'configurations' : {'method' : 'xpath',
+                            'value' : '//*[@id="custom-accordion-panel"]/div/div/a[6]'},
+        'text_field_dragged' : {'method' : 'xpath',
+                                'value' : '//*[contains(concat( " ", @class, " " ), concat( " ", "color-label", " " ))]'},
+        'save_config' : {'method' : 'xpath',
+                         'value' : '//button[@class="btn btn-primary mb-md-0 mr-md-3"]'},
+
         'edit order header': {'method': 'xpath',
                               'value': '//span[contains(text(),"Edit Order")]'},
         'analysis_order_tab': {'method': 'xpath',
@@ -758,6 +765,14 @@ elements = {
         'filter_analysis_no': {
             'method': 'id',
             'value': 'nofield'
+        },
+        'additional_field' : {
+        'method' : 'xpath',
+        'value' : '//*[@id="59"]/span/span'
+        },
+        'section1_titles' : {
+        'method' : 'class_name',
+        'value' : 'field-title-limitations'
         }
     },
 

@@ -3230,4 +3230,39 @@ class OrdersTestCases(BaseTest):
                 for testunit in testunit_names:
                     self.assertIn(testunit, result['test_units'])
 
+    def test094_check_added_dynamic_field_displayed_in_edit_order(self) :
+        """
+        check that added dynamic fields will be displayed in edit order screen
+        LIMS-7871
+        """
+
+        section1_fields = []
+        section2_fields = []
+        self.orders_api.order_with_added_dynamic_field()
+        self.info('Rename the added field ')
+        self.order_page.rename_dynamic_field(field='orders:text_field_dragged', value='Additional Field')
+        self.order_page.get_orders_page()
+        self.order_page.click_create_order_button()
+
+        self.orders_page.click_overview()
+        additional_field = self.base_selenium.find_element(element='order:additional_field')
+        self.info('Assert the added field is visible in overview page')
+        self.assertTrue(additional_field)
+
+        random_order = random.choice(self.orders_api.get_all_orders_json())
+        self.orders_page.get_order_edit_page_by_id(random_order['id'])
+        visible_fields_in_edit_order_screen = self.base_selenium.find_elements(element='order:section1_titles')
+        for field in visible_fields_in_edit_order_screen :
+            section1_fields.append(field.text)
+        self.info('Assert the added field is visible in edit order page')
+        self.assertIn('Additional Field:', section1_fields)
+
+        visible_fields = self.base_selenium.find_elements(element='order:section1_titles')
+        for field in visible_fields :
+            section2_fields.append(field.text)
+        self.info('Assert the added field is visible in create new order page')
+        self.assertIn('Additional Field:', section2_fields)
+
+
+
 
