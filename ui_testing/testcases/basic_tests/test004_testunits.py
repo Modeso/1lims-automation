@@ -1371,7 +1371,7 @@ class TestUnitsTestCases(BaseTest):
                            ('Name', 'No'),
                            ('Type', 'Method'),
                            ('Type', 'No'),
-                           ('Method', 'No'),
+                           ('No', 'Method'),
                            ('Unit', 'No'),
                            ('Quantification Limit', '')
                            ])
@@ -1423,31 +1423,37 @@ class TestUnitsTestCases(BaseTest):
             self.assertFalse(is_number_exist)
             self.assertTrue(is_type_exist)
             self.assertFalse(is_method_exist)
+            self.assertFalse(is_unit_exist)
         elif search_view_option1 == 'Name' and search_view_option2 == 'Method':
             self.assertTrue(is_name_exist)
             self.assertFalse(is_number_exist)
             self.assertFalse(is_type_exist)
             self.assertTrue(is_method_exist)
+            self.assertFalse(is_unit_exist)
         elif search_view_option1 == 'Name' and search_view_option2 == 'No':
             self.assertTrue(is_name_exist)
             self.assertTrue(is_number_exist)
             self.assertFalse(is_type_exist)
             self.assertFalse(is_method_exist)
+            self.assertFalse(is_unit_exist)
         elif search_view_option1 == 'Type' and search_view_option2 == 'Method':
             self.assertFalse(is_name_exist)
             self.assertFalse(is_number_exist)
             self.assertTrue(is_type_exist)
             self.assertTrue(is_method_exist)
+            self.assertFalse(is_unit_exist)
         elif search_view_option1 == 'Type' and search_view_option2 == 'No':
             self.assertFalse(is_name_exist)
             self.assertTrue(is_number_exist)
             self.assertTrue(is_type_exist)
             self.assertFalse(is_method_exist)
-        elif search_view_option1 == 'Method' and search_view_option2 == 'No':
+            self.assertFalse(is_unit_exist)
+        elif search_view_option1 == 'No' and search_view_option2 == 'Method':
             self.assertFalse(is_name_exist)
             self.assertTrue(is_number_exist)
             self.assertFalse(is_type_exist)
             self.assertTrue(is_method_exist)
+            self.assertFalse(is_unit_exist)
         elif search_view_option1 == 'Unit' and search_view_option2 == 'No':
             self.assertFalse(is_name_exist)
             self.assertTrue(is_number_exist)
