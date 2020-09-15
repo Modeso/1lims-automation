@@ -428,6 +428,22 @@ class OrdersAPI(OrdersAPIFactory):
         }
         return self.create_new_order(**payload)
 
+    def get_suborder_valid_data(self, formatted_material):
+        res, payload = ArticleAPI().create_article(materialType=formatted_material,
+                                                   selectedMaterialType=[formatted_material],
+                                                   materialTypeId=formatted_material['id'])
+        article_id = ArticleAPI().get_articleID(article_name=payload['name'], article_no=payload['No'])
+        formatted_article = {'id': article_id, 'text': payload['name']}
+        test_plan = TestPlanAPI().create_completed_testplan(material_type=formatted_material['text'],
+                                                            formatted_article=formatted_article)
+        tu_res, tu_payload = TestUnitAPI().create_qualitative_testunit(selectedMaterialTypes=[formatted_material])
+        data = {'Material Type': formatted_material['text'],
+                'Article': formatted_article['text'],
+                'Test Plan': test_plan['testPlanEntity']['name'],
+                'Test Unit': tu_payload['name']}
+        return data
+
+
     def set_configuration(self):
         self.info('set order configuration')
         config_file = os.path.abspath('api_testing/config/order.json')

@@ -8,7 +8,7 @@ class Header(BasePages):
         super().__init__()
         self.user_url = "{}users".format(self.base_selenium.url)
         self.role_url = "{}roles".format(self.base_selenium.url)
-        self.modules_config = "{}/modulesConfigurations".format(self.base_selenium.url)
+        self.modules_config = "{}modulesConfigurations".format(self.base_selenium.url)
 
     def get_users_page(self):
         self.info('get users page.')

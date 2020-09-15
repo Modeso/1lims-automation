@@ -92,6 +92,6 @@ end_points = {
     },
     'modules': {
         'disable_article': '/api/modulesConfigurations/disableArticles',
-        'has_articles': '/api/modulesConfigurations/hasArticles'
+        'has_articles': '/api/modulesConfigurations/getComponentConfigs'
     }
 }

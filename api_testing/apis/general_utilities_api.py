@@ -67,3 +67,16 @@ class GeneralUtilitiesAPI(GeneralUtilitiesAPIFactory):
             if material['name'] != old_material:
                 material_without_duplicate.append(material['name'])
         return material_without_duplicate
+
+    def get_formatted_material_types_without_duplicate(self, old_material):
+        all_materials, _ = self.list_all_material_types()
+        material_without_duplicate = []
+        for material in all_materials['materialTypes']:
+            if material['name'] != old_material:
+                material_without_duplicate.append(material)
+        return material_without_duplicate
+
+    def is_article_enabled(self):
+        response, _ = self.has_articles()
+        if response['status']==1:
+            return response['reponse'][0]['isAllowed']
