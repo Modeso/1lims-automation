@@ -372,7 +372,7 @@ class OrdersTestCases(BaseTest):
         suborder_data = self.order_page.create_new_suborder(
             material_type=test_plan['materialType'][0]['text'],
             article_name=test_plan['selectedArticles'][0]['text'],
-            test_plan=test_plan['testPlan']['text'],
+            test_plans=[test_plan['testPlan']['text']], test_units=[],
             add_new_suborder_btn='order:add_another_suborder')
 
         self.assertEqual(suborder_data['orderNo'].replace("'", ""), order['orderNo'])
@@ -533,17 +533,23 @@ class OrdersTestCases(BaseTest):
         I can filter by any order No.
 
         LIMS-3495
+
+        Filter: Order number format: In case the order number displayed with full year, I can filter by it
+
+        LIMS-7426
         """
         self.info('select random order using api')
         orders, _ = self.orders_api.get_all_orders()
         order = random.choice(orders['orders'])
+        self.assertIn('-2020', order['orderNo'], 'selected order with format {}'.format(order['orderNo']))
         self.info('filter by order No. {}'.format(order['orderNo']))
         self.orders_page.filter_by_order_no(order['orderNo'])
         result_order = self.orders_page.result_table()
         self.assertEqual(len(self.order_page.result_table()), 2)
         self.assertIn(order['orderNo'], result_order[0].text.replace("'", ""))
+        self.assertIn('-2020', result_order[0].text.replace("'", ""))
 
-    def test016_filter_by_Status_or_anlysis_result(self):
+    def test016_filter_by_status(self):
         """
         I can filter by status
 
@@ -2494,37 +2500,47 @@ class OrdersTestCases(BaseTest):
         self.info('asserting the order with order number {} is created'.format(order_no))
         self.assertIn(order_no_with_year, results[0].text.replace("'", ""))
 
-    @skip("https://modeso.atlassian.net/browse/LIMSA-299")
+    #@skip("https://modeso.atlassian.net/browse/LIMSA-299")
     def test074_create_existing_order_change_contact(self):
         """
          Create existing order then change the contact for this existing one,
          all old records with the same order number will update its contact.
 
          LIMS-4293
+
+         LIMS-5818 - added departments assertion
         """
-        res, payload = self.orders_api.create_new_order()
+        self.info("create order with departments")
+        res, payload = self.orders_api.create_order_with_department()
         self.assertEqual(res['status'], 1)
         order_no_with_year = payload[0]['orderNoWithYear']
         order_id = res['order']['mainOrderId']
         response, _ = self.orders_api.get_suborder_by_order_id(id=order_id)
-        self.info('Getting all {} suborders data to get analysis number'.format(len(response['orders'])))
-        self.info("create existing order with order no {}".format(order_no_with_year))
+        analysis_no = response['orders'][0]['analysis']
+        self.info("create new contact with departments")
+        response2, payload2 = ContactsAPI().create_contact_with_multiple_departments()
+        self.assertEqual(response2['status'], 1)
+        new_contact = response2['company']['name']
+        new_contact_departments = [dep['text'] for dep in payload2['departments']]
+        self.info("create existing order from order with No {}".format(order_no_with_year))
         self.order_page.create_existing_order_with_auto_fill(no=order_no_with_year)
         self.order_page.sleep_tiny()
-        new_contact = self.order_page.set_contact(remove_old=True)[0]
+        self.info("update contact to {}".format(new_contact))
+        self.order_page.set_contact(contact=new_contact, remove_old=True)
+        self.info('Asserting departments of selected contact are correctly displayed')
+        _, departments_only_list = self.order_page.get_department_suggestion_lists(open_suborder_table=True)
+        self.assertCountEqual(departments_only_list, new_contact_departments)
         self.order_page.save(save_btn='order:save_btn')
         self.orders_page.get_orders_page()
         self.order_page.sleep_tiny()
         self.order_page.navigate_to_analysis_tab()
-        self.info('asserting that contact has changed for this order')
-        for i in range(len(response['orders'])):
-            analysis_no = response['orders'][i]['analysis']
-            self.analyses_page.filter_by_analysis_number(analysis_no)
-            results = self.analyses_page.get_the_latest_row_data()
-            self.info(
-                'checking contact is updated for suborder {} - new contact is {} and current contact is {}'
-                    .format(i + 1, new_contact, results['Contact Name']))
-            self.assertEqual(new_contact, results['Contact Name'])
+        self.info('Asserting that contact has changed for this order')
+        self.analyses_page.filter_by_analysis_number(analysis_no)
+        results = self.analyses_page.get_the_latest_row_data()
+        self.info('checking contact is updated to {}'.format(new_contact))
+        self.assertEqual(new_contact, results['Contact Name'])
+        self.info('checking old department removed{}'.format(new_contact))
+        self.assertNotEqual(results['Departments'], response['orders'][0]['departments'])
 
     @attr(series=True)
     def test075_enter_long_method_should_be_in_multiple_lines_in_order_form(self):
@@ -2557,36 +2573,45 @@ class OrdersTestCases(BaseTest):
         self.assertEquals(multiple_lines_properties['textOverflow'], 'clip')
         self.assertEquals(multiple_lines_properties['lineBreak'], 'auto')
 
-    @attr(series=True)
-    def test076_search_with_test_unit_name(self):
+    # @attr(series=True)
+    @parameterized.expand(['Name', 'Method', 'Unit', 'No'])
+    def test076_search_with_test_unit_name_method(self, search_by):
         """
         Orders:Test unit search approach
         allow user to search with test unit name in the drop down list of the order form
-
         LIMS-6664
+        allow user to search with test unit method in the drop down list of order form
+        LIMS-6666
+        allow user to search with test unit type in the drop down list of order form
+        LIMS-6668
+        allow user to search with test unit number in the drop down list of order form
+        LIMS-6665
+
         """
         self.test_units_page = TstUnits()
-        self.info("get random test unit data to get its material type")
-        response, payload = TestUnitAPI().get_all_test_units()
-        self.assertEqual(response['status'], 1, payload)
-        random_test_unit = random.choice(response['testUnits'])
+        response, payload = TestUnitAPI().create_quantitative_testunit(unit="RandomUnit")
+        self.assertEqual(response['status'], 1)
         self.test_units_page.get_test_units_page()
         self.orders_page.sleep_tiny()
         self.test_units_page.open_configurations()
         self.orders_page.sleep_tiny()
         self.test_units_page.open_testunit_name_configurations_options()
-        self.test_units_page.select_option_to_view_search_with(view_search_options=['Name'])
-        self.info('go to orders page')
+        self.test_units_page.select_option_to_view_search_with(view_search_options=[search_by])
         self.order_page.get_orders_page()
-        if random_test_unit['materialTypes'][0] != 'All':
-            test_unit_suggestion_list = Order().create_new_order_get_test_unit_suggetion_list(
-                material_type=random_test_unit['materialTypes'][0], test_unit_name=' ')
-        else:
-            test_unit_suggestion_list = Order().create_new_order_get_test_unit_suggetion_list(
-                material_type='', test_unit_name=' ')
-        self.info('checking name field only is displayed')
-        for test_unit in test_unit_suggestion_list:
-            self.assertNotIn(':', test_unit)
+
+        if search_by == 'Name':
+            testunit_search = payload['name']
+        elif search_by == 'Method':
+            testunit_search = payload['method']
+        elif search_by == 'Unit':
+            testunit_search = payload['unit']
+        elif search_by == 'No':
+            testunit_search = str(payload['number'])
+
+        testunits = self.order_page.create_new_order_get_test_unit_suggetion_list(test_unit_name=testunit_search)
+
+        self.info('checking {} field only is displayed'.format(search_by))
+        self.assertGreater(len(testunits), 0)
 
     @parameterized.expand(['Quantitative', 'Qualitative', 'Quantitative MiBi'])
     @attr(series=True)
@@ -2801,6 +2826,7 @@ class OrdersTestCases(BaseTest):
         records created successfully according to that.
 
         LIMS-4249
+        LIMS-4251
         """
         response, payload = self.test_unit_api.get_all_test_units()
         random_testunit = random.choice(response['testUnits'])
@@ -2936,8 +2962,8 @@ class OrdersTestCases(BaseTest):
                       format(testplans[i]['testPlan']['text'], testunits[i]))
             self.order_page.create_new_suborder(material_type=testplans[i]['materialType'][0]['text'],
                                                 article_name=testplans[i]['selectedArticles'][0]['text'],
-                                                test_plan=testplans[i]['testPlan']['text'],
-                                                test_unit=testunits[i])
+                                                test_plans=[testplans[i]['testPlan']['text']],
+                                                test_units=[testunits[i]])
 
         self.order_page.save(save_btn='order:save_btn')
         self.order_page.navigate_to_analysis_tab()
@@ -2999,7 +3025,8 @@ class OrdersTestCases(BaseTest):
         self.order_page.sleep_tiny()
         self.order_page.create_new_suborder(material_type=order_payload[0]['materialType']['text'],
                                             article_name=order_payload[0]['article']['text'],
-                                            test_plan=order_payload[0]['testPlans'][0]['name'])
+                                            test_plans=[order_payload[0]['testPlans'][0]['name']],
+                                            test_units=[])
         self.order_page.sleep_tiny()
         self.info("get departments suggestion list for first suborder")
         _, department_suggestion_list1 = self.order_page.get_department_suggestion_lists(
@@ -3010,7 +3037,8 @@ class OrdersTestCases(BaseTest):
         self.order_page.sleep_tiny()
         self.order_page.create_new_suborder(material_type=order_payload[0]['materialType']['text'],
                                             article_name=order_payload[0]['article']['text'],
-                                            test_plan=order_payload[0]['testPlans'][0]['name'])
+                                            test_plan=[order_payload[0]['testPlans'][0]['name']],
+                                            test_units=[])
         self.order_page.sleep_tiny()
         self.info("get departments suggestion list for second suborder")
         _, department_suggestion_list2 = self.order_page.get_department_suggestion_lists(
@@ -3078,7 +3106,30 @@ class OrdersTestCases(BaseTest):
             self.orders_page.filter_by_analysis_number(filter_text=analysis_no[i])
             self.assertEqual(len(self.order_page.result_table()) - 1, 0)
 
-    def test091_order_of_testunits_in_analysis_section(self):
+    def test091_filter_by_analysis_number_with_year(self):
+        """
+         Filter: Analysis number format: In case the analysis number displayed with full year, I can filter by it
+         LIMS-7425
+        """
+        self.info('open analysis configuration')
+        self.analyses_page.open_analysis_configuration()
+        self.info('set analysis number format to be Year before number')
+        self.analyses_page.set_analysis_no_with_year()
+        self.info('select random order and get analysis no of its suborder')
+        orders, _ = self.orders_api.get_all_orders(limit=20)
+        order = random.choice(orders['orders'])
+        suborder, _ = self.orders_api.get_suborder_by_order_id(id=order['id'])
+        analysis_no = suborder['orders'][0]['analysis'][0]
+        self.info('navigate to analysis active table')
+        self.orders_page.get_orders_page()
+        self.orders_page.navigate_to_analysis_active_table()
+        self.info('filter by analysis no')
+        self.analyses_page.filter_by_analysis_number(filter_text=analysis_no)
+        analysis = self.analyses_page.get_the_latest_row_data()
+        result_analysis_no = analysis['Analysis No.']
+        self.assertEqual(analysis_no, result_analysis_no)
+
+    def test092_order_of_testunits_in_analysis_section(self):
         """
         Ordering test units Approach: In case I put test plans and test units at the same time , the order of
         the analysis section should be the test units of the test plans then the order test units
@@ -3108,7 +3159,7 @@ class OrdersTestCases(BaseTest):
         test_units_list_in_analysis = [analysis['Test Unit'] for analysis in analysis_data]
         self.assertCountEqual(testunits, test_units_list_in_analysis)
 
-    def test092_same_testunits_in_different_testplans(self):
+    def test093_same_testunits_in_different_testplans(self):
         """
         Order: Add Same test units in different test plan
         LIMS-4354
@@ -3187,7 +3238,7 @@ class OrdersTestCases(BaseTest):
                   .format(analysis_data[0]['Test Unit'], tp1_pd['testUnits'][0]['name']))
         self.assertEqual(analysis_data[0]['Test Unit'], tp1_pd['testUnits'][0]['name'])
 
-    def test093_select_large_number_of_test_units_in_one_testplan(self):
+    def test094_select_large_number_of_test_units_in_one_testplan(self):
         """
           Orders: Test plan Approach: In case I select large number of test units in one test plan,
           they should display successfully in the pop up
@@ -3213,3 +3264,92 @@ class OrdersTestCases(BaseTest):
             if result['test_plan'] == testPlan['testPlan']['text']:
                 for testunit in testunit_names:
                     self.assertIn(testunit, result['test_units'])
+
+    def test100_year_format_in_suborder_sheet(self):
+        """
+         Analysis number format: In case the analysis number displayed with full year,
+         this should reflect on the export file
+
+         LIMS-7424
+
+         Order number format: In case the order number displayed with full year,
+         this should reflect on the export file
+
+         LIMS-7423
+        """
+        self.info('select random order')
+        order = random.choice(self.orders_api.get_all_orders_json())
+        order_no = order['orderNo']
+        self.assertIn('-2020', order_no)
+        response, _ = self.orders_api.get_suborder_by_order_id(order['orderId'])
+        self.assertEqual(response['status'], 1)
+        analysis_no = response['orders'][0]['analysis'][0]
+        self.assertIn('-2020', analysis_no)
+        self.orders_page.filter_by_order_no(order_no)
+        row = self.orders_page.result_table()[0]
+        self.assertTrue(row)
+        self.orders_page.click_check_box(source=row)
+        self.order_page.download_xslx_sheet()
+        self.info('Comparing the downloaded  order ')
+        values = self.order_page.sheet.iloc[0].values
+        fixed_sheet_row_data = self.reformat_data(values)
+        self.assertIn(order_no, fixed_sheet_row_data)
+        self.assertIn(analysis_no, fixed_sheet_row_data)
+
+    def test101_create_multiple_suborders_with_testplans_testunits(self):
+        """
+         New: Orders: table view: Create Approach: when you create suborders with multiple
+         test plans & units select the corresponding analysis that triggered according to that.
+
+         LIMS-4256
+        """
+        self.test_plan_api = TestPlanAPI()
+        self.analysis_page = SingleAnalysisPage()
+        self.info("generate data of first suborder")
+        test_units = TestUnitAPI().get_testunits_with_material_type('All')
+        test_units_names_only = [testunit['name'] for testunit in test_units]
+        first_suborder_test_units = random.sample(test_units_names_only, 2)
+
+        self.info("generate data of second suborder")
+        first_test_plan = self.test_plan_api.create_completed_testplan_random_data()
+        second_test_plan = self.test_plan_api.create_completed_testplan(
+            material_type=first_test_plan['materialType'][0]['text'],
+            formatted_article=first_test_plan['selectedArticles'][0])
+        testplans = [first_test_plan, second_test_plan]
+        testplans_of_second_suborder = [first_test_plan['testPlan']['text'], second_test_plan['testPlanEntity']['name']]
+        second_suborder_test_units = []
+        for i in range(2):
+            second_suborder_test_units.extend(
+                self.test_plan_api.get_testunits_in_testplan_by_No(testplans[i]['number']))
+
+        self.info("generate data of third suborder")
+        third_suborder_test_units = random.sample(test_units_names_only, 3)
+
+        self.info("create new order")
+
+        self.order_page.create_new_order(material_type=testplans[0]['materialType'][0]['text'],
+                                         article=testplans[0]['selectedArticles'][0]['text'],
+                                         test_units=first_suborder_test_units,
+                                         test_plans=[], save=False)
+
+        self.order_page.create_new_suborder(material_type=testplans[0]['materialType'][0]['text'],
+                                            article_name=testplans[0]['selectedArticles'][0]['text'],
+                                            test_plans=testplans_of_second_suborder, test_units=[])
+
+        self.order_page.create_new_suborder(material_type=testplans[0]['materialType'][0]['text'],
+                                            article_name=testplans[0]['selectedArticles'][0]['text'],
+                                            test_plans=[], test_units=third_suborder_test_units)
+
+        self.order_page.save(save_btn='order:save_btn')
+        self.order_page.navigate_to_analysis_tab()
+        self.assertEqual(self.analysis_page.get_analysis_count(), 3)
+        for i in range(3):
+            row = self.analysis_page.open_accordion_for_analysis_index(i)
+            test_units = self.analysis_page.get_testunits_in_analysis(row)
+            test_units_names = [name['Test Unit Name'].split(' ')[0] for name in test_units]
+            if i == 0:
+                self.assertCountEqual(test_units_names, first_suborder_test_units)
+            elif i == 1:
+                self.assertCountEqual(test_units_names, second_suborder_test_units)
+            else:
+                self.assertCountEqual(test_units_names, third_suborder_test_units)
