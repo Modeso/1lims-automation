@@ -363,8 +363,8 @@ class Order(Orders):
         self.info(' Get suborder table list.')
         self.base_selenium.click(element='order:suborder_list')
 
-    def create_new_suborder(self, material_type='', article_name='', test_plan='', test_unit='',
-                            add_new_suborder_btn='order:add_new_item'):
+    def create_new_suborder(self, material_type='', article_name='', test_plans=[''], test_units=[''],
+                            add_new_suborder_btn='order:add_another_suborder'):
         # self.get_suborder_table()
         rows_before = self.base_selenium.get_table_rows(element='order:suborder_table')
         self.info('Add new suborder.')
@@ -383,10 +383,12 @@ class Order(Orders):
             self.sleep_tiny()
             self.set_article(article_name)
         self.sleep_tiny()
-        self.info('Set test plan : {}'.format(test_plan))
-        self.set_test_plan(test_plan)
+        self.info('Set test plan : {}'.format(test_plans))
+        for test_plan in test_plans:
+            self.set_test_plan(test_plan)
         self.sleep_tiny()
-        self.set_test_unit(test_unit)
+        for test_unit in test_units:
+            self.set_test_unit(test_unit)
         self.sleep_tiny()
         return self.get_suborder_data()
 
@@ -722,8 +724,8 @@ class Order(Orders):
             results.append({'test_plan': test_plan, 'test_units': test_units})
         return results
 
-    def create_new_order_get_test_unit_suggetion_list(self, material_type='', test_unit_name=' '):
-        self.info(' Create new order.')
+    def create_new_order_get_test_unit_suggetion_list(self, material_type='', test_unit_name=' ',check_option=False):
+        self.info('Create new order.')
         self.click_create_order_button()
         self.sleep_small()
         self.set_new_order()
@@ -734,9 +736,14 @@ class Order(Orders):
         self.set_article(article='')
         self.sleep_small()
         self.info('get test unit suggestion list')
-        test_units = self.base_selenium.get_drop_down_suggestion_list(element='order:test_unit',
+        if check_option:
+            is_option_exist = self.base_selenium.select_item_from_drop_down(element='order:test_unit',
+                                                                            item_text=test_unit_name)
+            return is_option_exist
+        else:
+            test_units = self.base_selenium.get_drop_down_suggestion_list(element='order:test_unit',
                                                                       item_text=test_unit_name)
-        return test_units
+            return test_units
 
     def is_contact_existing(self, contact):
         self.set_contact(contact=contact)
