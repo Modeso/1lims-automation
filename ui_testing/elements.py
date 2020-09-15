@@ -776,13 +776,17 @@ elements = {
                              'value': '//*[contains(text(),"My Profile")]'},
         'companyprofile_button': {'method': 'xpath',
                                   'value': '//*[contains(text(),"Company Profile")]'},
-        'modules_configurations_button':{'method': 'xpath',
+        'modules_configurations_button': {'method': 'xpath',
                                          'value': "//span[contains(text(),'Modules Configurations')]"},
         'logout': {
             'method': 'xpath',
             'value': "//a[@class='btn m-btn--pill btn-secondary m-btn m-btn--custom m-btn--label-brand m-btn--bolder']"
         },
 
+    },
+    'modules_configurations': {
+        'save': {'method': 'xpath',
+                 'value': "//button[@class='btn btn-primary mb-md-0 mr-md-3']"}
     },
     'user_management': {
         'right_menu': {'method': 'xpath',

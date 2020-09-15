@@ -8,10 +8,16 @@ class Header(BasePages):
         super().__init__()
         self.user_url = "{}users".format(self.base_selenium.url)
         self.role_url = "{}roles".format(self.base_selenium.url)
+        self.modules_config = "{}/modulesConfigurations".format(self.base_selenium.url)
 
     def get_users_page(self):
         self.info('get users page.')
         self.base_selenium.get(url=self.user_url)
+        self.wait_until_page_is_loaded()
+        self.sleep_tiny()
+
+    def get_modules_config_page(self):
+        self.base_selenium.get(url=self.modules_config)
         self.wait_until_page_is_loaded()
         self.sleep_tiny()
 
@@ -427,4 +433,4 @@ class Header(BasePages):
     def disable_article_option(self):
         check_box = self.base_selenium.find_element(element='general:checkbox')
         check_box.click()
-        self.save(save_btn='modules_config:save_btn')
+        self.save(save_btn='modules_configurations:save')
