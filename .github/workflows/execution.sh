@@ -13,7 +13,7 @@
 ui_testing/testcases/basic_tests/test00_orders.py
 #  )
 #
-TEST_REG='test94'
+TEST_REG='test96'
 #
 #
 NODE_TOTAL=$1;

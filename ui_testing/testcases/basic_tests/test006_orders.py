@@ -3214,7 +3214,7 @@ class OrdersTestCases(BaseTest):
                 for testunit in testunit_names:
                     self.assertIn(testunit, result['test_units'])
 
-    def test094_check_list_menu(self):
+    def test096_check_list_menu(self):
         '''
         [Orders][Active table] Make sure that list menu will contain ( COA,Archive , XSLX - Archived - Configurations) Only
         LIMS-5358
