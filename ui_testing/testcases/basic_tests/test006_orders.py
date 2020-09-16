@@ -3220,10 +3220,6 @@ class OrdersTestCases(BaseTest):
         LIMS-5358
         :return:
         '''
-        self.base_selenium.click(element='orders:right_menu')
         options = ['Duplicate', 'CoA', 'Archive', 'XSLX', 'Archived', 'Configurations']
-        self.info('get right menu drop down options ')
-        items = self.base_selenium.find_elements(element='orders:dropdown_options')
-        list = items[0].text.split('\n')
-        self.assertEqual(len(list), 6)
+        list = self.orders_page.get_right_menu_options()
         self.assertCountEqual(list,options)
