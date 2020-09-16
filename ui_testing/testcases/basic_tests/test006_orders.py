@@ -2835,7 +2835,7 @@ class OrdersTestCases(BaseTest):
         if material_type == "All":
             material_type = ''
         self.order_page.create_new_order(material_type=material_type, test_units=[testunit_name],
-                                         multiple_suborders=5, with_testplan=False)
+                                         multiple_suborders=5, test_plans=[])
         order_id = self.order_page.get_order_id()
         suborders = self.orders_api.get_suborder_by_order_id(id=order_id)
         self.info('asserting api success')

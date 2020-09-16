@@ -78,5 +78,7 @@ class GeneralUtilitiesAPI(GeneralUtilitiesAPIFactory):
 
     def is_article_enabled(self):
         response, _ = self.has_articles()
-        if response['status']==1:
-            return response['reponse'][0]['isAllowed']
+        if response['status'] == 1:
+            return True
+        else:
+            return False

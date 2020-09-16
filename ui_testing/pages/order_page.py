@@ -49,6 +49,8 @@ class Order(Orders):
             return article
 
     def set_article(self, article=''):
+        if article is None:
+            return
         if article:
             self.base_selenium.select_item_from_drop_down(element='order:article', item_text=article)
         else:
@@ -65,11 +67,11 @@ class Order(Orders):
 
     def set_contact(self, contact='', remove_old=False):
         if remove_old:
-           self.base_selenium.clear_items_in_drop_down(element='order:contact')
+            self.base_selenium.clear_items_in_drop_down(element='order:contact')
         if contact:
-           self.base_selenium.select_item_from_drop_down(element='order:contact', item_text=contact)
+            self.base_selenium.select_item_from_drop_down(element='order:contact', item_text=contact)
         else:
-           self.base_selenium.select_item_from_drop_down(element='order:contact', avoid_duplicate=True)
+            self.base_selenium.select_item_from_drop_down(element='order:contact', avoid_duplicate=True)
         return self.get_contact()
 
     def get_contact(self):
@@ -133,8 +135,7 @@ class Order(Orders):
         return is_option_exist
 
     def create_new_order(self, material_type='', article='', contact='', test_plans=[''], test_units=[''],
-                         multiple_suborders=0, departments='', order_no='', save=True, with_article=True,
-                         check_testunits_testplans=False):
+                         multiple_suborders=0, departments='', order_no='', save=True, check_testunits_testplans=False):
 
         self.info(' Create new order.')
         self.click_create_order_button()
@@ -146,24 +147,24 @@ class Order(Orders):
         self.set_departments(departments=departments)
         self.set_material_type(material_type=material_type)
         self.sleep_small()
-        if with_article:
-            self.set_article(article=article)
-            self.sleep_small()
+
+        self.set_article(article=article)
+        self.sleep_small()
+
         if order_no:
             self.set_no(order_no)
 
         order_no = self.get_no()
 
         if check_testunits_testplans:
-            testplans = self.base_selenium.get_drop_down_suggestion_list(element='order:test_plan',
+            suggested_testplans = self.base_selenium.get_drop_down_suggestion_list(element='order:test_plan',
                                                                          item_text=' ')
+            suggested_test_units = self.base_selenium.get_drop_down_suggestion_list(element='order:test_unit',
+                                                                          item_text=' ')
         for test_plan in test_plans:
             self.set_test_plan(test_plan=test_plan)
 
         for test_unit in test_units:
-            if check_testunits_testplans:
-                test_units = self.base_selenium.get_drop_down_suggestion_list(element='order:test_unit',
-                                                                              item_text=' ')
             self.set_test_unit(test_unit=test_unit)
             self.sleep_small()
 
@@ -174,7 +175,7 @@ class Order(Orders):
             self.save(save_btn='order:save_btn')
         self.info(' Order created with no : {} '.format(order_no))
         if check_testunits_testplans:
-            return order_no, test_units, testplans
+            return order_no, suggested_test_units, suggested_testplans
         else:
             return order_no
 
@@ -223,7 +224,7 @@ class Order(Orders):
                 contact_dict['contact'] = item
             else:
                 contact_dict['departments'].append(item)
-                if suggested_department_list.index(item) == len(suggested_department_list)-1:
+                if suggested_department_list.index(item) == len(suggested_department_list) - 1:
                     contact_dep_list.append(contact_dict)
 
         return contact_dep_list, departments_only_list
@@ -347,7 +348,7 @@ class Order(Orders):
 
     def get_departments(self):
         departments = self.base_selenium.get_text(element='order:departments').replace('×', '').split('\n')
-        if departments == ['Search']: #empty
+        if departments == ['Search']:  # empty
             return []
         return departments
 
@@ -423,7 +424,6 @@ class Order(Orders):
         duplicate_element = self.base_selenium.find_element_in_element(source=suborders_elements['Options'],
                                                                        destination_element='order:duplicate_table_view')
         duplicate_element.click()
-
 
     # this method to be used while you are order's table with add page ONLY, and you can get the required data by sending the index, and the needed fields of the suborder
     def get_suborder_data(self):
@@ -704,22 +704,22 @@ class Order(Orders):
         suborders = self.base_selenium.get_table_rows(element='order:suborder_table')
         suborder_row = suborders[index]
         suborder_data = self.get_suborder_data()
-        return  suborder_data
+        return suborder_data
 
     def upload_attachment(self, file_name, drop_zone_element, remove_current_file=False, save=False):
         super().upload_file(file_name, drop_zone_element, remove_current_file)
         if save:
-           self.base_selenium.driver.execute_script("document.querySelector('.dz-details').style.opacity = 'initial';")
-           self.sleep_tiny()
-           uploaded_file_name = self.base_selenium.find_element(element='general:uploaded_file_name').text
-           self.base_selenium.click('order:uploader_close_btn')
-           self.save(save_btn='order:save_btn')
-           return uploaded_file_name
+            self.base_selenium.driver.execute_script("document.querySelector('.dz-details').style.opacity = 'initial';")
+            self.sleep_tiny()
+            uploaded_file_name = self.base_selenium.find_element(element='general:uploaded_file_name').text
+            self.base_selenium.click('order:uploader_close_btn')
+            self.save(save_btn='order:save_btn')
+            return uploaded_file_name
         else:
             self.base_selenium.click('order:uploader_close_btn')
             self.cancel(True)
-            
-    def get_testplan_pop_up(self,index=0):
+
+    def get_testplan_pop_up(self, index=0):
         suborders = self.base_selenium.get_table_rows(element='order:suborder_table')
         suborders_elements = self.base_selenium.get_row_cells_elements_related_to_header(
             row=suborders[index],
@@ -735,7 +735,7 @@ class Order(Orders):
             results.append({'test_plan': test_plan, 'test_units': test_units})
         return results
 
-    def create_new_order_get_test_unit_suggetion_list(self, material_type='', test_unit_name=' ',check_option=False):
+    def create_new_order_get_test_unit_suggetion_list(self, material_type='', test_unit_name=' ', check_option=False):
         self.info('Create new order.')
         self.click_create_order_button()
         self.sleep_small()
@@ -753,7 +753,7 @@ class Order(Orders):
             return is_option_exist
         else:
             test_units = self.base_selenium.get_drop_down_suggestion_list(element='order:test_unit',
-                                                                      item_text=test_unit_name)
+                                                                          item_text=test_unit_name)
             return test_units
 
     def is_contact_existing(self, contact):

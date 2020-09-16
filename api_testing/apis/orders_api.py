@@ -126,7 +126,7 @@ class OrdersAPIFactory(BaseAPI):
         year_option = 0 : order no with year before (2020-1668)
         :return:
         """
-        api = '{}{}'.format(self.url, self.END_POINTS['orders_api']['get_auto_generated_number'])+year_option
+        api = '{}{}'.format(self.url, self.END_POINTS['orders_api']['get_auto_generated_number']) + year_option
         return api, {}
 
     @api_factory('put')
@@ -137,7 +137,7 @@ class OrdersAPIFactory(BaseAPI):
         :return: response, payload
         """
         api = '{}{}{}'.format(self.url, self.END_POINTS['orders_api']['archive_main_order'],
-                                                str(mainorder_id))
+                              str(mainorder_id))
         return api, {}
 
     @api_factory('put')
@@ -148,7 +148,7 @@ class OrdersAPIFactory(BaseAPI):
         :return: response, payload
         """
         api = '{}{}{}'.format(self.url, self.END_POINTS['orders_api']['restore_main_order'],
-                                                str(mainorder_id))
+                              str(mainorder_id))
         return api, {}
 
     @api_factory('delete')
@@ -159,7 +159,7 @@ class OrdersAPIFactory(BaseAPI):
         :return: response, payload
         """
         api = '{}{}{}'.format(self.url, self.END_POINTS['orders_api']['delete_main_order'],
-                                               str(mainorder_id))
+                              str(mainorder_id))
         return api, {}
 
     @api_factory('put')
@@ -429,10 +429,11 @@ class OrdersAPI(OrdersAPIFactory):
         return self.create_new_order(**payload)
 
     def get_suborder_valid_data(self, formatted_material):
-        res, payload = ArticleAPI().create_article(materialType=formatted_material,
-                                                   selectedMaterialType=[formatted_material],
-                                                   materialTypeId=formatted_material['id'])
-        article_id = ArticleAPI().get_articleID(article_name=payload['name'], article_no=payload['No'])
+        article_api = ArticleAPI()
+        res, payload = article_api.create_article(materialType=formatted_material,
+                                                  selectedMaterialType=[formatted_material],
+                                                  materialTypeId=formatted_material['id'])
+        article_id = article_api.get_article_id(article_name=payload['name'], article_no=payload['No'])
         formatted_article = {'id': article_id, 'text': payload['name']}
         test_plan = TestPlanAPI().create_completed_testplan(material_type=formatted_material['text'],
                                                             formatted_article=formatted_article)
@@ -442,7 +443,6 @@ class OrdersAPI(OrdersAPIFactory):
                 'Test Plan': test_plan['testPlanEntity']['name'],
                 'Test Unit': tu_payload['name']}
         return data
-
 
     def set_configuration(self):
         self.info('set order configuration')

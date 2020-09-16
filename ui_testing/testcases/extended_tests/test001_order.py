@@ -13,8 +13,6 @@ from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from api_testing.apis.base_api import BaseAPI
 from parameterized import parameterized
 from nose.plugins.attrib import attr
-import random
-
 
 
 class OrdersWithoutArticleTestCases(BaseTest):
@@ -68,7 +66,7 @@ class OrdersWithoutArticleTestCases(BaseTest):
         self.assertNotIn('Article Name', displayed_headers)
         order_no, testunits, testplans = self.order_page.create_new_order(
             material_type=formatted_material['text'], test_plans=[created_testplan['testPlan']['text']],
-            test_units=[created_testunit[1]['name']], with_article=False, check_testunits_testplans=True)
+            test_units=[created_testunit[1]['name']], article=None, check_testunits_testplans=True)
 
         self.info('asserting article field is not displayed in new order page')
         fields = self.base_selenium.get_table_head_elements(element='order:suborder_table')
@@ -138,6 +136,7 @@ class OrdersWithoutArticleTestCases(BaseTest):
         self.orders_page.filter_by_order_no(filter_text=order_no)
         results = self.order_page.result_table()[0].text
         self.assertIn(order_no.replace("'", ""), results.replace("'", ""))
+
 
 class OrdersExtendedTestCases(BaseTest):
     def setUp(self):

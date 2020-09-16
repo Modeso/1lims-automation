@@ -224,7 +224,7 @@ class ArticleAPI(ArticleAPIFactory):
         selected_article = random.choice(self.get_all_articles(limit=30)[0]['articles'])
         return selected_article['name'], selected_article['id']
 
-    def get_articleID(self, article_no, article_name):
+    def get_article_id(self, article_no, article_name):
         articles = self.quick_search_article(name=article_name)
         for article in articles['articles']:
             if article['No'] == article_no:

@@ -128,10 +128,7 @@ def api_factory(method):
             api, _payload = func(*args, **kwargs)
             payload = base_api.update_payload(_payload, **kwargs)
             base_api.info('GET : {}'.format(api))
-            if method in ["post"]:
-                response_json = base_api.session.post(api, json=payload, headers=base_api.headers,
-                                                      verify=False).json()
-            elif method in ["put"]:
+            if method in ["post", "put"]:
                 response_json = base_api.session.__getattribute__(method)(api, json=payload, headers=base_api.headers,
                                                                           verify=False).json()
             else:
