@@ -3268,7 +3268,7 @@ class OrdersTestCases(BaseTest):
 
                   
     @parameterized.expand(['Name','No','Name:No'])
-    def test094_change_contact_config(self,search_by):
+    def test095_change_contact_config(self,search_by):
         '''
          Orders: Contact configuration approach: In case the user
          configures the contact field to display name & number this action
