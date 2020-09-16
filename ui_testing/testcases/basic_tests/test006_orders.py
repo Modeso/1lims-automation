@@ -1,6 +1,7 @@
 from ui_testing.testcases.base_test import BaseTest
 from ui_testing.pages.order_page import Order
 from ui_testing.pages.orders_page import Orders
+from ui_testing.pages.contacts_page import Contacts
 from ui_testing.pages.login_page import Login
 from ui_testing.pages.testunits_page import TstUnits
 from api_testing.apis.orders_api import OrdersAPI
@@ -3238,5 +3239,44 @@ class OrdersTestCases(BaseTest):
             if result['test_plan'] == testPlan['testPlan']['text']:
                 for testunit in testunit_names:
                     self.assertIn(testunit, result['test_units'])
+
+    @parameterized.expand(['Name','No','Name:No'])
+    def test094_change_contact_config(self,search_by):
+        '''
+         Orders: Contact configuration approach: In case the user
+         configures the contact field to display name & number this action
+         should reflect on the order active table
+         LIMS-6632
+        :param search_by:
+        :return:
+        '''
+        self.contacts_page = Contacts()
+        self.info('get random contact')
+        contacts_response,_ = ContactsAPI().get_all_contacts(limit=10)
+        self.assertEqual(contacts_response['status'], 1)
+        payload = random.choice(contacts_response['contacts'])
+        self.orders_page.open_order_config()
+        self.info('change contact view by options')
+        self.contacts_page.open_contact_configurations_options()
+        if  search_by == 'Name':
+            search_text = payload['name']
+            result = payload['name']
+            search_by = [search_by]
+        elif search_by== 'No':
+            search_text = 'No: '+ str(payload['companyNo'])
+            result = str(payload['companyNo'])
+            search_by = [search_by]
+        elif search_by == 'Name:No':
+            search_text = payload['name'] + ' No: ' + str(payload['companyNo'])
+            search_by = search_by.split(':')
+            result = payload['name']
+
+        self.contacts_page.select_option_to_view_search_with(view_search_options=search_by)
+        self.info('go to order active table')
+        self.orders_page.get_orders_page()
+        self.orders_page.filter_by_contact(filter_text=result)
+        rows = self.orders_page.result_table()
+        self.assertIn(search_text,rows[0].text)
+
 
 
