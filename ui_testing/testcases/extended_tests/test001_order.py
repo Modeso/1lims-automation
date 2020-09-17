@@ -209,7 +209,7 @@ class OrdersExtendedTestCases(BaseTest):
         self.orders_page.sleep_tiny()
         self.info('Assert the added field is visible in main order table')
         header_elements = self.base_selenium.get_table_head_elements_with_tr(element='general:table')
-        headers = [h.text for h in header_elements]
+        headers = header_elements.text.split('\n')
         self.assertIn(random_name, headers)
         self.info("navigate to random order's edit page")
         random_order = random.choice(self.orders_api.get_all_orders_json())
