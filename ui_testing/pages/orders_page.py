@@ -348,3 +348,11 @@ class Orders(BasePages):
         items = self.base_selenium.find_elements(element='orders:dropdown_options')
         list = items[0].text.split('\n')
         return list
+
+    def get_configurations_options(self, child=False):
+        self.base_selenium.click(element='orders:configurations_options')
+        if child:
+            self.base_selenium.click(element='orders:child_config')
+            self.sleep_tiny()
+        options = self.base_selenium.get_text(element='orders:configurations_options_values')
+        return options
