@@ -3303,7 +3303,9 @@ class OrdersTestCases(BaseTest):
         self.orders_page.get_orders_page()
         self.orders_page.filter_by_contact(filter_text=result)
         rows = self.orders_page.result_table()
-        self.assertIn(search_text,rows[0].text)
+        order_data = self.base_selenium.get_row_cells_dict_related_to_header(row=rows[0])
+        self.info('assert contact appear in format {}'.format(search_by))
+        self.assertEqual(order_data['Contact Name'],search_text)
 
 
     def test100_year_format_in_suborder_sheet(self):
