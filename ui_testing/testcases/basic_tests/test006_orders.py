@@ -155,66 +155,57 @@ class OrdersTestCases(BaseTest):
         self.assertIn(order_number, archived_row[0].text)
         self.info('Order number: {} is archived correctly'.format(order_number))
 
-    @parameterized.expand(['main_order','suborder'])
+    @parameterized.expand(['main_order', 'suborder'])
     def test005_restore_archived_orders(self, order_type):
         """
         I can restore any sub order successfully
-
         LIMS-4374
 
         Orders: Restore Approach: User can restore any order from the archived table
         LIMS-5361 (added the main order part)
         """
-        analysis_numbers = []
-        restored_analysis_numbers = []
-        order = self.orders_api.get_order_with_multiple_sub_orders()
-        order_no = order['orderNo']
-        order_id = order['orderId']
-        suborders = self.orders_api.get_suborder_by_order_id(order_id)
-        number_of_suborders = len(suborders[0]['orders'])
-        for suborder in suborders[0]['orders']:
-            analysis_numbers.append(suborder['analysis'][0])
-        self.info("archive order no {}".format(order_no))
-        self.orders_page.filter_by_order_no(order_no)
-        row = self.orders_page.result_table()[0]
-        self.orders_page.click_check_box(row)
-        self.orders_page.archive_selected_items()
+        self.info("create order with multiple suborders using api")
+        response, payload = self.orders_api.create_order_with_multiple_suborders()
+        self.assertEqual(response['status'], 1)
+        order_no = response['order']['orderNo']
+        order_id = response['order']['mainOrderId']
+        suborders = self.orders_api.get_suborder_by_order_id(order_id)[0]['orders']
+        number_of_suborders = len(suborders)
+        analysis_numbers = [suborder['analysis'][0] for suborder in suborders]
+        self.info("archive order no {} using api".format(order_no))
+        archive_response, _ = self.orders_api.archive_main_order(order_id)
+        self.assertEqual(archive_response['message'], 'archive_success')
         self.info("Navigate to archived orders table")
         self.orders_page.get_archived_items()
         self.orders_page.filter_by_order_no(order_no)
         if order_type == 'suborder':
-            suborders_data = self.order_page.get_child_table_data(index=0)
-            self.info("Restore suborder with analysis No {}".format(suborders_data[0]['Analysis No.']))
-            self.order_page.restore_table_suborder(index=0)
-            self.info('Navigate to orders active table')
-            self.orders_page.get_active_items()
-            self.orders_page.filter_by_order_no(order_no)
-            self.info('assert that suborder restored')
-            child_data = self.orders_page.get_child_table_data(open_child=False)
-            self.assertEqual(suborders_data[0]['Analysis No.'].replace("'", ""),
-                             child_data[0]['Analysis No.'].replace("'", ""))
-
+            random_index = randint(0, len(suborders))
+            suborders_data = self.order_page.get_child_table_data()
+            self.info("Restore suborder with analysis No {}".format(suborders_data[random_index]['Analysis No.']))
+            self.order_page.restore_table_suborder(index=random_index)
         else:
+            self.info("restore order no {}".format(order_no))
             row = self.orders_page.result_table()[0]
             self.orders_page.click_check_box(row)
             self.orders_page.restore_selected_items()
-            self.orders_page.get_active_items()
-            self.orders_page.filter_by_order_no(order_no)
-            self.info('assert that main order is restored')
-            latest_order_data = \
-                self.base_selenium.get_row_cells_dict_related_to_header(row=self.orders_page.result_table()[0])
-            self.assertEqual(order_no, latest_order_data['Order No.'].replace("'", ""))
-            restored_suborders = self.orders_page.get_child_table_data()
-            for restored_suborder in restored_suborders:
-                restored_analysis_numbers.append(restored_suborder['Analysis No.'].replace("'", ""))
-            self.info("asserting the order's suborders are restored too ")
-            self.info('original suborders were {}, restored suborders are {}'.format(number_of_suborders,
-                                                                                     len(restored_suborders)))
-            self.assertEqual(len(restored_suborders), number_of_suborders)
+
+        self.info('Navigate to orders active table')
+        self.orders_page.sleep_tiny()
+        self.orders_page.get_active_items()
+        self.orders_page.filter_by_order_no(order_no)
+        if order_type == 'suborder':
+            self.info('assert that only one suborder restored')
+            child_data = self.orders_page.get_child_table_data(open_child=False)
+            self.assertEqual(len(child_data), 1)
+            self.assertEqual(suborders_data[random_index]['Analysis No.'].replace("'", ""),
+                             child_data[0]['Analysis No.'].replace("'", ""))
+        else:
+            self.info('assert that all suborders restored')
+            child_data = self.orders_page.get_child_table_data(open_child=True)
+            restored_analysis_numbers = [item['Analysis No.'].replace("'", "") for item in child_data]
+            self.assertEqual(len(child_data), number_of_suborders)
             self.info('asserting restored suborders are correct')
-            for restored_analysis_number in restored_analysis_numbers:
-                self.info('Suborder with analysis number {} restored'.format(restored_analysis_number))
-                self.assertIn(restored_analysis_number, analysis_numbers)
+            self.assertCountEqual(analysis_numbers, restored_analysis_numbers)
 
     @attr(series=True)
     @skip("https://modeso.atlassian.net/browse/LIMSA-299")
@@ -3246,13 +3237,3 @@ class OrdersTestCases(BaseTest):
             if result['test_plan'] == testPlan['testPlan']['text']:
                 for testunit in testunit_names:
                     self.assertIn(testunit, result['test_units'])
-
-
-    def test094_restore_main_order(self):
-        self.info('Get a random order with multiple suborders')
-        order = self.orders_api.get_order_with_multiple_sub_orders()
-        print(order)
-        order_id=order['orderId']
-        suborders=self.orders_api.get_suborder_by_order_id(order_id)
-        print(suborders)
-        print(len(suborders[0]['orders']))
