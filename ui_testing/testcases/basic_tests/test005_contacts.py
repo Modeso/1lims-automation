@@ -363,8 +363,7 @@ class ContactsTestCases(BaseTest):
             self.contact_page.set_contact_name(new_name)
 
         if case == 'edit_cancel':
-            import ipdb;ipdb.set_trace()
-            self.contact_page.cancel(force=False)
+            self.base_selenium.click(element='general:cancel')
         else:
             self.contacts_page.info('click on Overview ')
             self.base_page.click_overview()
