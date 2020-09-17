@@ -163,14 +163,12 @@ class OrdersAPIFactory(BaseAPI):
             'testDatedateOption': {'year': test_date_arr[0], 'month': test_date_arr[1], 'day': test_date_arr[2]}
         }
         suborders = []
-        sub_order_dict = {}
         for i in range(no_suborders):
             sub_order_dict = {**suborders_common_data}
             if len(suborders_fields) > i:
                 for dict_key in suborders_fields[i].keys():
                     sub_order_dict[dict_key] = suborders_fields[i][dict_key]
             suborders.append(sub_order_dict)
-            sub_order_dict = {}
         payload = suborders
         api = '{}{}'.format(self.url, self.END_POINTS['orders_api']['create_new_order'])
         return api, payload
@@ -310,11 +308,10 @@ class OrdersAPI(OrdersAPIFactory):
 
     def get_order_with_multiple_sub_orders(self, no_suborders=1):
         api, payload = self.get_all_orders(limit=100)
-        while True:
-            random_order = random.choice(api['orders'])
-            suborder = self.get_suborder_by_order_id(id=random_order['orderId'])[0]['orders']
+        for order in api['orders']:
+            suborder = self.get_suborder_by_order_id(id=order['orderId'])[0]['orders']
             if len(suborder) > no_suborders:
-                return random_order
+                return order
 
     def get_order_with_field_name(self, field, no_of_field):
         """
