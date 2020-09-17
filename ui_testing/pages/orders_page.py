@@ -345,6 +345,6 @@ class Orders(BasePages):
         self.info('open testunits configurations')
         self.base_selenium.scroll()
         self.base_selenium.click(element='orders:right_menu')
-        self.base_selenium.click(element='orders:configurations')
+        self.base_selenium.click(element='general:configurations')
 
 
