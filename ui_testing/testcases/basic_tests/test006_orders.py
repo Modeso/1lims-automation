@@ -1401,6 +1401,11 @@ class OrdersTestCases(BaseTest):
          and when user click on it suborders will be expanded
 
          LIMS-5356
+         
+         [Orders][Archive Table]Make sure that every record should display the main order
+         and when user click on it will display suborders under order record
+         
+         LIMS-5357
         """
         self.info('select random record')
         random_order = random.choice(self.orders_api.get_all_orders_json())
