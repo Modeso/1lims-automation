@@ -166,7 +166,7 @@ class OrdersAPIFactory(BaseAPI):
         sub_order_dict = {}
         for i in range(no_suborders):
             sub_order_dict = {** suborders_common_data}
-            if suborders_feilds[i]:
+            if len(suborders_feilds)>i:
                 for dict_key in suborders_feilds[i].keys():
                     sub_order_dict[dict_key] = suborders_feilds[i][dict_key]
             suborders.append(sub_order_dict)
