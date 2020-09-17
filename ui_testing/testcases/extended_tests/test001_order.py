@@ -13,6 +13,7 @@ from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from api_testing.apis.base_api import BaseAPI
 from parameterized import parameterized
 from nose.plugins.attrib import attr
+import random
 
 
 class OrdersWithoutArticleTestCases(BaseTest):
@@ -190,3 +191,30 @@ class OrdersExtendedTestCases(BaseTest):
             self.info('asserting {} is displayed '.format(header))
             self.assertIn(header, displayed_child_headers)
             self.assertIn(header, displayed_Configuration_headers)
+
+    def test002_check_added_dynamic_field_displayed_in_edit_order(self):
+        """
+        check that added dynamic fields will be displayed in edit order screen
+        LIMS-7871
+
+        check that added dynamic field will be displayed in order main table
+        LIMS-7865
+        """
+        self.info("set order configuration to add dynamic field to section 1")
+        self.orders_api.order_with_added_dynamic_field()
+        self.info('Rename the added field ')
+        random_name = self.generate_random_string()
+        self.order_page.rename_dynamic_field(field='orders:text_field_dragged', value=random_name)
+        self.order_page.get_orders_page()
+        self.orders_page.sleep_tiny()
+        self.info('Assert the added field is visible in main order table')
+        header_elements = self.base_selenium.get_table_head_elements_with_tr(element='general:table')
+        headers = [h.text for h in header_elements]
+        self.assertIn(random_name, headers)
+        self.info("navigate to random order's edit page")
+        random_order = random.choice(self.orders_api.get_all_orders_json())
+        self.orders_page.get_order_edit_page_by_id(random_order['id'])
+        visible_fields_in_edit_order_screen = self.base_selenium.find_elements(element='order:section1_titles')
+        section1_fields = [field.text for field in visible_fields_in_edit_order_screen]
+        self.info('Assert the added field is visible in edit order page')
+        self.assertIn('{}:'.format(random_name), section1_fields)

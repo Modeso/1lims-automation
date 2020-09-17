@@ -772,14 +772,8 @@ elements = {
             'method': 'id',
             'value': 'nofield'
         },
-        'additional_field' : {
-        'method' : 'xpath',
-        'value' : '//*[@id="59"]/span/span'
-        },
-        'section1_titles' : {
-        'method' : 'class_name',
-        'value' : 'field-title-limitations'
-        }
+        'section1_titles': {'method': 'class_name',
+                             'value': 'field-title-limitations'}
     },
 
     'header': {
