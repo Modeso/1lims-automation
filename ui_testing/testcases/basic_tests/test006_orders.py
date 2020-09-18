@@ -179,7 +179,7 @@ class OrdersTestCases(BaseTest):
         self.orders_page.get_archived_items()
         self.orders_page.filter_by_order_no(order_no)
         if order_type == 'suborder':
-            random_index = randint(0, len(suborders))
+            random_index = randint(0, len(suborders)-1)
             suborders_data = self.order_page.get_child_table_data()
             self.info("Restore suborder with analysis No {}".format(suborders_data[random_index]['Analysis No.']))
             self.order_page.restore_table_suborder(index=random_index)
