@@ -3464,6 +3464,8 @@ class OrdersTestCases(BaseTest):
         order : create new order: check that dynamic field added in order section 1 will be displayed
         in create new order screen
         LIMS-7870
+        orders : configuration : check that user can add dynamic field in order section 1
+        LIMS-7864
         """
         section1_fields = []
         self.orders_api.order_with_added_dynamic_field()
