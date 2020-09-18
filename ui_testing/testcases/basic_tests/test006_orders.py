@@ -2500,7 +2500,7 @@ class OrdersTestCases(BaseTest):
         self.info('asserting the order with order number {} is created'.format(order_no))
         self.assertIn(order_no_with_year, results[0].text.replace("'", ""))
 
-    #@skip("https://modeso.atlassian.net/browse/LIMSA-299")
+    # @skip("https://modeso.atlassian.net/browse/LIMSA-299")
     def test074_create_existing_order_change_contact(self):
         """
          Create existing order then change the contact for this existing one,
@@ -3457,3 +3457,20 @@ class OrdersTestCases(BaseTest):
                 self.assertCountEqual(test_units_names, second_suborder_test_units)
             else:
                 self.assertCountEqual(test_units_names, third_suborder_test_units)
+
+    def test102_check_test_unit_displayed_correct_under_test_plan(self):
+        article_data = ArticleAPI().get_article_with_material_type(material_type='Raw Material')
+        formatted_article = {'id': article_data['id'], 'text': article_data['name']}
+        tp_list = []
+        for _ in range(3):
+            tp1 = TestPlanAPI().create_completed_testplan(material_type='Raw Material',
+                                                          formatted_article=formatted_article)
+            print(tp1)
+            tp_list.append(tp1)
+        self.order_page.create_new_order(material_type='Raw Material',test_units=[], test_plans=tp_list, save=False)
+        data = self.order_page.get_testplan_pop_up()
+        for i in data:
+            print('11>', tp_list[i]['testPlan']['text'])
+            print('222>', data[i]['test_plan'])
+            print('333>', tp_list[i]['testUnits'])
+            print('444>', data[i]['test_units'])
