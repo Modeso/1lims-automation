@@ -3457,3 +3457,25 @@ class OrdersTestCases(BaseTest):
                 self.assertCountEqual(test_units_names, second_suborder_test_units)
             else:
                 self.assertCountEqual(test_units_names, third_suborder_test_units)
+
+    def test100_check_validation_date_validation_by(self):
+        '''
+        Orders: Validation date & Validation by : check that when user update the validation date & the validation by,
+         the update should reflect on order's child table
+         LIMS-7729
+        :return:
+        '''
+        self.single_analysis_page = SingleAnalysisPage()
+        #random_order = random.choice(self.orders_api.get_all_orders_json())
+        response, payload = self.orders_api.create_new_order()
+        self.assertEqual(response['status'], 1, payload)
+        order_no = payload[0]['orderNo']
+        self.info('edit order with No {}'.format(order_no))
+        self.orders_page.get_order_edit_page_by_id(order_no)
+        self.order_page.navigate_to_analysis_tab()
+        self.single_analysis_page.change_result(text='Not Recieved')
+        self.order_page.get_orders_page()
+        self.orders_page.filter_by_order_no(filter_text=order_no)
+        suborders_data = self.order_page.get_child_table_data(index=0)
+        # gbt suborder data mzbot
+        # print(suborders_data)
