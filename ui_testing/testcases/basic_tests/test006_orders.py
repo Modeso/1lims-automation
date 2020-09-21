@@ -15,6 +15,7 @@ from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from parameterized import parameterized
 from random import randint
 from unittest import skip
+from datetime import date
 import random, re
 from nose.plugins.attrib import attr
 
@@ -3467,15 +3468,45 @@ class OrdersTestCases(BaseTest):
         '''
         self.single_analysis_page = SingleAnalysisPage()
         #random_order = random.choice(self.orders_api.get_all_orders_json())
-        response, payload = self.orders_api.create_new_order()
-        self.assertEqual(response['status'], 1, payload)
-        order_no = payload[0]['orderNo']
-        self.info('edit order with No {}'.format(order_no))
-        self.orders_page.get_order_edit_page_by_id(order_no)
+        #response, payload = self.orders_api.create_new_order()
+        #self.assertEqual(response['status'], 1, payload)
+        #order_no = payload[0]['orderNo']
+        order_no = self.order_page.create_new_order(material_type='Raw Material')
+        #self.info('edit order with No {}'.format(order_no))
+        #self.orders_page.get_order_edit_page_by_id(order_no)
+        self.order_page.sleep_small()
         self.order_page.navigate_to_analysis_tab()
-        self.single_analysis_page.change_result(text='Not Recieved')
+        self.single_analysis_page.set_testunit_values()
+        self.single_analysis_page.change_validation_options(text='Conform')
         self.order_page.get_orders_page()
         self.orders_page.filter_by_order_no(filter_text=order_no)
         suborders_data = self.order_page.get_child_table_data(index=0)
-        # gbt suborder data mzbot
-        # print(suborders_data)
+        self.assertEqual(suborders_data[0]['Validation by'],self.base_selenium.username)
+        today = date.today()
+        curr_date = today.strftime("%d.%m.%Y")
+        self.assertEqual(suborders_data[0]['Validation date'],curr_date)
+        analysis_no = suborders_data[0]['Analysis No.']
+        self.orders_page.navigate_to_analysis_active_table()
+        self.analyses_page.filter_by_analysis_number(analysis_no)
+        analysis_data = self.analyses_page.get_the_latest_row_data()
+        self.assertEqual(suborders_data[0]['Validation by'], analysis_data['Validation by'])
+        self.assertEqual(suborders_data[0]['Validation date'], analysis_data['Validation date'])
+        self.login_page = Login()
+        self.info('Calling the users api to create a new user with username')
+        response, payload = UsersAPI().create_new_user()
+        self.assertEqual(response['status'], 1, payload)
+        self.orders_page.sleep_tiny()
+        self.login_page.logout()
+        self.login_page.login(username=payload['username'], password=payload['password'])
+        self.base_selenium.wait_until_page_url_has(text='dashboard')
+        self.orders_page.get_order_edit_page_by_id(int(order_no.split('-')[0])+1)
+        self.order_page.navigate_to_analysis_tab()
+        self.single_analysis_page.change_validation_options(text='Approved')
+        self.order_page.sleep_medium()
+        self.single_analysis_page.navigate_to_order_tab()
+        self.base_selenium.refresh()
+        self.order_page.get_orders_page()
+        print(self.base_selenium.get_url())
+        self.orders_page.filter_by_order_no(filter_text=order_no)
+        suborders_after = self.order_page.get_child_table_data(index=0)
+        print(suborders_after)
