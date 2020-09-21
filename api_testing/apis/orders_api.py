@@ -531,4 +531,4 @@ class OrdersAPI(OrdersAPIFactory):
             suborder['article'] = formatted_article
             suborder['articleId'] = article_id
             suborders.append(suborder)
-        return self.create_order_with_multiple_suborders(suborders_feilds=suborders, no_suborders=3)
+        return self.create_order_with_multiple_suborders(no_suborders=3, suborders_fields=suborders)
