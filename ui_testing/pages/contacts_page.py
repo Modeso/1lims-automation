@@ -134,8 +134,6 @@ class Contacts(BasePages):
         self.open_edit_page_by_css_selector(row=rows[0])
 
     def open_contact_configurations_options(self):
-        self.info('open contact configurations options')
-        self.sleep_tiny()
         self.base_selenium.click(element='configurations_page:display_options_menu')
         self.sleep_tiny()
         self.base_selenium.click(element='configurations_page:field_options')
@@ -147,7 +145,7 @@ class Contacts(BasePages):
         self.sleep_tiny()
 
     def select_option_to_view_search_with(self, view_search_options):
-        print(view_search_options)
+        self.info(change view search options')
         self.clear_all_selected_view_and_search_options()
         for view_search_option in view_search_options:
             if view_search_option != '':
