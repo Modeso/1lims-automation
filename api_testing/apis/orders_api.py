@@ -67,9 +67,10 @@ class OrdersAPIFactory(BaseAPI):
         material_type_id = testplan['materialType'][0]['id']
         article = testplan['selectedArticles'][0]['text']
         article_id = testplan['selectedArticles'][0]['id']
-        tu_response, testunit = TestUnitAPI().create_quantitative_testunit(
+        tu_response, tu_payload = TestUnitAPI().create_quantitative_testunit(
             selectedMaterialTypes=[testplan['materialType'][0]])
 
+        testunit = TestUnitAPI().get_testunit_form_data(tu_response['testUnit']['testUnitId'])[0]['testUnit']
         test_date = self.get_current_date()
         shipment_date = self.get_current_date()
         current_year = self.get_current_year()
@@ -251,9 +252,9 @@ class OrdersAPIFactory(BaseAPI):
             selected_testplan_arr = []
             for testplan in payload['testPlans']:
                 selected_testplan_arr.append({
-                    'id': int(testplan['id']),
-                    'name': testplan['testPlanName'],
-                    'version': testplan['version']
+                    'id': int(testplan['testPlan']['id']),
+                    'name': testplan['testPlan']['text'],
+                    'version': 1
                 })
             payload['selectedTestPlans'] = selected_testplan_arr
             payload['testPlans'] = selected_testplan_arr
