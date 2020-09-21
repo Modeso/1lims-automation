@@ -118,6 +118,61 @@ class OrdersAPIFactory(BaseAPI):
         api = '{}{}'.format(self.url, self.END_POINTS['orders_api']['create_new_order'])
         return api, payload
 
+    @api_factory('post')
+    def create_order_with_multiple_suborders(self, no_suborders=3, suborders_fields=[]):
+        order_no = self.get_auto_generated_order_no()[0]['id']
+        test_date = self.get_current_date()
+        test_date_arr = test_date.split('-')
+        shipment_date = self.get_current_date()
+        shipment_date_arr = shipment_date.split('-')
+        current_year = self.get_current_year()
+        orderNoWithYear = "{}-{}".format(current_year, order_no)
+        contacts = random.choice(ContactsAPI().get_all_contacts()[0]['contacts'])
+        test_plan = TestPlanAPI().create_completed_testplan_random_data()
+        suborders_common_data = {
+            'orderNo': int(order_no),
+            'orderNoWithYear': orderNoWithYear,
+            'contact': [{"id": contacts['id'], "text": contacts['name'], 'No': contacts['companyNo']}],
+            'deletedTestPlans': [],
+            'deletedAnalysisIds': [],
+            'dynamicFieldsValues': [],
+            'analysisNo': [],
+            'selectedDepartments': [],
+            'orderType': {'id': 1, 'text': 'New Order'},
+            'departments': [],
+            'attachments': [],
+            'testUnits': [],
+            'selectedTestUnits': [],
+            'testPlans': [{'id': int(test_plan['selectedTestPlan']['id']),
+                           'name': test_plan['selectedTestPlan']['text'],
+                           'version': 1}],
+            'selectedTestPlans': [{'id': int(test_plan['selectedTestPlan']['id']),
+                                   'name': test_plan['selectedTestPlan']['text'],
+                                   'version': 1}],
+            'materialType': test_plan['materialType'][0],
+            'materialTypeId': test_plan['materialType'][0]['id'],
+            'article': test_plan['selectedArticles'][0],
+            'articleId': test_plan['selectedArticles'][0]['id'],
+            "withArticle": True,
+            'shipmentDate': shipment_date,
+            'testDate': test_date,
+            'year': current_year,
+            'yearOption': 1,
+            'shipmentDatedateOption': {'year': shipment_date_arr[0], 'month': shipment_date_arr[1],
+                                       'day': shipment_date_arr[2]},
+            'testDatedateOption': {'year': test_date_arr[0], 'month': test_date_arr[1], 'day': test_date_arr[2]}
+        }
+        suborders = []
+        for i in range(no_suborders):
+            sub_order_dict = {**suborders_common_data}
+            if len(suborders_fields) > i:
+                for dict_key in suborders_fields[i].keys():
+                    sub_order_dict[dict_key] = suborders_fields[i][dict_key]
+            suborders.append(sub_order_dict)
+        payload = suborders
+        api = '{}{}'.format(self.url, self.END_POINTS['orders_api']['create_new_order'])
+        return api, payload
+
     @api_factory('get')
     def get_auto_generated_order_no(self, year_option="1"):
         """
@@ -126,7 +181,7 @@ class OrdersAPIFactory(BaseAPI):
         year_option = 0 : order no with year before (2020-1668)
         :return:
         """
-        api = '{}{}'.format(self.url, self.END_POINTS['orders_api']['get_auto_generated_number'])+year_option
+        api = '{}{}'.format(self.url, self.END_POINTS['orders_api']['get_auto_generated_number']) + year_option
         return api, {}
 
     @api_factory('put')
@@ -137,7 +192,7 @@ class OrdersAPIFactory(BaseAPI):
         :return: response, payload
         """
         api = '{}{}{}'.format(self.url, self.END_POINTS['orders_api']['archive_main_order'],
-                                                str(mainorder_id))
+                              str(mainorder_id))
         return api, {}
 
     @api_factory('put')
@@ -148,7 +203,7 @@ class OrdersAPIFactory(BaseAPI):
         :return: response, payload
         """
         api = '{}{}{}'.format(self.url, self.END_POINTS['orders_api']['restore_main_order'],
-                                                str(mainorder_id))
+                              str(mainorder_id))
         return api, {}
 
     @api_factory('delete')
@@ -159,7 +214,7 @@ class OrdersAPIFactory(BaseAPI):
         :return: response, payload
         """
         api = '{}{}{}'.format(self.url, self.END_POINTS['orders_api']['delete_main_order'],
-                                               str(mainorder_id))
+                              str(mainorder_id))
         return api, {}
 
     @api_factory('put')
@@ -253,8 +308,7 @@ class OrdersAPI(OrdersAPIFactory):
 
     def get_order_with_multiple_sub_orders(self, no_suborders=1):
         api, payload = self.get_all_orders(limit=100)
-        all_orders = api['orders']
-        for order in all_orders:
+        for order in api['orders']:
             suborder = self.get_suborder_by_order_id(id=order['orderId'])[0]['orders']
             if len(suborder) > no_suborders:
                 return order
@@ -427,6 +481,22 @@ class OrdersAPI(OrdersAPIFactory):
             'materialTypeId': 1
         }
         return self.create_new_order(**payload)
+
+    def get_suborder_valid_data(self, formatted_material):
+        article_api = ArticleAPI()
+        res, payload = article_api.create_article(materialType=formatted_material,
+                                                  selectedMaterialType=[formatted_material],
+                                                  materialTypeId=formatted_material['id'])
+        article_id = article_api.get_article_id(article_name=payload['name'], article_no=payload['No'])
+        formatted_article = {'id': article_id, 'text': payload['name']}
+        test_plan = TestPlanAPI().create_completed_testplan(material_type=formatted_material['text'],
+                                                            formatted_article=formatted_article)
+        tu_res, tu_payload = TestUnitAPI().create_qualitative_testunit(selectedMaterialTypes=[formatted_material])
+        data = {'Material Type': formatted_material['text'],
+                'Article': formatted_article['text'],
+                'Test Plan': test_plan['testPlanEntity']['name'],
+                'Test Unit': tu_payload['name']}
+        return data
 
     def set_configuration(self):
         self.info('set order configuration')

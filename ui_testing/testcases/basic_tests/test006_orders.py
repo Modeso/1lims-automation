@@ -155,33 +155,57 @@ class OrdersTestCases(BaseTest):
         self.assertIn(order_number, archived_row[0].text)
         self.info('Order number: {} is archived correctly'.format(order_number))
 
-    def test005_restore_archived_orders(self):
+    @parameterized.expand(['main_order', 'suborder'])
+    def test005_restore_archived_orders(self, order_type):
         """
         I can restore any sub order successfully
-
         LIMS-4374
+
+        Orders: Restore Approach: User can restore any order from the archived table
+        LIMS-5361 (added the main order part)
         """
-        response, payload = self.orders_api.create_new_order()
-        self.assertEqual(response['status'], 1, payload)
-        order_no = payload[0]['orderNo']
-        self.info("archive order no {}".format(order_no))
-        self.orders_page.filter_by_order_no(order_no)
-        row = self.orders_page.result_table()[0]
-        self.orders_page.click_check_box(row)
-        self.orders_page.archive_selected_items()
+        self.info("create order with multiple suborders using api")
+        response, payload = self.orders_api.create_order_with_multiple_suborders()
+        self.assertEqual(response['status'], 1)
+        order_no = response['order']['orderNo']
+        order_id = response['order']['mainOrderId']
+        suborders = self.orders_api.get_suborder_by_order_id(order_id)[0]['orders']
+        number_of_suborders = len(suborders)
+        analysis_numbers = [suborder['analysis'][0] for suborder in suborders]
+        self.info("archive order no {} using api".format(order_no))
+        archive_response, _ = self.orders_api.archive_main_order(order_id)
+        self.assertEqual(archive_response['message'], 'archive_success')
         self.info("Navigate to archived orders table")
         self.orders_page.get_archived_items()
         self.orders_page.filter_by_order_no(order_no)
-        suborders_data = self.order_page.get_child_table_data(index=0)
-        self.info("Restore suborder with analysis No {}".format(suborders_data[0]['Analysis No.']))
-        self.order_page.restore_table_suborder(index=0)
+        if order_type == 'suborder':
+            random_index = randint(0, len(suborders)-1)
+            suborders_data = self.order_page.get_child_table_data()
+            self.info("Restore suborder with analysis No {}".format(suborders_data[random_index]['Analysis No.']))
+            self.order_page.restore_table_suborder(index=random_index)
+        else:
+            self.info("restore order no {}".format(order_no))
+            row = self.orders_page.result_table()[0]
+            self.orders_page.click_check_box(row)
+            self.orders_page.restore_selected_items()
+
         self.info('Navigate to orders active table')
+        self.orders_page.sleep_tiny()
         self.orders_page.get_active_items()
         self.orders_page.filter_by_order_no(order_no)
-        self.info('assert that suborder restored')
-        child_data = self.orders_page.get_child_table_data(open_child=False)
-        self.assertEqual(suborders_data[0]['Analysis No.'].replace("'", ""),
-                         child_data[0]['Analysis No.'].replace("'", ""))
+        if order_type == 'suborder':
+            self.info('assert that only one suborder restored')
+            child_data = self.orders_page.get_child_table_data(open_child=False)
+            self.assertEqual(len(child_data), 1)
+            self.assertEqual(suborders_data[random_index]['Analysis No.'].replace("'", ""),
+                             child_data[0]['Analysis No.'].replace("'", ""))
+        else:
+            self.info('assert that all suborders restored')
+            child_data = self.orders_page.get_child_table_data(open_child=True)
+            restored_analysis_numbers = [item['Analysis No.'].replace("'", "") for item in child_data]
+            self.assertEqual(len(child_data), number_of_suborders)
+            self.info('asserting restored suborders are correct')
+            self.assertCountEqual(analysis_numbers, restored_analysis_numbers)
 
     @attr(series=True)
     @skip("https://modeso.atlassian.net/browse/LIMSA-299")
@@ -2649,6 +2673,7 @@ class OrdersTestCases(BaseTest):
          Make sure that user can filter by sub & super scripts in the filter drop down list
 
          LIMS-7447
+         LIMS-7444
         """
         self.test_unit_api = TestUnitAPI()
         self.test_unit_api.set_name_configuration()
@@ -2835,7 +2860,7 @@ class OrdersTestCases(BaseTest):
         if material_type == "All":
             material_type = ''
         self.order_page.create_new_order(material_type=material_type, test_units=[testunit_name],
-                                         multiple_suborders=5, with_testplan=False)
+                                         multiple_suborders=5, test_plans=[])
         order_id = self.order_page.get_order_id()
         suborders = self.orders_api.get_suborder_by_order_id(id=order_id)
         self.info('asserting api success')
@@ -3183,17 +3208,17 @@ class OrdersTestCases(BaseTest):
         self.order_page.sleep_tiny()
         self.order_page.create_new_order(material_type=tp1_pd['materialType'][0]['text'],
                                          article=tp1_pd['selectedArticles'][0]['text'],
-                                         test_plans=[testplan1_name, testplan2_name], with_testunits=False)
+                                         test_plans=[testplan1_name, testplan2_name], test_units=[])
         self.order_page.sleep_tiny()
         order_id = self.order_page.get_order_id()
         suborders = self.orders_api.get_suborder_by_order_id(id=order_id)
-        
+
         self.info('asserting api success')
         self.assertEqual(suborders[0]['status'], 1)
         analysis_number = [suborder['analysis'][0] for suborder in suborders[0]['orders']]
         self.info('asserting there is only one analysis for this order')
         self.assertEqual(len(analysis_number), 1)
-        
+
         self.info('checking testunit for each testplan record ')
         self.order_page.get_orders_page()
         self.order_page.navigate_to_analysis_tab()
@@ -3265,7 +3290,110 @@ class OrdersTestCases(BaseTest):
                 for testunit in testunit_names:
                     self.assertIn(testunit, result['test_units'])
 
-    def test100_year_format_in_suborder_sheet(self):
+    def test095_check_list_menu(self):
+        """
+          [Orders][Active table] Make sure that list menu will contain
+          (COA,Archive , XSLX - Archived - Configurations) Only
+
+          LIMS-5358
+        """
+        options = ['Duplicate', 'CoA', 'Archive', 'XSLX', 'Archived', 'Configurations']
+        list = self.orders_page.get_right_menu_options()
+        self.assertCountEqual(list, options)
+
+    @parameterized.expand([('Name', 'Type'),
+                           ('Unit', 'No'),
+                           ('Quantification Limit', '')])
+    @attr(series=True)
+    def test096_test_unit_name_allow_user_to_filter_with_selected_two_options_order(self, search_view_option1,
+                                                                                    search_view_option2):
+        """
+         Orders: Filter test unit Approach: Allow the search criteria in
+         the drop down list in the filter section to be same as in the form
+
+         LIMS-7411
+        """
+        self.test_units_page = TstUnits()
+        self.test_units_page.get_test_units_page()
+        self.test_units_page.open_configurations()
+        self.test_units_page.open_testunit_name_configurations_options()
+        self.test_units_page.select_option_to_view_search_with(
+            view_search_options=[search_view_option1, search_view_option2])
+
+        upperLimit = self.generate_random_number(lower=50, upper=100)
+        lowerLimit = self.generate_random_number(lower=1, upper=49)
+        self.info('Create new quantitative test unit with unit and quantification')
+        response, payload = self.test_unit_api.create_quantitative_testunit(
+            useSpec=False, useQuantification=True, quantificationUpperLimit=upperLimit,
+            quantificationLowerLimit=lowerLimit, unit='m[g]{o}')
+        self.assertEqual(response['status'], 1, payload)
+        formated_tu, _ = TestUnitAPI().get_testunit_form_data(response['testUnit']['testUnitId'])
+        test_unit = [{'id': formated_tu['testUnit']['id'], 'name': formated_tu['testUnit']['name']}]
+        self.info('create new order created test unit number'.format(payload))
+        res, order = self.orders_api.create_new_order(testUnits=test_unit)
+        self.assertEqual(res['status'], 1, 'order not created with {}'.format(order))
+        if search_view_option1 == 'Name' and search_view_option2 == 'Type':
+            filter_text = payload['name']
+        elif search_view_option1 == 'Unit' and search_view_option2 == 'No':
+            filter_text = str(payload['number'])
+        else:
+            filter_text = str(payload['quantificationLowerLimit']) + '-' + str(payload['quantificationUpperLimit'])
+
+        self.orders_page.get_orders_page()
+        self.orders_page.sleep_tiny()
+        self.orders_page.open_filter_menu()
+        self.base_selenium.wait_element(element='orders:test_units_filter')
+        self.orders_page.filter_by(filter_element='orders:test_units_filter', filter_text=filter_text)
+        found_filter_text = self.base_selenium.get_text('orders:test_units_filter').replace("\n×", "")
+        if search_view_option1 == 'Name' and search_view_option2 == 'Type':
+            self.assertEqual(found_filter_text, payload['name'] + ': Quantitative')
+        elif search_view_option1 == 'Unit' and search_view_option2 == 'No':
+            self.assertEqual(found_filter_text, 'm[g]{o}: ' + str(payload['number']))
+        else:
+            self.assertEqual(found_filter_text, filter_text)
+
+        self.orders_page.filter_apply()
+        self.orders_page.sleep_tiny()
+        results = self.order_page.result_table()
+        self.assertGreaterEqual(len(results), 1)
+        for i in range(len(results) - 1):
+            suborders = self.orders_page.get_child_table_data(index=i)
+            key_found = False
+            for suborder in suborders:
+                if payload['name'] == suborder['Test Units']:
+                    key_found = True
+                    break
+            self.assertTrue(key_found)
+            # close child table
+            self.orders_page.close_child_table(source=results[i])
+
+    def test097_filter_configuration_fields(self):
+        """
+          Orders: Make sure that user can filter order TestUnit that exist
+          on order only(TestUnit in Analysis not Included)
+
+          LIMS-5379
+
+          Orders: Filter Approach: Make sure that the user can filter from the
+          default filter ( with status & dynamic fields )
+
+          LIMS-5486
+        """
+        self.info("open filter menu")
+        self.orders_page.open_filter_menu()
+        self.info("open filter configuration")
+        found_fields = self.orders_page.list_filter_feilds()
+        self.info("fields in filter are {}".format(found_fields))
+        required_fields = ['Analysis Results', 'Test Units', 'Material Type', 'Analysis No.',
+                           'Departments', 'Test Plans', 'Changed By', 'Created On', 'Shipment Date',
+                           'Test Date', 'Contact Name', 'Article Name', 'Order No.',
+                           'Forwarding', 'Status']
+
+        self.assertGreaterEqual(len(found_fields), len(required_fields))
+        for field in required_fields:
+            self.assertIn(field, found_fields)
+
+    def test098_year_format_in_suborder_sheet(self):
         """
          Analysis number format: In case the analysis number displayed with full year,
          this should reflect on the export file
@@ -3296,7 +3424,7 @@ class OrdersTestCases(BaseTest):
         self.assertIn(order_no, fixed_sheet_row_data)
         self.assertIn(analysis_no, fixed_sheet_row_data)
 
-    def test101_create_multiple_suborders_with_testplans_testunits(self):
+    def test099_create_multiple_suborders_with_testplans_testunits(self):
         """
          New: Orders: table view: Create Approach: when you create suborders with multiple
          test plans & units select the corresponding analysis that triggered according to that.
@@ -3353,4 +3481,3 @@ class OrdersTestCases(BaseTest):
                 self.assertCountEqual(test_units_names, second_suborder_test_units)
             else:
                 self.assertCountEqual(test_units_names, third_suborder_test_units)
-
