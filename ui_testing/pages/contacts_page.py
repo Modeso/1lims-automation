@@ -145,7 +145,7 @@ class Contacts(BasePages):
         self.sleep_tiny()
 
     def select_option_to_view_search_with(self, view_search_options):
-        self.info(change view search options')
+        self.info('change view search options')
         self.clear_all_selected_view_and_search_options()
         for view_search_option in view_search_options:
             if view_search_option != '':
