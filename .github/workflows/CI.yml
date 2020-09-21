@@ -21,3 +21,4 @@ jobs:
       - name: parallel execution for each module
         run: timeout 2h bash .github/workflows/execution.sh ${{ strategy.job-total }} ${{ matrix.test_cases }} ${{ github.head_ref }} ${{ github.run_id }} ${{ github.run_number }} $(pwd) 'not series' ${{ secrets.UUID }}
 
+
