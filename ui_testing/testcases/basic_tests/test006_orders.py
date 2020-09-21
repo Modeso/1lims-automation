@@ -3539,3 +3539,29 @@ class OrdersTestCases(BaseTest):
             else:
                 self.assertCountEqual(test_units_names, third_suborder_test_units)
 
+    @parameterized.expand(['update_a_field', 'no_updates'])
+    def test100_edit_order_page_then_overview(self, edit_case):
+        """
+        Orders: Popup should appear when editing then clicking on overview without saving <All data will be lost>
+        LIMS-6814
+
+        Orders: No popup should appear when clicking on overview without changing anything
+        LIMS-6821
+        """
+        random_order = random.choice(self.orders_api.get_all_orders_json())
+        self.info('edit order with No {}'.format(random_order['orderNo']))
+        self.order_page.filter_by_order_no(random_order['orderNo'])
+        row = self.orders_page.result_table()[0]
+        self.order_page.open_edit_page(row=row)
+        if edit_case == 'update_a_field':
+            self.info('update the contact field')
+            self.order_page.set_contact(remove_old=True)
+        self.order_page.click_overview()
+        if edit_case == 'update_a_field':
+            self.assertIn('All data will be lost',
+                          self.base_selenium.find_element(element='general:confirmation_pop_up').text)
+            self.assertTrue(self.order_page.confirm_popup(check_only=True))
+        else:
+            self.assertFalse(self.order_page.confirm_popup(check_only=True))
+            self.info('asserting redirection to active table')
+            self.assertEqual(self.order_page.orders_url, self.base_selenium.get_url())
