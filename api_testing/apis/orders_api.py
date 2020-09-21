@@ -62,18 +62,13 @@ class OrdersAPIFactory(BaseAPI):
         :return: response, payload
         """
         order_no = self.get_auto_generated_order_no()[0]['id']
-        testplan = random.choice(TestPlanAPI().get_completed_testplans(limit=1000))
-        material_type = testplan['materialTypes'][0]
-        material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
-        testplan_form_data = TestPlanAPI()._get_testplan_form_data(id=testplan['id'])[0]
-        article = testplan_form_data['testPlan']['selectedArticles'][0]['name']
-        article_id = testplan_form_data['testPlan']['selectedArticles'][0]['id']
-        if article == 'all':
-            article, article_id = ArticleAPI().get_random_article_articleID()
-
-        # modify_test_plan_ID
-        testplan['id'] = testplan_form_data['testPlan']['testPlanEntity']['id']
-        testunit = testplan_form_data['testPlan']['specifications'][0]
+        testplan = TestPlanAPI().create_completed_testplan_random_data()
+        material_type = testplan['materialType'][0]['text']
+        material_type_id = testplan['materialType'][0]['id']
+        article = testplan['selectedArticles'][0]['text']
+        article_id = testplan['selectedArticles'][0]['id']
+        tu_response, testunit = TestUnitAPI().create_quantitative_testunit(
+            selectedMaterialTypes=[testplan['materialType'][0]])
 
         test_date = self.get_current_date()
         shipment_date = self.get_current_date()

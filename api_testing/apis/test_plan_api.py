@@ -226,6 +226,7 @@ class TestPlanAPI(TestPlanAPIFactory):
         return test_plan_same_article
 
     def create_completed_testplan(self, material_type, formatted_article):
+        import ipdb;ipdb.set_trace()
         material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
         formatted_material = {'id': material_type_id, 'text': material_type}
         tu_response, tu_payload = TestUnitAPI().create_qualitative_testunit()
