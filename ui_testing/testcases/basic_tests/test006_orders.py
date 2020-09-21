@@ -155,33 +155,57 @@ class OrdersTestCases(BaseTest):
         self.assertIn(order_number, archived_row[0].text)
         self.info('Order number: {} is archived correctly'.format(order_number))
 
-    def test005_restore_archived_orders(self):
+    @parameterized.expand(['main_order', 'suborder'])
+    def test005_restore_archived_orders(self, order_type):
         """
         I can restore any sub order successfully
-
         LIMS-4374
+
+        Orders: Restore Approach: User can restore any order from the archived table
+        LIMS-5361 (added the main order part)
         """
-        response, payload = self.orders_api.create_new_order()
-        self.assertEqual(response['status'], 1, payload)
-        order_no = payload[0]['orderNo']
-        self.info("archive order no {}".format(order_no))
-        self.orders_page.filter_by_order_no(order_no)
-        row = self.orders_page.result_table()[0]
-        self.orders_page.click_check_box(row)
-        self.orders_page.archive_selected_items()
+        self.info("create order with multiple suborders using api")
+        response, payload = self.orders_api.create_order_with_multiple_suborders()
+        self.assertEqual(response['status'], 1)
+        order_no = response['order']['orderNo']
+        order_id = response['order']['mainOrderId']
+        suborders = self.orders_api.get_suborder_by_order_id(order_id)[0]['orders']
+        number_of_suborders = len(suborders)
+        analysis_numbers = [suborder['analysis'][0] for suborder in suborders]
+        self.info("archive order no {} using api".format(order_no))
+        archive_response, _ = self.orders_api.archive_main_order(order_id)
+        self.assertEqual(archive_response['message'], 'archive_success')
         self.info("Navigate to archived orders table")
         self.orders_page.get_archived_items()
         self.orders_page.filter_by_order_no(order_no)
-        suborders_data = self.order_page.get_child_table_data(index=0)
-        self.info("Restore suborder with analysis No {}".format(suborders_data[0]['Analysis No.']))
-        self.order_page.restore_table_suborder(index=0)
+        if order_type == 'suborder':
+            random_index = randint(0, len(suborders)-1)
+            suborders_data = self.order_page.get_child_table_data()
+            self.info("Restore suborder with analysis No {}".format(suborders_data[random_index]['Analysis No.']))
+            self.order_page.restore_table_suborder(index=random_index)
+        else:
+            self.info("restore order no {}".format(order_no))
+            row = self.orders_page.result_table()[0]
+            self.orders_page.click_check_box(row)
+            self.orders_page.restore_selected_items()
+
         self.info('Navigate to orders active table')
+        self.orders_page.sleep_tiny()
         self.orders_page.get_active_items()
         self.orders_page.filter_by_order_no(order_no)
-        self.info('assert that suborder restored')
-        child_data = self.orders_page.get_child_table_data(open_child=False)
-        self.assertEqual(suborders_data[0]['Analysis No.'].replace("'", ""),
-                         child_data[0]['Analysis No.'].replace("'", ""))
+        if order_type == 'suborder':
+            self.info('assert that only one suborder restored')
+            child_data = self.orders_page.get_child_table_data(open_child=False)
+            self.assertEqual(len(child_data), 1)
+            self.assertEqual(suborders_data[random_index]['Analysis No.'].replace("'", ""),
+                             child_data[0]['Analysis No.'].replace("'", ""))
+        else:
+            self.info('assert that all suborders restored')
+            child_data = self.orders_page.get_child_table_data(open_child=True)
+            restored_analysis_numbers = [item['Analysis No.'].replace("'", "") for item in child_data]
+            self.assertEqual(len(child_data), number_of_suborders)
+            self.info('asserting restored suborders are correct')
+            self.assertCountEqual(analysis_numbers, restored_analysis_numbers)
 
     @attr(series=True)
     @skip("https://modeso.atlassian.net/browse/LIMSA-299")
@@ -1391,46 +1415,60 @@ class OrdersTestCases(BaseTest):
     #     self.assertFalse(self.order_page.is_testunit_existing(
     #         test_unit=payload['name']))
     #
-    # def test039_duplicate_sub_order_table_with_add(self):
-    #     """
-    #     Orders: User can duplicate any suborder from the order form ( table with add )
-    #     LIMS-3738
-    #     :return:
-    #     """
-    #     # get random order
-    #     self.info('select random record')
-    #     orders, payload = self.orders_api.get_all_orders(limit=20)
-    #     data_before_duplicate_main_order = random.choice(orders['orders'])
-    #
-    #     self.orders_page.get_order_edit_page_by_id(id=data_before_duplicate_main_order['id'])
-    #     data_before_duplicate = self.order_page.get_suborder_data()
-    #
-    #     self.order_page.duplicate_from_table_view(index_to_duplicate_from=0)
-    #     after_duplicate_order = self.order_page.get_suborder_data()
-    #
-    #     # make sure that the new order has same order No
-    #     self.assertEqual(data_before_duplicate['orderNo'].replace("'", ""),
-    #                      after_duplicate_order['orderNo'].replace("'", ""))
-    #     # compare the contacts between two records
-    #     self.assertCountEqual(data_before_duplicate['contacts'], after_duplicate_order['contacts'])
-    #     # compare the data of suborders data in both orders
-    #     self.assertNotEqual(data_before_duplicate['suborders'], after_duplicate_order['suborders'])
-    #
-    #     # save the duplicated order
-    #     self.order_page.save(save_btn='orders:save_order')
-    #     # go back to the table view
-    #     self.order_page.get_orders_page()
-    #     # search for the created order no
-    #     self.order_page.search(after_duplicate_order['orderNo'])
-    #     suborder_data = self.order_page.get_child_table_data()[0]
-    #     order_result = self.order_page.result_table()[0].text
-    #     # check that it exists
-    #     self.assertIn(after_duplicate_order['orderNo'].replace("'", ""), order_result.replace("'", ""))
-    #     self.orders_page.navigate_to_analysis_active_table()
-    #     self.order_page.search(suborder_data['Analysis No.'])
-    #     analysis_result = self.order_page.result_table()[0].text
-    #     self.assertIn(suborder_data['Analysis No.'].replace("'", ""), analysis_result.replace("'", ""))
-    #
+    def test039_duplicate_sub_order_table_with_add(self):
+        """
+         Orders: User can duplicate any suborder from the order form ( table with add )
+
+         LIMS-3738
+
+         [Orders][Active Table]Make sure that every record should display the main order
+         and when user click on it suborders will be expanded
+
+         LIMS-5356
+         
+         [Orders][Archive Table]Make sure that every record should display the main order
+         and when user click on it will display suborders under order record
+         
+         LIMS-5357
+        """
+        self.info('select random record')
+        random_order = random.choice(self.orders_api.get_all_orders_json())
+        suborders = self.orders_api.get_suborder_by_order_id(random_order['orderId'])[0]['orders']
+        contacts = [contact['name'] for contact in random_order['company']]
+        self.orders_page.filter_by_order_no(random_order['orderNo'])
+        row = self.orders_page.result_table()[0]
+        self.info('assert that child table arrow exist')
+        childtable_arrow = self.base_selenium.find_element_in_element(
+            destination_element='general:child_table_arrow', source=row)
+        self.assertTrue(childtable_arrow)
+        childtable_arrow.click()
+        self.orders_page.sleep_tiny()
+        self.info("assert when click in child table arrow, all suborders appears")
+        suborders_data = self.orders_page.get_table_data()
+        self.assertEqual(len(suborders), len(suborders_data))
+        for i in range(len(suborders)):
+            self.assertEqual(suborders_data[i]['Analysis No.'].replace("'", ""), suborders[i]['analysis'][0])
+        self.info("open order edit page")
+        self.orders_page.open_edit_page_by_css_selector(row)
+        self.orders_page.sleep_small()
+        self.info("Duplicate first suborder from table view")
+        self.order_page.duplicate_from_table_view(index_to_duplicate_from=0)
+        after_duplicate_order = self.order_page.get_suborder_data()
+        self.info("make sure that the new order has same order No and contact")
+        self.assertEqual(random_order['orderNo'], after_duplicate_order['orderNo'].replace("'", ""))
+        self.assertCountEqual(contacts, after_duplicate_order['contacts'])
+        self.info("save the duplicated order")
+        self.order_page.save(save_btn='orders:save_order')
+        self.info("go back to the table view, and assert that duplicated suborder added to child table")
+        self.order_page.get_orders_page()
+        self.order_page.filter_by_order_no(random_order['orderNo'])
+        suborder_data = self.order_page.get_child_table_data()
+        self.assertTrue(len(suborder_data), len(suborders)+1)
+        self.orders_page.navigate_to_analysis_active_table()
+        self.analyses_page.filter_by_analysis_number(suborder_data[0]['Analysis No.'])
+        analysis_result = self.analyses_page.get_the_latest_row_data()['Analysis No.'].replace("'", "")
+        self.assertEqual(suborder_data[0]['Analysis No.'].replace("'", ""), analysis_result)
+
     # def test040_Duplicate_sub_order_and_cahange_materiel_type(self):
     #     """
     #     duplicate sub-order of any order then change the materiel type
@@ -3188,13 +3226,13 @@ class OrdersTestCases(BaseTest):
         self.order_page.sleep_tiny()
         order_id = self.order_page.get_order_id()
         suborders = self.orders_api.get_suborder_by_order_id(id=order_id)
-        
+
         self.info('asserting api success')
         self.assertEqual(suborders[0]['status'], 1)
         analysis_number = [suborder['analysis'][0] for suborder in suborders[0]['orders']]
         self.info('asserting there is only one analysis for this order')
         self.assertEqual(len(analysis_number), 1)
-        
+
         self.info('checking testunit for each testplan record ')
         self.order_page.get_orders_page()
         self.order_page.navigate_to_analysis_tab()
@@ -3304,11 +3342,22 @@ class OrdersTestCases(BaseTest):
             test_units = [item['Test Unit'] for item in child_data]
             self.assertCountEqual(test_units, test_units_names[i*2:(i*2)+2])
 
+    def test095_check_list_menu(self):
+        """
+          [Orders][Active table] Make sure that list menu will contain
+          (COA,Archive , XSLX - Archived - Configurations) Only
+
+          LIMS-5358
+        """
+        options = ['Duplicate', 'CoA', 'Archive', 'XSLX', 'Archived', 'Configurations']
+        list = self.orders_page.get_right_menu_options()
+        self.assertCountEqual(list, options)
+
     @parameterized.expand([('Name', 'Type'),
                            ('Unit', 'No'),
                            ('Quantification Limit', '')])
     @attr(series=True)
-    def test100_test_unit_name_allow_user_to_filter_with_selected_two_options_order(self, search_view_option1,
+    def test096_test_unit_name_allow_user_to_filter_with_selected_two_options_order(self, search_view_option1,
                                                                                     search_view_option2):
         """
          Orders: Filter test unit Approach: Allow the search criteria in
@@ -3370,7 +3419,7 @@ class OrdersTestCases(BaseTest):
             # close child table
             self.orders_page.close_child_table(source=results[i])
 
-    def test095_filter_configuration_fields(self):
+    def test097_filter_configuration_fields(self):
         """
           Orders: Make sure that user can filter order TestUnit that exist
           on order only(TestUnit in Analysis not Included)
@@ -3396,7 +3445,7 @@ class OrdersTestCases(BaseTest):
         for field in required_fields:
             self.assertIn(field, found_fields)
 
-    def test100_year_format_in_suborder_sheet(self):
+    def test098_year_format_in_suborder_sheet(self):
         """
          Analysis number format: In case the analysis number displayed with full year,
          this should reflect on the export file
@@ -3427,7 +3476,7 @@ class OrdersTestCases(BaseTest):
         self.assertIn(order_no, fixed_sheet_row_data)
         self.assertIn(analysis_no, fixed_sheet_row_data)
 
-    def test101_create_multiple_suborders_with_testplans_testunits(self):
+    def test099_create_multiple_suborders_with_testplans_testunits(self):
         """
          New: Orders: table view: Create Approach: when you create suborders with multiple
          test plans & units select the corresponding analysis that triggered according to that.
