@@ -370,9 +370,15 @@ class TestPlanAPI(TestPlanAPIFactory):
         article_data = ArticleAPI().get_formatted_article_with_formatted_material_type(materialType)
         article_name = article_data['name']
         formatted_article = {'id': article_data['id'], 'text': article_name}
-        tst1 = TestPlanAPI().create_completed_testplan(
+        tp_1 = TestPlanAPI().create_completed_testplan(
                     material_type='Raw Material', formatted_article=formatted_article)
-        tst2 = TestPlanAPI().create_completed_testplan(
+        tp_2 = TestPlanAPI().create_completed_testplan(
                     material_type='Raw Material', formatted_article=formatted_article)
-        return tst1, tst2, article_name
+        formatted_material_type = {'id': tp_1['materialType'][0]['id'], 'text': tp_1['materialType'][0]['name']}
+        formatted_testPlan1 = {'id': int(tp_1['id']), 'name': tp_1['testPlanEntity']['name'], 'version': 1}
+        formatted_testPlan2 = {'id': int(tp_2['id']), 'name': tp_2['testPlanEntity']['name'], 'version': 1}
+        created_data = {'material_type': formatted_material_type,
+                        'article': formatted_article,
+                        'testPlans': [formatted_testPlan1, formatted_testPlan2]}
+        return created_data
 
