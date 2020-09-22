@@ -145,6 +145,7 @@ class Order(Orders):
         self.set_contact(contact=contact)
         self.sleep_small()
         self.set_departments(departments=departments)
+        self.sleep_small()
         self.set_material_type(material_type=material_type)
         self.sleep_small()
 
@@ -162,6 +163,7 @@ class Order(Orders):
             suggested_test_units = self.base_selenium.get_drop_down_suggestion_list(element='order:test_unit',
                                                                           item_text=' ')
         for test_plan in test_plans:
+            print(test_plan)
             self.set_test_plan(test_plan=test_plan)
 
         for test_unit in test_units:
@@ -725,7 +727,7 @@ class Order(Orders):
             row=suborders[index],
             table_element='order:suborder_table')
         popup_element = self.base_selenium.find_element_in_element(
-            source=suborders_elements['Test Plan:'], destination_element='order:testplan_popup_btn')
+            source=suborders_elements['Test Plan: *'], destination_element='order:testplan_popup_btn')
         popup_element.click()
         self.sleep_small()
         results = []

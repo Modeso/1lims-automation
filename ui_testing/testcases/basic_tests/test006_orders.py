@@ -3458,19 +3458,28 @@ class OrdersTestCases(BaseTest):
             else:
                 self.assertCountEqual(test_units_names, third_suborder_test_units)
 
-    def test102_check_test_unit_displayed_correct_under_test_plan(self):
+    def test103_check_test_unit_displayed_correct_under_test_plan(self):
+        '''
+         Orders: Test Plan: Test unit pop up Approach: Make sure the test units that displayed below test plan, it belongs to this test plan
+         LIMS-4793
+        :return:
+        '''
         article_data = ArticleAPI().get_article_with_material_type(material_type='Raw Material')
         formatted_article = {'id': article_data['id'], 'text': article_data['name']}
         tp_list = []
+        tp_names = []
+        self.info('create 3 completed testplans')
         for _ in range(3):
             tp1 = TestPlanAPI().create_completed_testplan(material_type='Raw Material',
                                                           formatted_article=formatted_article)
-            print(tp1)
+            tp_names.append(tp1['testPlanEntity']['name'])
             tp_list.append(tp1)
-        self.order_page.create_new_order(material_type='Raw Material',test_units=[], test_plans=tp_list, save=False)
+        self.info('create order with testplans {},{},{}'.format(tp_names[0], tp_names[1], tp_names[2]))
+        self.order_page.create_new_order(material_type='Raw Material', test_units=[], test_plans=tp_names,
+                                         article=article_data['name'])
         data = self.order_page.get_testplan_pop_up()
-        for i in data:
-            print('11>', tp_list[i]['testPlan']['text'])
-            print('222>', data[i]['test_plan'])
-            print('333>', tp_list[i]['testUnits'])
-            print('444>', data[i]['test_units'])
+        for i in range(len(data)):
+            self.info('assert test unit : {} is displayed correctly under its corresponding testplan :{} '.format(
+                data[i]['test_units'][0], tp_list[i]['testPlanEntity']['name']))
+            self.assertEqual(tp_list[i]['testPlanEntity']['name'], data[i]['test_plan'])
+            self.assertEqual(tp_list[i]['specifications'][0]['name'], data[i]['test_units'][0])
