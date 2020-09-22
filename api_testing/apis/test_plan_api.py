@@ -365,20 +365,20 @@ class TestPlanAPI(TestPlanAPIFactory):
             payload = json.load(read_file)
         super().set_configuration(payload=payload)
 
-    def create_multiple_test_plan_with_same_article(self):
+    def create_multiple_test_plan_with_same_article(self, no_of_testplans=2):
         materialType = {"id": 1, "text": 'Raw Material'}
         article_data = ArticleAPI().get_formatted_article_with_formatted_material_type(materialType)
         article_name = article_data['name']
         formatted_article = {'id': article_data['id'], 'text': article_name}
-        tp_1 = TestPlanAPI().create_completed_testplan(
-                    material_type='Raw Material', formatted_article=formatted_article)
-        tp_2 = TestPlanAPI().create_completed_testplan(
-                    material_type='Raw Material', formatted_article=formatted_article)
-        formatted_material_type = {'id': tp_1['materialType'][0]['id'], 'text': tp_1['materialType'][0]['name']}
-        formatted_testPlan1 = {'id': int(tp_1['id']), 'name': tp_1['testPlanEntity']['name'], 'version': 1}
-        formatted_testPlan2 = {'id': int(tp_2['id']), 'name': tp_2['testPlanEntity']['name'], 'version': 1}
+        formatted_material_type = {'id': 1, 'text': 'Raw Material'}
+        testPlans = []
+        for _ in range(no_of_testplans):
+            tp = TestPlanAPI().create_completed_testplan(
+                        material_type='Raw Material', formatted_article=formatted_article)
+            testPlans.append({'id': int(tp['id']), 'name': tp['testPlanEntity']['name'], 'version': 1})
+
         created_data = {'material_type': formatted_material_type,
                         'article': formatted_article,
-                        'testPlans': [formatted_testPlan1, formatted_testPlan2]}
+                        'testPlans': testPlans}
         return created_data
 

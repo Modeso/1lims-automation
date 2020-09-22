@@ -512,7 +512,7 @@ class OrdersAPI(OrdersAPIFactory):
         suborders = []
         for _ in range(no_suborders):
             suborder = {}
-            created_suborder_data = TestPlanAPI().create_multiple_test_plan_with_same_article()
+            created_suborder_data = TestPlanAPI().create_multiple_test_plan_with_same_article(no_of_testplans=2)
             suborder['testPlans'] = created_suborder_data['testPlans']
             suborder['selectedTestPlans'] = created_suborder_data['testPlans']
             suborder['materialType'] = created_suborder_data['material_type']
