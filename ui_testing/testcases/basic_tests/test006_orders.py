@@ -3575,7 +3575,7 @@ class OrdersTestCases(BaseTest):
             test_units = [item['Test Unit'] for item in child_data]
             self.assertCountEqual(test_units, test_units_names[i * 2:(i * 2) + 2])
 
-    def test106_choose_test_plans_without_test_units(self):
+    def test106_multiple_suborders(self):
         """
         Orders: Table with add: Allow user to add any number of the suborders records not only 5 suborders
 
@@ -3588,11 +3588,15 @@ class OrdersTestCases(BaseTest):
         self.orders_page.get_order_edit_page_by_id(response['order']['mainOrderId'])
         suborder_table = self.base_selenium.get_table_rows(element='order:suborder_table')
         self.assertEqual(len(suborder_table), 10)
+        self.order_page.create_new_suborder(material_type=testPlan['materialType'][0]['text'],
+                                            article_name=testPlan['selectedArticles'][0]['text'],
+                                            test_plans=[testPlan['testPlan']['text']], test_units=[])
+        self.order_page.sleep_tiny()
+        self.order_page.save(save_btn='order:save_btn')
         self.info('duplicate 5 suborders')
         self.order_page.duplicate_from_table_view(number_of_duplicates=5)
-        self.order_page.save(save_btn='order:save_btn')
-        self.base_selenium.refresh()
+        self.order_page.save_and_wait(save_btn='order:save_btn')
         table_after2 = self.base_selenium.get_table_rows(element='order:suborder_table')
-        self.assertEqual(len(table_after2), 15)
+        self.assertEqual(len(table_after2), 16)
         self.order_page.navigate_to_analysis_tab()
-        self.assertEqual(SingleAnalysisPage().get_analysis_count(), 15)
+        self.assertEqual(SingleAnalysisPage().get_analysis_count(), 16)
