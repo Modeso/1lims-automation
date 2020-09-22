@@ -164,7 +164,6 @@ class Order(Orders):
             suggested_test_units = self.base_selenium.get_drop_down_suggestion_list(element='order:test_unit',
                                                                           item_text=' ')
         for test_plan in test_plans:
-            print(test_plan)
             self.set_test_plan(test_plan=test_plan)
 
         for test_unit in test_units:
