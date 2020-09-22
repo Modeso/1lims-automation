@@ -62,19 +62,15 @@ class OrdersAPIFactory(BaseAPI):
         :return: response, payload
         """
         order_no = self.get_auto_generated_order_no()[0]['id']
-        testplan = random.choice(TestPlanAPI().get_completed_testplans(limit=1000))
-        material_type = testplan['materialTypes'][0]
-        material_type_id = GeneralUtilitiesAPI().get_material_id(material_type)
-        testplan_form_data = TestPlanAPI()._get_testplan_form_data(id=testplan['id'])[0]
-        article = testplan_form_data['testPlan']['selectedArticles'][0]['name']
-        article_id = testplan_form_data['testPlan']['selectedArticles'][0]['id']
-        if article == 'all':
-            article, article_id = ArticleAPI().get_random_article_articleID()
+        testplan = TestPlanAPI().create_completed_testplan_random_data()
+        material_type = testplan['materialType'][0]['text']
+        material_type_id = testplan['materialType'][0]['id']
+        article = testplan['selectedArticles'][0]['text']
+        article_id = testplan['selectedArticles'][0]['id']
+        tu_response, tu_payload = TestUnitAPI().create_quantitative_testunit(
+            selectedMaterialTypes=[testplan['materialType'][0]])
 
-        # modify_test_plan_ID
-        testplan['id'] = testplan_form_data['testPlan']['testPlanEntity']['id']
-        testunit = testplan_form_data['testPlan']['specifications'][0]
-
+        testunit = TestUnitAPI().get_testunit_form_data(tu_response['testUnit']['testUnitId'])[0]['testUnit']
         test_date = self.get_current_date()
         shipment_date = self.get_current_date()
         current_year = self.get_current_year()
@@ -115,6 +111,61 @@ class OrdersAPIFactory(BaseAPI):
             }]
         payload = self.update_payload(_payload, **kwargs)
         payload = self._format_payload(payload)
+        api = '{}{}'.format(self.url, self.END_POINTS['orders_api']['create_new_order'])
+        return api, payload
+
+    @api_factory('post')
+    def create_order_with_multiple_suborders(self, no_suborders=3, suborders_fields=[]):
+        order_no = self.get_auto_generated_order_no()[0]['id']
+        test_date = self.get_current_date()
+        test_date_arr = test_date.split('-')
+        shipment_date = self.get_current_date()
+        shipment_date_arr = shipment_date.split('-')
+        current_year = self.get_current_year()
+        orderNoWithYear = "{}-{}".format(current_year, order_no)
+        contacts = random.choice(ContactsAPI().get_all_contacts()[0]['contacts'])
+        test_plan = TestPlanAPI().create_completed_testplan_random_data()
+        suborders_common_data = {
+            'orderNo': int(order_no),
+            'orderNoWithYear': orderNoWithYear,
+            'contact': [{"id": contacts['id'], "text": contacts['name'], 'No': contacts['companyNo']}],
+            'deletedTestPlans': [],
+            'deletedAnalysisIds': [],
+            'dynamicFieldsValues': [],
+            'analysisNo': [],
+            'selectedDepartments': [],
+            'orderType': {'id': 1, 'text': 'New Order'},
+            'departments': [],
+            'attachments': [],
+            'testUnits': [],
+            'selectedTestUnits': [],
+            'testPlans': [{'id': int(test_plan['selectedTestPlan']['id']),
+                           'name': test_plan['selectedTestPlan']['text'],
+                           'version': 1}],
+            'selectedTestPlans': [{'id': int(test_plan['selectedTestPlan']['id']),
+                                   'name': test_plan['selectedTestPlan']['text'],
+                                   'version': 1}],
+            'materialType': test_plan['materialType'][0],
+            'materialTypeId': test_plan['materialType'][0]['id'],
+            'article': test_plan['selectedArticles'][0],
+            'articleId': test_plan['selectedArticles'][0]['id'],
+            "withArticle": True,
+            'shipmentDate': shipment_date,
+            'testDate': test_date,
+            'year': current_year,
+            'yearOption': 1,
+            'shipmentDatedateOption': {'year': shipment_date_arr[0], 'month': shipment_date_arr[1],
+                                       'day': shipment_date_arr[2]},
+            'testDatedateOption': {'year': test_date_arr[0], 'month': test_date_arr[1], 'day': test_date_arr[2]}
+        }
+        suborders = []
+        for i in range(no_suborders):
+            sub_order_dict = {** suborders_common_data}
+            if len(suborders_fields) > i:
+                for dict_key in suborders_fields[i].keys():
+                    sub_order_dict[dict_key] = suborders_fields[i][dict_key]
+            suborders.append(sub_order_dict)
+        payload = suborders
         api = '{}{}'.format(self.url, self.END_POINTS['orders_api']['create_new_order'])
         return api, payload
 
@@ -199,9 +250,9 @@ class OrdersAPIFactory(BaseAPI):
             selected_testplan_arr = []
             for testplan in payload['testPlans']:
                 selected_testplan_arr.append({
-                    'id': int(testplan['id']),
-                    'name': testplan['testPlanName'],
-                    'version': testplan['version']
+                    'id': int(testplan['testPlan']['id']),
+                    'name': testplan['testPlan']['text'],
+                    'version': 1
                 })
             payload['selectedTestPlans'] = selected_testplan_arr
             payload['testPlans'] = selected_testplan_arr
@@ -253,8 +304,7 @@ class OrdersAPI(OrdersAPIFactory):
 
     def get_order_with_multiple_sub_orders(self, no_suborders=1):
         api, payload = self.get_all_orders(limit=100)
-        all_orders = api['orders']
-        for order in all_orders:
+        for order in api['orders']:
             suborder = self.get_suborder_by_order_id(id=order['orderId'])[0]['orders']
             if len(suborder) > no_suborders:
                 return order
@@ -457,3 +507,42 @@ class OrdersAPI(OrdersAPIFactory):
         with open(config_file, "r") as read_file:
             payload = json.load(read_file)
         super().set_configuration(payload=payload)
+
+    def create_order_with_multiple_suborders_double_tp(self, no_suborders=3):
+        suborders = []
+        for _ in range(no_suborders):
+            suborder = {}
+            created_suborder_data = TestPlanAPI().create_multiple_test_plan_with_same_article(no_of_testplans=2)
+            suborder['testPlans'] = created_suborder_data['testPlans']
+            suborder['selectedTestPlans'] = created_suborder_data['testPlans']
+            suborder['materialType'] = created_suborder_data['material_type']
+            suborder['materialTypeId'] = created_suborder_data['material_type']['id']
+            suborder['article'] = created_suborder_data['article']
+            suborder['articleId'] = created_suborder_data['article']['id']
+            suborders.append(suborder)
+        return self.create_order_with_multiple_suborders(no_suborders=no_suborders, suborders_fields=suborders)
+
+    def get_suborders_data_of_test_plan_list(self, test_plans_list):
+        first_test_plan_dict = {'id': int(test_plans_list[0]['selectedTestPlan']['id']),
+                                'name': test_plans_list[0]['selectedTestPlan']['text'],
+                                'version': 1}
+        second_test_plan_dict = {'id': int(test_plans_list[1]['selectedTestPlan']['id']),
+                                 'name': test_plans_list[1]['selectedTestPlan']['text'],
+                                 'version': 1}
+        first_material = test_plans_list[0]['materialType'][0]
+        second_material = test_plans_list[1]['materialType'][0]
+        first_article = test_plans_list[0]['selectedArticles'][0]
+        second_article = test_plans_list[1]['selectedArticles'][0]
+        update_suborder = [{'testPlans': [first_test_plan_dict],
+                            'selectedTestPlans': [first_test_plan_dict],
+                            'materialType': first_material,
+                            'materialTypeId': first_material['id'],
+                            'article': first_article,
+                            'articleId': first_article['id']},
+                           {'testPlans': [second_test_plan_dict],
+                            'selectedTestPlans': [second_test_plan_dict],
+                            'materialType': second_material,
+                            'materialTypeId': second_material['id'],
+                            'article': second_article,
+                            'articleId': second_article['id']}]
+        return update_suborder

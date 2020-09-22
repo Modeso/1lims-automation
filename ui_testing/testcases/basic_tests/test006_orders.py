@@ -2501,7 +2501,7 @@ class OrdersTestCases(BaseTest):
         self.info('asserting the order with order number {} is created'.format(order_no))
         self.assertIn(order_no_with_year, results[0].text.replace("'", ""))
 
-    #@skip("https://modeso.atlassian.net/browse/LIMSA-299")
+    # @skip("https://modeso.atlassian.net/browse/LIMSA-299")
     def test074_create_existing_order_change_contact(self):
         """
          Create existing order then change the contact for this existing one,
@@ -3459,7 +3459,7 @@ class OrdersTestCases(BaseTest):
             else:
                 self.assertCountEqual(test_units_names, third_suborder_test_units)
 
-    def test100_check_validation_date_validation_by(self):
+    def test103_check_validation_date_validation_by(self):
         '''
         Orders: Validation date & Validation by : check that when user update the validation date & the validation by,
          the update should reflect on order's child table
@@ -3467,25 +3467,28 @@ class OrdersTestCases(BaseTest):
         :return:
         '''
         self.single_analysis_page = SingleAnalysisPage()
-        #random_order = random.choice(self.orders_api.get_all_orders_json())
-        #response, payload = self.orders_api.create_new_order()
-        #self.assertEqual(response['status'], 1, payload)
-        #order_no = payload[0]['orderNo']
-        order_no = self.order_page.create_new_order(material_type='Raw Material')
-        #self.info('edit order with No {}'.format(order_no))
-        #self.orders_page.get_order_edit_page_by_id(order_no)
+        order_response, order_payload = self.orders_api.create_new_order()
+        self.assertEqual(order_response['status'], 1, order_payload)
+        order_no = order_payload[0]['orderNo']
+        self.info('edit order with No {}'.format(order_no))
+        self.orders_page.get_order_edit_page_by_id(order_response['order']['mainOrderId'])
         self.order_page.sleep_small()
+        self.info('navigate to analysis tab')
         self.order_page.navigate_to_analysis_tab()
         self.single_analysis_page.set_testunit_values()
+        self.info('change validation options to conform')
         self.single_analysis_page.change_validation_options(text='Conform')
         self.order_page.get_orders_page()
         self.orders_page.filter_by_order_no(filter_text=order_no)
         suborders_data = self.order_page.get_child_table_data(index=0)
-        self.assertEqual(suborders_data[0]['Validation by'],self.base_selenium.username)
+        self.info('assert validation by is set correctly')
+        self.assertEqual(suborders_data[0]['Validation by'], self.base_selenium.username)
         today = date.today()
         curr_date = today.strftime("%d.%m.%Y")
-        self.assertEqual(suborders_data[0]['Validation date'],curr_date)
+        self.assertEqual(suborders_data[0]['Validation date'], curr_date)
         analysis_no = suborders_data[0]['Analysis No.']
+        self.info(
+            'go to analysis table and assert validation by and validation options are set correctly as in order active table')
         self.orders_page.navigate_to_analysis_active_table()
         self.analyses_page.filter_by_analysis_number(analysis_no)
         analysis_data = self.analyses_page.get_the_latest_row_data()
@@ -3500,12 +3503,13 @@ class OrdersTestCases(BaseTest):
         self.login_page.logout()
         self.login_page.login(username=payload['username'], password=payload['password'])
         self.base_selenium.wait_until_page_url_has(text='dashboard')
-        self.orders_page.get_order_edit_page_by_id(int(order_no.split('-')[0])+1)
+        self.orders_page.get_order_edit_page_by_id(order_response['order']['mainOrderId'])
+        self.info('change validation options so validation by is changed to {}',payload['username'])
         self.order_page.navigate_to_analysis_tab()
         self.single_analysis_page.change_validation_options(text='Approved')
         self.orders_page.get_orders_page()
         self.orders_page.navigate_to_order_active_table()
         self.orders_page.filter_by_order_no(filter_text=order_no)
         suborders_after = self.order_page.get_child_table_data(index=0)
-        self.assertEqual(suborders_after[0]['Validation by'],payload['username'])
+        self.assertEqual(suborders_after[0]['Validation by'], payload['username'])
         self.assertEqual(suborders_after[0]['Validation date'], curr_date)

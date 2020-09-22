@@ -351,4 +351,4 @@ class Orders(BasePages):
 
     def navigate_to_order_active_table(self):
         self.base_selenium.click(element='orders:order_tab')
-        self.orders_page.sleep_medium()
+        self.sleep_medium()
