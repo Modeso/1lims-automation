@@ -218,7 +218,8 @@ class TestPlanAPI(TestPlanAPIFactory):
 
     def get_completed_testplans_with_material_and_same_article(self, material_type, article, articleNo):
         all_test_plans = self.get_completed_testplans(limit=1000)
-        completed_test_plans = [test_plan for test_plan in all_test_plans if test_plan['materialTypes'] == material_type]
+        completed_test_plans = [test_plan for test_plan in all_test_plans if
+                                test_plan['materialTypes'] == material_type]
         test_plan_same_article = []
         for testplan in completed_test_plans:
             if testplan['article'][0] in [article, 'all'] and testplan['articleNo'][0] in [articleNo, 'all']:
@@ -304,7 +305,7 @@ class TestPlanAPI(TestPlanAPIFactory):
                                                  materialType=[formatted_material],
                                                  materialTypeId=[material_type_id])
         if testplan['message'] == 'operation_success':
-            return self.get_testplan_form_data(id= payload['number'])
+            return self.get_testplan_form_data(id=payload['number'])
         else:
             self.info(testplan)
 
@@ -319,7 +320,6 @@ class TestPlanAPI(TestPlanAPIFactory):
             return (self.get_testplan_form_data(id=payload['number']))
         else:
             raise Exception(f'cant create the test plan with payload {payload}')
-
 
     def create_completed_testplan_random_data(self, no_testunits=1):
         random_article = random.choice(ArticleAPI().get_all_articles_json())
@@ -364,3 +364,20 @@ class TestPlanAPI(TestPlanAPIFactory):
         with open(config_file, "r") as read_file:
             payload = json.load(read_file)
         super().set_configuration(payload=payload)
+
+    def create_multiple_test_plan_with_same_article(self):
+        materialType = {"id": 1, "text": 'Raw Material'}
+        article_data = ArticleAPI().get_formatted_article_with_formatted_material_type(materialType)
+        article_name = article_data['name']
+        formatted_article = {'id': article_data['id'], 'text': article_name}
+        tp_1 = TestPlanAPI().create_completed_testplan(
+            material_type='Raw Material', formatted_article=formatted_article)
+        tp_2 = TestPlanAPI().create_completed_testplan(
+            material_type='Raw Material', formatted_article=formatted_article)
+        formatted_material_type = {'id': tp_1['materialType'][0]['id'], 'text': tp_1['materialType'][0]['name']}
+        formatted_testPlan1 = {'id': int(tp_1['id']), 'name': tp_1['testPlanEntity']['name'], 'version': 1}
+        formatted_testPlan2 = {'id': int(tp_2['id']), 'name': tp_2['testPlanEntity']['name'], 'version': 1}
+        created_data = {'material_type': formatted_material_type,
+                        'article': formatted_article,
+                        'testPlans': [formatted_testPlan1, formatted_testPlan2]}
+        return created_data

@@ -28,6 +28,7 @@ class OrdersTestCases(BaseTest):
         self.analyses_page = AllAnalysesPage()
         self.contacts_api = ContactsAPI()
         self.test_unit_api = TestUnitAPI()
+        self.article_api = ArticleAPI()
         self.set_authorization(auth=self.contacts_api.AUTHORIZATION_RESPONSE)
         self.order_page.get_orders_page()
         self.test_unit_api.set_name_configuration_name_only()
@@ -3481,3 +3482,25 @@ class OrdersTestCases(BaseTest):
                 self.assertCountEqual(test_units_names, second_suborder_test_units)
             else:
                 self.assertCountEqual(test_units_names, third_suborder_test_units)
+
+    def test100_check_testunit_after_change_article(self):
+        """
+         Orders with test units: Edit the article and check that test unit is not affected
+         LIMS-3422
+               """
+        self.info('create new order')
+        res, payload = self.orders_api.create_order_with_test_units(no_of_test_units=1)
+        self.assertEqual(res['status'], 1)
+        self.info('get order test unit')
+        selected_testunits = payload[0]['testUnits'][0]['name']
+        self.info('edit order and update article')
+        self.order_page.get_order_edit_page_by_id(id=res['order']['mainOrderId'])
+        api, _payload = self.article_api.get_all_articles()
+        new_article = random.choice(api['articles'])['name']
+        self.order_page.update_suborder(articles=new_article)
+        self.order_page.save()
+        self.info('get test unit after update article')
+        suborder = self.order_page.get_suborder_data()['suborders'][0]
+        testunits_after_edit_article = suborder['testunits'][0]['name']
+        self.info('Assert that test unit doesnt affected by updating article')
+        self.assertEqual(selected_testunits, testunits_after_edit_article)
