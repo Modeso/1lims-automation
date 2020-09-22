@@ -320,7 +320,6 @@ class TestPlanAPI(TestPlanAPIFactory):
         else:
             raise Exception(f'cant create the test plan with payload {payload}')
 
-
     def create_completed_testplan_random_data(self, no_testunits=1):
         random_article = random.choice(ArticleAPI().get_all_articles_json())
         formatted_article = {'id': random_article['id'], 'text': random_article['name']}
@@ -358,9 +357,55 @@ class TestPlanAPI(TestPlanAPIFactory):
                     testplan_materials.append(tp['materialTypes'][0])
         return testplan_materials
 
+    def create_double_completed_testplan_same_name_diff_material(self, **kwargs):
+        self.info("create completed test plan with random data")
+        testplan1 = self.create_completed_testplan_random_data()
+        test_plan_name_dict = {'id': 'new', 'text': testplan1['testPlan']['text']}
+        new_material = random.choice(GeneralUtilitiesAPI().get_material_types_without_duplicate(
+            testplan1['materialType'][0]['text']))
+        new_material_id = GeneralUtilitiesAPI().get_material_id(new_material)
+        formatted_material = {'id': new_material_id, 'text': new_material}
+        tu_response, _ = TestUnitAPI().create_qualitative_testunit(selectedMaterialTypes=[formatted_material])
+        testunit_data = TestUnitAPI().get_testunit_form_data(id=tu_response['testUnit']['testUnitId'])[0]['testUnit']
+        formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
+        self.info("create completed test plan with same name {} and new material {}".format(
+            testplan1['testPlan']['text'], new_material))
+        formatted_article = ArticleAPI().get_formatted_article_with_formatted_material_type(
+            material_type=formatted_material)
+        response, testplan2 = self.create_testplan(selectedTestPlan=test_plan_name_dict,
+                                                   testPlan=test_plan_name_dict,
+                                                   testUnits=[formated_testunit],
+                                                   selectedArticles=[formatted_article],
+                                                   materialType=[formatted_material],
+                                                   materialTypeId=[new_material_id])
+
+        if response['message'] == 'name_already_exist':
+            testplan2['testPlan']['id'] = response['testPlanDetails']['testPlanId']
+            testplan2['selectedTestPlan']['id'] = response['testPlanDetails']['testPlanId']
+            return [testplan1, testplan2]
+        else:
+            raise Exception(f'cant create the test plan with payload {testplan2}')
+
     def set_configuration(self):
         self.info('set test Plan configuration')
         config_file = os.path.abspath('api_testing/config/test_plan.json')
         with open(config_file, "r") as read_file:
             payload = json.load(read_file)
         super().set_configuration(payload=payload)
+
+    def create_multiple_test_plan_with_same_article(self, no_of_testplans=2):
+        materialType = {"id": 1, "text": 'Raw Material'}
+        article_data = ArticleAPI().get_formatted_article_with_formatted_material_type(materialType)
+        article_name = article_data['name']
+        formatted_article = {'id': article_data['id'], 'text': article_name}
+        formatted_material_type = {'id': 1, 'text': 'Raw Material'}
+        testPlans = []
+        for _ in range(no_of_testplans):
+            tp = TestPlanAPI().create_completed_testplan(
+                        material_type='Raw Material', formatted_article=formatted_article)
+            testPlans.append({'id': int(tp['id']), 'name': tp['testPlanEntity']['name'], 'version': 1})
+
+        created_data = {'material_type': formatted_material_type,
+                        'article': formatted_article,
+                        'testPlans': testPlans}
+        return created_data
