@@ -3558,8 +3558,7 @@ class OrdersTestCases(BaseTest):
             self.order_page.set_contact(remove_old=True)
         self.order_page.click_overview()
         if edit_case == 'update_a_field':
-            self.assertIn('All data will be lost',
-                          self.base_selenium.find_element(element='general:confirmation_pop_up').text)
+            self.assertIn('All data will be lost', self.order_page.get_confirmation_pop_up_text())
             self.assertTrue(self.order_page.confirm_popup(check_only=True))
         else:
             self.assertFalse(self.order_page.confirm_popup(check_only=True))
