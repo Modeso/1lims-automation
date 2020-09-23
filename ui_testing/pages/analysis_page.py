@@ -74,7 +74,7 @@ class SingleAnalysisPage(AllAnalysesPage):
             records_data.append(temp_record)
         return records_data
 
-    def set_testunit_values(self,lower=0, upper=100):
+    def set_quantitative_testunit_values(self, lower=0, upper=100):
         self.open_accordion_for_analysis_index()
         testunit_value_fields = self.base_selenium.find_elements(element='analysis_page:testunits_analysis')
         value = self.generate_random_number(lower=lower, upper=upper)
@@ -92,4 +92,4 @@ class SingleAnalysisPage(AllAnalysesPage):
                 element='analysis_page:validation_options', options_element='general:drop_down_div')
 
         self.base_selenium.click(element='general:save')
-        self.sleep_medium()
+        self.sleep_small()

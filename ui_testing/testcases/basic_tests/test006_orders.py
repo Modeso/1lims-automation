@@ -3539,63 +3539,6 @@ class OrdersTestCases(BaseTest):
             else:
                 self.assertCountEqual(test_units_names, third_suborder_test_units)
 
-
-    def test103_check_validation_date_validation_by(self):
-        '''
-        Orders: Validation date & Validation by : check that when user update the validation date & the validation by,
-         the update should reflect on order's child table
-         LIMS-7729
-        :return:
-        '''
-        self.single_analysis_page = SingleAnalysisPage()
-        order_response, order_payload = self.orders_api.create_new_order()
-        self.assertEqual(order_response['status'], 1, order_payload)
-        order_no = order_payload[0]['orderNo']
-        self.info('edit order with No {}'.format(order_no))
-        self.orders_page.get_order_edit_page_by_id(order_response['order']['mainOrderId'])
-        self.order_page.sleep_small()
-        self.info('navigate to analysis tab')
-        self.order_page.navigate_to_analysis_tab()
-        self.single_analysis_page.set_testunit_values()
-        self.info('change validation options to conform')
-        self.single_analysis_page.change_validation_options(text='Conform')
-        self.order_page.get_orders_page()
-        self.orders_page.filter_by_order_no(filter_text=order_no)
-        suborders_data = self.order_page.get_child_table_data(index=0)
-        self.info('assert validation by is set correctly')
-        self.assertEqual(suborders_data[0]['Validation by'], self.base_selenium.username)
-        today = date.today()
-        curr_date = today.strftime("%d.%m.%Y")
-        self.assertEqual(suborders_data[0]['Validation date'], curr_date)
-        analysis_no = suborders_data[0]['Analysis No.']
-        self.info(
-            'go to analysis table and assert validation by and validation options are set correctly as in order active table')
-        self.orders_page.navigate_to_analysis_active_table()
-        self.analyses_page.filter_by_analysis_number(analysis_no)
-        analysis_data = self.analyses_page.get_the_latest_row_data()
-        self.assertEqual(suborders_data[0]['Validation by'], analysis_data['Validation by'])
-        self.assertEqual(suborders_data[0]['Validation date'], analysis_data['Validation date'])
-        self.order_page.get_orders_page()
-        self.login_page = Login()
-        self.info('Calling the users api to create a new user with username')
-        response, payload = UsersAPI().create_new_user()
-        self.assertEqual(response['status'], 1, payload)
-        self.orders_page.sleep_tiny()
-        self.login_page.logout()
-        self.login_page.login(username=payload['username'], password=payload['password'])
-        self.base_selenium.wait_until_page_url_has(text='dashboard')
-        self.orders_page.get_order_edit_page_by_id(order_response['order']['mainOrderId'])
-        self.info('change validation options so validation by is changed to {}',payload['username'])
-        self.order_page.navigate_to_analysis_tab()
-        self.single_analysis_page.change_validation_options(text='Approved')
-        self.orders_page.get_orders_page()
-        self.orders_page.navigate_to_order_active_table()
-        self.orders_page.filter_by_order_no(filter_text=order_no)
-        suborders_after = self.order_page.get_child_table_data(index=0)
-        self.assertEqual(suborders_after[0]['Validation by'], payload['username'])
-        self.assertEqual(suborders_after[0]['Validation date'], curr_date)
-                  
-                  
     def test101_choose_test_plans_without_test_units(self):
         """
         Orders: Create: Orders Choose test plans without test units
@@ -3634,7 +3577,7 @@ class OrdersTestCases(BaseTest):
             test_units = [item['Test Unit'] for item in child_data]
             self.assertCountEqual(test_units, test_units_names[i * 2:(i * 2) + 2])
 
-    def test106_multiple_suborders(self):
+    def test102_multiple_suborders(self):
         """
         Orders: Table with add: Allow user to add any number of the suborders records not only 5 suborders
 
@@ -3660,7 +3603,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.navigate_to_analysis_tab()
         self.assertEqual(SingleAnalysisPage().get_analysis_count(), 16)
 
-    def test102_create_order_with_test_plans_with_same_name(self):
+    def test103_create_order_with_test_plans_with_same_name(self):
         """
         Orders: Create Approach: Make sure In case you create two test plans with the same name
         and different materiel type, the test units that belongs to them displayed correct in
@@ -3691,7 +3634,7 @@ class OrdersTestCases(BaseTest):
             self.assertEqual(test_units_name, test_units_list[i])
              
     @parameterized.expand(['update_a_field', 'no_updates'])
-    def test103_edit_order_page_then_overview(self, edit_case):
+    def test104_edit_order_page_then_overview(self, edit_case):
         """
         Orders: Popup should appear when editing then clicking on overview without saving <All data will be lost>
         LIMS-6814
@@ -3714,5 +3657,4 @@ class OrdersTestCases(BaseTest):
         else:
             self.assertFalse(self.order_page.confirm_popup(check_only=True))
             self.info('asserting redirection to active table')
-            self.assertEqual(self.order_page.orders_url, self.base_selenium.get_url())  
-
+            self.assertEqual(self.order_page.orders_url, self.base_selenium.get_url())
