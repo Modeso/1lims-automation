@@ -3631,4 +3631,17 @@ class OrdersTestCases(BaseTest):
             self.assertEqual(len(test_units), 1)
             test_units_name = test_units[0]['Test Unit Name'].split(' ')[0]
             self.assertEqual(test_units_name, test_units_list[i])
+    def test107_check_that_two_testunits_with_same_name_displayed_in_one_testplan(self):
+        """
+       Orders: Test plan Approach: test units pop-up: In case I have two test units with the same name
+       in one test plan, both of them should display in the test units pop-up.
+
+        LIMS-4800
+        """
+        self.test_plan_api = TestPlanAPI()
+        response, payload = self.test_unit_api.create_qualitative_testunit(name='testt')
+        response2, payload2 =self.test_unit_api.create_qualitative_testunit(name='testt')
+        import ipdb;
+        ipdb.set_trace()
+        response_testplan, payload_testplan = self.test_plan_api.create_testplan(testUnits= [payload['name']])
 
