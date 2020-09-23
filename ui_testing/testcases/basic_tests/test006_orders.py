@@ -3489,14 +3489,14 @@ class OrdersTestCases(BaseTest):
          LIMS-3422
                """
         self.info('create new order')
-        res, payload = self.orders_api.create_order_with_test_units(no_of_test_units=1)
-        self.assertEqual(res['status'], 1)
+        api, payload = self.orders_api.create_order_with_test_units(no_of_test_units=1)
+        self.assertEqual(api['status'], 1)
         self.info('get order test unit')
         selected_testunits = payload[0]['testUnits'][0]['name']
         self.info('edit order and update article')
-        self.order_page.get_order_edit_page_by_id(id=res['order']['mainOrderId'])
-        api, _payload = self.article_api.get_all_articles()
-        new_article = random.choice(api['articles'])['name']
+        self.order_page.get_order_edit_page_by_id(id=api['order']['mainOrderId'])
+        res, _ = self.article_api.get_all_articles()
+        new_article = random.choice(res['articles'])['name']
         self.order_page.update_suborder(articles=new_article)
         self.order_page.save()
         self.info('get test unit after update article')
