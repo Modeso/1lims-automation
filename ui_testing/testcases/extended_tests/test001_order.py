@@ -218,7 +218,7 @@ class OrdersExtendedTestCases(BaseTest):
         self.order_page.sleep_small()
         self.info('navigate to analysis tab')
         self.order_page.navigate_to_analysis_tab()
-        self.single_analysis_page.set_quantitative_testunit_values()
+        self.single_analysis_page.set_testunit_values()
         self.info('change validation options to conform')
         self.single_analysis_page.change_validation_options(text='Conform')
         self.order_page.get_orders_page()
