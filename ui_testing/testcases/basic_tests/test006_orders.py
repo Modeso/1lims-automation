@@ -3658,3 +3658,39 @@ class OrdersTestCases(BaseTest):
             self.assertFalse(self.order_page.confirm_popup(check_only=True))
             self.info('asserting redirection to active table')
             self.assertEqual(self.order_page.orders_url, self.base_selenium.get_url())
+
+    def test105_delete_archived_order_without_all_suborders(self):
+        """
+         [Archiving][MainOrder]Make sure that user able to delete the archived orders with all suborders,
+         and analysis of the order without affecting the active orders
+
+         LIMS-5405
+        """
+        self.info('create order with 3 suborders')
+        response, payload = self.orders_api.create_order_with_multiple_suborders(no_suborders=3)
+        self.assertEqual(response['message'], 'created_success')
+        suborders, _ = self.orders_api.get_suborder_by_order_id(response['order']['mainOrderId'])
+        analysis = [suborder['analysis'][0] for suborder in suborders['orders']]
+        self.orders_page.filter_by_order_no(filter_text=payload[0]['orderNo'])
+        self.info('archive the main order from active table')
+        self.assertTrue(self.orders_page.archive_main_order_from_order_option(check_pop_up=True))
+        self.orders_page.get_archived_items()
+        self.orders_page.filter_by_order_no(payload[0]['orderNo'])
+        rows = self.orders_page.result_table()
+        self.assertEqual(len(rows)-1, 1)
+        self.info('assert main orders with its suborders in archived table')
+        suborders = self.orders_page.get_child_table_data()
+        analysis_no_list = [analysis['Analysis No.'].replace("'", "") for analysis in suborders]
+        self.assertCountEqual(analysis_no_list, analysis)
+        self.orders_page.click_check_box(rows[0])
+        self.order_page.delete_selected_item()
+        self.orders_page.confirm_popup()
+        self.info('filter by order no {} to make sure no result found'.format(payload[0]['orderNo']))
+        self.orders_page.filter_by_order_no(payload[0]['orderNo'])
+        results = self.orders_page.result_table()[0]
+        self.assertTrue(results.get_attribute("textContent"), 'No data available in table')
+        self.info('assert active table not affected by deleted order')
+        self.orders_page.get_active_items()
+        self.orders_page.filter_by_order_no(payload[0]['orderNo'])
+        results = self.orders_page.result_table()[0]
+        self.assertTrue(results.get_attribute("textContent"), 'No data available in table')
