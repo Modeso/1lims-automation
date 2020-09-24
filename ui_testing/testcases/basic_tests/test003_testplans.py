@@ -741,7 +741,7 @@ class TestPlansTestCases(BaseTest):
                 material_type=selected_material_types[i], test_plans=['test222'], check_testunits_testplans=True, save=False)
             self.info('asserting test222 appears in testplans suggesstion list when selecting material type {}'.format(
                 selected_material_types[i]))
-            self.assertIn('t0', suggested_testplans)
+            self.assertIn('test222', suggested_testplans)
             self.order_page.get_orders_page()
             self.order_page.confirm_popup(force=True)
 
