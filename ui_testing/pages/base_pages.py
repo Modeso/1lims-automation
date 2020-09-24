@@ -434,12 +434,15 @@ class BasePages:
         if apply_button:
             apply_button.click()
 
-    def set_all_configure_table_columns_to_specific_value(self, value=True, always_hidden_columns=['']):
+    def set_all_configure_table_columns_to_specific_value(self, value=True, always_hidden_columns=[''], child=False,
+                                                          source_element_to_find='general:configure_table_items') :
         self.open_configure_table()
+        if child :
+            self.base_selenium.click(element='general:configure_child_table')
         total_columns = self.base_selenium.find_elements_in_element(
-            source_element='general:configure_table_items',
+            source_element=source_element_to_find,
             destination_element='general:li')
-        for column in total_columns:
+        for column in total_columns :
             self.change_column_view(column=column, value=value, always_hidden_columns=always_hidden_columns)
         self.press_apply_in_configure_table()
 

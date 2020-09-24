@@ -10,6 +10,7 @@ from ui_testing.pages.analysis_page import AllAnalysesPage
 from api_testing.apis.article_api import ArticleAPI
 from api_testing.apis.test_unit_api import TestUnitAPI
 from ui_testing.pages.analysis_page import SingleAnalysisPage
+from ui_testing.pages.base_pages import BasePages
 from api_testing.apis.contacts_api import ContactsAPI
 from api_testing.apis.test_plan_api import TestPlanAPI
 from api_testing.apis.users_api import UsersAPI
@@ -3658,3 +3659,34 @@ class OrdersTestCases(BaseTest):
             self.assertFalse(self.order_page.confirm_popup(check_only=True))
             self.info('asserting redirection to active table')
             self.assertEqual(self.order_page.orders_url, self.base_selenium.get_url())
+
+    def test107_analysis_number_displayed_in_order_child_table(self) :
+        """
+          Orders: Analysis number Approach: Make sure that the analysis number
+          should display in the order child table
+          LIMS-2622
+        """
+        self.base_pages = BasePages()
+        self.base_pages.set_all_configure_table_columns_to_specific_value(child=True,
+                                                                          source_element_to_find='general:configure_child_table_items')
+        self.orders_page.open_child_table(self.orders_page.result_table()[0])
+        self.info("Check if Analysis No. heading is displayed in Child Table")
+        headers = self.base_selenium.get_table_head_elements(element='general:table_child')
+        Child_table_headings = [i.text for i in headers]
+        self.assertIn('Analysis No.', Child_table_headings)
+
+        self.info("Searching by the analysis number displayed in child table")
+        self.order_page.get_orders_page()
+        random_row = self.orders_page.get_random_table_row(table_element='general:table')
+        self.base_selenium.get_row_cells_dict_related_to_header(random_row)
+        self.orders_page.open_child_table(source=random_row)
+        child_table_data = self.order_page.get_table_data()
+        self.orders_page.filter_by_analysis_number(filter_text=child_table_data[0]['Analysis No.'])
+        child_data_after_filter = self.order_page.get_child_table_data()
+        self.assertEqual(child_table_data[0]['Analysis No.'].replace("'", ""),
+                         child_data_after_filter[0]['Analysis No.'])
+
+        # self.info("Checking the highlighted text background colour")
+        # color = self.base_selenium.element_background_color(element='orders:highlighted_element')
+        # self.info( "Hightlight colour 'yellow' in rgb equals'Hex=ffff00,dec(255,255,0) and in rgba equals 'Hex=ffff0059' ")
+        # self.assertEqual(color, 'rgba(255, 255, 0, 0.35)')

@@ -557,6 +557,9 @@ elements = {
                                'value': '//span[contains(text(),"Analysis")]'},
         'order_analysis_tab': {'method': 'xpath',
                                'value': '//span[contains(text(),"Orders")]'},
+        'highlighted_element' :
+            {'method' : 'xpath',
+             'value' : '//*[@id="DataTables_Table_0"]/tbody/tr[1]/td[13]/app-column-display/span/span/mark'},
         'new_order': {'method': 'id',
                       'value': 'add-btn'},
         'right_menu': {'method': 'xpath',
