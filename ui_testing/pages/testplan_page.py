@@ -117,8 +117,7 @@ class TstPlan(TestPlans):
         self.sleep_small()
         return self.base_selenium.get_text(element='test_plan:test_unit_category')
 
-
-    def create_new_test_plan(self, name='', material_type='', article='', test_unit='', save=True,multiple_material_types=False, **kwargs):
+    def create_new_test_plan(self, name='', material_type='', article='', test_unit='', save=True, **kwargs):
         self.info(' Create new test plan')
         self.test_plan_name = name or self.generate_random_text()
         self.material_type = material_type
@@ -126,21 +125,12 @@ class TstPlan(TestPlans):
         self.click_create_test_plan_button()
         self.sleep_small()
         self.set_test_plan(name=self.test_plan_name)
-        if not multiple_material_types:
-            if self.material_type:
-                self.info(' With {} material type'.format(material_type))
-                self.set_material_type(material_type=self.material_type)
-            else:
-                self.info(' With random material type')
-                self.material_type = self.set_material_type(random=True)
-
+        if self.material_type:
+            self.info(' With {} material type'.format(material_type))
+            self.set_material_type(material_type=self.material_type)
         else:
-            all_material_types = GeneralUtilitiesAPI().list_all_material_types()[0]['materialTypes']
-            material_type_names = [material['name'] for material in all_material_types]
-            material_types = random.sample(material_type_names, 3)
-            for i in range(3):
-                self.set_material_type(material_type=material_types[i])
-
+            self.info(' With random material type')
+            self.material_type = self.set_material_type(random=True)
         self.sleep_tiny()
 
         if self.article:
@@ -156,7 +146,6 @@ class TstPlan(TestPlans):
             self.sleep_tiny()
             if save:
                 self.save(save_btn='test_plan:save_and_complete')
-                return self.test_plan_name
 
         if save:
             self.save(save_btn='test_plan:save_btn')
