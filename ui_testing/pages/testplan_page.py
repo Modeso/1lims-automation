@@ -1,6 +1,4 @@
 from ui_testing.pages.testplans_page import TestPlans
-import random
-from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 
 class TstPlan(TestPlans):
     def get_no(self):
