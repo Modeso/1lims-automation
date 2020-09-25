@@ -1,5 +1,6 @@
 from ui_testing.pages.testplans_page import TestPlans
 
+
 class TstPlan(TestPlans):
     def get_no(self):
         self.base_selenium.wait_until_element_located("test_plan:no")
@@ -114,6 +115,7 @@ class TstPlan(TestPlans):
         self.navigate_to_testunits_selection_page()
         self.sleep_small()
         return self.base_selenium.get_text(element='test_plan:test_unit_category')
+
 
     def create_new_test_plan(self, name='', material_type='', article='', test_unit='', save=True, **kwargs):
         self.info(' Create new test plan')
