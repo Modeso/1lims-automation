@@ -86,7 +86,7 @@ class TestPlanAPIFactory(BaseAPI):
         return api, {}
 
     @api_factory('post')
-    def create_testplan(self, name='', **kwargs):
+    def create_testplan(self, **kwargs):
         """
         NOTE: calling this api without adding testunits, will create an in progress testplan, to create a complete testplan
         you will need to pass parameter testunits[testunit_object], and this object is can be formated by the following steps,
@@ -112,10 +112,7 @@ class TestPlanAPIFactory(BaseAPI):
         and then use the return of this mapping function test_unit_page.map_testunit_to_testplan_format(testunit=formdata_testunit) to add it to the testunits array
         """
         api = '{}{}'.format(self.url, self.END_POINTS['test_plan_api']['create_testplan'])
-        if name == '':
-            testplan_name = self.generate_random_string()
-        else:
-            testplan_name = name
+        testplan_name = self.generate_random_string()
         _payload = {
             'number': self.generate_random_number(),
             'testPlan': {
@@ -323,7 +320,7 @@ class TestPlanAPI(TestPlanAPIFactory):
         else:
             raise Exception(f'cant create the test plan with payload {payload}')
 
-    def create_completed_testplan_random_data(self, no_testunits=1, no_material_types=1,name=''):
+    def create_completed_testplan_random_data(self, no_testunits=1, no_material_types=1):
         formatted_articles = []
         formatted_materials = []
         material_type_ids = []
@@ -351,7 +348,7 @@ class TestPlanAPI(TestPlanAPIFactory):
             formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
             formated_testunits.append(formated_testunit)
 
-        testplan, payload = self.create_testplan(name=name, testUnits=formated_testunits,
+        testplan, payload = self.create_testplan(testUnits=formated_testunits,
                                                  selectedArticles=formatted_articles,
                                                  materialType=formatted_materials,
                                                  materialTypeId=material_type_ids)
