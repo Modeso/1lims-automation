@@ -729,6 +729,8 @@ class TestPlansTestCases(BaseTest):
         LIMS-7519
         """
         testplan = self.test_plan_api.create_completed_testplan_random_data(no_material_types=3, name='test222')
+        testplan_name = testplan['testPlan']['text']
+        self.info('created testplan with name: {}'.format(testplan_name))
         selected_material_types = [material_type['text'] for material_type in testplan['materialType']]
         selected_articles = [article['text'] for article in testplan['selectedArticles']]
         Order().get_orders_page()
@@ -736,12 +738,12 @@ class TestPlansTestCases(BaseTest):
             order_no, suggested_test_units, suggested_testplans = Order().create_new_order(article=selected_articles[i],
                                                                                            material_type=
                                                                                            selected_material_types[i],
-                                                                                           test_plans=['test222'],
+                                                                                           test_plans=[testplan_name],
                                                                                            check_testunits_testplans=
                                                                                            True,
                                                                                            save=False)
-            self.info('asserting test222 appears in testplans suggesstion list when selecting material type {}'.format(
-                selected_material_types[i]))
-            self.assertIn('test222', suggested_testplans)
+            self.info('asserting testplan {} appears in testplans suggesstion list when selecting material type {}'.format(
+                testplan_name, selected_material_types[i]))
+            self.assertIn(testplan_name, suggested_testplans)
             Order().get_orders_page()
             Order().confirm_popup(force=True)
