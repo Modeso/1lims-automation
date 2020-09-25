@@ -86,7 +86,7 @@ class TestPlanAPIFactory(BaseAPI):
         return api, {}
 
     @api_factory('post')
-    def create_testplan(self, **kwargs):
+    def create_testplan(self, name='', **kwargs):
         """
         NOTE: calling this api without adding testunits, will create an in progress testplan, to create a complete testplan
         you will need to pass parameter testunits[testunit_object], and this object is can be formated by the following steps,
@@ -112,7 +112,10 @@ class TestPlanAPIFactory(BaseAPI):
         and then use the return of this mapping function test_unit_page.map_testunit_to_testplan_format(testunit=formdata_testunit) to add it to the testunits array
         """
         api = '{}{}'.format(self.url, self.END_POINTS['test_plan_api']['create_testplan'])
-        testplan_name = self.generate_random_string()
+        if name == '':
+            testplan_name = self.generate_random_string()
+        else:
+            testplan_name = name
         _payload = {
             'number': self.generate_random_number(),
             'testPlan': {
@@ -320,15 +323,27 @@ class TestPlanAPI(TestPlanAPIFactory):
         else:
             raise Exception(f'cant create the test plan with payload {payload}')
 
-    def create_completed_testplan_random_data(self, no_testunits=1):
+    def create_completed_testplan_random_data(self, no_testunits=1, no_material_types=1,name=''):
+        formatted_articles = []
+        formatted_materials = []
+        material_type_ids = []
         random_article = random.choice(ArticleAPI().get_all_articles_json())
         formatted_article = {'id': random_article['id'], 'text': random_article['name']}
         material_type_id = GeneralUtilitiesAPI().get_material_id(random_article['materialType'])
         formatted_material = {'id': material_type_id, 'text': random_article['materialType']}
+        for i in range(no_material_types):
+            formatted_articles.append(formatted_article)
+            material_type_ids.append(material_type_id)
+            formatted_materials.append(formatted_material)
+            random_article = random.choice(
+                ArticleAPI().get_article_with_different_material(random_article['materialType']))
+            formatted_article = {'id': random_article['id'], 'text': random_article['name']}
+            material_type_id = GeneralUtilitiesAPI().get_material_id(random_article['materialType'])
+            formatted_material = {'id': material_type_id, 'text': random_article['materialType']}
         # creates test unit with values in it
         formated_testunits = []
         for testunit in range(no_testunits):
-            tu_response, _ = TestUnitAPI().create_quantitative_testunit(selectedMaterialTypes=[formatted_material])
+            tu_response, _ = TestUnitAPI().create_quantitative_testunit(selectedMaterialTypes=formatted_materials[0])
             if tu_response['status'] == 2:
                 continue
             testunit_data = TestUnitAPI().get_testunit_form_data(id=tu_response['testUnit']['testUnitId'])[0][
@@ -336,10 +351,10 @@ class TestPlanAPI(TestPlanAPIFactory):
             formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
             formated_testunits.append(formated_testunit)
 
-        testplan, payload = self.create_testplan(testUnits=formated_testunits,
-                                                 selectedArticles=[formatted_article],
-                                                 materialType=[formatted_material],
-                                                 materialTypeId=[material_type_id])
+        testplan, payload = self.create_testplan(name=name, testUnits=formated_testunits,
+                                                 selectedArticles=formatted_articles,
+                                                 materialType=formatted_materials,
+                                                 materialTypeId=material_type_ids)
 
         if testplan['message'] == 'operation_success':
             payload['testPlan']['id'] = testplan['testPlanDetails']['testPlanId']

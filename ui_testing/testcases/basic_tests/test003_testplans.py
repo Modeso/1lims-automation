@@ -728,20 +728,20 @@ class TestPlansTestCases(BaseTest):
         in case multiple material types are selected
         LIMS-7519
         """
-        self.order_page = Order()
-        all_testunits, payload = TestUnitAPI().get_all_test_units(filter='{"materialTypes":"all"}')
-        testunit = random.choice(all_testunits['testUnits'])
-        self.test_plan.get_test_plans_page()
-        self.test_plan.create_new_test_plan(name='test222', article='All', test_unit=testunit['name'],
-                                                 multiple_material_types=True)
-        selected_material_types = TestPlanAPI().get_testplan_with_quicksearch(quickSearchText='test222')[0]['materialTypes']
-        self.order_page.get_orders_page()
+        testplan = self.test_plan_api.create_completed_testplan_random_data(no_material_types=3, name='test222')
+        selected_material_types = [material_type['text'] for material_type in testplan['materialType']]
+        selected_articles = [article['text'] for article in testplan['selectedArticles']]
+        Order().get_orders_page()
         for i in range(3):
-            order_no, suggested_test_units, suggested_testplans = self.order_page.create_new_order(
-                material_type=selected_material_types[i], test_plans=['test222'], check_testunits_testplans=True, save=False)
+            order_no, suggested_test_units, suggested_testplans = Order().create_new_order(article=selected_articles[i],
+                                                                                           material_type=
+                                                                                           selected_material_types[i],
+                                                                                           test_plans=['test222'],
+                                                                                           check_testunits_testplans=
+                                                                                           True,
+                                                                                           save=False)
             self.info('asserting test222 appears in testplans suggesstion list when selecting material type {}'.format(
                 selected_material_types[i]))
             self.assertIn('test222', suggested_testplans)
-            self.order_page.get_orders_page()
-            self.order_page.confirm_popup(force=True)
-
+            Order().get_orders_page()
+            Order().confirm_popup(force=True)
