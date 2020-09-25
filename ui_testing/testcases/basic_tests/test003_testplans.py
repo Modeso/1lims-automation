@@ -728,7 +728,7 @@ class TestPlansTestCases(BaseTest):
         in case multiple material types are selected
         LIMS-7519
         """
-        testplan = self.test_plan_api.create_completed_testplan_random_data(no_material_types=3, name='test222')
+        testplan = self.test_plan_api.create_completed_testplan_random_data(no_material_types=3)
         testplan_name = testplan['testPlan']['text']
         self.info('created testplan with name: {}'.format(testplan_name))
         selected_material_types = [material_type['text'] for material_type in testplan['materialType']]
