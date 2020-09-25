@@ -3658,3 +3658,21 @@ class OrdersTestCases(BaseTest):
             self.assertFalse(self.order_page.confirm_popup(check_only=True))
             self.info('asserting redirection to active table')
             self.assertEqual(self.order_page.orders_url, self.base_selenium.get_url())
+
+    def test105_check_new_fields_are_displayed_in_XSLX(self):
+        """
+        Orders: Export : check that the fields of "Forwarding" , "Report sent by", "validation date" and
+        "validation by" are displaying in excel sheet
+        LIMS-7727
+        """
+        random_order = random.choice(self.orders_api.get_all_orders_json())
+        fields = ['Forwarding', 'Report sent by', 'Validation date', 'Validation by']
+        self.orders_page.filter_by_order_no(random_order['orderNo'])
+        row = self.orders_page.result_table()[0]
+        self.assertTrue(row)
+        self.orders_page.click_check_box(source=row)
+        self.order_page.download_xslx_sheet()
+        self.info('Comparing the downloaded  order ')
+        for field in fields:
+            self.info('asserting {} field is displayed in xslx sheet'.format(field))
+            self.assertIn(field, self.order_page.sheet)
