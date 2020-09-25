@@ -10,6 +10,7 @@ from ui_testing.pages.analysis_page import AllAnalysesPage
 from api_testing.apis.article_api import ArticleAPI
 from api_testing.apis.test_unit_api import TestUnitAPI
 from ui_testing.pages.analysis_page import SingleAnalysisPage
+from ui_testing.pages.base_pages import BasePages
 from api_testing.apis.contacts_api import ContactsAPI
 from api_testing.apis.test_plan_api import TestPlanAPI
 from api_testing.apis.users_api import UsersAPI
@@ -3659,13 +3660,13 @@ class OrdersTestCases(BaseTest):
             self.info('asserting redirection to active table')
             self.assertEqual(self.order_page.orders_url, self.base_selenium.get_url())
 
-    def test105_check_added_dynamic_field_displayed_in_edit_order(self) :
+    def test106_check_added_dynamic_field_displayed_in_configuration_main_table(self) :
         """
-        check that added dynamic fields will be displayed in edit order screen
-        LIMS-7871
-        check that added dynamic field will be displayed in order main table
-        LIMS-7865
+        orders : configuration menu : check that added dynamic field will be displayed in configuration main table
+        LIMS-7866
         """
+
+        self.base_pages = BasePages()
         self.info("set order configuration to add dynamic field to section 1")
         self.general_utilities_api = GeneralUtilitiesAPI()
         if not self.general_utilities_api.is_dynamic_field_existing(field_name='Text'):
@@ -3675,15 +3676,25 @@ class OrdersTestCases(BaseTest):
         self.order_page.rename_dynamic_field(field='orders:text_field_dragged', value=random_name)
         self.order_page.get_orders_page()
         self.orders_page.sleep_tiny()
-        self.info('Assert the added field is visible in main order table')
+        self.info('Assert the added field is displayed in configuration main menu')
+        fields_in_main_configurations_menu=self.orders_page.get_configurations_options()
+        self.assertIn(random_name, fields_in_main_configurations_menu)
+
+        self.info("If check box of the added dynamic field is checked it is displayed in grid view")
+        self.order_page.get_orders_page()
+        self.base_pages.set_all_configure_table_columns_to_specific_value()
         header_elements = self.base_selenium.get_table_head_elements_with_tr(element='general:table')
-        for i in header_elements:
+        for i in header_elements :
             headers = i.text.split('\n')
         self.assertIn(random_name, headers)
-        self.info("navigate to random order's edit page")
-        random_order = random.choice(self.orders_api.get_all_orders_json())
-        self.orders_page.get_order_edit_page_by_id(random_order['id'])
-        visible_fields_in_edit_order_screen = self.base_selenium.find_elements(element='order:section1_titles')
-        section1_fields = [field.text for field in visible_fields_in_edit_order_screen]
-        self.info('Assert the added field is visible in edit order page')
-        self.assertIn('{}:'.format(random_name), section1_fields)
+
+
+
+
+
+
+
+
+
+
+
