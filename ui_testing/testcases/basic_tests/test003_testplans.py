@@ -9,6 +9,7 @@ from api_testing.apis.orders_api import OrdersAPI
 from api_testing.apis.users_api import UsersAPI
 from api_testing.apis.test_unit_api import TestUnitAPI
 from api_testing.apis.article_api import ArticleAPI
+from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from unittest import skip
 from parameterized import parameterized
 import random
@@ -721,3 +722,39 @@ class TestPlansTestCases(BaseTest):
         test_plan_data = self.test_plan.get_the_latest_row_data()
         self.info('Asserting that new version created')
         self.assertEqual(test_plan_data['Version'], '2')
+
+    def test029_testplan_multiple_material_types(self):
+        """
+        Master Data: Test plan: Material-Type Approach: Test plans are loaded correctly in the order section
+        in case multiple material types are selected
+        LIMS-7519
+        """
+        all_material_types = GeneralUtilitiesAPI().list_all_material_types()[0]['materialTypes']
+        formatted_materials = random.sample(all_material_types, 3)
+        selected_material_types = [material['name'] for material in formatted_materials]
+        material_type_ids = [material['id'] for material in formatted_materials]
+        tu_response, _ = TestUnitAPI().create_quantitative_testunit(selectedMaterialTypes=formatted_materials[0])
+        testunit_data = TestUnitAPI().get_testunit_form_data(id=tu_response['testUnit']['testUnitId'])[0]['testUnit']
+        formatted_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
+        testplan = self.test_plan_api.create_testplan(testUnits=[formatted_testunit], materialType=formatted_materials,
+                                                      materialTypeId=material_type_ids)
+        testplan_name = testplan[1]['testPlan']['text']
+        self.info('testplan {} is created'.format(testplan_name))
+        Order().get_orders_page()
+        order_no, suggested_test_units, suggested_testplans = Order().create_new_order(material_type=
+                                                                                       selected_material_types[0],
+                                                                                       test_plans=[testplan_name],
+                                                                                       check_testunits_testplans=
+                                                                                       True,
+                                                                                       save=False)
+        self.info('asserting testplan {} appears in testplans suggesstion list when selecting material type {}'.format(
+                testplan_name, selected_material_types[0]))
+        self.assertIn(testplan_name, suggested_testplans)
+        for i in range(2):
+            suggested_testplans = Order().get_testplan_according_to_materialtype(material_type=
+                                                                                 selected_material_types[i + 1]
+                                                                                 )
+            self.info(
+                'asserting testplan {} appears in testplans suggesstion list when selecting material type {}'.format(
+                    testplan_name, selected_material_types[i + 1]))
+            self.assertIn(testplan_name, suggested_testplans)

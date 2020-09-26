@@ -1,10 +1,10 @@
 #!/bin/bash
 
 EXECUTION_FILES=(
-     ui_testing/testcases/extended_tests/test001_order.py
+     ui_testing/testcases/basic_tests/test003_testplans.py
   )
 
- TEST_REG='test004'
+ TEST_REG='test029'
 
 
  NODE_TOTAL=$1;
