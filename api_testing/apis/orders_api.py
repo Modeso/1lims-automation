@@ -546,4 +546,3 @@ class OrdersAPI(OrdersAPIFactory):
                             'article': second_article,
                             'articleId': second_article['id']}]
         return update_suborder
-
