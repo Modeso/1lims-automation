@@ -634,9 +634,13 @@ elements = {
         'suborder_archive': {'method': 'id', 'value': 'child_table_archive'},
         'suborder_restore': {'method': 'id', 'value': 'child_table_restore'},
         'suborder_delete': {'method': 'id',
-                             'value': 'child_table_delete'},
-        'confirm_delete': {'method':'xpath',
-                           'value': '//h2[@id="swal2-title"]'}
+                            'value': 'child_table_delete'},
+        'confirm_delete': {'method': 'xpath',
+                           'value': '//h2[@id="swal2-title"]'},
+        'text_field_dragged': {'method': 'xpath',
+                               'value': '//*[contains(concat( " ", @class, " " ), concat( " ", "color-label", " " ))]'},
+        'save_config': {'method': 'xpath',
+                        'value': '//button[@class="btn btn-primary mb-md-0 mr-md-3"]'}
     },
 
     'audit_trail': {
@@ -768,6 +772,10 @@ elements = {
         'filter_analysis_no': {
             'method': 'id',
             'value': 'nofield'
+        },
+        'section1_titles':{
+            'method':'class_name',
+            'value':'field-title-limitations'
         }
     },
 
