@@ -3658,3 +3658,54 @@ class OrdersTestCases(BaseTest):
             self.assertFalse(self.order_page.confirm_popup(check_only=True))
             self.info('asserting redirection to active table')
             self.assertEqual(self.order_page.orders_url, self.base_selenium.get_url())
+
+    def test105_check_analysis_result_active_table(self):
+        """
+        [Orders][Active Table][Suborders] Make Sure that Next to the analysis result an icon will be displayed
+        upon click a dialog will open containing (the current child table of analysis page ) table with the test units
+        in it and it's specs and values.
+
+        LIMS-5373
+        """
+        self.single_analysis_page = SingleAnalysisPage()
+        response, payload = self.orders_api.create_new_order()
+        self.assertEqual(response['status'], 1)
+        order_id = response['order']['mainOrderId']
+        testplan_info = TestPlanAPI().get_testplan_form_data(id=payload[0]['testPlans'][0]['id'])
+        testplan_specs = '{}-{}'.format(testplan_info['specifications'][0]['lowerLimit'],
+                                        testplan_info['specifications'][0]['upperLimit'])
+        testunit_list = [testplan_info['specifications'][0]['name'], payload[0]['testUnits'][0]['name']]
+        testunit_info = self.test_unit_api.get_testunit_form_data(id=payload[0]['testUnits'][0]['id'])
+        testunit_specs = '{}-{}'.format(testunit_info[0]['testUnit']['lowerLimit'],
+                                        testunit_info[0]['testUnit']['upperLimit'])
+        specs_list = [testplan_specs, testunit_specs]
+
+        self.orders_page.get_order_edit_page_by_id(order_id)
+        self.info('navigate to analysis tab')
+        self.order_page.navigate_to_analysis_tab()
+        value = self.single_analysis_page.set_testunit_values(save=False)
+        self.base_selenium.scroll()
+        self.info('change validation options')
+        analysis_result = self.single_analysis_page.change_validation_options()
+        self.order_page.get_orders_page()
+        self.order_page.filter_by_order_no(filter_text=payload[0]['orderNo'])
+        suborders = self.order_page.get_child_table_data()
+        self.info('asserting analysis result is displayed correctly')
+        for suborder in suborders:
+            if analysis_result == 'Conform W. Rest.':
+                self.assertEqual(suborder['Analysis Results'], 'Conform With Restrictions (1)')
+            else:
+                self.assertEqual(suborder['Analysis Results'], analysis_result)
+        self.info('asserting icon exists beside analysis results')
+        self.assertTrue(self.base_selenium.check_element_is_exist(element='order:analysis_result_icon'))
+        self.base_selenium.click(element='order:analysis_result_icon')
+        testunits_table = self.base_selenium.get_rows_cells_dict_related_to_header(
+            table_element='order:analysis_testunits_table')
+        self.order_page.sleep_tiny()
+        self.base_selenium.click(element='order:close_testunits_table')
+        displayed_testunits = [testunit_record['Test Unit'] for testunit_record in testunits_table]
+        displayed_testunits_specs = [testunit_record['Specifications'] for testunit_record in testunits_table]
+        self.info('asserting all selected testunits are displayed')
+        self.assertCountEqual(displayed_testunits, testunit_list)
+        self.info('asserting all selected testunits specification are displayed')
+        self.assertCountEqual(displayed_testunits_specs, specs_list)
