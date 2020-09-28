@@ -41,7 +41,6 @@ class OrdersTestCases(BaseTest):
         """
         New: Orders: Save/Cancel button: After I edit no field then press on cancel button,
         a pop up will appear that the data will be
-
         LIMS-7200
         """
         random_order = random.choice(self.orders_api.get_all_orders_json())
@@ -72,7 +71,6 @@ class OrdersTestCases(BaseTest):
         """
         Orders: In case I update the contact then press on cancel button, a pop up should display with
         (ok & cancel) buttons and when I press on cancel button, this update shouldn't submit
-
         LIMS-4764
         """
         random_order = random.choice(self.orders_api.get_all_orders_json())
@@ -101,7 +99,6 @@ class OrdersTestCases(BaseTest):
         """
         Orders: department Approach: In case I update the department then press on save button
         (the department updated successfully) & when I press on cancel button ( this department not updated )
-
         LIMS-4765
         """
         self.info('create contact with multiple departments')
@@ -142,7 +139,6 @@ class OrdersTestCases(BaseTest):
     def test004_archive_main_order(self):
         """"
         User can archive a main order
-
         LIMS-6516
         """
         self.info('choosing a random order table row')
@@ -163,7 +159,6 @@ class OrdersTestCases(BaseTest):
         """
         I can restore any sub order successfully
         LIMS-4374
-
         Orders: Restore Approach: User can restore any order from the archived table
         LIMS-5361 (added the main order part)
         """
@@ -182,7 +177,7 @@ class OrdersTestCases(BaseTest):
         self.orders_page.get_archived_items()
         self.orders_page.filter_by_order_no(order_no)
         if order_type == 'suborder':
-            random_index = randint(0, len(suborders)-1)
+            random_index = randint(0, len(suborders) - 1)
             suborders_data = self.order_page.get_child_table_data()
             self.info("Restore suborder with analysis No {}".format(suborders_data[random_index]['Analysis No.']))
             self.order_page.restore_table_suborder(index=random_index)
@@ -216,7 +211,6 @@ class OrdersTestCases(BaseTest):
         """
         New: Order without/with article: Deleting of orders
         The user can hard delete any archived order
-
         LIMS-3257
         """
         response, payload = self.orders_api.get_all_orders(deleted=1)
@@ -251,7 +245,6 @@ class OrdersTestCases(BaseTest):
     def test007_order_search(self, small_letters):
         """
         New: Orders: Search Approach: User can search by any field & each field should display with yellow color
-
         LIMS-3492
         LIMS-3061
         """
@@ -290,7 +283,6 @@ class OrdersTestCases(BaseTest):
     def test008_duplicate_main_order(self):
         """
         New: Orders with test units: Duplicate an order with test unit 1 copy
-
         LIMS-3270
         """
         response, payload = self.orders_api.create_new_order()
@@ -326,7 +318,6 @@ class OrdersTestCases(BaseTest):
         """
         Make sure that the user can duplicate suborder with multiple copies ( record with test units )
         Make sure that the user can duplicate suborder with multiple copies ( record with test plans )
-
         LIMS-4285
         LIMS-6224
         """
@@ -380,7 +371,6 @@ class OrdersTestCases(BaseTest):
     def test010_user_can_add_suborder(self):
         """
         New: Orders: Table view: Suborder Approach: User can add suborder from the main order
-
         LIMS-3817
         """
         self.info("create completed test plan")
@@ -426,7 +416,6 @@ class OrdersTestCases(BaseTest):
         New: Orders: Edit material type: Make sure that user can cancel any update successfully
         New: Orders: Materiel type Approach: In case then material type of the second suborder
         updated then press on cancel button, Nothing update when I enter one more time
-
         LIMS-4281
         LIMS-4282
         """
@@ -456,7 +445,6 @@ class OrdersTestCases(BaseTest):
         """
         New: Orders: Material type Approach: I can update the material type
         filed with test units records successfully
-
         LIMS-4833
         """
         order, payload = self.orders_api.create_new_order(testPlans=[])
@@ -494,7 +482,6 @@ class OrdersTestCases(BaseTest):
     def test013_filter_by_any_fields(self, key):
         """
         New: Orders: Filter Approach: I can filter by any field in the table view
-
         LIMS-3495
         """
         self.info('select random order using api')
@@ -533,7 +520,6 @@ class OrdersTestCases(BaseTest):
     def test014_filter_by_analysis_no(self):
         """
         New: Orders: Filter Approach: I can filter by analysis No
-
         LIMS-3495
         """
         self.info('select random order using api')
@@ -558,11 +544,8 @@ class OrdersTestCases(BaseTest):
     def test015_filter_by_order_No(self):
         """
         I can filter by any order No.
-
         LIMS-3495
-
         Filter: Order number format: In case the order number displayed with full year, I can filter by it
-
         LIMS-7426
         """
         self.info('select random order using api')
@@ -579,7 +562,6 @@ class OrdersTestCases(BaseTest):
     def test016_filter_by_status(self):
         """
         I can filter by status
-
         LIMS-3495
         """
         self.info("filter by status: Open")
@@ -601,7 +583,6 @@ class OrdersTestCases(BaseTest):
     def test017_filter_by_analysis_result(self):
         """
         I can filter by Analysis result
-
         LIMS-3495
         """
         self.info("filter by analysis_result: Conform")
@@ -622,7 +603,6 @@ class OrdersTestCases(BaseTest):
     def test018_filter_by_contact(self):
         """
         New: Orders: Filter Approach: I can filter by contact
-
         LIMS-3495
         """
         self.info('get contact of random order')
@@ -640,7 +620,6 @@ class OrdersTestCases(BaseTest):
     def test019_filter_by_department(self):
         """
         I can filter by department
-
         LIMS-3495
         """
         self.info('get create order with department')
@@ -669,7 +648,6 @@ class OrdersTestCases(BaseTest):
     def test020_filter_by_date(self, key):
         """
          I can filter by testDate, shipmentDate, or createdAt fields
-
          LIMS-3495
         """
         orders, _ = self.orders_api.get_all_orders(limit=20)
@@ -695,7 +673,6 @@ class OrdersTestCases(BaseTest):
     def test021_validate_order_test_unit_test_plan(self):
         """
         New: orders Test plan /test unit validation
-
         LIMS-4349
         """
         self.info(' Running test case to make sure from the validation of the test plan & test unit ')
@@ -712,7 +689,6 @@ class OrdersTestCases(BaseTest):
     def test022_validate_order_test_unit_test_plan_edit_mode(self):
         """
         New: orders Test plan /test unit validation in edit mode
-
         LIMS-4826
         """
         self.info(' Running test case to check that '
@@ -742,7 +718,6 @@ class OrdersTestCases(BaseTest):
     def test023_update_test_date(self, save):
         """
         New: Orders: Test Date: I can update test date successfully with cancel/save buttons
-
         LIMS-4780
         """
         # open random order edit page
@@ -789,7 +764,6 @@ class OrdersTestCases(BaseTest):
     def test024_update_shipment_date(self, save):
         """
         New: Orders: Shipment date Approach: I can update shipment date successfully with save/cancel button
-
         LIMS-4779
         """
         # open random order edit page
@@ -834,7 +808,6 @@ class OrdersTestCases(BaseTest):
     def test025_validate_order_no_exists(self):
         """
         New: Orders: Create new order and change the autogenerated number
-
         LIMS-3406
         """
         orders, payload = self.orders_api.get_all_orders(limit=40)
@@ -878,11 +851,8 @@ class OrdersTestCases(BaseTest):
     def test026_create_order_with_test_units(self, order):
         """
         New: Orders: Create a new order with test units
-
         LIMS-3267
-
         New: Orders: Create an existing order with test units
-
         LIMS-3268
         """
         response, payload = TestUnitAPI().create_qualitative_testunit()
@@ -1421,17 +1391,14 @@ class OrdersTestCases(BaseTest):
     def test039_duplicate_sub_order_table_with_add(self):
         """
          Orders: User can duplicate any suborder from the order form ( table with add )
-
          LIMS-3738
-
          [Orders][Active Table]Make sure that every record should display the main order
          and when user click on it suborders will be expanded
-
          LIMS-5356
-         
+
          [Orders][Archive Table]Make sure that every record should display the main order
          and when user click on it will display suborders under order record
-         
+
          LIMS-5357
         """
         self.info('select random record')
@@ -1466,7 +1433,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.get_orders_page()
         self.order_page.filter_by_order_no(random_order['orderNo'])
         suborder_data = self.order_page.get_child_table_data()
-        self.assertTrue(len(suborder_data), len(suborders)+1)
+        self.assertTrue(len(suborder_data), len(suborders) + 1)
         self.orders_page.navigate_to_analysis_active_table()
         self.analyses_page.filter_by_analysis_number(suborder_data[0]['Analysis No.'])
         analysis_result = self.analyses_page.get_the_latest_row_data()['Analysis No.'].replace("'", "")
@@ -2355,7 +2322,6 @@ class OrdersTestCases(BaseTest):
         """
         Orders: Create: In case of clicking on the overview button after clicking create new order
         check it redirects to the active table
-
         LIMS-6204
         """
         self.order_page.click_create_order_button()
@@ -2372,7 +2338,6 @@ class OrdersTestCases(BaseTest):
         """
         Orders: Active table: Pagination Approach; Make sure that I can set the pagination
         to display 10/20/25/50/100 records in each page
-
         LIMS-6199
         """
         self.order_page.set_page_limit(limit=pagination_limit)
@@ -2394,7 +2359,6 @@ class OrdersTestCases(BaseTest):
     def test068_archived_contact_not_retrieved(self):
         """
         Make sure that Archived contacts are n't appear in contacts drop down list
-
         LIMS-5829
         """
         api, payload = self.contacts_api.get_all_contacts(deleted=1)
@@ -2413,7 +2377,6 @@ class OrdersTestCases(BaseTest):
     def test069_close_testplan_popup(self, button):
         """
         Make sure the user can press on the cancel button to close the pop-up or from the ( x ) sign
-
         LIMS-4797
         """
         order, payload = self.orders_api.create_new_order()
@@ -2434,7 +2397,6 @@ class OrdersTestCases(BaseTest):
     def test070_main_orders_only_should_be_displayed_in_the_orders_list(self):
         """
         Make sure that user sees the main orders only in the order list
-
         LIMS-5354
         """
         self.info('assert active table is displayed')
@@ -2464,7 +2426,6 @@ class OrdersTestCases(BaseTest):
         """
         Orders: Archive Approach: Make sure that you can select multiple records
         and then archive them at the same time
-
         LIMS-5364
         """
         self.info("select multiple orders and archive them")
@@ -2483,7 +2444,6 @@ class OrdersTestCases(BaseTest):
     def test072_multiple_contacts_should_appear_in_active_table(self):
         """
         Multiple contacts should appear in active table
-
         LIMS-5773
         """
         response1, contact1 = self.contacts_api.create_contact()
@@ -2509,7 +2469,6 @@ class OrdersTestCases(BaseTest):
         """
          create new order :make sure that user can't create a new order with
          existing order using a deleted order number
-
          LIMS-2430
         """
         response, payload = self.orders_api.create_new_order()
@@ -2546,9 +2505,7 @@ class OrdersTestCases(BaseTest):
         """
          Create existing order then change the contact for this existing one,
          all old records with the same order number will update its contact.
-
          LIMS-4293
-
          LIMS-5818 - added departments assertion
         """
         self.info("create order with departments")
@@ -2588,7 +2545,6 @@ class OrdersTestCases(BaseTest):
         """
         In case you select the method to display and you entered long text in it,
         the method should display into multiple lines in the order form
-
         LIMS-6663
         """
         self.test_units_page = TstUnits()
@@ -2627,7 +2583,6 @@ class OrdersTestCases(BaseTest):
         LIMS-6668
         allow user to search with test unit number in the drop down list of order form
         LIMS-6665
-
         """
         self.test_units_page = TstUnits()
         response, payload = TestUnitAPI().create_quantitative_testunit(unit="RandomUnit")
@@ -2660,7 +2615,6 @@ class OrdersTestCases(BaseTest):
         """
         New: Test unit: Export: In case the unit field with sub & super,
         allow this to display in the unit field drop down list in the analysis form
-
         LIMS-6675
         """
         self.test_unit_api = TestUnitAPI()
@@ -2688,7 +2642,6 @@ class OrdersTestCases(BaseTest):
     def test078_filter_testunit_by_scripts(self, value):
         """
          Make sure that user can filter by sub & super scripts in the filter drop down list
-
          LIMS-7447
          LIMS-7444
         """
@@ -2727,7 +2680,6 @@ class OrdersTestCases(BaseTest):
         """
          orders :Make sure that when user click on options of order or suborder,
          it displays Four options: (Duplicate, COA, Mail, Archive)
-
             LIMS-5367
             LIMS-5360
         """
@@ -2750,13 +2702,10 @@ class OrdersTestCases(BaseTest):
     def test080_Duplicate_or_update_order_with_test_plan_only(self, case):
         """
         Duplicate main order Approach: duplicate order with test plan
-
         LIMS-6849
-
         -When I edit order by deleting test plan message will appear
         (This Test Plan will be removed from the corresponding analysis )
         -make sure the corresponding analysis records created according to this update in test plan.
-
         LIMS-4269 case 1
         """
         self.info("create new order")
@@ -2804,11 +2753,8 @@ class OrdersTestCases(BaseTest):
     def test081_Duplicate_order_and_cahange_article(self, case):
         """
         Duplicate from the main order Approach: Duplicate then change the article
-
         LIMS-6220
-
         Duplicate suborder Approach: Duplicate any sub order then change the article
-
         LIMS-6228
         """
         self.info('create order with test_unit and test_plan')
@@ -2851,7 +2797,6 @@ class OrdersTestCases(BaseTest):
         """
          Make Sure that when user click on edit icon he will be redirect to the first step
          of the merged page that has the order data(Order Table with Add).
-
          LIMS-5371
         """
         self.info('choose random order and click on edit button')
@@ -2866,7 +2811,6 @@ class OrdersTestCases(BaseTest):
         """
         Create 5 suborders with same test units ( single select ) and make sure 5 analysis
         records created successfully according to that.
-
         LIMS-4249
         LIMS-4251
         """
@@ -2902,7 +2846,6 @@ class OrdersTestCases(BaseTest):
     def test084_filter_by_changed_by(self):
         """
         New: Orders: Filter Approach: I can filter by changed by
-
         LIMS-3495
         """
         response, contact = self.contacts_api.create_contact()
@@ -2950,7 +2893,6 @@ class OrdersTestCases(BaseTest):
         """
         Sample Management: Contact configuration approach: In case the user configures the
         contact field to display number this action should reflect on the order form step one
-
         LIMS-6626
         """
         self.info("set contact configuration to be searchable by number only")
@@ -2980,7 +2922,6 @@ class OrdersTestCases(BaseTest):
         """
          New: Orders: table/create: Create 4 suborders from the table view with different
          test plans & units ( single select ) and make sure the correct corresponding analysis records.
-
          LIMS-4247
         """
         self.test_plan_api = TestPlanAPI()
@@ -3022,7 +2963,6 @@ class OrdersTestCases(BaseTest):
         """
         Any new suborder with multiple test plans should create one analysis record
         only with those test plans and test units that corresponding to them.
-
         LIMS-4276
         """
         self.info('create order with two testplans only')
@@ -3049,7 +2989,6 @@ class OrdersTestCases(BaseTest):
         Orders: table: Departments Approach: In case I created multiple suborders
         the departments should open drop down list with the options that I can
         select different departments in each one.
-
         LIMS-4258
         """
         self.info('create contact with multiple departments')
@@ -3175,7 +3114,6 @@ class OrdersTestCases(BaseTest):
         """
         Ordering test units Approach: In case I put test plans and test units at the same time , the order of
         the analysis section should be the test units of the test plans then the order test units
-
         LIMS-7416
         """
         response, _ = self.test_unit_api.get_all_test_units()
@@ -3284,7 +3222,6 @@ class OrdersTestCases(BaseTest):
         """
           Orders: Test plan Approach: In case I select large number of test units in one test plan,
           they should display successfully in the pop up
-
           LIMS-4795
         """
         order = self.orders_api.get_order_with_multiple_sub_orders(no_suborders=2)
@@ -3306,9 +3243,9 @@ class OrdersTestCases(BaseTest):
             if result['test_plan'] == testPlan['testPlan']['text']:
                 for testunit in testunit_names:
                     self.assertIn(testunit, result['test_units'])
-                  
-    @parameterized.expand(['Name','No','Name:No'])
-    def test095_change_contact_config(self,search_by):
+
+    @parameterized.expand(['Name', 'No', 'Name:No'])
+    def test095_change_contact_config(self, search_by):
         '''
          Orders: Contact configuration approach: In case the user
          configures the contact field to display name & number this action
@@ -3319,18 +3256,18 @@ class OrdersTestCases(BaseTest):
         '''
         self.contacts_page = Contacts()
         self.info('get random contact')
-        contacts_response,_ = ContactsAPI().get_all_contacts(limit=10)
+        contacts_response, _ = ContactsAPI().get_all_contacts(limit=10)
         self.assertEqual(contacts_response['status'], 1)
         payload = random.choice(contacts_response['contacts'])
         self.orders_page.open_order_config()
         self.info('change contact view by options')
         self.contacts_page.open_contact_configurations_options()
-        if  search_by == 'Name':
+        if search_by == 'Name':
             search_text = payload['name']
             result = payload['name']
             search_by = [search_by]
-        elif search_by== 'No':
-            search_text = 'No: '+ str(payload['companyNo'])
+        elif search_by == 'No':
+            search_text = 'No: ' + str(payload['companyNo'])
             result = str(payload['companyNo'])
             search_by = [search_by]
         elif search_by == 'Name:No':
@@ -3345,13 +3282,12 @@ class OrdersTestCases(BaseTest):
         rows = self.orders_page.result_table()
         order_data = self.base_selenium.get_row_cells_dict_related_to_header(row=rows[0])
         self.info('assert contact appear in format {}'.format(search_by))
-        self.assertEqual(order_data['Contact Name'],search_text)
+        self.assertEqual(order_data['Contact Name'], search_text)
 
     def test096_check_list_menu(self):
         """
           [Orders][Active table] Make sure that list menu will contain
           (COA,Archive , XSLX - Archived - Configurations) Only
-
           LIMS-5358
         """
         options = ['Duplicate', 'CoA', 'Archive', 'XSLX', 'Archived', 'Configurations']
@@ -3367,7 +3303,6 @@ class OrdersTestCases(BaseTest):
         """
          Orders: Filter test unit Approach: Allow the search criteria in
          the drop down list in the filter section to be same as in the form
-
          LIMS-7411
         """
         self.test_units_page = TstUnits()
@@ -3428,12 +3363,9 @@ class OrdersTestCases(BaseTest):
         """
           Orders: Make sure that user can filter order TestUnit that exist
           on order only(TestUnit in Analysis not Included)
-
           LIMS-5379
-
           Orders: Filter Approach: Make sure that the user can filter from the
           default filter ( with status & dynamic fields )
-
           LIMS-5486
         """
         self.info("open filter menu")
@@ -3454,12 +3386,9 @@ class OrdersTestCases(BaseTest):
         """
          Analysis number format: In case the analysis number displayed with full year,
          this should reflect on the export file
-
          LIMS-7424
-
          Order number format: In case the order number displayed with full year,
          this should reflect on the export file
-
          LIMS-7423
         """
         self.info('select random order')
@@ -3485,7 +3414,6 @@ class OrdersTestCases(BaseTest):
         """
          New: Orders: table view: Create Approach: when you create suborders with multiple
          test plans & units select the corresponding analysis that triggered according to that.
-
          LIMS-4256
         """
         self.test_plan_api = TestPlanAPI()
@@ -3542,7 +3470,6 @@ class OrdersTestCases(BaseTest):
     def test101_choose_test_plans_without_test_units(self):
         """
         Orders: Create: Orders Choose test plans without test units
-
         LIMS-4350
         """
         self.test_plan_api = TestPlanAPI()
@@ -3580,7 +3507,6 @@ class OrdersTestCases(BaseTest):
     def test102_multiple_suborders(self):
         """
         Orders: Table with add: Allow user to add any number of the suborders records not only 5 suborders
-
         LIMS-5220
         """
         response, payload = self.orders_api.create_order_with_multiple_suborders(no_suborders=10)
@@ -3608,7 +3534,6 @@ class OrdersTestCases(BaseTest):
         Orders: Create Approach: Make sure In case you create two test plans with the same name
         and different materiel type, the test units that belongs to them displayed correct in
         analysis step two
-
         LIMS-6296
         """
         test_plans_list = TestPlanAPI().create_double_completed_testplan_same_name_diff_material()
@@ -3632,13 +3557,12 @@ class OrdersTestCases(BaseTest):
             self.assertEqual(len(test_units), 1)
             test_units_name = test_units[0]['Test Unit Name'].split(' ')[0]
             self.assertEqual(test_units_name, test_units_list[i])
-             
+
     @parameterized.expand(['update_a_field', 'no_updates'])
     def test104_edit_order_page_then_overview(self, edit_case):
         """
         Orders: Popup should appear when editing then clicking on overview without saving <All data will be lost>
         LIMS-6814
-
         Orders: No popup should appear when clicking on overview without changing anything
         LIMS-6821
         """
@@ -3658,3 +3582,17 @@ class OrdersTestCases(BaseTest):
             self.assertFalse(self.order_page.confirm_popup(check_only=True))
             self.info('asserting redirection to active table')
             self.assertEqual(self.order_page.orders_url, self.base_selenium.get_url())
+
+    def test105_update_test_unit_reflect_analysis_section(self):
+        '''
+        New: Orders: Update test units & plans then add one more suborder record & this update should reflect in the analysis section
+        LIMS-4351
+        :return:
+        '''
+        response, payload = self.orders_api.create_new_order(testPlans=[])
+        testUnits = [i.name for i in payload[0]['testUnits']]
+        print(testUnits)
+        print('%%%%%%%%%%%%%')
+        self.orders_page.get_order_edit_page_by_id(id=response['order']['mainOrderId'])
+        testunits = self.order_page.set_test_unit(no_testunits=3)
+        print(testunits)
