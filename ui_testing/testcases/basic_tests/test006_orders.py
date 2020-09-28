@@ -3589,10 +3589,29 @@ class OrdersTestCases(BaseTest):
         LIMS-4351
         :return:
         '''
+        self.analysis_page = SingleAnalysisPage()
         response, payload = self.orders_api.create_new_order(testPlans=[])
-        testUnits = [i.name for i in payload[0]['testUnits']]
-        print(testUnits)
-        print('%%%%%%%%%%%%%')
+        old_testUnit = payload[0]['testUnits'][0]['name']
+        test_units = TestUnitAPI().get_testunits_with_material_type('All')
+        test_units_names_only = [testunit['name'] for testunit in test_units]
+        self.info('add extra testunits in the first suborder')
+        extra_testunits = random.sample(test_units_names_only, 2)
         self.orders_page.get_order_edit_page_by_id(id=response['order']['mainOrderId'])
-        testunits = self.order_page.set_test_unit(no_testunits=3)
-        print(testunits)
+        self.order_page.update_suborder(test_units=extra_testunits)
+        suborder_testunits = random.sample(test_units_names_only,3)
+        self.info('create new suborder with testunits only')
+        self.order_page.create_new_suborder(test_units=suborder_testunits,test_plans=[])
+        self.order_page.save(save_btn='order:save_btn')
+        self.order_page.sleep_medium()
+        self.order_page.navigate_to_analysis_tab()
+        self.assertEqual(self.analysis_page.get_analysis_count(), 2)
+        self.info('assert that those updates reflects in the analysis section')
+        for i in range(2):
+            row = self.analysis_page.open_accordion_for_analysis_index(i)
+            test_units = self.analysis_page.get_testunits_in_analysis(row)
+            test_units_names = [name['Test Unit Name'].split(' ')[0] for name in test_units]
+            if i == 0:
+                extra_testunits.append(old_testUnit)
+                self.assertCountEqual(test_units_names, extra_testunits)
+            elif i == 1:
+                self.assertCountEqual(test_units_names, suborder_testunits)
