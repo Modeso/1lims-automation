@@ -3660,10 +3660,11 @@ class OrdersTestCases(BaseTest):
             self.info('asserting redirection to active table')
             self.assertEqual(self.order_page.orders_url, self.base_selenium.get_url())
 
-    def test107_analysis_number_displayed_in_order_child_table(self) :
+    def test107_analysis_number_displayed_in_order_child_table(self):
         """
           Orders: Analysis number Approach: Make sure that the analysis number
           should display in the order child table
+
           LIMS-2622
         """
         self.orders_page.set_all_configure_table_columns_to_specific_value(
@@ -3673,7 +3674,7 @@ class OrdersTestCases(BaseTest):
         self.assertIn('Analysis No.', first_child_data[0].keys())
         self.info("Searching by the analysis number displayed in child table")
         self.orders_page.filter_by_analysis_number(filter_text=first_child_data[0]['Analysis No.'])
-        import ipdb;ipdb.set_trace()
+        self.info("assert that analysis no is marked")
         xpath = "//mark[contains(text(),'{}')]".format(first_child_data[0]['Analysis No.'].replace("'", ""))
         elem = self.base_selenium.find_element_by_xpath(xpath)
         self.assertTrue(elem)
