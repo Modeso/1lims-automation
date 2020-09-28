@@ -553,6 +553,11 @@ elements = {
                                'order': 4},
         'edit order header': {'method': 'xpath',
                               'value': '//span[contains(text(),"Edit Order")]'},
+        'material_type_checkbox':{ 'method':'xpath',
+                          'value':'//*[@id="materialType"]/a/span/div/span/label/span'},
+        'article_name_checkbox': {'method':'xpath',
+                                  'value':'//*[@id="articleName"]/a/span/div/span/label/span'},
+        
         'analysis_order_tab': {'method': 'xpath',
                                'value': '//span[contains(text(),"Analysis")]'},
         'order_analysis_tab': {'method': 'xpath',

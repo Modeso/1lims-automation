@@ -10,6 +10,7 @@ from ui_testing.pages.analysis_page import AllAnalysesPage
 from api_testing.apis.article_api import ArticleAPI
 from api_testing.apis.test_unit_api import TestUnitAPI
 from ui_testing.pages.analysis_page import SingleAnalysisPage
+from ui_testing.pages.base_pages import BasePages
 from api_testing.apis.contacts_api import ContactsAPI
 from api_testing.apis.test_plan_api import TestPlanAPI
 from api_testing.apis.users_api import UsersAPI
@@ -3658,3 +3659,31 @@ class OrdersTestCases(BaseTest):
             self.assertFalse(self.order_page.confirm_popup(check_only=True))
             self.info('asserting redirection to active table')
             self.assertEqual(self.order_page.orders_url, self.base_selenium.get_url())
+    def test105_edit_order_page_then_overview(self):
+
+        """
+        Order: Table configuration: Make sure that you can configure any field in the child table
+        LIMS-8212
+        """
+
+        self.base_pages= BasePages()
+        self.info('Unchecking material type and article name checkboxes in configure table')
+        self.base_pages.Clicking_on_checkboxes_in_configure_table(field_one='orders:material_type_checkbox',field_two='orders:article_name_checkbox',child=True)
+
+        Fields_displayed_in_child_table=self.orders_page.get_child_table_headings()
+        self.info('Checking that unchecked fields disappear from child table')
+        self.assertNotIn('Article Name',Fields_displayed_in_child_table)
+        self.assertNotIn('Material Type',Fields_displayed_in_child_table)
+
+        self.orders_page.get_orders_page()
+        self.base_pages.Clicking_on_checkboxes_in_configure_table(field_one='orders:material_type_checkbox',field_two='orders:article_name_checkbox',child=True)
+        Fields_displayed_after_rechecking_boxes= self.orders_page.get_child_table_headings()
+        self.info('Checking after rechecking article name and material type reappear in child table')
+        self.assertIn('Article Name',Fields_displayed_after_rechecking_boxes)
+        self.assertIn('Material Type',Fields_displayed_after_rechecking_boxes)
+
+
+
+
+
+

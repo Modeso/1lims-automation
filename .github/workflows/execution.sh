@@ -1,7 +1,7 @@
 #!/bin/bash
 
 EXECUTION_FILES=(
-     ui_testing/testcases/extended_tests/test001_order.py
+     ui_testing/testcases/basic_tests/test006_orders.py
   )
 
  TEST_REG='test004'

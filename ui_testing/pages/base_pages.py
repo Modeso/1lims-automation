@@ -645,3 +645,12 @@ class BasePages:
     def get_current_year(self):
         current_year = datetime.datetime.now()
         return str(current_year.year)
+
+    def Clicking_on_checkboxes_in_configure_table(self,field_one,field_two,child=False):
+        self.open_configure_table()
+        if child:
+            self.base_selenium.click(element='general:configure_child_table')
+        self.base_selenium.click(element=field_one)
+        self.base_selenium.click(element=field_two)
+        self.press_apply_in_configure_table()
+

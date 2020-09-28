@@ -367,3 +367,11 @@ class Orders(BasePages):
     def navigate_to_order_active_table(self):
         self.base_selenium.click(element='orders:order_tab')
         self.sleep_medium()
+
+    def get_child_table_headings(self):
+        self.open_child_table(self.result_table()[0])
+        headers = self.base_selenium.get_table_head_elements(element='general:table_child')
+        Child_table_headings = [i.text for i in headers]
+        return Child_table_headings
+
+
