@@ -3538,33 +3538,6 @@ class OrdersTestCases(BaseTest):
             else:
                 self.assertCountEqual(test_units_names, third_suborder_test_units)
 
-
-    def test103_check_test_unit_displayed_correct_under_test_plan(self):
-        '''
-         Orders: Test Plan: Test unit pop up Approach: Make sure the test units that displayed below test plan, it belongs to this test plan
-         LIMS-4793
-        :return:
-        '''
-        article_data = ArticleAPI().get_article_with_material_type(material_type='Raw Material')
-        formatted_article = {'id': article_data['id'], 'text': article_data['name']}
-        tp_list = []
-        tp_names = []
-        self.info('create 3 completed testplans')
-        for _ in range(3):
-            tp1 = TestPlanAPI().create_completed_testplan(material_type='Raw Material',
-                                                          formatted_article=formatted_article)
-            tp_names.append(tp1['testPlanEntity']['name'])
-            tp_list.append(tp1)
-        self.info('create order with testplans {},{},{}'.format(tp_names[0], tp_names[1], tp_names[2]))
-        self.order_page.create_new_order(material_type='Raw Material', test_units=[], test_plans=tp_names,
-                                         article=article_data['name'])
-        data = self.order_page.get_testplan_pop_up()
-        for i in range(len(data)):
-            self.info('assert test unit : {} is displayed correctly under its corresponding testplan :{} '.format(
-                data[i]['test_units'][0], tp_list[i]['testPlanEntity']['name']))
-            self.assertEqual(tp_list[i]['testPlanEntity']['name'], data[i]['test_plan'])
-            self.assertEqual(tp_list[i]['specifications'][0]['name'], data[i]['test_units'][0])
-
     def test101_choose_test_plans_without_test_units(self):
         """
         Orders: Create: Orders Choose test plans without test units
@@ -3603,7 +3576,7 @@ class OrdersTestCases(BaseTest):
             test_units = [item['Test Unit'] for item in child_data]
             self.assertCountEqual(test_units, test_units_names[i * 2:(i * 2) + 2])
 
-    def test106_multiple_suborders(self):
+    def test102_multiple_suborders(self):
         """
         Orders: Table with add: Allow user to add any number of the suborders records not only 5 suborders
 
@@ -3629,7 +3602,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.navigate_to_analysis_tab()
         self.assertEqual(SingleAnalysisPage().get_analysis_count(), 16)
 
-    def test102_create_order_with_test_plans_with_same_name(self):
+    def test103_create_order_with_test_plans_with_same_name(self):
         """
         Orders: Create Approach: Make sure In case you create two test plans with the same name
         and different materiel type, the test units that belongs to them displayed correct in
@@ -3659,3 +3632,30 @@ class OrdersTestCases(BaseTest):
             test_units_name = test_units[0]['Test Unit Name'].split(' ')[0]
             self.assertEqual(test_units_name, test_units_list[i])
 
+    def test105_check_test_unit_displayed_correct_under_test_plan(self):
+        """
+         Orders: Test Plan: Test unit pop up Approach: Make sure the test units that
+         displayed below test plan, it belongs to this test plan
+
+         LIMS-4793
+        """
+        created_data = TestPlanAPI().create_multiple_test_plan_with_same_article(no_of_testplans=3)
+        test_plans_formatted = []
+        for testplan in created_data['testPlans']:
+            test_plans_formatted.append({'testPlan': {'id': testplan['id'], 'text': testplan['name']}})
+        response, payload = self.orders_api.create_new_order(testPlans=test_plans_formatted,
+                                                             testUnits=[],
+                                                             materialType=created_data['material_type'],
+                                                             materialTypeId=created_data['material_type']['id'],
+                                                             article=created_data['article'],
+                                                             articleId=created_data['article']['id'])
+        self.assertEqual(response['status'], 1)
+        self.orders_page.get_order_edit_page_by_id(response['order']['mainOrderId'])
+        self.base_selenium.refresh()
+        self.orders_page.sleep_tiny()
+        data = self.order_page.get_testplan_pop_up()
+        for i in range(len(data)):
+            self.info('assert test unit : {} is displayed correctly under its corresponding testplan :{} '.format(
+                data[i]['test_units'][0], created_data['testPlans'][i]['name']))
+            self.assertEqual(created_data['testPlans'][i]['name'], data[i]['test_plan'])
+            self.assertEqual(created_data['testUnits'][i]['name'], data[i]['test_units'][0])

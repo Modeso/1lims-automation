@@ -400,12 +400,14 @@ class TestPlanAPI(TestPlanAPIFactory):
         formatted_article = {'id': article_data['id'], 'text': article_name}
         formatted_material_type = {'id': 1, 'text': 'Raw Material'}
         testPlans = []
+        testUnits = []
         for _ in range(no_of_testplans):
             tp = TestPlanAPI().create_completed_testplan(
                         material_type='Raw Material', formatted_article=formatted_article)
             testPlans.append({'id': int(tp['id']), 'name': tp['testPlanEntity']['name'], 'version': 1})
-
+            testUnits.append({'id': int(tp['specifications'][0]['id']), 'name': tp['specifications'][0]['name']})
         created_data = {'material_type': formatted_material_type,
                         'article': formatted_article,
-                        'testPlans': testPlans}
+                        'testPlans': testPlans,
+                        'testUnits': testUnits}
         return created_data
