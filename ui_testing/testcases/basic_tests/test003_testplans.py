@@ -9,7 +9,6 @@ from api_testing.apis.orders_api import OrdersAPI
 from api_testing.apis.users_api import UsersAPI
 from api_testing.apis.test_unit_api import TestUnitAPI
 from api_testing.apis.article_api import ArticleAPI
-from api_testing.apis.general_utilities_api import GeneralUtilitiesAPI
 from unittest import skip
 from parameterized import parameterized
 import random
