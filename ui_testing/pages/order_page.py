@@ -797,8 +797,7 @@ class Order(Orders):
                                                                                          dom_element)
         return multiple_line_properties
 
-    def get_testplan_according_to_materialtype(self,material_type):
+    def get_testplan_according_to_materialtype(self, material_type):
         self.set_material_type(material_type=material_type)
         self.set_article()
-        return self.base_selenium.get_drop_down_suggestion_list(element='order:test_plan',
-                                                                                   item_text=' ')
+        return self.base_selenium.get_drop_down_suggestion_list(element='order:test_plan', item_text=' ')

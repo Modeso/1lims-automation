@@ -409,3 +409,15 @@ class TestPlanAPI(TestPlanAPIFactory):
                         'article': formatted_article,
                         'testPlans': testPlans}
         return created_data
+
+    def create_testplan_with_multiple_materials(self, no_materials=3):
+        all_material_types = GeneralUtilitiesAPI().list_all_material_types()[0]['materialTypes']
+        formatted_materials = random.sample(all_material_types, no_materials)
+        material_type_ids = [material['id'] for material in formatted_materials]
+        selected_material_types = [material['name'] for material in formatted_materials]
+        tu_response, _ = TestUnitAPI().create_quantitative_testunit(selectedMaterialTypes=formatted_materials[0])
+        testunit_data = TestUnitAPI().get_testunit_form_data(id=tu_response['testUnit']['testUnitId'])[0]['testUnit']
+        formatted_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
+        testplan = self.create_testplan(testUnits=[formatted_testunit], materialType=formatted_materials,
+                                        materialTypeId=material_type_ids)
+        return testplan[1]['testPlan']['text'], selected_material_types
