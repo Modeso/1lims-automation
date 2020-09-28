@@ -16,6 +16,7 @@ from api_testing.apis.base_api import BaseAPI
 from parameterized import parameterized
 from datetime import date
 from nose.plugins.attrib import attr
+import datetime
 
 
 class OrdersWithoutArticleTestCases(BaseTest):
@@ -140,6 +141,37 @@ class OrdersWithoutArticleTestCases(BaseTest):
         results = self.order_page.result_table()[0].text
         self.assertIn(order_no.replace("'", ""), results.replace("'", ""))
 
+    @attr(series=True)
+    def test003_export_xslx_file(self):
+        """
+         New: Orders without articles: exporting an order, should not have article and
+         article number fields in the xslx file
+
+         LIMS-3260
+        """
+        no_of_orders = len(self.orders_page.result_table())-1
+        orders_data = self.orders_api.get_all_orders(limit=no_of_orders, sort_order=-1)[0]['orders']
+        all_orders_data = self.orders_page.format_orders_suborders_to_match_sheet_format(orders_data)
+        self.info(' * Download XSLX sheet')
+        self.order_page.select_all_records()
+        self.order_page.download_xslx_sheet()
+        for index in range(len(all_orders_data)):
+            self.info('Comparing the order no. {} '.format(index + 1))
+            sheet_keys = self.order_page.sheet.iloc[index].keys()
+            self.assertNotIn('Article', sheet_keys)
+            self.assertNotIn('Article No.', sheet_keys)
+            for key in all_orders_data[index].keys():
+                if not(all_orders_data[index][key]):
+                    self.assertEqual(self.order_page.sheet.iloc[index][key], '-', '{} of order {}'.format(key, index))
+                elif key in ['Test Plans', 'Test Units']:
+                    value = self.order_page.sheet.iloc[index][key].split(' & ')
+                    self.assertCountEqual(all_orders_data[index][key], value, '{} of order {}'.format(key, index))
+                elif key in ['Contact Name']:
+                    value = self.order_page.sheet.iloc[index][key].split(', ')
+                    self.assertCountEqual(all_orders_data[index][key], value, '{} of order {}'.format(key, index))
+                else:
+                    value = self.order_page.sheet.iloc[index][key].replace("'", "")
+                    self.assertEqual(all_orders_data[index][key], value, '{} of order {}'.format(key, index))
 
 class OrdersExtendedTestCases(BaseTest):
     def setUp(self):
@@ -168,7 +200,7 @@ class OrdersExtendedTestCases(BaseTest):
 
     @parameterized.expand(['EN', 'DE'])
     @attr(series=True)
-    def test003_new_fields_are_displayed_in_order_child_table(self, lang):
+    def test004_new_fields_are_displayed_in_order_child_table(self, lang):
         """
         Orders : child table: check that new fields of "Forwarding" , "Report sent by", "validation date" and
         "validation by"have been added to order's child table in both EN and DE
@@ -195,7 +227,7 @@ class OrdersExtendedTestCases(BaseTest):
             self.assertIn(header, displayed_Configuration_headers)
 
     @attr(series=True)
-    def test004_check_validation_date_validation_by(self):
+    def test005_check_validation_date_validation_by(self):
         """
          Orders: Validation date & Validation by : check that when user update the validation date &
          the validation by, the update should reflect on order's child table
