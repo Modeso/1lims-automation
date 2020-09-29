@@ -248,3 +248,29 @@ class OrdersExtendedTestCases(BaseTest):
         suborders_after = self.order_page.get_child_table_data(index=0)
         self.assertEqual(suborders_after[0]['Validation by'], payload['username'])
         self.assertEqual(suborders_after[0]['Validation date'], current_date)
+
+    @attr(series=True)
+    def test006_configure_any_field_in_child_table(self):
+        """
+         Order: Table configuration: Make sure that you can configure any field in the child table
+
+         LIMS-8212
+        """
+        import ipdb;ipdb.set_trace()
+        self.info('Unchecking material type and article name checkboxes in configure table')
+        self.orders_page.set_specific_configure_table_column_to_specific_value(
+            fields=['Material Type', 'Article Name'], child=True, value=False,
+            element='general:configure_child_table_items')
+        fields_displayed_in_child_table = self.orders_page.get_child_table_headings()
+        self.info('Checking that unchecked fields disappear from child table')
+        self.assertNotIn('Article Name', fields_displayed_in_child_table)
+        self.assertNotIn('Material Type', fields_displayed_in_child_table)
+        self.base_selenium.refresh()
+        self.orders_page.set_specific_configure_table_column_to_specific_value(
+            fields=['Material Type', 'Article Name'], child=True, value=True,
+            element='general:configure_child_table_items')
+        fields_displayed_after_rechecking_boxes = self.orders_page.get_child_table_headings()
+        self.info('Checking after rechecking article name and material type reappear in child table')
+        self.assertIn('Article Name', fields_displayed_after_rechecking_boxes)
+        self.assertIn('Material Type', fields_displayed_after_rechecking_boxes)
+

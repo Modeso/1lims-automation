@@ -446,6 +446,25 @@ class BasePages:
             self.change_column_view(column=column, value=value, always_hidden_columns=always_hidden_columns)
         self.press_apply_in_configure_table()
 
+    def set_specific_configure_table_column_to_specific_value(self, fields=[''], value=True, child=False,
+                                                              element='general:configure_table_items'):
+        """
+        :param fields: list of items to select or deslect in table
+        :param value: True to select, False to deselect
+        :param child: true if want child table
+        :param element: configure_child_table_items if child table selected
+        :return:
+        """
+        self.open_configure_table()
+        if child:
+            self.base_selenium.click(element='general:configure_child_table')
+        total_columns = self.base_selenium.find_elements_in_element(
+            source_element=element, destination_element='general:li')
+        for column in total_columns:
+            if column.text in fields:
+                self.change_column_view(column=column, value=value)
+        self.press_apply_in_configure_table()
+
     def deselect_all_configurations(self):
         self.open_configure_table()
         active_columns = self.base_selenium.find_elements_in_element(
