@@ -434,10 +434,13 @@ class BasePages:
         if apply_button:
             apply_button.click()
 
-    def set_all_configure_table_columns_to_specific_value(self, value=True, always_hidden_columns=['']):
+    def set_all_configure_table_columns_to_specific_value(self, value=True, always_hidden_columns=[''], child=False,
+                                                          element='general:configure_table_items'):
         self.open_configure_table()
+        if child:
+            self.base_selenium.click(element='general:configure_child_table')
         total_columns = self.base_selenium.find_elements_in_element(
-            source_element='general:configure_table_items',
+            source_element=element,
             destination_element='general:li')
         for column in total_columns:
             self.change_column_view(column=column, value=value, always_hidden_columns=always_hidden_columns)
@@ -646,11 +649,11 @@ class BasePages:
         current_year = datetime.datetime.now()
         return str(current_year.year)
 
-    def Clicking_on_checkboxes_in_configure_table(self,field_one,field_two,child=False):
+    def clicking_on_checkboxes_in_configure_table(self,fields=[],child=False):
         self.open_configure_table()
         if child:
             self.base_selenium.click(element='general:configure_child_table')
-        self.base_selenium.click(element=field_one)
-        self.base_selenium.click(element=field_two)
+        for field in fields:
+            self.base_selenium.click(element=field)
         self.press_apply_in_configure_table()
 

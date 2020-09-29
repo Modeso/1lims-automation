@@ -3665,19 +3665,19 @@ class OrdersTestCases(BaseTest):
         Order: Table configuration: Make sure that you can configure any field in the child table
         LIMS-8212
         """
-
         self.base_pages= BasePages()
         self.info('Unchecking material type and article name checkboxes in configure table')
-        self.base_pages.Clicking_on_checkboxes_in_configure_table(field_one='orders:material_type_checkbox',field_two='orders:article_name_checkbox',child=True)
-
-        Fields_displayed_in_child_table=self.orders_page.get_child_table_headings()
+        self.orders_page.set_all_configure_table_columns_to_specific_value(
+            child=True, element='general:configure_child_table_items')
+        self.base_pages.clicking_on_checkboxes_in_configure_table(fields=['orders:material_type_checkbox','orders:article_name_checkbox'],child=True)
+        fields_displayed_in_child_table=self.orders_page.get_child_table_headings()
         self.info('Checking that unchecked fields disappear from child table')
-        self.assertNotIn('Article Name',Fields_displayed_in_child_table)
-        self.assertNotIn('Material Type',Fields_displayed_in_child_table)
+        self.assertNotIn('Article Name',fields_displayed_in_child_table)
+        self.assertNotIn('Material Type',fields_displayed_in_child_table)
 
         self.orders_page.get_orders_page()
-        self.base_pages.Clicking_on_checkboxes_in_configure_table(field_one='orders:material_type_checkbox',field_two='orders:article_name_checkbox',child=True)
-        Fields_displayed_after_rechecking_boxes= self.orders_page.get_child_table_headings()
+        self.base_pages.clicking_on_checkboxes_in_configure_table(fields=['orders:material_type_checkbox','orders:article_name_checkbox'],child=True)
+        fields_displayed_after_rechecking_boxes= self.orders_page.get_child_table_headings()
         self.info('Checking after rechecking article name and material type reappear in child table')
-        self.assertIn('Article Name',Fields_displayed_after_rechecking_boxes)
-        self.assertIn('Material Type',Fields_displayed_after_rechecking_boxes)
+        self.assertIn('Article Name',fields_displayed_after_rechecking_boxes)
+        self.assertIn('Material Type',fields_displayed_after_rechecking_boxes)
