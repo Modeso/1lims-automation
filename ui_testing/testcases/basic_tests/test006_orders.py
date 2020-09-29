@@ -3680,7 +3680,6 @@ class OrdersTestCases(BaseTest):
         headers_after_rechecking= self.base_selenium.get_table_head_elements_with_tr(element='general:table')[0].text.split('\n')
         self.assertIn('Order No.',headers_after_rechecking)
         self.assertIn('Contact Name',headers_after_rechecking)
-               
         self.base_pages.clicking_on_checkboxes_in_configure_table(fields=['orders:created_on_checkbox'])
         self.orders_page.get_orders_page()
         self.info('Checking that the unchecked field "Created On"  disappear from orders active table')
