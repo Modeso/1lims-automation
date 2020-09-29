@@ -248,3 +248,20 @@ class OrdersExtendedTestCases(BaseTest):
         suborders_after = self.order_page.get_child_table_data(index=0)
         self.assertEqual(suborders_after[0]['Validation by'], payload['username'])
         self.assertEqual(suborders_after[0]['Validation date'], current_date)
+
+    def test005_filter_fields_configuration(self):
+        """
+        Orders: Filter configuration: Make sure that the user can configure any field from the filter configuration
+        and this action should reflect on the filter section.
+        LIMS-5848
+        """
+        self.orders_page.open_filter_menu()
+        self.info('asserting contact filter field is displayed at the beginning')
+        self.assertTrue(self.base_selenium.check_element_is_exist(element='orders:contact_filter'))
+        self.orders_page.list_filter_feilds()
+        self.info('hiding contact field')
+        self.base_selenium.click(element='orders:contact_filter_switch')
+        self.base_selenium.click(element='orders:save_filter_config')
+        self.orders_page.sleep_tiny()
+        self.info('asserting contact filter field is not displayed')
+        self.assertFalse(self.base_selenium.check_element_is_exist(element='orders:contact_filter'))
