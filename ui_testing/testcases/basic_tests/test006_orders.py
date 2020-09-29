@@ -3659,7 +3659,7 @@ class OrdersTestCases(BaseTest):
             self.assertFalse(self.order_page.confirm_popup(check_only=True))
             self.info('asserting redirection to active table')
             self.assertEqual(self.order_page.orders_url, self.base_selenium.get_url())
-    def test105_edit_order_page_then_overview(self):
+    def test105_configure_any_field_in_child_table(self):
 
         """
         Order: Table configuration: Make sure that you can configure any field in the child table
