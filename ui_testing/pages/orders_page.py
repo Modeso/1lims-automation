@@ -373,5 +373,3 @@ class Orders(BasePages):
         headers = self.base_selenium.get_table_head_elements(element='general:table_child')
         child_table_headings = [i.text for i in headers]
         return child_table_headings
-
-
