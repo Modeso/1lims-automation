@@ -3673,3 +3673,4 @@ class OrdersTestCases(BaseTest):
         self.order_page.download_xslx_sheet()
         data_in_sheet = self.order_page.sheet.iloc[0]
         self.assertIn('Forwarding',data_in_sheet)
+        self.assertIn(data_in_sheet['Forwarding'] , ['Forwarded', 'Not Forwarded'] )
