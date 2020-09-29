@@ -3660,7 +3660,6 @@ class OrdersTestCases(BaseTest):
             self.info('asserting redirection to active table')
             self.assertEqual(self.order_page.orders_url, self.base_selenium.get_url())
     def test105_configure_any_field_in_child_table(self):
-
         """
         Order: Table configuration: Make sure that you can configure any field in the child table
         LIMS-8212
@@ -3674,7 +3673,6 @@ class OrdersTestCases(BaseTest):
         self.info('Checking that unchecked fields disappear from child table')
         self.assertNotIn('Article Name',fields_displayed_in_child_table)
         self.assertNotIn('Material Type',fields_displayed_in_child_table)
-
         self.orders_page.get_orders_page()
         self.base_pages.clicking_on_checkboxes_in_configure_table(fields=['orders:material_type_checkbox','orders:article_name_checkbox'],child=True)
         fields_displayed_after_rechecking_boxes= self.orders_page.get_child_table_headings()
