@@ -796,3 +796,14 @@ class Order(Orders):
                                                                                          '"None").lineBreak',
                                                                                          dom_element)
         return multiple_line_properties
+
+    def change_text_dynamic_field_options(self, option):
+        self.base_selenium.click(element='general:right_menu')
+        self.base_selenium.click(element='general:configurations')
+        self.base_selenium.click(element='orders:text_dynamic_field_options')
+        if option == 'required':
+            self.base_selenium.click(element='orders:text_dynamic_field_required')
+        elif option == 'unique':
+            self.base_selenium.click(element='orders:text_dynamic_field_unique')
+        self.base_selenium.click(element='orders:save_config')
+
