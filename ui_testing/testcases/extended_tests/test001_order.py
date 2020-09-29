@@ -256,7 +256,6 @@ class OrdersExtendedTestCases(BaseTest):
 
          LIMS-8212
         """
-        import ipdb;ipdb.set_trace()
         self.info('Unchecking material type and article name checkboxes in configure table')
         self.orders_page.set_specific_configure_table_column_to_specific_value(
             fields=['Material Type', 'Article Name'], child=True, value=False,
