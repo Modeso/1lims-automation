@@ -646,10 +646,10 @@ class BasePages:
         current_year = datetime.datetime.now()
         return str(current_year.year)
 
-    def Clicking_on_checkboxes_in_configure_table(self, field_one, field_two, child=False) :
+    def clicking_on_checkboxes_in_configure_table(self,fields=[],child=False):
         self.open_configure_table()
-        if child :
+        if child:
             self.base_selenium.click(element='general:configure_child_table')
-        self.base_selenium.click(element=field_one)
-        self.base_selenium.click(element=field_two)
+        for field in fields:
+            self.base_selenium.click(element=field)
         self.press_apply_in_configure_table()

@@ -559,6 +559,8 @@ elements = {
                                'value': '//span[contains(text(),"Orders")]'},
         'Order_number_checkbox':{'method':'xpath',
                                  'value':'//*[@id="orderNumber"]/a/span/div/span/label/span'},
+        'created_on_checkbox':{'method':'xpath',
+                                 'value':'//*[@id="createdAt"]/a/span/div/span/label/span'},
         'Contact_name_checkbox' :{'method':'xpath',
                                                   'value':'//*[@id="contact"]/a/span/div/span/label/span'},
         'new_order': {'method': 'id',
