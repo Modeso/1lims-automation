@@ -656,4 +656,3 @@ class BasePages:
         for field in fields:
             self.base_selenium.click(element=field)
         self.press_apply_in_configure_table()
-
