@@ -3658,3 +3658,18 @@ class OrdersTestCases(BaseTest):
             self.assertFalse(self.order_page.confirm_popup(check_only=True))
             self.info('asserting redirection to active table')
             self.assertEqual(self.order_page.orders_url, self.base_selenium.get_url())
+
+    def test105_field_should_be_displayes_in_export_table(self):
+        '''
+        Mailing improvement: In export table, field will be displayed "Forwarded/Not forwarded"
+        LIMS-6947
+        :return:
+        '''
+        random_order = random.choice(self.orders_api.get_all_orders_json())
+        self.info('edit order with No {}'.format(random_order['orderNo']))
+        self.order_page.filter_by_order_no(random_order['orderNo'])
+        row = self.orders_page.result_table()[0]
+        self.info('download excel sheet of order {}'.format(random_order['orderNo']))
+        self.order_page.download_xslx_sheet()
+        data_in_sheet = self.order_page.sheet.iloc[0]
+        self.assertIn('Forwarding',data_in_sheet)
