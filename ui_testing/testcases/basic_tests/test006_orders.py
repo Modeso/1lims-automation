@@ -3681,9 +3681,3 @@ class OrdersTestCases(BaseTest):
         self.info('Checking after rechecking article name and material type reappear in child table')
         self.assertIn('Article Name',Fields_displayed_after_rechecking_boxes)
         self.assertIn('Material Type',Fields_displayed_after_rechecking_boxes)
-
-
-
-
-
-
