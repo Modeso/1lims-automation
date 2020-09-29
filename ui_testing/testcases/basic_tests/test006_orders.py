@@ -10,6 +10,7 @@ from ui_testing.pages.analysis_page import AllAnalysesPage
 from api_testing.apis.article_api import ArticleAPI
 from api_testing.apis.test_unit_api import TestUnitAPI
 from ui_testing.pages.analysis_page import SingleAnalysisPage
+from ui_testing.pages.base_pages import BasePages
 from api_testing.apis.contacts_api import ContactsAPI
 from api_testing.apis.test_plan_api import TestPlanAPI
 from api_testing.apis.users_api import UsersAPI
@@ -3658,3 +3659,27 @@ class OrdersTestCases(BaseTest):
             self.assertFalse(self.order_page.confirm_popup(check_only=True))
             self.info('asserting redirection to active table')
             self.assertEqual(self.order_page.orders_url, self.base_selenium.get_url())
+
+    def test106_configure_any_field_in_active_table(self):
+
+        """
+        Order: Table configuration: Make sure that you can configure any field in the active table
+        LIMS-8213
+        """
+
+        self.base_pages= BasePages()
+        self.info('Unchecking Contact name and order number checkboxes in configure table')
+        self.base_pages.Clicking_on_checkboxes_in_configure_table(field_one='orders:Order_number_checkbox',field_two='orders:Contact_name_checkbox')
+        self.orders_page.get_orders_page()
+        headers = self.base_selenium.get_table_head_elements_with_tr(element='general:table')[0].text.split('\n')
+        self.info('Checking that unchecked fields disappear from orders active table')
+        self.assertNotIn('Order No.',headers)
+        self.assertNotIn('Contact Name',headers)
+
+
+        self.info('Checking after rechecking Contact Name and Order No reappear in orders active table')
+        self.base_pages.Clicking_on_checkboxes_in_configure_table(field_one='orders:Order_number_checkbox',field_two='orders:Contact_name_checkbox')
+        self.orders_page.get_orders_page()
+        headers_after_rechecking= self.base_selenium.get_table_head_elements_with_tr(element='general:table')[0].text.split('\n')
+        self.assertIn('Order No.',headers_after_rechecking)
+        self.assertIn('Contact Name',headers_after_rechecking)
