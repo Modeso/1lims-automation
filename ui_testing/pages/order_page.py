@@ -727,7 +727,7 @@ class Order(Orders):
             row=suborders[index],
             table_element='order:suborder_table')
         popup_element = self.base_selenium.find_element_in_element(
-            source=suborders_elements['Test Plan:'], destination_element='order:testplan_popup_btn')
+            source=suborders_elements['Test Plan: *'], destination_element='order:testplan_popup_btn')
         popup_element.click()
         self.sleep_small()
         results = []
@@ -736,6 +736,10 @@ class Order(Orders):
             test_plan, test_units = element.text.split('\n')[0], element.text.split('\n')[1:]
             results.append({'test_plan': test_plan, 'test_units': test_units})
         return results
+
+    def close_test_plan_pop_up(self, element='order:testplan_pop_up_close_btn'):
+        self.base_selenium.wait_until_element_clickable(element=element)
+        self.base_selenium.click(element='order:testplan_pop_up_close_btn')
 
     def create_new_order_get_test_unit_suggetion_list(self, material_type='', test_unit_name=' ', check_option=False):
         self.info('Create new order.')

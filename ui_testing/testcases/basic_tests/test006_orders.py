@@ -2423,11 +2423,9 @@ class OrdersTestCases(BaseTest):
         self.orders_page.sleep_small()
         self.base_selenium.click(element='order:testplan_popup_btn')
         if button == 'cancel_btn':
-            self.base_selenium.wait_until_element_clickable(element='order:testplan_cancel_btn')
-            self.base_selenium.click(element='order:testplan_cancel_btn')
+            self.order_page.close_test_plan_pop_up(element='order:testplan_pop_up_cancel_btn')
         else:
-            self.base_selenium.wait_until_element_clickable(element='order:testplan_close_btn')
-            self.base_selenium.click(element='order:testplan_close_btn')
+            self.order_page.close_test_plan_pop_up()
 
         self.assertTrue(self.base_selenium.check_element_is_not_exist(element='order:testplan_popup'))
 
@@ -3658,3 +3656,33 @@ class OrdersTestCases(BaseTest):
             self.assertFalse(self.order_page.confirm_popup(check_only=True))
             self.info('asserting redirection to active table')
             self.assertEqual(self.order_page.orders_url, self.base_selenium.get_url())
+
+    def test107_check_that_two_testunits_with_same_name_displayed_in_one_testplan(self):
+        """
+         Orders: Test plan Approach: test units pop-up: In case I have two test units with the same name
+         in one test plan, both of them should display in the test units pop-up.
+
+         LIMS-4800
+        """
+        self.analysis_page = SingleAnalysisPage()
+        data = self.orders_api.create_order_with_testplan_with_double_tu_same_name()
+        self.assertTrue(data['orderID'])
+        self.orders_page.get_order_edit_page_by_id(data['orderID'])
+        self.orders_page.sleep_tiny()
+        pop_up_data = self.order_page.get_testplan_pop_up()
+        self.assertEqual(len(pop_up_data), 1)
+        self.assertCountEqual(pop_up_data[0]['test_units'], data['tu_names'])
+        self.order_page.close_test_plan_pop_up()
+        self.info('checking that both testunits with same name appear in the analysis form')
+        self.order_page.navigate_to_analysis_tab()
+        row = self.analysis_page.open_accordion_for_analysis_index()
+        test_units = self.analysis_page.get_testunits_in_analysis(row)
+        tu_names_in_analysis = [tu['Test Unit Name'].split(' ')[0] for tu in test_units]
+        self.assertCountEqual(tu_names_in_analysis, data['tu_names'])
+        self.info('checking that both testunits with same name appear in the analysis table')
+        self.orders_page.get_orders_page()
+        self.orders_page.navigate_to_analysis_active_table()
+        self.analyses_page.filter_by_order_no(filter_text=data['orderNo'])
+        analysis_data = self.analyses_page.get_child_table_data(index=0)
+        tu_names_in_analysis_table = [tu['Test Unit'] for tu in analysis_data]
+        self.assertCountEqual(tu_names_in_analysis_table, data['tu_names'])
