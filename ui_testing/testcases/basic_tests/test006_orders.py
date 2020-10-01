@@ -182,7 +182,7 @@ class OrdersTestCases(BaseTest):
         self.orders_page.get_archived_items()
         self.orders_page.filter_by_order_no(order_no)
         if order_type == 'suborder':
-            random_index = randint(0, len(suborders)-1)
+            random_index = randint(0, len(suborders) - 1)
             suborders_data = self.order_page.get_child_table_data()
             self.info("Restore suborder with analysis No {}".format(suborders_data[random_index]['Analysis No.']))
             self.order_page.restore_table_suborder(index=random_index)
@@ -1466,7 +1466,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.get_orders_page()
         self.order_page.filter_by_order_no(random_order['orderNo'])
         suborder_data = self.order_page.get_child_table_data()
-        self.assertTrue(len(suborder_data), len(suborders)+1)
+        self.assertTrue(len(suborder_data), len(suborders) + 1)
         self.orders_page.navigate_to_analysis_active_table()
         self.analyses_page.filter_by_analysis_number(suborder_data[0]['Analysis No.'])
         analysis_result = self.analyses_page.get_the_latest_row_data()['Analysis No.'].replace("'", "")
@@ -3306,9 +3306,9 @@ class OrdersTestCases(BaseTest):
             if result['test_plan'] == testPlan['testPlan']['text']:
                 for testunit in testunit_names:
                     self.assertIn(testunit, result['test_units'])
-                  
-    @parameterized.expand(['Name','No','Name:No'])
-    def test095_change_contact_config(self,search_by):
+
+    @parameterized.expand(['Name', 'No', 'Name:No'])
+    def test095_change_contact_config(self, search_by):
         '''
          Orders: Contact configuration approach: In case the user
          configures the contact field to display name & number this action
@@ -3319,18 +3319,18 @@ class OrdersTestCases(BaseTest):
         '''
         self.contacts_page = Contacts()
         self.info('get random contact')
-        contacts_response,_ = ContactsAPI().get_all_contacts(limit=10)
+        contacts_response, _ = ContactsAPI().get_all_contacts(limit=10)
         self.assertEqual(contacts_response['status'], 1)
         payload = random.choice(contacts_response['contacts'])
         self.orders_page.open_order_config()
         self.info('change contact view by options')
         self.contacts_page.open_contact_configurations_options()
-        if  search_by == 'Name':
+        if search_by == 'Name':
             search_text = payload['name']
             result = payload['name']
             search_by = [search_by]
-        elif search_by== 'No':
-            search_text = 'No: '+ str(payload['companyNo'])
+        elif search_by == 'No':
+            search_text = 'No: ' + str(payload['companyNo'])
             result = str(payload['companyNo'])
             search_by = [search_by]
         elif search_by == 'Name:No':
@@ -3345,7 +3345,7 @@ class OrdersTestCases(BaseTest):
         rows = self.orders_page.result_table()
         order_data = self.base_selenium.get_row_cells_dict_related_to_header(row=rows[0])
         self.info('assert contact appear in format {}'.format(search_by))
-        self.assertEqual(order_data['Contact Name'],search_text)
+        self.assertEqual(order_data['Contact Name'], search_text)
 
     def test096_check_list_menu(self):
         """
@@ -3638,7 +3638,6 @@ class OrdersTestCases(BaseTest):
         """
         Orders: Popup should appear when editing then clicking on overview without saving <All data will be lost>
         LIMS-6814
-
         Orders: No popup should appear when clicking on overview without changing anything
         LIMS-6821
         """
@@ -3658,3 +3657,4 @@ class OrdersTestCases(BaseTest):
             self.assertFalse(self.order_page.confirm_popup(check_only=True))
             self.info('asserting redirection to active table')
             self.assertEqual(self.order_page.orders_url, self.base_selenium.get_url())
+

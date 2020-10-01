@@ -16,6 +16,8 @@ from api_testing.apis.base_api import BaseAPI
 from parameterized import parameterized
 from datetime import date
 from nose.plugins.attrib import attr
+from unittest import skip
+
 
 
 class OrdersWithoutArticleTestCases(BaseTest):
@@ -248,3 +250,132 @@ class OrdersExtendedTestCases(BaseTest):
         suborders_after = self.order_page.get_child_table_data(index=0)
         self.assertEqual(suborders_after[0]['Validation by'], payload['username'])
         self.assertEqual(suborders_after[0]['Validation date'], current_date)
+
+    @parameterized.expand(['0', '1', '2'])
+    @attr(series=True)
+    @skip("https://modeso.atlassian.net/browse/LIMSA-349")
+    def test005_order_no_format_in_XLSX_sheet(self, year_option):
+        """
+         Orders: Search/filter Approach: User can search/filter by all the new number format
+         (without year, number before year, number after year
+
+         LIMS-4110
+         LIMS-4109 format in XLSX sheet
+        """
+        if year_option == '2':  # year before number
+            self.orders_api.set_configuration_year_before_no()
+        elif year_option == '0':  # without year
+            self.orders_api.set_configuration_without_year()
+        response, payload = self.orders_api.create_new_order(yearOption=int(year_option))
+        self.assertEqual(response['status'], 1)
+        order_no = payload[0]['orderNoWithYear']
+        self.info('can filter in order active table with order no in format .{}'.format(format))
+        self.orders_page.filter_by_order_no(order_no)
+        rows = self.orders_page.result_table()
+        order_data = self.base_selenium.get_row_cells_dict_related_to_header(row=rows[0])
+        self.assertEqual(order_no, order_data['Order No.'])
+        self.assertTrue(
+            self.orders_page.is_order_no_match_config(year_option=year_option, order_no=order_data['Order No.']))
+        self.orders_page.click_check_box(rows[0])
+        self.order_page.download_xslx_sheet()
+        order_in_sheet = self.order_page.sheet.iloc[0]['Order No.']
+        self.assertTrue(self.orders_page.is_order_no_match_config(year_option=year_option, order_no=order_in_sheet))
+
+    @parameterized.expand(['0', '1', '2'])
+    @attr(series=True)
+    @skip("https://modeso.atlassian.net/browse/LIMSA-349")
+    def test006_order_no_format_in_duplicate_main_order_page(self, year_option):
+        """
+         Orders: Search/filter Approach: User can search/filter by all the new number format
+         (without year, number before year, number after year
+
+         LIMS-4110
+         LIMS-4109 format in duplicate main order page
+        """
+        if year_option == '2':  # year before number
+            self.orders_api.set_configuration_year_before_no()
+        elif year_option == '0':  # without year
+            self.orders_api.set_configuration_without_year()
+        response, payload = self.orders_api.create_new_order(yearOption=int(year_option))
+        self.assertEqual(response['status'], 1)
+        order_no = payload[0]['orderNoWithYear']
+        self.orders_page.filter_by_order_no(order_no)
+        self.info('duplicate the main order')
+        rows = self.orders_page.result_table()
+        self.orders_page.click_check_box(rows[0])
+        self.orders_page.duplicate_main_order_from_table_overview()
+        self.orders_page.sleep_tiny()
+        duplicated_order_number = self.order_page.get_no()
+        self.assertTrue(
+            self.orders_page.is_order_no_match_config(year_option=year_option, order_no=duplicated_order_number))
+
+    @parameterized.expand(['0', '1', '2'])
+    @attr(series=True)
+    @skip("https://modeso.atlassian.net/browse/LIMSA-349")
+    def test007_order_no_format_in_create_form(self, year_option):
+        """
+        New: orders: No Approach: Number format should display in all sections
+        (Table view, XLSX, Duplication, Suborder table, QR Code) in the configuration section
+
+        LIMS-4109 format in create order form
+        """
+        if year_option == '2':  # year before number
+            self.orders_api.set_configuration_year_before_no()
+        elif year_option == '0':  # without year
+            self.orders_api.set_configuration_without_year()
+        self.info('open the create form')
+        self.order_page.create_new_order()
+        order_no = self.order_page.get_no()
+        self.assertTrue(
+            self.orders_page.is_order_no_match_config(year_option=year_option, order_no=order_no))
+
+    @parameterized.expand(['0', '1', '2'])
+    @attr(series=True)
+    @skip("https://modeso.atlassian.net/browse/LIMSA-349")
+    def test008_order_no_format_in_analysis_section(self, year_option):
+        """
+        New: orders: No Approach: Number format should display in: Table view of the analysis section
+
+        LIMS-4109
+        """
+        if year_option == '2':  # year before number
+            self.orders_api.set_configuration_year_before_no()
+        elif year_option == '0':  # without year
+            self.orders_api.set_configuration_without_year()
+        response, payload = self.orders_api.create_new_order(yearOption=int(year_option))
+        self.assertEqual(response['status'], 1)
+        order_no = payload[0]['orderNoWithYear']
+        self.info('edit order with No {}'.format(order_no))
+        self.orders_page.get_order_edit_page_by_id(response['order']['mainOrderId'])
+        self.info('navigate to analysis tab')
+        self.order_page.navigate_to_analysis_tab()
+        analysis_record = SingleAnalysisPage().get_all_analysis_records()
+        self.assertTrue(
+            self.orders_page.is_order_no_match_config(year_option=year_option,
+                                                      order_no=analysis_record[0]['Order No.']))
+
+    @parameterized.expand(['0', '1', '2'])
+    @attr(series=True)
+    @skip("https://modeso.atlassian.net/browse/LIMSA-349")
+    def test009_filter_by_order_no_format_in_analysis_active_table(self, year_option):
+        """
+         Orders: Search/filter Approach: User can search/filter by all the new number format
+         (without year, number before year, number after year
+
+         LIMS-4110 filter by order no in analysis active table
+        """
+        if year_option == '2':  # year before number
+            self.orders_api.set_configuration_year_before_no()
+        elif year_option == '0':  # without year
+            self.orders_api.set_configuration_without_year()
+        response, payload = self.orders_api.create_new_order(yearOption=int(year_option))
+        self.assertEqual(response['status'], 1)
+        order_no = payload[0]['orderNoWithYear']
+        self.orders_page.navigate_to_analysis_active_table()
+        self.analyses_page.filter_by_order_no(order_no)
+        self.analyses_page.sleep_tiny()
+        self.assertEqual(len(self.orders_page.result_table()) - 1, 1)
+        analysis_data = self.analyses_page.get_the_latest_row_data()
+        self.assertEqual(analysis_data['Order No.'].replace("'", ""), order_no)
+        self.assertTrue(self.orders_page.is_order_no_match_config(year_option=year_option,
+                                                                  order_no=analysis_data['Order No.']))

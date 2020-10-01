@@ -71,8 +71,10 @@ class Orders(BasePages):
         self.base_selenium.click(element='general:right_menu')
         self.sleep_tiny()
         self.base_selenium.click(element='orders:duplicate')
-        self.wait_until_page_is_loaded()
+        self.sleep_tiny()
         self.base_selenium.refresh()
+        self.wait_until_page_is_loaded()
+
 
     def duplicate_main_order_from_order_option(self, index=0):
         self.info('duplicate main order from the order\'s active table')
@@ -367,3 +369,22 @@ class Orders(BasePages):
     def navigate_to_order_active_table(self):
         self.base_selenium.click(element='orders:order_tab')
         self.sleep_medium()
+
+    def is_order_no_match_config(self, year_option, order_no):
+        if year_option == '1':
+            if order_no.split('-')[1] == '2020':
+                return True
+            else:
+                return False
+        elif year_option == '2':
+            if order_no.split('-')[0].replace("'", "") == '2020':
+                return True
+            else:
+                return False
+        else:
+            if '-' in order_no:
+                return False
+            else:
+                return True
+
+

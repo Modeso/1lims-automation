@@ -293,6 +293,8 @@ class OrdersAPIFactory(BaseAPI):
             payload['orderNoWithYear'] = "{}-{}".format((payload['orderNo']), payload['year'])
         elif payload['yearOption'] == 2:
             payload['orderNoWithYear'] = "{}-{}".format(payload['year'], payload['orderNo'])
+        else:
+            payload['orderNoWithYear'] = payload['orderNo']
 
         return [payload]
 
@@ -499,6 +501,20 @@ class OrdersAPI(OrdersAPIFactory):
         config_file = os.path.abspath('api_testing/config/order.json')
         with open(config_file, "r") as read_file:
             payload = json.load(read_file)
+        super().set_configuration(payload=payload)
+
+    def set_configuration_without_year(self):
+        self.info('set order configuration')
+        config_file = os.path.abspath('api_testing/config/order_without_year.json')
+        with open(config_file, "r") as read_file:
+            payload = json.load(read_file)
+        super().set_configuration(payload=payload)
+
+    def set_configuration_year_before_no(self):
+        self.info('set order configuration')
+        config_file = os.path.abspath('api_testing/config/order_year_bedore_no.json')
+        with open(config_file, "r") as read_file:
+             payload = json.load(read_file)
         super().set_configuration(payload=payload)
 
     def set_contact_configuration_to_number_only(self):
