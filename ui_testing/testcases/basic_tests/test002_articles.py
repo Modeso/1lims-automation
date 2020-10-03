@@ -11,7 +11,7 @@ from ui_testing.pages.login_page import Login
 from api_testing.apis.users_api import UsersAPI
 from parameterized import parameterized
 from unittest import skip
-import random, re
+import random, re, ipdb
 
 
 class ArticlesTestCases(BaseTest):
@@ -110,6 +110,7 @@ class ArticlesTestCases(BaseTest):
             self.assertEqual(current_unit, article_unit)
 
     @parameterized.expand(['save', 'cancel'])
+    @skip('https://modeso.atlassian.net/browse/LIMSA-380')
     def test002_cancel_button_edit_no(self, save):
         """
         New: Article: Save/Cancel button: After I edit no field then press on cancel button,
@@ -137,7 +138,6 @@ class ArticlesTestCases(BaseTest):
             url=article_url, sleep=self.base_selenium.TIME_MEDIUM)
         self.base_selenium.scroll()
         article_no = self.article_page.get_no()
-
         if 'save' == save:
             self.info(' Assert {} (new_no) == {} (article_no)'.format(new_no, article_no))
             self.assertEqual(new_no, article_no)
@@ -234,23 +234,27 @@ class ArticlesTestCases(BaseTest):
         self.assertFalse(self.test_plan_page.is_article_existing(
             article=article_created['article']['name']))
 
+    @skip('https://modeso.atlassian.net/browse/LIMSA-382')
     def test006_archived_articles_shoudnt_dispaly_in_order(self):
         """
         New: Article: Archived any article this article shouldn't display in the order module
 
         LIMS-3668
         """
-        api, payload = self.article_api.create_article()
+        api, art_payload = self.article_api.create_article()
         self.article_api.archive_articles(ids=[str(api['article']['id'])])
+        ipdb.set_trace()
         orders, payload = self.order_api.get_all_orders(limit=20)
         random_order = random.choice(orders['orders'])
-        self.info('{}'.format(random_order['orderNo']))
+        self.info('selected random order : {}'.format(random_order['orderNo']))
         self.orders_page.get_order_edit_page_by_id(random_order['id'])
-        self.order_page.set_material_type_of_first_suborder(material_type='Raw Material', sub_order_index=0)
-        self.order_page.confirm_popup()
-        self.order_page.set_article(article=api['article']['name'])
+        if self.order_page.get_material_type() != "Raw Material":
+            self.order_page.set_material_type_of_first_suborder(material_type='Raw Material', sub_order_index=0)
+            self.order_page.confirm_popup()
+
+        self.order_page.set_article(article=art_payload['name'])
         self.assertFalse(
-            self.order_page.is_article_existing(article=api['article']['name']))
+            self.order_page.is_article_existing(article=art_payload['name']))
 
     @skip('https://modeso.atlassian.net/browse/LIMSA-200')
     def test007_created_article_appear_in_test_plan(self):

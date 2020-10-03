@@ -208,7 +208,7 @@ class ArticleAPI(ArticleAPIFactory):
         for article in articles['articles']:
             if article['name'] == avoid_article:
                 break
-            elif article['materialType'] == material_type['text']:
+            elif article['materialType'] == material_type['name']:
                 formatted_article = {'id': article['id'], 'name': article['name']}
                 return formatted_article
 
