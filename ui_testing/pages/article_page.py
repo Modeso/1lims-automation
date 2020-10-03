@@ -10,6 +10,8 @@ class Article(Articles):
         self.info('create new article.')
         self.base_selenium.click(element='articles:new_article')
         self.sleep_small()
+        self.article_number = self.generate_random_number()
+        self.set_no(self.article_number)
         self.article_name = self.generate_random_text()
         self.set_name(name=self.article_name)
         if material_type:
@@ -23,7 +25,7 @@ class Article(Articles):
         self.article_create_user = config['site']['username']
 
         article_data = {
-            "number": self.get_no(),
+            "number": self.article_number,
             "name": self.article_name,
             "material_type": self.article_material_type,
             "created_at": self.article_create_date,
@@ -107,7 +109,7 @@ class Article(Articles):
 
     def filter_article_by(self, filter_element, filter_text, field_type='text'):
         self.info(
-            ' + Filter by {} : {}'.format(filter_element.replace('article:filter_', '').replace('_', ' '), filter_text))
+            'Filter by {} : {}'.format(filter_element.replace('article:filter_', '').replace('_', ' '), filter_text))
         self.filter_by(filter_element=filter_element, filter_text=filter_text, field_type=field_type)
         self.filter_apply()
         self.sleep_tiny()

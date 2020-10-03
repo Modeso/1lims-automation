@@ -12,6 +12,7 @@ from api_testing.apis.users_api import UsersAPI
 from parameterized import parameterized
 from unittest import skip
 import random, re
+from datetime import date
 
 
 class ArticlesTestCases(BaseTest):
@@ -352,6 +353,7 @@ class ArticlesTestCases(BaseTest):
         for article_name in article_names:
             self.assertTrue(self.article_page.is_article_in_table(value=article_name))
 
+    @skip('https://modeso.atlassian.net/browse/LIMSA-383')
     def test012_create_new_material_type(self):
         """
         Article: Materiel type Approach: make sure you can create new materiel type
@@ -603,10 +605,10 @@ class ArticlesTestCases(BaseTest):
         self.article_api.archive_all_optional_fields()
 
         if page == "edit":
-            self.info(' open article edit page')
+            self.info('open article edit page')
             self.article_page.open_edit_page(row=self.article_page.get_random_article_row())
         else:
-            self.info(' open article create page')
+            self.info('open article create page')
             self.base_selenium.click(element='articles:new_article')
             self.article_page.wait_until_page_is_loaded()
         self.info(' assert unit field is not existing in article page')
@@ -659,29 +661,19 @@ class ArticlesTestCases(BaseTest):
 
         LIMS-3595
         """
-        # set default material type and field type
-        material_type = 'Raw Material'
-        field_type = 'text'
-        full_options = False
-        # set the material type to None in case of material type filter to test with random material type name
-        if filter_name == 'material_type':
-            material_type = None
-            field_type = 'drop_down'
-        # use full options in case of unit field
-        if filter_name == 'unit':
-            full_options = True
-        # create new article with full options
-        article = self.article_page.create_new_article(
-            material_type=material_type, full_options=full_options)
-        # open article table page and open the filter menu
-        self.assertTrue(article, 'article not created')
-        self.article_page.sleep_medium()
+        response, payload = self.article_api.create_article()
+        payload['number'] = payload['No']
+        payload['material_type'] = payload['materialType']['text']
+        payload['created_at'] = date.today().strftime("%d.%m.%Y")
+
+        field_type = 'drop_down' if filter_name == 'material_type' else 'text'
+
         self.article_page.open_filter_menu()
         # filter the article and get the result
         article_results = self.article_page.filter_article_by(filter_element='article:filter_{}'.format(
-            filter_name), filter_text=article[filter_name], field_type=field_type)
+            filter_name), filter_text=payload[filter_name], field_type=field_type)
         for article_result in article_results:
-            self.assertEqual(article[filter_name].replace("'", ""), article_result[header].replace("'", ""))
+            self.assertEqual(str(payload[filter_name]), article_result[header].replace("'", ""))
 
     def test027_filter_article_by_changed_by_filter(self):
         """
@@ -690,10 +682,10 @@ class ArticlesTestCases(BaseTest):
         LIMS-3595
         """
         self.login_page = Login()
-        self.info('Calling the users api to create a new user with username')
+        self.info('create a new user with username')
         response, payload = UsersAPI().create_new_user()
         self.assertEqual(response['status'], 1, payload)
-        self.article_page.sleep_tiny()
+        self.info(f'username: {payload["username"]}')
         self.login_page.logout()
         self.article_page.sleep_tiny()
         self.login_page.login(username=payload['username'], password=payload['password'])
@@ -701,10 +693,9 @@ class ArticlesTestCases(BaseTest):
         self.article_page.get_articles_page()
         self.article_page.sleep_tiny()
         article = self.article_page.create_new_article()['name']
-        self.info('New article is created successfully with name: {}'.format(article))
+        self.info('new article is created successfully with name: {}'.format(article))
         self.article_page.set_all_configure_table_columns_to_specific_value(
             always_hidden_columns=['selectedArticles'])
-        # filter the article and get the results
         self.article_page.apply_filter_scenario(filter_element='article:filter_changed_by',
                                                 filter_text=payload['username'])
         self.article_page.sleep_tiny()
@@ -744,4 +735,4 @@ class ArticlesTestCases(BaseTest):
         LIMS-6288
         """
         self.article_page.sleep_medium()
-        self.assertFalse(self.article_page.deselect_all_configurations())
+        self.assertTrue(self.article_page.deselect_all_configurations())
