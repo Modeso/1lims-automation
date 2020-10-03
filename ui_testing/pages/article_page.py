@@ -162,7 +162,7 @@ class Article(Articles):
         self.open_configuration()
         self._archive_field(field_name='unit')
         self._archive_field(field_name='comment')
-        self._archive_field(field_name='related_article')
+        #self._archive_field(field_name='related_article')
 
     def _restore_field(self, field_name):
         self.info(' restore field {}'.format(field_name))
@@ -175,7 +175,7 @@ class Article(Articles):
         self.open_archived_configuration()
         self._restore_field(field_name='unit')
         self._restore_field(field_name='comment')
-        self._restore_field(field_name='related_article')
+        # self._restore_field(field_name='related_article')
 
     def filter_and_select(self, article_no):
         self.info("filter by article No {}".format(article_no))

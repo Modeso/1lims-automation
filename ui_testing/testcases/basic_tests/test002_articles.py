@@ -75,6 +75,8 @@ class ArticlesTestCases(BaseTest):
                 element1='article:default_filter_test_plan')
             self.default_filters_flags['test_plan'] = False
 
+        super().tearDown()
+
     @parameterized.expand(['save', 'cancel'])
     def test001_cancel_button_edit_unit(self, save):
         """
@@ -442,7 +444,6 @@ class ArticlesTestCases(BaseTest):
         row = self.article_page.get_the_latest_row_data()
         self.assertEqual(row['Article No.'].replace("'", ""), test_plan['selectedArticleNos'][0]['name'])
 
-    #@skip('waiting create order update')
     def test017_delete_article_with_order(self):
         """
         New: Articles: Delete Approach; I can't delete any article if this article related to some data
