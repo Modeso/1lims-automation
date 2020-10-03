@@ -402,7 +402,7 @@ class ArticlesTestCases(BaseTest):
 
         LIMS-3597
         """
-        self.article_page.create_new_article(sleep=False, material_type='Raw Material')
+        self.article_page.create_new_article(material_type='Raw Material')
         self.article_page.sleep_small()
         self.assertEqual(self.base_selenium.get_text(element='general:alert_confirmation'),
                          'Successfully created')

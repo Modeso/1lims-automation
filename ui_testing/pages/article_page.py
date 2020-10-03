@@ -6,8 +6,8 @@ from datetime import date
 
 
 class Article(Articles):
-    def create_new_article(self, material_type='', sleep=True, full_options=False):
-        self.info(' + Create new article.')
+    def create_new_article(self, material_type='', full_options=False):
+        self.info('create new article.')
         self.base_selenium.click(element='articles:new_article')
         self.sleep_small()
         self.article_name = self.generate_random_text()
@@ -37,13 +37,13 @@ class Article(Articles):
             self.set_comment(comment=self.article_comment)
             self.article_unit = self.generate_random_text()
             self.set_unit(self.article_unit)
-            self.set_related_article()
-            self.article_related_article = self.get_related_article()
+            # self.set_related_article()
+            # self.article_related_article = self.get_related_article()
             article_data = {
                 "number": self.get_no(),
                 "name": self.article_name,
                 "material_type": self.article_material_type,
-                "related_article": self.article_related_article,
+                "related_article": None,
                 "unit": self.article_unit,
                 "comment": self.article_comment,
                 "created_at": self.article_create_date,
@@ -53,8 +53,7 @@ class Article(Articles):
             }
 
         self.save()
-        self.info(' + Article name : {}'.format(self.article_name))
-
+        self.info('article name : {}'.format(self.article_name))
         return article_data
 
     def edit_random_article(self, edit_method, edit_value, save=True):
