@@ -11,7 +11,7 @@ from ui_testing.pages.login_page import Login
 from api_testing.apis.users_api import UsersAPI
 from parameterized import parameterized
 from unittest import skip
-import random, re, ipdb
+import random, re
 
 
 class ArticlesTestCases(BaseTest):
