@@ -676,8 +676,6 @@ elements = {
                           'order': 1},
         'save_btn': {'method': 'xpath',
                      'value': '//button[@id="button_save_order"]'},
-        'no': {'method': 'id',
-               'value': 'orderNoWithYearfield'},
         'error_in_number_mssg': {'method': 'xpath',
                     'value': '//span[@class="m-form__help"]',
                     'order': 0},
@@ -695,10 +693,9 @@ elements = {
         'cancel': {'method': 'class_name',
                    'value': 'btn-secondary',
                    'order': 1},
-
         'order_number': {'method': 'id',
                          'value': 'orderNoWithYearfield'},
-        'order_number_add_form': {'method': 'id',
+        'existing_order_number': {'method': 'id',
                                   'value': 'selectedOrderNofield'},
         'shipment_date': {'method': 'id',
                           'value': 'date_shipmentDate_0'},
@@ -719,14 +716,6 @@ elements = {
                           'order': 0},
 
         'add_new_item': {'method': 'class_name',
-                         'value': 'addNewItem',
-                         'order': 0},
-        'add_another_suborder': {
-            'method': 'class_name',
-            'value': 'add-another',
-            'order': 0
-        },
-        'add_new_item11': {'method': 'class_name',
                          'value': 'addNewItem',
                          'order': 0},
         'order_no_error_message': {'method': 'xpath',
