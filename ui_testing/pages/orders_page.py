@@ -12,6 +12,10 @@ class Orders(BasePages):
         self.base_selenium.get(url=self.orders_url)
         self.wait_until_page_is_loaded()
         self.sleep_tiny()
+        if "sample/analysis" in self.base_selenium.get_url():
+            self.info("analysis page selected so press on orders tab")
+            self.navigate_to_order_active_table()
+            self.sleep_tiny()
 
     def get_order_edit_page_by_id(self, id):
         url_text = "{}sample/orders/" + str(id)
