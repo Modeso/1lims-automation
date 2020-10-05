@@ -193,15 +193,20 @@ class Orders(BasePages):
         return orders_data, orders
 
     # Return all filter fields used in order
-    def order_filters_element(self, key='all'):
-        filter_fileds = {'orderNo': {'element': 'orders:order_filter', 'type': 'text'},
+    def order_filters_element(self, key='all', payload={}):
+        """
+        :param key:
+        :param payload:you can get it from  response, payload = self.orders_api.create_new_order()
+        :return:
+        """
+        filter_fields = {'orderNo': {'element': 'orders:order_filter', 'type': 'text'},
                          'analysis': {'element': 'orders:analysis_filter', 'type': 'text',
                                       'result_key': 'Analysis No.'},
                          'Contact Name': {'element': 'orders:contact_filter', 'type': 'drop_down'},
                          'lastModifiedUser': {'element': 'orders:changed_by', 'type': 'drop_down',
-                                             'result_key':'Changed By'},
+                                              'result_key': 'Changed By'},
                          'materialType': {'element': 'orders:material_type_filter', 'type': 'drop_down',
-                                          'result_key':'Material Type'},
+                                          'result_key': 'Material Type'},
                          'article': {'element': 'orders:article_filter', 'type': 'drop_down',
                                      'result_key': 'Article Name'},
                          'shipmentDate': {'element': ['orders:shipment_date_filter', 'orders:shipment_date_filter_end'],
@@ -218,11 +223,20 @@ class Orders(BasePages):
                          'testPlans': {'element': 'orders:test_plans_filter', 'type': 'drop_down',
                                        'result_key': 'Test Plans'}
                          }
+        if payload:
+            if 'testPlans' in payload.keys():
+                filter_fields['testPlans']['value'] = payload['testPlans'][0]['name']
+            if 'testUnits' in payload.keys():
+                filter_fields['testUnit']['value'] = payload['testUnits'][0]['name']
+            if 'article' in payload.keys():
+                filter_fields['article']['value'] = payload['article']['text']
+            if 'materialType' in payload.keys():
+                filter_fields['materialType']['value'] = payload['materialType']['text']
 
         if key == 'all':
-            return filter_fileds
+            return filter_fields
         else:
-            return filter_fileds[key]
+            return filter_fields[key]
 
     def archive_table_suborder(self, index=0):
         self.info('archive suborder from the order\'s active table')
