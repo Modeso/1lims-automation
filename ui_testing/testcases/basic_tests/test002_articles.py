@@ -224,7 +224,7 @@ class ArticlesTestCases(BaseTest):
         LIMS-3668
         """
         article_created, payload = self.article_api.create_article()
-        self.info('archive the article.')
+        self.info(f'archive the article : {payload["name"]}')
         self.article_api.archive_articles(ids=[str(article_created['article']['id'])])
         self.test_plan_page.get_test_plans_page()
         self.info('create test plan with the same material type.')
