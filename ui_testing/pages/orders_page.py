@@ -155,7 +155,6 @@ class Orders(BasePages):
 
     def list_filter_fields(self):
         config_btn = self.base_selenium.find_element('general:filter_configuration')
-        import ipdb;ipdb.set_trace()
         config_btn.click()
         self.sleep_tiny()
         elements = self.base_selenium.find_elements('general:filter_Configure_options')

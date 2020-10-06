@@ -62,10 +62,8 @@ class OrdersTestCases(BaseTest):
         """
         self.info('choose random order and click on edit button')
         self.orders_page.sleep_tiny()
-        order_data = self.orders_page.get_random_order()
-        order_no = self.order_page.get_order_no()
+        self.orders_page.get_random_order()
         self.assertTrue(self.base_selenium.wait_element(element='orders:edit order header'))
-        self.assertEqual(order_no, order_data['Order No.'])
 
     def test003_check_orders_active_table_list_menu(self):
         """
@@ -241,7 +239,7 @@ class OrdersTestCases(BaseTest):
         self.info("create order with multiple suborders using api")
         response, payload = self.orders_api.create_order_with_multiple_suborders()
         self.assertEqual(response['status'], 1)
-        order_no = response['order']['orderNo']
+        order_no = response['order']['orderNoWithYear']
         order_id = response['order']['mainOrderId']
         suborders = self.orders_api.get_suborder_by_order_id(order_id)[0]['orders']
         number_of_suborders = len(suborders)
@@ -316,11 +314,11 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(response['message'], 'created_success')
         suborders, _ = self.orders_api.get_suborder_by_order_id(response['order']['mainOrderId'])
         analysis = [suborder['analysis'][0] for suborder in suborders['orders']]
-        self.orders_page.filter_by_order_no(filter_text=payload[0]['orderNo'])
+        self.orders_page.filter_by_order_no(filter_text=payload[0]['orderNoWithYear'])
         self.info('archive the main order from active table')
         self.assertTrue(self.orders_page.archive_main_order_from_order_option(check_pop_up=True))
         self.orders_page.get_archived_items()
-        self.orders_page.filter_by_order_no(payload[0]['orderNo'])
+        self.orders_page.filter_by_order_no(payload[0]['orderNoWithYear'])
         rows = self.orders_page.result_table()
         self.assertEqual(len(rows) - 1, 1)
         self.info('assert main orders with its suborders in archived table')
@@ -330,13 +328,13 @@ class OrdersTestCases(BaseTest):
         self.orders_page.click_check_box(rows[0])
         self.order_page.delete_selected_item()
         self.orders_page.confirm_popup()
-        self.info('filter by order no {} to make sure no result found'.format(payload[0]['orderNo']))
-        self.orders_page.filter_by_order_no(payload[0]['orderNo'])
+        self.info('filter by order no {} to make sure no result found'.format(payload[0]['orderNoWithYear']))
+        self.orders_page.filter_by_order_no(payload[0]['orderNoWithYear'])
         results = self.orders_page.result_table()[0]
         self.assertTrue(results.get_attribute("textContent"), 'No data available in table')
         self.info('assert active table not affected by deleted order')
         self.orders_page.get_active_items()
-        self.orders_page.filter_by_order_no(payload[0]['orderNo'])
+        self.orders_page.filter_by_order_no(payload[0]['orderNoWithYear'])
         results = self.orders_page.result_table()[0]
         self.assertTrue(results.get_attribute("textContent"), 'No data available in table')
 
@@ -392,7 +390,7 @@ class OrdersTestCases(BaseTest):
         self.info("create order with multiple suborders using api")
         response, payload = self.orders_api.create_order_with_multiple_suborders()
         self.assertEqual(response['status'], 1)
-        order_no = response['order']['orderNo']
+        order_no = response['order']['orderNoWithYear']
         order_id = response['order']['mainOrderId']
         suborders = self.orders_api.get_suborder_by_order_id(order_id)[0]['orders']
         self.info("archive order no {} using api".format(order_no))
@@ -456,7 +454,7 @@ class OrdersTestCases(BaseTest):
         self.info('navigate to analysis tab')
         self.orders_page.navigate_to_analysis_active_table()
         self.info('filter by order number')
-        self.analyses_page.filter_by_order_no(payload[0]['orderNoWithYear'])
+        self.analyses_page.filter_by_order_no(payload[0]['orderNo'])
         self.info('get child table data')
         table_data = self.analyses_page.get_child_table_data()
         analysis_testunits = [test_unit['Test Unit'] for test_unit in table_data]
@@ -571,11 +569,11 @@ class OrdersTestCases(BaseTest):
         self.info('select random order using api')
         response, payload = self.orders_api.create_new_order()
         filter_dict = self.order_page.order_filters_element(key=key, payload=payload[0])
-        self.info('filter by {} with value {}'.format(key, filter_dict[key]['value']))
+        self.info('filter by {} with value {}'.format(key, filter_dict['value']))
         self.orders_page.apply_filter_scenario(
-            filter_element=filter_dict[key]['element'],
-            filter_text=filter_dict[key]['value'],
-            field_type=filter_dict[key]['type'])
+            filter_element=filter_dict['element'],
+            filter_text=filter_dict['value'],
+            field_type=filter_dict['type'])
         self.base_selenium.scroll()
         self.orders_page.close_filter_menu()
         results = self.order_page.result_table()
@@ -585,7 +583,7 @@ class OrdersTestCases(BaseTest):
             suborders = self.orders_page.get_child_table_data(index=i)
             key_found = False
             for suborder in suborders:
-                if filter_dict[key]['value'] in suborder[filter_dict[key]['result_key']].split(',\n'):
+                if filter_dict['value'] in suborder[filter_dict[key]['result_key']].split(',\n'):
                     key_found = True
                     break
             self.assertTrue(key_found)
@@ -660,6 +658,7 @@ class OrdersTestCases(BaseTest):
 
         self.assertTrue(filter_key_found)
 
+    @skip('need to be reimplemented after updating anlysis result')
     def test027_filter_by_analysis_result(self):
         """
         I can filter by Analysis result
@@ -801,58 +800,129 @@ class OrdersTestCases(BaseTest):
             # close child table
             self.orders_page.close_child_table(source=results[i])
 
-    @skip("https://modeso.atlassian.net/browse/LIMSA-205")
-    def test032_download_suborder_sheet_for_single_order(self):
+    def test032_create_order_then_overview(self):
         """
-        Export order child table
+        Orders: Create: In case of clicking on the overview button after clicking create new order
+        check it redirects to the active table
 
-        LIMS-8085- single order case
+        LIMS-6204
         """
-        self.info('select random order')
-        random_row = self.orders_page.get_random_table_row(table_element='general:table')
-        self.orders_page.click_check_box(source=random_row)
-        random_row_data = self.base_selenium.get_row_cells_dict_related_to_header(random_row)
-        self.orders_page.open_child_table(source=random_row)
-        child_table_data = self.order_page.get_table_data()
-        order_data_list = []
-        order_dict = {}
-        for sub_order in child_table_data:
-            order_dict.update(random_row_data)
-            order_dict.update(sub_order)
-            order_data_list.append(order_dict)
-            order_dict = {}
+        self.order_page.click_create_order_button()
+        self.order_page.sleep_tiny()
+        self.order_page.click_overview()
+        self.info('asserting correct redirection to orders active table ')
+        self.info('Active table url is {} , current url is {}'.format(
+            self.orders_page.orders_url, self.base_selenium.get_url()))
+        self.assertEqual(self.orders_page.orders_url, self.base_selenium.get_url())
 
-        #formatted_orders = self.orders_page.match_format_to_sheet_format(order_data_list)
-        self.order_page.download_xslx_sheet()
-        for index in range(len(formatted_orders)):
-            self.info('Comparing the order no {} '.format(formatted_orders[index][0]))
-            values = self.order_page.sheet.iloc[index].values
-            fixed_sheet_row_data = self.reformat_data(values)
-            self.assertCountEqual(fixed_sheet_row_data, formatted_orders[index],
-                                  f"{str(fixed_sheet_row_data)} : {str(formatted_orders[index])}")
-            for item in formatted_orders[index]:
-                self.assertIn(item, fixed_sheet_row_data)
-
-    @skip('need to be re-implemented to include child table data')
-    def test033_export_order_sheet(self):
+    @parameterized.expand(['update_a_field', 'no_updates'])
+    def test033_edit_order_page_then_overview(self, edit_case):
         """
-        New: Orders: XSLX Approach: user can download all data in table view with the same order with table view
+        Orders: Popup should appear when editing then clicking on overview without saving <All data will be lost>
+        LIMS-6814
 
-        LIMS-3274
+        Orders: No popup should appear when clicking on overview without changing anything
+        LIMS-6821
         """
-        self.info(' * Download XSLX sheet')
-        self.order_page.select_all_records()
-        self.order_page.download_xslx_sheet()
-        rows_data = self.order_page.get_table_rows_data()
-        for index in range(len(rows_data) - 1):
-            self.info(
-                ' * Comparing the order no. {} '.format(index + 1))
-            fixed_row_data = self.fix_data_format(rows_data[index].split('\n'))
-            values = self.order_page.sheet.iloc[index].values
-            fixed_sheet_row_data = self.fix_data_format(values)
-            for item in fixed_row_data:
-                if item != " ":
-                    self.assertIn(item, fixed_sheet_row_data)
+        random_order = random.choice(self.orders_api.get_all_orders_json())
+        res, payload = self.contacts_api.create_contact()
+        self.assertEqual(res['status'], 1)
+        new_contact = res['company']['name']
+        new_department = payload['departments'][0]['text']
+        self.info('edit order with No {}'.format(random_order['orderNo']))
+        self.order_page.filter_by_order_no(random_order['orderNo'])
+        row = self.orders_page.result_table()[0]
+        self.order_page.open_edit_page(row=row)
+        if edit_case == 'update_a_field':
+            self.info('update the contact field')
+            self.order_page.set_contacts(remove_old=True, contacts=[new_contact])
+            SubOrders().set_departments(departments=[new_department])
+        self.order_page.click_overview()
+        if edit_case == 'update_a_field':
+            self.assertIn('All data will be lost', self.order_page.get_confirmation_pop_up_text())
+            self.assertTrue(self.order_page.confirm_popup(check_only=True))
+        else:
+            self.assertFalse(self.order_page.confirm_popup(check_only=True))
+            self.info('asserting redirection to active table')
+            self.assertEqual(self.order_page.orders_url, self.base_selenium.get_url())
+
+    @parameterized.expand(['10', '20', '25', '50', '100'])
+    @attr(series=True)
+    def test034_testing_table_pagination(self, pagination_limit):
+        """
+        Orders: Active table: Pagination Approach; Make sure that I can set the pagination
+        to display 10/20/25/50/100 records in each page
+
+        LIMS-6199
+        """
+        self.order_page.set_page_limit(limit=pagination_limit)
+        table_info = self.order_page.get_table_info_data()
+        self.info('get current table records count')
+        table_records_count = str(len(self.order_page.result_table()) - 1)
+
+        self.info('table records count is {}, and it should be {}'.
+                  format(table_records_count, table_info['page_limit']))
+        self.assertEqual(table_records_count, table_info['page_limit'])
+
+        self.info('current page limit is {}, and it should be {}'.
+                  format(table_info['pagination_limit'], pagination_limit))
+        self.assertEqual(table_info['pagination_limit'], pagination_limit)
+
+        if int(table_info['pagination_limit']) <= int((table_info['count']).replace(",", "")):
+            self.assertEqual(table_info['pagination_limit'], table_records_count)
+
+    # @skip("https://modeso.atlassian.net/browse/LIMSA-205")
+    # def test032_download_suborder_sheet_for_single_order(self):
+    #     """
+    #     Export order child table
+    #
+    #     LIMS-8085- single order case
+    #     """
+    #     self.info('select random order')
+    #     random_row = self.orders_page.get_random_table_row(table_element='general:table')
+    #     self.orders_page.click_check_box(source=random_row)
+    #     random_row_data = self.base_selenium.get_row_cells_dict_related_to_header(random_row)
+    #     self.orders_page.open_child_table(source=random_row)
+    #     child_table_data = self.order_page.get_table_data()
+    #     order_data_list = []
+    #     order_dict = {}
+    #     for sub_order in child_table_data:
+    #         order_dict.update(random_row_data)
+    #         order_dict.update(sub_order)
+    #         order_data_list.append(order_dict)
+    #         order_dict = {}
+    #
+    #     formatted_orders = self.orders_page.match_format_to_sheet_format(order_data_list)
+    #     self.order_page.download_xslx_sheet()
+    #     for index in range(len(formatted_orders)):
+    #         self.info('Comparing the order no {} '.format(formatted_orders[index][0]))
+    #         values = self.order_page.sheet.iloc[index].values
+    #         fixed_sheet_row_data = self.reformat_data(values)
+    #         self.assertCountEqual(fixed_sheet_row_data, formatted_orders[index],
+    #                               f"{str(fixed_sheet_row_data)} : {str(formatted_orders[index])}")
+    #         for item in formatted_orders[index]:
+    #             self.assertIn(item, fixed_sheet_row_data)
+    #
+    # @skip('need to be re-implemented to include child table data')
+    # def test033_export_order_sheet(self):
+    #     """
+    #     New: Orders: XSLX Approach: user can download all data in table view with the same order with table view
+    #
+    #     LIMS-3274
+    #     """
+    #     self.info(' * Download XSLX sheet')
+    #     self.order_page.select_all_records()
+    #     self.order_page.download_xslx_sheet()
+    #     rows_data = self.order_page.get_table_rows_data()
+    #     for index in range(len(rows_data) - 1):
+    #         self.info(
+    #             ' * Comparing the order no. {} '.format(index + 1))
+    #         fixed_row_data = self.fix_data_format(rows_data[index].split('\n'))
+    #         values = self.order_page.sheet.iloc[index].values
+    #         fixed_sheet_row_data = self.fix_data_format(values)
+    #         for item in fixed_row_data:
+    #             if item != " ":
+    #                 self.assertIn(item, fixed_sheet_row_data)
 
     def test034_year_format_in_suborder_sheet(self):
         """
@@ -884,69 +954,3 @@ class OrdersTestCases(BaseTest):
         fixed_sheet_row_data = self.reformat_data(values)
         self.assertIn(order_no, fixed_sheet_row_data)
         self.assertIn(analysis_no, fixed_sheet_row_data)
-
-    def test035_create_order_then_overview(self):
-        """
-        Orders: Create: In case of clicking on the overview button after clicking create new order
-        check it redirects to the active table
-
-        LIMS-6204
-        """
-        self.order_page.click_create_order_button()
-        self.order_page.sleep_tiny()
-        self.order_page.click_overview()
-        self.info('asserting correct redirection to orders active table ')
-        self.info('Active table url is {} , current url is {}'.format(
-            self.orders_page.orders_url, self.base_selenium.get_url()))
-        self.assertEqual(self.orders_page.orders_url, self.base_selenium.get_url())
-
-    @parameterized.expand(['update_a_field', 'no_updates'])
-    def test036_edit_order_page_then_overview(self, edit_case):
-        """
-        Orders: Popup should appear when editing then clicking on overview without saving <All data will be lost>
-        LIMS-6814
-
-        Orders: No popup should appear when clicking on overview without changing anything
-        LIMS-6821
-        """
-        random_order = random.choice(self.orders_api.get_all_orders_json())
-        self.info('edit order with No {}'.format(random_order['orderNo']))
-        self.order_page.filter_by_order_no(random_order['orderNo'])
-        row = self.orders_page.result_table()[0]
-        self.order_page.open_edit_page(row=row)
-        if edit_case == 'update_a_field':
-            self.info('update the contact field')
-            self.order_page.set_contacts(remove_old=True)
-        self.order_page.click_overview()
-        if edit_case == 'update_a_field':
-            self.assertIn('All data will be lost', self.order_page.get_confirmation_pop_up_text())
-            self.assertTrue(self.order_page.confirm_popup(check_only=True))
-        else:
-            self.assertFalse(self.order_page.confirm_popup(check_only=True))
-            self.info('asserting redirection to active table')
-            self.assertEqual(self.order_page.orders_url, self.base_selenium.get_url())
-
-    @parameterized.expand(['10', '20', '25', '50', '100'])
-    @attr(series=True)
-    def test037_testing_table_pagination(self, pagination_limit):
-        """
-        Orders: Active table: Pagination Approach; Make sure that I can set the pagination
-        to display 10/20/25/50/100 records in each page
-
-        LIMS-6199
-        """
-        self.order_page.set_page_limit(limit=pagination_limit)
-        table_info = self.order_page.get_table_info_data()
-        self.info('get current table records count')
-        table_records_count = str(len(self.order_page.result_table()) - 1)
-
-        self.info('table records count is {}, and it should be {}'.
-                  format(table_records_count, table_info['page_limit']))
-        self.assertEqual(table_records_count, table_info['page_limit'])
-
-        self.info('current page limit is {}, and it should be {}'.
-                  format(table_info['pagination_limit'], pagination_limit))
-        self.assertEqual(table_info['pagination_limit'], pagination_limit)
-
-        if int(table_info['pagination_limit']) <= int((table_info['count']).replace(",", "")):
-            self.assertEqual(table_info['pagination_limit'], table_records_count)
