@@ -8,7 +8,7 @@ class TstUnits(BasePages):
         self.test_units_url = "{}testUnits".format(self.base_selenium.url)
 
     def get_test_units_page(self):
-        self.base_selenium.LOGGER.info(' + Get test units page.')
+        self.info('get test units page.')
         self.base_selenium.get(url=self.test_units_url)
         self.wait_until_page_is_loaded()
 
@@ -46,13 +46,6 @@ class TstUnits(BasePages):
         self.base_selenium.click(element='test_units:archived')
         self.sleep_small()
     
-    def open_configurations(self):
-        self.info('open testunits configurations')
-        self.base_selenium.scroll()
-        self.base_selenium.click(element='test_units:right_menu')
-        self.base_selenium.click(element='test_units:configurations')
-        self.sleep_small()
-
     def is_test_unit_in_table(self, value):
         """
             - get_archived_test_units then call me to check if the test unit has been archived.
@@ -162,7 +155,7 @@ class TstUnits(BasePages):
         self.sleep_tiny()
 
     def archive_quantification_limit_field(self):
-        self.base_selenium.LOGGER.info('archive quantification limit field')
+        self.info('archive quantification limit field')
         self.get_active_fields_tab()
         element_exists = self.base_selenium.check_element_is_exist(element='test_unit:configuration_testunit_useQuantification')
         if element_exists == False:
@@ -175,7 +168,7 @@ class TstUnits(BasePages):
         return True
 
     def restore_quantification_limit_field(self):
-        self.base_selenium.LOGGER.info('restore quantification limit field')
+        self.info('restore quantification limit field')
         self.get_archived_items()
         self.sleep_tiny()
         element_exists = self.base_selenium.check_element_is_exist(element='test_unit:configuration_testunit_useQuantification')
@@ -226,7 +219,7 @@ class TstUnits(BasePages):
         row = self.base_selenium.get_table_rows(element='general:table')[0]
         self.click_check_box(row)
         self.sleep_tiny()
-        self.info('Open Versions for the selected test unit')
+        self.info('open Versions for the selected test unit')
         self.get_versions_of_selected_test_units()
         version_data = []
         rows = self.result_table()

@@ -286,7 +286,7 @@ class Orders(BasePages):
         return order_data
 
     def get_random_main_order_with_sub_orders_data(self):
-        self.info('+ Get Main order data with related subOrders')
+        self.info('Get Main order data with related subOrders')
         # get all the order rows
         all_orders = self.base_selenium.get_table_rows(element='orders:orders_table')
         # select random order
