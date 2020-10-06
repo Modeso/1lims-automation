@@ -153,8 +153,9 @@ class Orders(BasePages):
                                                             destination_element='general:filter')
         filter.click()
 
-    def list_filter_feilds(self):
+    def list_filter_fields(self):
         config_btn = self.base_selenium.find_element('general:filter_configuration')
+        import ipdb;ipdb.set_trace()
         config_btn.click()
         self.sleep_tiny()
         elements = self.base_selenium.find_elements('general:filter_Configure_options')
@@ -168,6 +169,7 @@ class Orders(BasePages):
         self.info('Filter by analysis number : {}'.format(filter_text))
         self.filter_by(filter_element='orders:analysis_filter', filter_text=filter_text, field_type='text')
         self.filter_apply()
+        self.close_filter_menu()
         self.sleep_tiny()
 
     def filter_by_contact(self, filter_text):

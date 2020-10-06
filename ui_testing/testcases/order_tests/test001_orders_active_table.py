@@ -29,6 +29,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.get_orders_page()
         self.test_unit_api.set_name_configuration_name_only()
         self.orders_api.set_configuration()
+        self.orders_api.set_filter_configuration()
 
     @parameterized.expand(['order', 'sub_order'])
     def test001_options_icon_items(self, order):
@@ -77,7 +78,71 @@ class OrdersTestCases(BaseTest):
         list = self.orders_page.get_right_menu_options()
         self.assertCountEqual(list, options)
 
-    def test004_archive_main_order(self):
+    @attr(series=True)
+    def test004_configure_any_field_in_active_table(self):
+        """
+        Order: Table configuration: Make sure that you can configure any field in the active table
+
+        LIMS-8213
+        """
+        self.info('uncheck Contact name, Order No. and Created On fields from configure order table')
+        headers = self.orders_page.set_specific_configure_table_column_to_specific_value(
+            fields=['Contact Name', 'Order No.', 'Created On'], value=False)
+        self.info('assert that unchecked fields disappear from orders active table')
+        self.assertNotIn('Order No.', headers)
+        self.assertNotIn('Contact Name', headers)
+        self.assertNotIn('Created On', headers)
+        self.info('rechecking Contact Name and Order No only reappear in orders active table')
+        headers_after_rechecking = self.orders_page.set_specific_configure_table_column_to_specific_value(
+            fields=['Contact Name', 'Order No.'], value=True)
+        self.assertIn('Order No.', headers_after_rechecking)
+        self.assertIn('Contact Name', headers_after_rechecking)
+        self.assertNotIn('Created On', headers_after_rechecking)
+
+    @attr(series=True)
+    def test005_configure_any_field_in_child_table(self):
+        """
+         Order: Table configuration: Make sure that you can configure any field in the child table
+
+         LIMS-8212
+        """
+        self.info('Uncheck material type and article name checkboxes in configure table')
+        child_table_headers = self.orders_page.set_specific_configure_table_column_to_specific_value(
+            fields=['Material Type', 'Article Name'], child=True, value=False,
+            element='general:configure_child_table_items')
+        self.info('assert that unchecked fields disappear from child table')
+        self.assertNotIn('Article Name', child_table_headers)
+        self.assertNotIn('Material Type', child_table_headers)
+        child_table_headers_after_check = self.orders_page.set_specific_configure_table_column_to_specific_value(
+            fields=['Material Type', 'Article Name'], child=True, value=True,
+            element='general:configure_child_table_items')
+        self.info('assert after rechecking that article name and material type reappear in child table')
+        self.assertIn('Article Name', child_table_headers_after_check)
+        self.assertIn('Material Type', child_table_headers_after_check)
+
+    def test006_analysis_number_displayed_in_order_child_table(self):
+        """
+          Orders: Analysis number Approach: Make sure that the analysis number
+          should display in the order child table
+
+          LIMS-2622
+        """
+        child_headers = self.orders_page.set_specific_configure_table_column_to_specific_value(
+            fields=['Analysis No.', 'Article Name'], child=True, value=True,
+            element='general:configure_child_table_items')
+        self.info("Check if Analysis No. displayed in Child Table headers")
+        self.assertIn('Analysis No.', child_headers)
+        random_order = random.choice(self.orders_api.get_all_orders_json())
+        analysis_no = self.orders_api.get_suborder_by_order_id(random_order['orderId'])[0]['orders'][0]['analysis'][0]
+        filter_element = self.order_page.order_filters_element(key='analysis')
+        self.info('filter by analysis No {}'.format(analysis_no))
+        self.orders_page.filter_by_analysis_number(analysis_no)
+        self.info("assert that analysis no is marked")
+        xpath = "//mark[contains(text(),'{}')]".format(analysis_no)
+        elem = self.base_selenium.find_element_by_xpath(xpath)
+        self.assertTrue(elem)
+
+    def test007_archive_main_order(self):
         """"
         User can archive a main order
 
@@ -92,13 +157,13 @@ class OrdersTestCases(BaseTest):
         self.orders_page.archive_selected_items()
         self.orders_page.get_archived_items()
         self.orders_page.filter_by_order_no(order_number)
-        self.assertEqual(len(self.orders_page.result_table()-1), 1)
+        self.assertEqual(len(self.orders_page.result_table())-1, 1)
         self.info('Checking if order number: {} is archived correctly'.format(order_number))
         order_data = self.orders_page.get_the_latest_row_data()
         self.assertEqual(order_number, order_data['Order No.'].replace("'", ""))
         self.info('Order number: {} is archived correctly'.format(order_number))
 
-    def test005_archive_multiple_orders(self):
+    def test008_archive_multiple_orders(self):
         """
         Orders: Archive Approach: Make sure that you can select multiple records
         and then archive them at the same time
@@ -118,7 +183,7 @@ class OrdersTestCases(BaseTest):
             result_data = self.orders_page.get_the_latest_row_data()
             self.assertIn(order_no.replace("'", ""), result_data['Order No.'].replace("'", ""))
 
-    def test006_archive_main_order_reflect_on_analysis(self):
+    def test009_archive_main_order_reflect_on_analysis(self):
         """
         New: Orders Form: Archive main order: Make sure when the user archive main order,
         the analysis corresponding to it will be archived also
@@ -130,7 +195,6 @@ class OrdersTestCases(BaseTest):
         order_no = response['order']['orderNo']
         order_id = response['order']['mainOrderId']
         suborders = self.orders_api.get_suborder_by_order_id(order_id)[0]['orders']
-        number_of_suborders = len(suborders)
         analysis_no_list = [suborder['analysis'][0] for suborder in suborders]
         self.info(" Archive order with number : {}".format(order_no))
         self.orders_page.filter_by_order_no(order_no)
@@ -138,13 +202,37 @@ class OrdersTestCases(BaseTest):
         self.assertTrue(self.orders_page.archive_main_order_from_order_option())
         self.info("Navigate to archived orders' table and filter by analysis no")
         self.orders_page.get_archived_items()
-        self.orders_page.filter_by_analysis_number(analysis_no_list[0])
-        self.assertTrue(self.orders_page.is_order_in_table(value=order_no))
-        child_data = self.orders_page.get_child_table_data()
-        result_analysis = [suborder['Analysis No.'].replace("'", "") for suborder in child_data]
-        self.assertCountEqual(result_analysis, analysis_no_list)
+        for analysis in analysis_no_list:
+            self.orders_page.filter_by_analysis_number(analysis)
+            self.assertTrue(self.orders_page.is_order_in_table(value=order_no))
 
-    def test007_restore_archived_order(self):
+    def test010_cancel_archive_reflect_on_analysis(self):
+        """
+        [Archiving][MainOrder]Make sure that if user cancel archive order,
+        No order or suborders or analysis of the order will be archived
+        LIMS-5404
+        """
+        self.info("create order with multiple suborders using api")
+        response, payload = self.orders_api.create_order_with_multiple_suborders()
+        self.assertEqual(response['status'], 1)
+        order_no = response['order']['orderNo']
+        order_id = response['order']['mainOrderId']
+        suborders = self.orders_api.get_suborder_by_order_id(order_id)[0]['orders']
+        analysis_no_list = [suborder['analysis'][0] for suborder in suborders]
+        self.info(" Archive order with number : {}".format(order_no))
+        self.orders_page.filter_by_order_no(order_no)
+        self.assertEqual(len(self.orders_page.result_table()) - 1, 1)
+        self.info('click on archive then cancel popup')
+        self.orders_page.archive_main_order_from_order_option(check_pop_up=True, confirm=False)
+        table_records = self.orders_page.result_table(element='general:table')
+        self.assertEqual(1, len(table_records) - 1)
+        self.info('go to archived orders')
+        self.orders_page.get_archived_items()
+        for analysis in analysis_no_list:
+            self.orders_page.filter_by_analysis_number(analysis)
+            self.assertFalse(self.orders_page.is_order_in_table(value=order_no))
+
+    def test011_restore_archived_order(self):
         """
          Orders: Restore Approach: User can restore any order from the archived table
 
@@ -172,7 +260,7 @@ class OrdersTestCases(BaseTest):
         self.orders_page.sleep_tiny()
         self.orders_page.get_active_items()
         self.orders_page.filter_by_order_no(order_no)
-        self.assertEqual(len(self.orders_page.result_table() - 1), 1)
+        self.assertEqual(len(self.orders_page.result_table())-1, 1)
         self.info('Checking if order number: {} is archived correctly'.format(order_no))
         order_data = self.orders_page.get_the_latest_row_data()
         self.assertEqual(order_no, order_data['Order No.'].replace("'", ""))
@@ -183,7 +271,7 @@ class OrdersTestCases(BaseTest):
         self.info('asserting restored suborders are correct')
         self.assertCountEqual(analysis_numbers, restored_analysis_numbers)
 
-    def test008_delete_main_order(self):
+    def test012_delete_main_order(self):
         """
         New: Order without/with article: Deleting of orders
         The user can hard delete any archived order
@@ -213,14 +301,50 @@ class OrdersTestCases(BaseTest):
         self.orders_page.navigate_to_analysis_active_table()
         for analysis in analysis_no_list:
             self.analyses_page.filter_by_analysis_number(analysis)
-            self.analyses_page.close_filter_menu()
             deleted_analysis = self.analyses_page.result_table()[0]
             self.assertTrue(deleted_analysis.get_attribute("textContent"), 'No data available in table')
 
-    def test009_delete_multiple_orders(self):
+    def test013_delete_archived_order_with_all_suborders(self):
         """
-        Orders: Make sure that you can't delete multiple orders records at the same time
-        LIMS-6854
+         [Archiving][MainOrder]Make sure that user able to delete the archived orders with all suborders,
+         and analysis of the order without affecting the active orders
+
+         LIMS-5405
+        """
+        self.info('create order with 3 suborders')
+        response, payload = self.orders_api.create_order_with_multiple_suborders(no_suborders=3)
+        self.assertEqual(response['message'], 'created_success')
+        suborders, _ = self.orders_api.get_suborder_by_order_id(response['order']['mainOrderId'])
+        analysis = [suborder['analysis'][0] for suborder in suborders['orders']]
+        self.orders_page.filter_by_order_no(filter_text=payload[0]['orderNo'])
+        self.info('archive the main order from active table')
+        self.assertTrue(self.orders_page.archive_main_order_from_order_option(check_pop_up=True))
+        self.orders_page.get_archived_items()
+        self.orders_page.filter_by_order_no(payload[0]['orderNo'])
+        rows = self.orders_page.result_table()
+        self.assertEqual(len(rows) - 1, 1)
+        self.info('assert main orders with its suborders in archived table')
+        suborders = self.orders_page.get_child_table_data()
+        analysis_no_list = [analysis['Analysis No.'].replace("'", "") for analysis in suborders]
+        self.assertCountEqual(analysis_no_list, analysis)
+        self.orders_page.click_check_box(rows[0])
+        self.order_page.delete_selected_item()
+        self.orders_page.confirm_popup()
+        self.info('filter by order no {} to make sure no result found'.format(payload[0]['orderNo']))
+        self.orders_page.filter_by_order_no(payload[0]['orderNo'])
+        results = self.orders_page.result_table()[0]
+        self.assertTrue(results.get_attribute("textContent"), 'No data available in table')
+        self.info('assert active table not affected by deleted order')
+        self.orders_page.get_active_items()
+        self.orders_page.filter_by_order_no(payload[0]['orderNo'])
+        results = self.orders_page.result_table()[0]
+        self.assertTrue(results.get_attribute("textContent"), 'No data available in table')
+
+    def test014_delete_multiple_orders(self):
+        """
+         Orders: Make sure that you can't delete multiple orders records at the same time
+
+         LIMS-6854
         """
         self.info("navigate to archived items' table")
         self.orders_page.get_archived_items()
@@ -233,12 +357,12 @@ class OrdersTestCases(BaseTest):
 
     # @skip("https://modeso.atlassian.net/browse/LIMSA-281")
     # @skip("https://modeso.atlassian.net/browse/LIMSA-280")
-    def test010_archive_sub_order(self):
+    def test015_archive_sub_order(self):
         """
-        orders :Make sure that by clicking on Archive from Suborder options a confirmation popup will appear
-        and user can Archive this suborder with its corresponding analysis
-        LIMS-3739
-        LIMS-5369
+         orders :Make sure that by clicking on Archive from Suborder options a confirmation popup will appear
+         and user can Archive this suborder with its corresponding analysis
+         LIMS-3739
+         LIMS-5369
         """
         self.info('select random order')
         random_row = self.orders_page.get_random_table_row(table_element='general:table')
@@ -260,10 +384,10 @@ class OrdersTestCases(BaseTest):
         results = self.order_page.result_table(element='general:table_child')[0].text
         self.assertIn(analysis_no.replace("'", ""), results.replace("'", ""))
 
-    def test011_restore_archived_sub_orders(self):
+    def test016_restore_archived_sub_orders(self):
         """
-        I can restore any sub order successfully
-        LIMS-4374
+         I can restore any sub order successfully
+         LIMS-4374
         """
         self.info("create order with multiple suborders using api")
         response, payload = self.orders_api.create_order_with_multiple_suborders()
@@ -292,7 +416,7 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(suborders_data[random_index]['Analysis No.'].replace("'", ""),
                          child_data[0]['Analysis No.'].replace("'", ""))
 
-    def test012_delete_suborder(self):
+    def test017_delete_suborder(self):
         """
          Delete sub order Approach: In case I have main order with multiple sub orders,
          make sure you can delete one of them
@@ -319,7 +443,7 @@ class OrdersTestCases(BaseTest):
                                                  filter_text=suborder_data['Analysis No.'], field_type='text')
         self.assertEqual(len(self.order_page.result_table()), 1)
 
-    def test013_order_of_test_units_in_analysis(self):
+    def test018_order_of_test_units_in_analysis(self):
         """
         Orders: Ordering test units: Test units in the analysis section should display
         in the same order as in the order section
@@ -338,39 +462,9 @@ class OrdersTestCases(BaseTest):
         analysis_testunits = [test_unit['Test Unit'] for test_unit in table_data]
         self.assertCountEqual(order_testunits, analysis_testunits)
 
-    def test014_cancel_archive_reflect_on_anlaysis(self):
-        """
-        [Archiving][MainOrder]Make sure that if user cancel archive order,
-        No order or suborders or analysis of the order will be archived
-        LIMS-5404
-        """
-        self.info('create order with 3 suborders')
-        import ipdb;ipdb.set_trace()
-        response, payload = self.orders_api.create_order_with_multiple_suborders(no_suborders=3)
-        self.assertEqual(response['status'], 1)
-        suborders_data, _ = self.orders_api.get_suborder_by_order_id()
-        suborders = suborders_data['orders']
-        self.assertEqual(3, len(suborders))
-        analysis_no = [suborder['analysis'][0] for suborder in suborders]
-        self.orders_page.get_orders_page()
-        self.orders_page.filter_by_order_no(filter_text=order_no)
-        self.info('click on arhcive then cancel popup')
-        self.orders_page.archive_main_order_from_order_option(check_pop_up=True, confirm=False)
-        table_records = self.orders_page.result_table(element='general:table')
-        self.assertEqual(1, len(table_records) - 1)
-        self.info('go to archived orders')
-        self.orders_page.get_archived_items()
-        self.orders_page.filter_by_order_no(filter_text=order_no)
-        self.assertEqual(len(self.order_page.result_table()) - 1, 0)
-        for i in range(0, len(analysis_no) - 1):
-            self.base_selenium.refresh()
-            self.orders_page.get_archived_items()
-            self.orders_page.filter_by_analysis_number(filter_text=analysis_no[i])
-            self.assertEqual(len(self.order_page.result_table()) - 1, 0)
-
     @parameterized.expand(['True', 'False'])
     # @skip('https://modeso.atlassian.net/browse/LIMSA-267')
-    def test015_order_search(self, small_letters):
+    def test019_order_search(self, small_letters):
         """
         New: Orders: Search Approach: User can search by any field & each field should display with yellow color
 
@@ -410,7 +504,7 @@ class OrdersTestCases(BaseTest):
                              search_data[column].replace("'", '').split(',')[0])
 
     @parameterized.expand(['2020', '20'])
-    def test016_search_by_year(self, search_text):
+    def test020_search_by_year(self, search_text):
         """
         Search: Orders: Make sure that you can search by all the year format
         ( with year in case year after or before & without year )
@@ -424,10 +518,9 @@ class OrdersTestCases(BaseTest):
         for order in orders:
             self.assertIn(search_text, order.replace("'", ""))
 
-    def test017_filter_configuration_fields(self):
+    def test021_filter_configuration_fields(self):
         """
-          Orders: Make sure that user can filter order TestUnit that exist
-          on order only(TestUnit in Analysis not Included)
+          [Orders][Filter] check fields displayed in filtration section in orders page
 
           LIMS-5379
 
@@ -439,7 +532,7 @@ class OrdersTestCases(BaseTest):
         self.info("open filter menu")
         self.orders_page.open_filter_menu()
         self.info("open filter configuration")
-        found_fields = self.orders_page.list_filter_feilds()
+        found_fields = self.orders_page.list_filter_fields()
         self.info("fields in filter are {}".format(found_fields))
         required_fields = ['Analysis Results', 'Test Units', 'Material Type', 'Analysis No.',
                            'Departments', 'Test Plans', 'Changed By', 'Created On', 'Shipment Date',
@@ -450,8 +543,26 @@ class OrdersTestCases(BaseTest):
         for field in required_fields:
             self.assertIn(field, found_fields)
 
+    def test022_filter_fields_configuration(self):
+        """
+         Orders: Filter configuration: Make sure that the user can configure any field from the filter configuration
+         and this action should reflect on the filter section.
+         LIMS-5848
+        """
+        self.orders_page.open_filter_menu()
+        self.info('asserting contact filter field is displayed at the beginning')
+        self.assertTrue(self.base_selenium.check_element_is_exist(element='orders:contact_filter'))
+        fields = self.orders_page.list_filter_fields()
+        self.assertIn('Contact Name', fields)
+        self.info('hiding contact field')
+        self.base_selenium.click(element='orders:contact_filter_switch')
+        self.base_selenium.click(element='orders:save_filter_config')
+        self.orders_page.sleep_tiny()
+        self.info('asserting contact filter field is not displayed')
+        self.assertFalse(self.base_selenium.check_element_is_exist(element='orders:contact_filter'))
+
     @parameterized.expand(['materialType', 'article', 'testPlans', 'testUnit'])
-    def test018_filter_by_any_fields(self, key):
+    def test023_filter_by_any_fields(self, key):
         """
         New: Orders: Filter Approach: I can filter by any field in the table view
 
@@ -481,7 +592,7 @@ class OrdersTestCases(BaseTest):
             # close child table
             self.orders_page.close_child_table(source=results[i])
 
-    def test019_filter_by_analysis_no(self):
+    def test024_filter_by_analysis_no(self):
         """
         New: Orders: Filter Approach: I can filter by analysis No
 
@@ -505,7 +616,7 @@ class OrdersTestCases(BaseTest):
                 break
         self.assertTrue(key_found)
 
-    def test020_filter_by_order_No(self):
+    def test025_filter_by_order_No(self):
         """
         I can filter by any order No.
 
@@ -527,7 +638,7 @@ class OrdersTestCases(BaseTest):
         self.assertIn(order['orderNo'], order_data['Order No.'].replace("'", ""))
         self.assertIn('-2020', result_order[0].text.replace("'", ""))
 
-    def test021_filter_by_status(self):
+    def test026_filter_by_status(self):
         """
         I can filter by status
 
@@ -549,7 +660,7 @@ class OrdersTestCases(BaseTest):
 
         self.assertTrue(filter_key_found)
 
-    def test022_filter_by_analysis_result(self):
+    def test027_filter_by_analysis_result(self):
         """
         I can filter by Analysis result
 
@@ -570,7 +681,7 @@ class OrdersTestCases(BaseTest):
 
         self.assertTrue(filter_key_found)
 
-    def test023_filter_by_contact(self):
+    def test028_filter_by_contact(self):
         """
         New: Orders: Filter Approach: I can filter by contact
 
@@ -588,7 +699,7 @@ class OrdersTestCases(BaseTest):
             if result.text:
                 self.assertIn(contact, result.text)
 
-    def test024_filter_by_department(self):
+    def test029_filter_by_department(self):
         """
         I can filter by department
 
@@ -617,7 +728,7 @@ class OrdersTestCases(BaseTest):
 
     @parameterized.expand(['testDate', 'shipmentDate', 'createdAt'])
     # @skip("https://modeso.atlassian.net/browse/LIMSA-279")
-    def test025_filter_by_date(self, key):
+    def test030_filter_by_date(self, key):
         """
          I can filter by testDate, shipmentDate, or createdAt fields
 
@@ -644,7 +755,7 @@ class OrdersTestCases(BaseTest):
         self.assertTrue(filter_key_found)
 
     @attr(series=True)
-    def test026_filter_by_changed_by(self):
+    def test031_filter_by_changed_by(self):
         """
         New: Orders: Filter Approach: I can filter by changed by
 
@@ -691,7 +802,7 @@ class OrdersTestCases(BaseTest):
             self.orders_page.close_child_table(source=results[i])
 
     @skip("https://modeso.atlassian.net/browse/LIMSA-205")
-    def test064_download_suborder_sheet_for_single_order(self):
+    def test032_download_suborder_sheet_for_single_order(self):
         """
         Export order child table
 
@@ -723,7 +834,7 @@ class OrdersTestCases(BaseTest):
                 self.assertIn(item, fixed_sheet_row_data)
 
     @skip('need to be re-implemented to include child table data')
-    def test065_export_order_sheet(self):
+    def test033_export_order_sheet(self):
         """
         New: Orders: XSLX Approach: user can download all data in table view with the same order with table view
 
@@ -743,7 +854,7 @@ class OrdersTestCases(BaseTest):
                 if item != " ":
                     self.assertIn(item, fixed_sheet_row_data)
 
-    def test099_year_format_in_suborder_sheet(self):
+    def test034_year_format_in_suborder_sheet(self):
         """
          Analysis number format: In case the analysis number displayed with full year,
          this should reflect on the export file
@@ -774,7 +885,7 @@ class OrdersTestCases(BaseTest):
         self.assertIn(order_no, fixed_sheet_row_data)
         self.assertIn(analysis_no, fixed_sheet_row_data)
 
-    def test066_create_order_then_overview(self):
+    def test035_create_order_then_overview(self):
         """
         Orders: Create: In case of clicking on the overview button after clicking create new order
         check it redirects to the active table
@@ -790,7 +901,7 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(self.orders_page.orders_url, self.base_selenium.get_url())
 
     @parameterized.expand(['update_a_field', 'no_updates'])
-    def test104_edit_order_page_then_overview(self, edit_case):
+    def test036_edit_order_page_then_overview(self, edit_case):
         """
         Orders: Popup should appear when editing then clicking on overview without saving <All data will be lost>
         LIMS-6814
@@ -817,7 +928,7 @@ class OrdersTestCases(BaseTest):
 
     @parameterized.expand(['10', '20', '25', '50', '100'])
     @attr(series=True)
-    def test067_testing_table_pagination(self, pagination_limit):
+    def test037_testing_table_pagination(self, pagination_limit):
         """
         Orders: Active table: Pagination Approach; Make sure that I can set the pagination
         to display 10/20/25/50/100 records in each page

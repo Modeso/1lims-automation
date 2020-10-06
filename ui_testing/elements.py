@@ -589,6 +589,8 @@ elements = {
                          'value': 'orderNofield'},
         'contact_filter': {'method': 'id',
                            'value': 'companyfield'},
+        'contact_filter_switch': {'method': 'xpath',
+                                  'value': "//div[@id='contact']//label[@class='switch']"},
         'changed_by': {'method': 'id',
                        'value': 'lastModifiedUserfield'},
         'material_type_filter': {'method': 'id',
@@ -616,6 +618,8 @@ elements = {
         'shipment_date_filter': {'method': 'id',
                                  'value': 'start_shipmentDate',
                                  'order': 1},
+        'save_filter_config': {'method': 'xpath',
+                               'value': "//div[@id='filterConfig']//button[@class='btn btn-primary'][contains(text(),'Save')]"},
         'analysis_tab': {
             'method': 'xpath',
             'value': "//label[@class='btn tab']"},
