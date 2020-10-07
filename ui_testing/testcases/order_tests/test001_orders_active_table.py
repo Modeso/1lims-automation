@@ -239,7 +239,7 @@ class OrdersTestCases(BaseTest):
         self.info("create order with multiple suborders using api")
         response, payload = self.orders_api.create_order_with_multiple_suborders()
         self.assertEqual(response['status'], 1)
-        order_no = response['order']['orderNoWithYear']
+        order_no = response['order']['order']
         order_id = response['order']['mainOrderId']
         suborders = self.orders_api.get_suborder_by_order_id(order_id)[0]['orders']
         number_of_suborders = len(suborders)
@@ -390,7 +390,7 @@ class OrdersTestCases(BaseTest):
         self.info("create order with multiple suborders using api")
         response, payload = self.orders_api.create_order_with_multiple_suborders()
         self.assertEqual(response['status'], 1)
-        order_no = response['order']['orderNoWithYear']
+        order_no = response['order']['orderNo']
         order_id = response['order']['mainOrderId']
         suborders = self.orders_api.get_suborder_by_order_id(order_id)[0]['orders']
         self.info("archive order no {} using api".format(order_no))
@@ -583,7 +583,7 @@ class OrdersTestCases(BaseTest):
             suborders = self.orders_page.get_child_table_data(index=i)
             key_found = False
             for suborder in suborders:
-                if filter_dict['value'] in suborder[filter_dict[key]['result_key']].split(',\n'):
+                if filter_dict['value'] in suborder[filter_dict['result_key']].split(',\n'):
                     key_found = True
                     break
             self.assertTrue(key_found)
@@ -593,7 +593,6 @@ class OrdersTestCases(BaseTest):
     def test024_filter_by_analysis_no(self):
         """
         New: Orders: Filter Approach: I can filter by analysis No
-
         LIMS-3495
         """
         self.info('select random order using api')
