@@ -528,7 +528,7 @@ class ContactsTestCases(BaseTest):
         LIMS-6421
         """
         data_to_filter_with = self.contacts_api.get_first_record_with_data_in_attribute(attribute='type')
-        self.assertNotEqual(data_to_filter_with, False)
+        self.assertTrue(data_to_filter_with)
         data_to_filter_with = self.contact_page.get_mapped_contact_type(contact_type=data_to_filter_with[0])
 
         self.info('filter with {}'.format(data_to_filter_with))
