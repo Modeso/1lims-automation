@@ -43,7 +43,7 @@ class ContactsTestCases(BaseTest):
         self.contact_page.get_archived_contacts()
         for contact in selected_contacts_data:
             contact_no = contact['Contact No']
-            self.info(' + {} Contact sucessfully archived.'.format(contact_no))
+            self.info('{} Contact sucessfully archived.'.format(contact_no))
             self.assertTrue(self.contact_page.is_contact_in_table(value=contact_no))
 
     def test002_restore_contact(self):
@@ -60,7 +60,7 @@ class ContactsTestCases(BaseTest):
         self.contact_page.get_active_contacts()
         for contact in selected_contacts_data:
             contact_no = contact['Contact No']
-            self.info(' + {} Contact sucessfully restored.'.format(contact_no))
+            self.info('{} Contact sucessfully restored.'.format(contact_no))
             self.assertTrue(self.contact_page.is_contact_in_table(value=contact_no))
 
     def test003_create_contact(self):

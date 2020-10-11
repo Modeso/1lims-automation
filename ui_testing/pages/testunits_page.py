@@ -120,9 +120,9 @@ class TstUnits(BasePages):
 
         self.clear_all_selected_view_and_search_options()
         for view_search_option in view_search_options:
-            if view_search_option != '':
+            if view_search_option:
                 self.base_selenium.select_item_from_drop_down(element='configurations_page:view_search_ddl',
-                                                              item_text=view_search_option.replace('×',''))
+                                                              item_text=view_search_option.replace('×', ''))
         self.base_selenium.click(element='configurations_page:popup_save_button')
         self.sleep_small()
         self.base_selenium.click(element='configurations_page:save_button')
