@@ -502,11 +502,11 @@ class OrdersAPI(OrdersAPIFactory):
         super().set_configuration(payload=payload)
 
     def set_filter_configuration(self):
-        self.info('set order configuration')
+        self.info('set order filter configuration')
         config_file = os.path.abspath('api_testing/config/order_filter_config.json')
         with open(config_file, "r") as read_file:
             payload = json.load(read_file)
-        super().set_configuration(payload=payload)
+        super().set_filter_configuration(payload=payload, module='orders_api')
 
     def set_contact_configuration_to_number_only(self):
         self.info('set order configuration')

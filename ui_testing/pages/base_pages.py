@@ -87,6 +87,7 @@ class BasePages:
         self.sleep_small()
 
     def get_confirmation_pop_up_text(self):
+        self.base_selenium.wait_element(element='general:confirmation_pop_up')
         return self.base_selenium.get_text(element='general:confirmation_pop_up')
 
     def open_filter_menu(self):

@@ -1,6 +1,5 @@
 from ui_testing.testcases.base_test import BaseTest
 from ui_testing.pages.order_page import Order
-from ui_testing.pages.order_page import SubOrders
 from ui_testing.pages.orders_page import Orders
 from ui_testing.pages.login_page import Login
 from api_testing.apis.orders_api import OrdersAPI
@@ -823,27 +822,19 @@ class OrdersTestCases(BaseTest):
         Orders: No popup should appear when clicking on overview without changing anything
         LIMS-6821
         """
-        random_order = random.choice(self.orders_api.get_all_orders_json())
-        res, payload = self.contacts_api.create_contact()
-        self.assertEqual(res['status'], 1)
-        new_contact = res['company']['name']
-        new_department = payload['departments'][0]['text']
-        self.info('edit order with No {}'.format(random_order['orderNo']))
-        self.order_page.filter_by_order_no(random_order['orderNo'])
-        row = self.orders_page.result_table()[0]
-        self.order_page.open_edit_page(row=row)
+        self.orders_page.get_random_order()
+        self.orders_page.sleep_tiny()
         if edit_case == 'update_a_field':
-            self.info('update the contact field')
-            self.order_page.set_contacts(remove_old=True, contacts=[new_contact])
-            SubOrders().set_departments(departments=[new_department])
+            self.info('update contact field')
+            self.order_page.set_contacts(remove_old=True, contacts=[''])
         self.order_page.click_overview()
         if edit_case == 'update_a_field':
             self.assertIn('All data will be lost', self.order_page.get_confirmation_pop_up_text())
-            self.assertTrue(self.order_page.confirm_popup(check_only=True))
+            self.order_page.confirm_popup()
         else:
             self.assertFalse(self.order_page.confirm_popup(check_only=True))
-            self.info('asserting redirection to active table')
-            self.assertEqual(self.order_page.orders_url, self.base_selenium.get_url())
+        self.info('asserting redirection to active table')
+        self.assertEqual(self.order_page.orders_url, self.base_selenium.get_url())
 
     @parameterized.expand(['10', '20', '25', '50', '100'])
     @attr(series=True)

@@ -48,7 +48,7 @@ end_points = {
         'restore_suborder': '/api/orders/restore/suborders/',
         'delete_suborder': '/api/orders/suborders/',
         'get_suborder': '/api/orders/suborder/?orderId=',
-        'set_filter_configurations': 'api/custom_field_data/table/'
+        'set_filter_configurations': '/api/custom_field_data/table/'
     },
     'analysis_api': {
         'list_all_analysis': '/api/reportSheets',
