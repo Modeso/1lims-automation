@@ -6,13 +6,9 @@ from ui_testing.pages.testunits_page import TstUnits
 from api_testing.apis.test_unit_api import TestUnitAPI
 from api_testing.apis.article_api import ArticleAPI
 from api_testing.apis.test_plan_api import TestPlanAPI
-from api_testing.apis.orders_api import OrdersAPI
 from ui_testing.pages.order_page import Order
-from ui_testing.pages.login_page import Login
-from api_testing.apis.users_api import UsersAPI
 from unittest import skip
 from parameterized import parameterized
-from nose.plugins.attrib import attr
 import re, random
 
 
@@ -164,7 +160,6 @@ class TestUnitsTestCases(BaseTest):
             element='test_plan:test_unit', item_text=archived_test_unit['name']))
 
     @parameterized.expand(['spec', 'quan'])
-    @skip('https://modeso.atlassian.net/browse/LIMSA-208')
     def test007_allow_unit_field_to_be_optional(self, specification_type):
         """
         Test unit: Limit of quantification Approach: Allow unit field to be optional field
@@ -200,7 +195,6 @@ class TestUnitsTestCases(BaseTest):
             self.assertEqual(test_unit_found['Quantification Limit Unit'], '-')
 
     @parameterized.expand(['spec', 'quan'])
-    @skip('https://modeso.atlassian.net/browse/LIMSA-208')
     def test008_force_use_to_choose_specification_or_limit_of_quantification(self, specification_type):
         """
         The specification & Limit of quantification one of them should be mandatory.
@@ -329,7 +323,6 @@ class TestUnitsTestCases(BaseTest):
                            ('lower', 'spec'),
                            ('lower', 'quan')
                            ])
-    @skip('https://modeso.atlassian.net/browse/LIMSA-208')
     def test012_create_test_unit_with_one_limit_only(self, limit, spec_or_quan):
         """
         New: Test unit: Specification Approach: In case I entered the upper limit or the lower limit only,
@@ -413,7 +406,6 @@ class TestUnitsTestCases(BaseTest):
         self.info('Assert error msg')
         self.assertEqual(validation_result, True)
 
-    @skip('https://modeso.atlassian.net/browse/LIMSA-208')
     def test015_specification_limit_of_quantification_approach(self):
         """
         New: Test unit: Specification/limit of quantification Approach: Allow user to select those both options
@@ -461,7 +453,6 @@ class TestUnitsTestCases(BaseTest):
             self.assertNotIn('ng-valid', class_attr)
 
     @parameterized.expand(['quan', 'spec'])
-    @skip('https://modeso.atlassian.net/browse/LIMSA-208')
     def test017_create_quantative_with_limits_of_quantative_only_and_specification_only(self, limits_type):
         """
         New:Test unit: Create Approach: User can create test unit with limits of quantification type only &
@@ -534,7 +525,6 @@ class TestUnitsTestCases(BaseTest):
         self.info('Assert upper and lower limits are in specifications with N/A values')
         self.assertEqual("N/A", test_unit_found['Specifications'])
 
-    @skip('https://modeso.atlassian.net/browse/LIMSA-208')
     def test020_change_quantification_limits_not_effect_test_plan(self):
         """
         New: Test units/effect on test plan: Limits of quantification Approach: In case I
@@ -893,7 +883,6 @@ class TestUnitsTestCases(BaseTest):
         self.info('Assert that category updated successfully')
         self.assertEqual(test_plan_category_after_edit, new_random_category_edit)
 
-    @skip('https://modeso.atlassian.net/browse/LIMSA-208')
     def test033_editing_limit_of_quantification_fields_should_affect_table_and_version(self):
         """
         New: Test unit: Limits of quantification Approach: Versions:In case I edit any field

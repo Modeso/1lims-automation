@@ -210,11 +210,11 @@ class ArticleAPI(ArticleAPIFactory):
         for article in articles['articles']:
             if article['name'] == avoid_article:
                 break
-            elif article['materialType'] == material_type['name']:
+            elif article['materialType'] == material_type['text']:
                 formatted_article = {'id': article['id'], 'name': article['name']}
                 return formatted_article
 
-        self.info("No article with requested material type, So create article")
+        self.info("no article with requested material type, so create article")
         api, payload = self.create_article(materialType=material_type,
                                            selectedMaterialType=[material_type],
                                            materialTypeId=int(material_type['id']))
