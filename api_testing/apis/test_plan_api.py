@@ -15,7 +15,7 @@ class TestPlanAPIFactory(BaseAPI):
                     "limit": 100,
                     "start": 0,
                     "sort_order": "DESC",
-                    "filter": "{}",
+                    "filter": '{"quickSearch":""}',
                     "deleted": "0"}
         return api, _payload
 
@@ -279,11 +279,10 @@ class TestPlanAPI(TestPlanAPIFactory):
 
     def get_suborder_data_with_different_material_type(self, material_type):
         test_plans = self.get_completed_testplans(limit=1000)
-        test_plans_without_duplicate = [test_plan for test_plan in test_plans if test_plan['materialType']
-                                        not in [material_type]]
+        test_plans_without_duplicate = [test_plan for test_plan in test_plans if material_type not in
+                                        test_plan['materialTypes']]
         test_plan = random.choice(test_plans_without_duplicate)
         test_unit = self.get_testunits_in_testplan(test_plan['id'])[0]
-
         return test_plan, test_unit
 
     def create_testplan_from_test_unit_id(self, test_unit_id):

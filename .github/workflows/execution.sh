@@ -3,7 +3,8 @@
 EXECUTION_FILES=(
 #    ui_testing/testcases/basic_tests/test002_articles.py
 #    ui_testing/testcases/extended_tests/test002_article.py
-     ui_testing/testcases/order_tests/test001_orders_active_table.py
+#     ui_testing/testcases/order_tests/test001_orders_active_table.py
+     ui_testing/testcases/order_tests/test003_orders_duplicate.py
 #    ui_testing/testcases/basic_tests/test004_testunits.py
 #    ui_testing/testcases/basic_tests/test003_testplans.py
 #    ui_testing/testcases/basic_tests/test005_contacts.py
