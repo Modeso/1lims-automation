@@ -278,12 +278,18 @@ class TestPlanAPI(TestPlanAPIFactory):
         return test_units_names
 
     def get_suborder_data_with_different_material_type(self, material_type):
-        test_plans = self.get_completed_testplans(limit=1000)
-        test_plans_without_duplicate = [test_plan for test_plan in test_plans if material_type not in
-                                        test_plan['materialTypes']]
-        test_plan = random.choice(test_plans_without_duplicate)
-        test_unit = self.get_testunits_in_testplan(test_plan['id'])[0]
-        return test_plan, test_unit
+        new_material = random.choice(
+            GeneralUtilitiesAPI().get_formatted_material_types_without_duplicate(material_type))
+        formatted_material = {'id': new_material['id'], 'text': new_material['name']}
+        formatted_article = ArticleAPI().get_formatted_article_with_formatted_material_type(
+            material_type=formatted_material)
+        test_plan_data = self.create_completed_testplan(material_type=new_material['name'],
+                                                        formatted_article=formatted_article)
+        created_data = {'test_plan': test_plan_data['testPlanEntity']['name'],
+                        'test_unit': test_plan_data['specifications'][0]['name'],
+                        'material_type': new_material['name'],
+                        'article': formatted_article['name']}
+        return created_data
 
     def create_testplan_from_test_unit_id(self, test_unit_id):
         testunit_data = TestUnitAPI().get_testunit_form_data(id=test_unit_id)[0]['testUnit']

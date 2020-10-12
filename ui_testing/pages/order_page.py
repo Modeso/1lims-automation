@@ -135,11 +135,14 @@ class SubOrders(Order):
             self.sleep_small()
             return self.get_departments()
 
-    def get_departments(self):
-        departments = self.base_selenium.get_text(element='order:departments').replace('×', '').split('\n')
-        if departments == ['Search']:  # empty
-            return []
-        return departments
+    def get_departments(self, suborder_index=0):
+        suborder_row = self.base_selenium.get_table_rows(element='order:suborder_table')[suborder_index]
+        suborder_data = self.base_selenium.get_row_cells_dict_related_to_header(
+            suborder_row, table_element='order:suborder_table')
+        if suborder_data['Departments:'] == 'Search':
+            return None
+        else:
+            return suborder_data['Departments:'].replace('×', '').split('\n')
 
     def get_department_suggestion_lists(self, open_suborder_table=False, contacts=[], index=0):
         """
@@ -183,8 +186,13 @@ class SubOrders(Order):
             return self.get_material_type()
 
     def get_material_type(self, suborder_index=0):
-        self.open_suborder_edit_mode(suborder_index)
-        return self.base_selenium.get_text(element='order:material_type').split('\n')[0]
+        suborder_row = self.base_selenium.get_table_rows(element='order:suborder_table')[suborder_index]
+        suborder_data = self.base_selenium.get_row_cells_dict_related_to_header(
+            suborder_row, table_element='order:suborder_table')
+        if suborder_data['Material Type: *'] == 'Search':
+            return None
+        else:
+            return suborder_data['Material Type: *'].replace('\n×', '')
 
     def set_article(self, article='', suborder_index=0):
         if article is None:
@@ -199,12 +207,16 @@ class SubOrders(Order):
             return self.get_article()
 
     def get_article(self, suborder_index=0):
-        self.open_suborder_edit_mode(suborder_index)
-        article = self.base_selenium.get_text(element='order:article').split(' No')[0]
-        if article == 'Search':
+        """
+        this function implemented while article name set to be searchable by name and number
+        """
+        suborder_row = self.base_selenium.get_table_rows(element='order:suborder_table')[suborder_index]
+        suborder_data = self.base_selenium.get_row_cells_dict_related_to_header(
+            suborder_row, table_element='order:suborder_table')
+        if suborder_data['Article: *'] == 'Search':
             return None
         else:
-            return article
+            return suborder_data['Article: *'].split(' No:')
 
     def remove_article(self, testplans=''):
         self.info('clear article data')
@@ -230,12 +242,13 @@ class SubOrders(Order):
             return self.get_test_plans()
 
     def get_test_plans(self, suborder_index=0):
-        self.open_suborder_edit_mode(suborder_index)
-        test_plans = self.base_selenium.get_text(element='order:test_plan')
-        if "×" in test_plans:
-            return test_plans.replace("× ", "").split('\n')
+        suborder_row = self.base_selenium.get_table_rows(element='order:suborder_table')[suborder_index]
+        suborder_data = self.base_selenium.get_row_cells_dict_related_to_header(
+            suborder_row, table_element='order:suborder_table')
+        if suborder_data['Test Plan: *'] == 'Search':
+            return None
         else:
-            return []
+            return suborder_data['Test Plan: *'].replace('×', '').split('\n')
 
     def clear_test_plan(self, suborder_index=0):
         self.open_suborder_edit_mode(suborder_index)
@@ -278,16 +291,13 @@ class SubOrders(Order):
             return self.get_test_units()
 
     def get_test_units(self, suborder_index=0):
-        """
-         This function implemented with test unit name configured to be searchable by "name" only
-         :return: selected test units names
-        """
-        self.open_suborder_edit_mode(suborder_index)
-        test_units = self.base_selenium.get_text(element='order:test_unit')
-        if test_units and test_units != 'Search':
-            return test_units.replace("×", "").split("\n")
+        suborder_row = self.base_selenium.get_table_rows(element='order:suborder_table')[suborder_index]
+        suborder_data = self.base_selenium.get_row_cells_dict_related_to_header(
+            suborder_row, table_element='order:suborder_table')
+        if suborder_data['Test Unit:'] == 'Search':
+            return None
         else:
-            return []
+            return suborder_data['Test Unit:'].replace('×', '').split('\n')
 
     def is_testunit_existing(self, test_unit, suborder_index=0):
         self.open_suborder_edit_mode(suborder_index)

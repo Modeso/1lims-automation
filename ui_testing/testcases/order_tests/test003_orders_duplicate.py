@@ -26,6 +26,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.get_orders_page()
         self.test_unit_api.set_name_configuration_name_only()
         self.orders_api.set_configuration()
+        self.orders_api.set_filter_configuration()
 
     def test001_duplicate_sub_order_table_with_add(self):
         """
@@ -86,21 +87,22 @@ class OrdersTestCases(BaseTest):
         Duplicate from the main order Approach: Duplicate then change the contact
         LIMS-6222
         """
+        res, _ = self.contacts_api.create_contact()
+        self.assertEqual(res['status'], 1)
+        new_contact = res['company']['name']
         self.info('get random main order data')
-        orders, payload = self.orders_api.get_all_orders(limit=20)
-        self.assertEqual(orders['status'], 1)
-        main_order = random.choice(orders['orders'])
-        self.info('{}'.format(main_order['orderNo']))
+        main_order = random.choice(self.orders_api.get_all_orders_json())
         self.info("duplicate order No {}".format(main_order['orderNo']))
-        self.order_page.search(main_order['orderNo'])
+        self.order_page.filter_by_order_no(main_order['orderNo'])
         self.order_page.duplicate_main_order_from_order_option()
-        new_contact = self.order_page.set_contacts(contacts=[''], remove_old=True)
-        duplicted_order_no = self.order_page.get_order_no()
+        self.order_page.set_contacts(contacts=[new_contact], remove_old=True)
+        duplicated_order_no = self.order_page.get_order_no()
         self.order_page.save(save_btn='order:save')
         self.orders_page.get_orders_page()
-        self.orders_page.filter_by_order_no(duplicted_order_no)
+        self.orders_page.filter_by_order_no(duplicated_order_no)
+        self.assertEqual(len(self.orders_page.result_table())-1, 1)
         order = self.orders_page.get_the_latest_row_data()
-        self.assertEqual(new_contact[0], order['Contact Name'])
+        self.assertEqual(order['Contact Name'], new_contact)
 
     def test003_duplicate_main_order_with_multiple_contacts(self):
         """
@@ -204,8 +206,7 @@ class OrdersTestCases(BaseTest):
         duplicated_order_data = self.orders_page.get_child_table_data()[0]
         self.info('assert that duplicated order data is updated correctly')
         self.assertEqual(duplicated_order_data['Test Plans'], '-')
-        self.assertEqual(duplicated_order_data['Article Name'].replace(" ", ""),
-                         article['name'].replace(" ", ""))
+        self.assertEqual(duplicated_order_data['Article Name'], article['name'])
         self.assertEqual(duplicated_order_data['Test Units'], test_unit_before_duplicate)
 
     @parameterized.expand(["main_order", "sub_order"])
@@ -219,10 +220,6 @@ class OrdersTestCases(BaseTest):
         old_material = payload[0]['materialType']['text']
         self.info('get completed test plan with different material type')
         new_suborder_data = TestPlanAPI().get_suborder_data_with_different_material_type(old_material)
-        new_material = new_suborder_data[0]['materialTypes'][0]
-        new_article = new_suborder_data[0]['article'][0]
-        new_test_plan = new_suborder_data[0]['testPlanName']
-        new_test_unit = new_suborder_data[1]['name']
         self.order_page.filter_by_order_no(payload[0]['orderNo'])
         if case == "main_order":
             self.info('duplicate the main order')
@@ -232,37 +229,39 @@ class OrdersTestCases(BaseTest):
             self.info("duplicate first sub order of order {} from suborder's options".format(payload[0]['orderNo']))
             self.order_page.duplicate_sub_order_from_table_overview()
         self.info('change material type of first suborder')
-        self.suborder_table.set_material_type(material_type=new_material)
+        self.suborder_table.set_material_type(material_type=new_suborder_data['material_type'])
+        self.order_page.sleep_tiny()
         self.info('Make sure that article, test unit, and test plan are empty')
-        self.assertEqual(self.base_selenium.get_value(element='order:article'), None)
-        self.assertEqual(self.base_selenium.get_value(element='order:test_unit'), None)
-        self.assertEqual(self.base_selenium.get_value(element='order:test_plan'), None)
-        duplicated_order_number = self.order_page.get_order_no()
+        self.assertEqual(self.suborder_table.get_article(), None)
+        self.assertEqual(self.suborder_table.get_test_units(), None)
+        self.assertEqual(self.suborder_table.get_test_plans(), None)
         if case == "main_order":
+            duplicated_order_number = self.order_page.get_order_no()
             self.info('order to be duplicated is {}, new order no is {}'.
                       format(payload[0]['orderNo'], duplicated_order_number))
             self.assertNotEqual(payload[0]['orderNo'], duplicated_order_number)
         self.info('Update article, test unit and test plan')
-        if new_article == 'all':
-            new_article = self.suborder_table.set_article(article='')
-        else:
-            self.suborder_table.set_article(article=new_article)
-        self.suborder_table.set_test_plans(test_plans=[new_test_plan])
-        self.suborder_table.set_test_units(test_units=[new_test_unit])
+        self.suborder_table.set_article(article=new_suborder_data['article'])
+        self.suborder_table.set_test_plans(test_plans=[new_suborder_data['test_plan']])
+        self.suborder_table.set_test_units(test_units=[new_suborder_data['test_unit']])
         self.info('duplicated order material is {}, article {}, test_unit {} and test_plan {}'.
-                  format(new_material, new_article, new_test_unit, new_test_plan))
+                  format(new_suborder_data['material_type'], new_suborder_data['article'],
+                         new_suborder_data['test_unit'], new_suborder_data['test_plan']))
         self.order_page.save(save_btn='order:save_btn', sleep=True)
         self.info("navigate to orders' page to make sure that order duplicated correctly with selected data")
         self.order_page.get_orders_page()
-        self.order_page.filter_by_order_no(duplicated_order_number)
+        if case == 'main_order':
+            self.orders_page.filter_by_order_no(duplicated_order_number)
+        else:
+            self.order_page.filter_by_order_no(payload[0]['orderNo'])
         suborder_data = self.order_page.get_child_table_data()[0]
         self.info('Make sure that suborder data is correct')
-        self.assertEqual(suborder_data['Material Type'], new_material)
-        self.assertEqual(suborder_data['Article Name'], new_article)
-        self.assertEqual(suborder_data['Test Units'], new_test_unit)
-        self.assertEqual(suborder_data['Test Plans'], new_test_plan)
+        self.assertEqual(suborder_data['Material Type'], new_suborder_data['material_type'])
+        self.assertEqual(suborder_data['Article Name'], new_suborder_data['article'])
+        self.assertEqual(suborder_data['Test Units'], new_suborder_data['test_unit'])
+        self.assertEqual(suborder_data['Test Plans'], new_suborder_data['test_plan'])
 
-    def test007_Duplicate_sub_order_with_multiple_testplans_and_testunits_delet_approach(self):
+    def test007_Duplicate_sub_order_with_multiple_testplans_and_testunits_delete_approach(self):
         """
         Duplicate suborder Approach: Duplicate any sub order then delete the units & test plans
         LIMS-6852
@@ -315,7 +314,7 @@ class OrdersTestCases(BaseTest):
             article_id=payload[0]['article']['id'], article=payload[0]['article']['text'])
 
         self.info("duplicate order No {} ".format(payload[0]['orderNo']))
-        self.orders_page.search(payload[0]['orderNo'])
+        self.orders_page.filter_by_order_no(payload[0]['orderNo'])
         self.info("duplicate main order")
         self.orders_page.duplicate_main_order_from_order_option()
         self.assertIn("duplicateMainOrder", self.base_selenium.get_url())
@@ -325,16 +324,16 @@ class OrdersTestCases(BaseTest):
         self.assertNotEqual(duplicated_order_No, payload[0]['orderNo'])
         if case == 'add':
             self.info("add test plan {} and test unit {} to duplicated order".format(new_test_plan, new_test_unit))
-            self.suborder_table.update_suborder(test_plans=[new_test_plan], test_units=[new_test_unit], article='')
+            self.suborder_table.update_suborder(test_plans=[new_test_plan], test_units=[new_test_unit])
         else:
             self.info("update test plan to {} and test unit to {}".format(new_test_plan, new_test_unit))
-            self.suborder_table.update_suborder(test_plans=[new_test_plan], test_units=[new_test_unit], remove_old=True,
-                                                article='')
+            self.suborder_table.update_suborder(test_plans=[new_test_plan], test_units=[new_test_unit], remove_old=True)
 
         self.order_page.save(save_btn='order:save')
         self.info("navigate to active table")
         self.order_page.get_orders_page()
-        self.assertTrue(self.orders_page.search(duplicated_order_No))
+        self.orders_page.filter_by_order_no(duplicated_order_No)
+        self.assertEqual(len(self.orders_page.result_table())-1, 1)
         duplicated_suborder_data = self.order_page.get_child_table_data()[0]
         if case == 'change':
             self.info("assert that test unit updated to {}, test plan {}".format(
@@ -349,7 +348,7 @@ class OrdersTestCases(BaseTest):
 
         self.info("navigate to analysis page")
         self.orders_page.navigate_to_analysis_active_table()
-        self.assertTrue(self.analyses_page.search(duplicated_order_No))
+        self.analyses_page.filter_by_order_no(duplicated_order_No)
         analyses = self.analyses_page.get_the_latest_row_data()
         if case == 'add':
             self.assertIn(new_test_plan, analyses['Test Plans'].replace("'", ""))
@@ -375,8 +374,7 @@ class OrdersTestCases(BaseTest):
             material_type=payload[0]['materialType']['text'],
             used_test_plan=payload[0]['testPlans'][0]['name'],
             used_test_unit=payload[0]['testUnits'][0]['name'],
-            article_id=payload[0]['article']['id'], article=payload[0]['article']['text']
-        )
+            article_id=payload[0]['article']['id'], article=payload[0]['article']['text'])
 
         self.info("duplicate order No {} ".format(payload[0]['orderNo']))
         self.orders_page.filter_by_order_no(payload[0]['orderNo'])
