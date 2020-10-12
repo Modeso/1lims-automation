@@ -1,5 +1,4 @@
 from ui_testing.testcases.base_test import BaseTest
-from ui_testing.pages.articles_page import Articles
 from ui_testing.pages.testplan_page import TstPlan
 from ui_testing.pages.testunit_page import TstUnit
 from ui_testing.pages.testunits_page import TstUnits
@@ -13,7 +12,7 @@ from api_testing.apis.users_api import UsersAPI
 from unittest import skip
 from parameterized import parameterized
 from nose.plugins.attrib import attr
-import re, random
+import random
 
 
 class TestUnitsTestCases(BaseTest):
@@ -296,7 +295,7 @@ class TestUnitsTestCases(BaseTest):
         else:
             checked_text = f'{payload["name"]}: Quantitative'
 
-        self.info("is test unit options existing or not.")
+        self.info("is test unit options existing?")
         options_exist['is_name_exist'] = order_page.is_test_unit_option_exist(search_field=payload['name'])
         options_exist['is_no_exist'] = order_page.is_test_unit_option_exist(search_field=str(payload['number']))
         options_exist['is_type_exist'] = order_page.is_test_unit_option_exist(search_field='Quantitative',

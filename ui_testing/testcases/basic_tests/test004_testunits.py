@@ -10,6 +10,7 @@ from ui_testing.pages.order_page import Order
 from unittest import skip
 from parameterized import parameterized
 import re, random
+from nose.plugins.attrib import attr
 
 
 class TestUnitsTestCases(BaseTest):
@@ -406,6 +407,7 @@ class TestUnitsTestCases(BaseTest):
         self.info('Assert error msg')
         self.assertEqual(validation_result, True)
 
+    @attr(series=True)
     def test015_specification_limit_of_quantification_approach(self):
         """
         New: Test unit: Specification/limit of quantification Approach: Allow user to select those both options
@@ -417,21 +419,20 @@ class TestUnitsTestCases(BaseTest):
         new_random_method = self.generate_random_string()
         new_random_upper_limit = self.generate_random_number(lower=500, upper=1000)
         new_random_lower_limit = self.generate_random_number(lower=1, upper=500)
-        spec_or_quan = 'spec_quan'
-        self.info('Create new testunit with qualitative and random generated data')
+        self.info('create new testunit with qualitative and random generated data')
         test_unit_no = self.test_unit_page.create_quantitative_testunit(
             name=new_random_name, method=new_random_method, upper_limit=new_random_upper_limit,
-            lower_limit=new_random_lower_limit, spec_or_quan=spec_or_quan)
+            lower_limit=new_random_lower_limit, spec_or_quan='spec_quan')
         self.test_unit_page.sleep_tiny()
         self.test_unit_page.save_and_wait()
         self.info('filter by test unit number: {}, to make sure that test unit created successfully'.
                   format(test_unit_no))
         test_unit_found = self.test_units_page.filter_and_get_latest_row_data(test_unit_no)
-        self.info('Assert upper and lower limits are in specifications')
+        self.info('assert upper and lower limits are in specifications')
         self.assertEqual("{}-{}".format(new_random_lower_limit, new_random_upper_limit),
                          test_unit_found['Specifications'])
 
-        self.info('Assert upper and lower limits are in quantification_limit')
+        self.info('assert upper and lower limits are in quantification_limit')
         self.assertEqual("{}-{}".format(new_random_lower_limit, new_random_upper_limit),
                          test_unit_found['Quantification Limit'])
 
