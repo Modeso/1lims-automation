@@ -189,6 +189,8 @@ class SubOrders(Order):
     def set_article(self, article='', suborder_index=0):
         if article is None:
             return
+        if self.get_article():
+            self.remove_article()
         self.open_suborder_edit_mode(suborder_index)
         if article:
             self.base_selenium.select_item_from_drop_down(element='order:article', item_text=article)

@@ -94,7 +94,9 @@ class Orders(BasePages):
         self.base_selenium.click(element='orders:suborder_duplicate')
         self.base_selenium.set_text(element='orders:number_of_copies', value=number_of_copies)
         self.base_selenium.click(element='orders:create_copies')
-        self.sleep_medium()
+        self.sleep_tiny()
+        self.base_selenium.refresh()
+        self.sleep_tiny()
 
     def archive_sub_order_from_active_table(self, index=0):
         self.info('archive suborder from the order\'s active table')

@@ -173,8 +173,8 @@ class OrdersTestCases(BaseTest):
         LIMS-6228
         """
         self.info('create order with test_unit and test_plan')
-        api, payload = self.orders_api.create_new_order()
-        self.assertEqual(api['status'], 1)
+        response, payload = self.orders_api.create_new_order()
+        self.assertEqual(response['status'], 1)
         test_unit_before_duplicate = payload[0]['testUnits'][0]['name']
         self.info('Order created with order No {}, article {}'.format(
             payload[0]['orderNo'], payload[0]['article']['text']))
@@ -191,11 +191,12 @@ class OrdersTestCases(BaseTest):
             self.orders_page.duplicate_sub_order_from_table_overview()
         self.orders_page.sleep_tiny()
         self.info("update article to {}".format(article['name']))
-        self.suborder_table.set_article(article=article['name'], suborder_index=1)
+        self.suborder_table.set_article(article=article['name'])
+        self.order_page.save(save_btn='order:save')
+        self.orders_page.sleep_tiny()
         self.info("assert that test plan is empty and test unit is {}".format(test_unit_before_duplicate))
         self.assertFalse(self.suborder_table.get_test_plans())
         self.assertCountEqual([test_unit_before_duplicate], self.suborder_table.get_test_units())
-        self.order_page.save(save_btn='order:save')
         duplicated_order_no = self.order_page.get_order_no()
         self.info("navigate to active table")
         self.orders_page.get_orders_page()
@@ -230,16 +231,17 @@ class OrdersTestCases(BaseTest):
             self.order_page.get_child_table_data()
             self.info("duplicate first sub order of order {} from suborder's options".format(payload[0]['orderNo']))
             self.order_page.duplicate_sub_order_from_table_overview()
-        duplicated_order_number = self.order_page.get_order_no()
-        self.info('order to be duplicated is {}, new order no is {}'.
-                  format(payload[0]['orderNo'], duplicated_order_number))
-        self.assertNotEqual(payload[0]['orderNo'], duplicated_order_number)
         self.info('change material type of first suborder')
         self.suborder_table.set_material_type(material_type=new_material)
         self.info('Make sure that article, test unit, and test plan are empty')
         self.assertEqual(self.base_selenium.get_value(element='order:article'), None)
         self.assertEqual(self.base_selenium.get_value(element='order:test_unit'), None)
         self.assertEqual(self.base_selenium.get_value(element='order:test_plan'), None)
+        duplicated_order_number = self.order_page.get_order_no()
+        if case == "main_order":
+            self.info('order to be duplicated is {}, new order no is {}'.
+                      format(payload[0]['orderNo'], duplicated_order_number))
+            self.assertNotEqual(payload[0]['orderNo'], duplicated_order_number)
         self.info('Update article, test unit and test plan')
         if new_article == 'all':
             new_article = self.suborder_table.set_article(article='')
@@ -252,10 +254,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.save(save_btn='order:save_btn', sleep=True)
         self.info("navigate to orders' page to make sure that order duplicated correctly with selected data")
         self.order_page.get_orders_page()
-        if case == "main_order":
-            self.order_page.filter_by_order_no(duplicated_order_number)
-        else:
-            self.order_page.search(payload[0]['orderNo'])
+        self.order_page.filter_by_order_no(duplicated_order_number)
         suborder_data = self.order_page.get_child_table_data()[0]
         self.info('Make sure that suborder data is correct')
         self.assertEqual(suborder_data['Material Type'], new_material)
@@ -380,19 +379,18 @@ class OrdersTestCases(BaseTest):
         )
 
         self.info("duplicate order No {} ".format(payload[0]['orderNo']))
-        self.orders_page.search(payload[0]['orderNo'])
+        self.orders_page.filter_by_order_no(payload[0]['orderNo'])
         self.info("duplicate sub order with one copy only")
         self.orders_page.open_child_table(source=self.orders_page.result_table()[0])
         self.orders_page.duplicate_sub_order_from_table_overview()
         self.info("update test plan to {} and test unit to {}".format(new_test_plan, new_test_unit))
-        self.suborder_table.update_suborder(test_plans=[new_test_plan], test_units=[new_test_unit], remove_old=True,
-                                            article='')
+        self.suborder_table.update_suborder(test_plans=[new_test_plan], test_units=[new_test_unit],
+                                            remove_old=True, article=None)
         self.order_page.save(save_btn='order:save')
-
-        self.info("navigate to analysis page")
+        self.info("navigate to analysis active table")
         self.order_page.get_orders_page()
         self.orders_page.navigate_to_analysis_active_table()
-        self.analyses_page.search(payload[0]['orderNo'])
+        self.analyses_page.filter_by_order_no(payload[0]['orderNo'])
         analyses = self.analyses_page.get_the_latest_row_data()
         self.assertEqual(new_test_plan, analyses['Test Plans'].replace("'", ""))
         child_data = self.analyses_page.get_child_table_data()
@@ -405,10 +403,10 @@ class OrdersTestCases(BaseTest):
 
         LIMS-6232
         """
-        self.info('create order data multiple testplans and test units')
+        self.info('create order data multiple test plans and test units')
         response, payload = self.orders_api.create_order_with_double_test_plans()
         self.assertEqual(response['status'], 1, payload)
-        test_plans = [payload[0]['testPlans'][0]['testPlanName'], payload[0]['testPlans'][1]['testPlanName']]
+        test_plans = [payload[0]['testPlans'][0]['testPlan']['text'], payload[0]['testPlans'][1]['testPlan']['text']]
         test_units = [payload[0]['testUnits'][0]['name'], payload[0]['testUnits'][1]['name']]
         self.info("get new completed test plan with article {} and material_type {}".format(
             payload[0]['article']['text'], payload[0]['materialType']['text']))
@@ -422,7 +420,7 @@ class OrdersTestCases(BaseTest):
         test_plans.append(test_plan)
         test_units.append(test_unit)
 
-        self.orders_page.search(payload[0]['orderNo'])
+        self.orders_page.filter_by_order_no(payload[0]['orderNo'])
         self.info("duplicate the sub order of order {} from suborder's options".format(payload[0]['orderNo']))
         self.orders_page.get_child_table_data()
         self.orders_page.duplicate_sub_order_from_table_overview()
@@ -441,6 +439,7 @@ class OrdersTestCases(BaseTest):
                          payload[0]['article']['text'].replace(' ', ''))
         self.assertEqual(duplicated_suborder_data['Material Type'], payload[0]['materialType']['text'])
         duplicated_suborder_test_units = duplicated_suborder_data['Test Units'].split(',\n') or []
+
         duplicated_suborder_test_plans = duplicated_suborder_data['Test Plans'].split(',\n') or []
         self.assertCountEqual(duplicated_suborder_test_units, test_units)
         self.assertCountEqual(duplicated_suborder_test_plans, test_plans)
@@ -469,9 +468,8 @@ class OrdersTestCases(BaseTest):
         self.info("navigate to analysis page  and make sure duplicated order created with same data")
         self.order_page.get_orders_page()
         self.orders_page.navigate_to_analysis_active_table()
-        self.assertTrue(self.orders_page.is_order_in_table(duplicated_order_no))
-        self.orders_page.sleep_small()
-        self.analyses_page.search(duplicated_order_no)
+        self.analyses_page.filter_by_order_no(duplicated_order_no)
+        self.assertEqual(len(self.analyses_page.result_table())-1, 1)
         duplicated_test_plans = self.analyses_page.get_the_latest_row_data()['Test Plans'].split(', ')
         self.assertEqual(duplicated_test_plans, test_plans)
         duplicated_suborder_data = self.order_page.get_child_table_data()

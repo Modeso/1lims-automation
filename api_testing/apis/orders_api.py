@@ -382,20 +382,17 @@ class OrdersAPI(OrdersAPIFactory):
         testplan2, _ = TestPlanAPI().create_testplan(testUnits=[formated_testunit],
                                                      selectedArticles=[formatted_article],
                                                      materialTypes=material_type)
-        firsr_testPlan_data = TestPlanAPI()._get_testplan_form_data(id=testplan1['testPlan']['id'])
+        first_testPlan_data = TestPlanAPI()._get_testplan_form_data(id=testplan1['testPlan']['id'])
         testPlan1 = {
-            'id': int(firsr_testPlan_data[0]['testPlan']['testPlanEntity']['id']),  # article_test_plan_id
-            'testPlanName': firsr_testPlan_data[0]['testPlan']['testPlanEntity']['name'],
-            'number': int(firsr_testPlan_data[0]['testPlan']['number']),
-            'version': 1
-        }
+            'testPlan': {'id': int(first_testPlan_data[0]['testPlan']['testPlanEntity']['id']),
+                         'text': first_testPlan_data[0]['testPlan']['testPlanEntity']['name']},
+            'number': int(first_testPlan_data[0]['testPlan']['number'])}
+
         second_testPlan_data = TestPlanAPI()._get_testplan_form_data(id=testplan2['testPlanDetails']['id'])
         testPlan2 = {
-            'id': int(second_testPlan_data[0]['testPlan']['testPlanEntity']['id']),  # article_test_plan_id
-            'testPlanName': second_testPlan_data[0]['testPlan']['testPlanEntity']['name'],
-            'number': int(second_testPlan_data[0]['testPlan']['number']),
-            'version': 1
-        }
+            'testPlan': {'id': int(second_testPlan_data[0]['testPlan']['testPlanEntity']['id']),
+                         'text': second_testPlan_data[0]['testPlan']['testPlanEntity']['name']},
+            'number': int(second_testPlan_data[0]['testPlan']['number'])}
         testplan_list = [testPlan1, testPlan2]
 
         payload = {

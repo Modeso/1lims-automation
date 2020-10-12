@@ -198,7 +198,7 @@ class TestPlanAPI(TestPlanAPIFactory):
         return response['testPlans']
 
     def get_testplan_with_filter(self, filter_option, filter_text, **kwargs):
-        filter_text = '{"' + filter_option + '":"' + filter_text + '","columns":["number","name"]}'
+        filter_text = '{"quickSearch": "", "' + filter_option + '":"' + filter_text + '","columns":["number","name"]}'
         response, _ = self.get_all_test_plans(filter=filter_text, start=0, **kwargs)
         return response['testPlans']
 
