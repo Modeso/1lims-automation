@@ -12,6 +12,7 @@ EXECUTION_FILES=(
 #    ui_testing/testcases/header_tests/test010_my_profile.py
 #    ui_testing/testcases/header_tests/test011_rolesandpermissions.py
 
+
     ui_testing/testcases/extended_tests/test002_article.py
   )
 
