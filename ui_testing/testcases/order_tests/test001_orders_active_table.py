@@ -239,7 +239,7 @@ class OrdersTestCases(BaseTest):
         self.info("create order with multiple suborders using api")
         response, payload = self.orders_api.create_order_with_multiple_suborders()
         self.assertEqual(response['status'], 1)
-        order_no = response['order']['order']
+        order_no = payload[0]['orderNoWithYear']
         order_id = response['order']['mainOrderId']
         suborders = self.orders_api.get_suborder_by_order_id(order_id)[0]['orders']
         number_of_suborders = len(suborders)
@@ -725,6 +725,7 @@ class OrdersTestCases(BaseTest):
             self.orders_page.open_child_table(source=results[i])
 
     @parameterized.expand(['testDate', 'shipmentDate', 'createdAt'])
+    @skip("https://modeso.atlassian.net/browse/LIMSA-386")
     # @skip("https://modeso.atlassian.net/browse/LIMSA-279")
     def test030_filter_by_date(self, key):
         """
@@ -743,7 +744,7 @@ class OrdersTestCases(BaseTest):
                                         first_filter_text=filter_value,
                                         second_filter_element=filter_element['element'][1],
                                         second_filter_text=filter_value)
-        self.assertGreater(len(self.order_page.result_table()), 1)
+        self.assertGreater(len(self.order_page.result_table())-1, 1)
         suborders = self.orders_page.get_child_table_data()
         filter_key_found = False
         for suborder in suborders:
@@ -814,7 +815,7 @@ class OrdersTestCases(BaseTest):
             self.orders_page.orders_url, self.base_selenium.get_url()))
         self.assertEqual(self.orders_page.orders_url, self.base_selenium.get_url())
 
-    @parameterized.expand(['update_a_field', 'no_updates'])
+    @parameterized.expand(['update', 'no_updates'])
     def test033_edit_order_page_then_overview(self, edit_case):
         """
         Orders: Popup should appear when editing then clicking on overview without saving <All data will be lost>
@@ -825,11 +826,11 @@ class OrdersTestCases(BaseTest):
         """
         self.orders_page.get_random_order()
         self.orders_page.sleep_tiny()
-        if edit_case == 'update_a_field':
+        if edit_case == 'update':
             self.info('update contact field')
-            self.order_page.set_contacts(remove_old=True, contacts=[''])
+            SubOrders().duplicate_from_table_view()
         self.order_page.click_overview()
-        if edit_case == 'update_a_field':
+        if edit_case == 'update':
             self.assertIn('All data will be lost', self.order_page.get_confirmation_pop_up_text())
             self.order_page.confirm_popup()
         else:
@@ -862,8 +863,37 @@ class OrdersTestCases(BaseTest):
         if int(table_info['pagination_limit']) <= int((table_info['count']).replace(",", "")):
             self.assertEqual(table_info['pagination_limit'], table_records_count)
 
+    def test035_main_orders_only_should_be_displayed_in_the_orders_list(self):
+        """
+        Make sure that user sees the main orders only in the order list
+
+        LIMS-5354
+        """
+        self.info('assert active table is displayed')
+        table_records_count = len(self.order_page.result_table())
+        self.assertGreater(table_records_count, 0)
+        self.info('There is no duplications in the orders numbers')
+        order = random.choice(self.orders_api.get_all_orders_json())
+        order_no = order['orderNo']
+        self.info('search by order No'.format(order_no))
+        self.orders_page.filter_by_order_no(order_no)
+        self.assertEqual(len(self.order_page.result_table()), 2)
+        self.info('click on the random order from the list, Order table with add will be opened')
+        self.orders_page.get_order_edit_page_by_id(order['orderId'])
+        table_with_add = self.order_page.get_table_with_add()
+        self.assertIsNotNone(table_with_add)
+        self.info('duplicate the first suborder')
+        SubOrders().duplicate_from_table_view()
+        self.info('click on save button')
+        self.order_page.save(save_btn='order:save_btn')
+        self.info('Go back to the active table')
+        self.order_page.get_orders_page()
+        self.orders_page.filter_by_order_no(order_no)
+        self.info('assert main order only displayed no duplicated rows for the suborders')
+        self.assertFalse(self.order_page.check_suborders_appear())
+
     # @skip("https://modeso.atlassian.net/browse/LIMSA-205")
-    # def test032_download_suborder_sheet_for_single_order(self):
+    # def test036_download_suborder_sheet_for_single_order(self):
     #     """
     #     Export order child table
     #
@@ -895,7 +925,7 @@ class OrdersTestCases(BaseTest):
     #             self.assertIn(item, fixed_sheet_row_data)
     #
     # @skip('need to be re-implemented to include child table data')
-    # def test033_export_order_sheet(self):
+    # def test037_export_order_sheet(self):
     #     """
     #     New: Orders: XSLX Approach: user can download all data in table view with the same order with table view
     #
@@ -915,7 +945,7 @@ class OrdersTestCases(BaseTest):
     #             if item != " ":
     #                 self.assertIn(item, fixed_sheet_row_data)
 
-    def test034_year_format_in_suborder_sheet(self):
+    def test038_year_format_in_suborder_sheet(self):
         """
          Analysis number format: In case the analysis number displayed with full year,
          this should reflect on the export file
@@ -945,3 +975,44 @@ class OrdersTestCases(BaseTest):
         fixed_sheet_row_data = self.reformat_data(values)
         self.assertIn(order_no, fixed_sheet_row_data)
         self.assertIn(analysis_no, fixed_sheet_row_data)
+
+    def test039_filter_by_analysis_number_with_year(self):
+        """
+         Filter: Analysis number format: In case the analysis number displayed with full year, I can filter by it
+
+         LIMS-7425
+        """
+        self.info('open analysis configuration')
+        self.analyses_page.open_analysis_configuration()
+        self.info('set analysis number format to be Year before number')
+        self.analyses_page.set_analysis_no_with_year()
+        self.info('select random order and get analysis no of its suborder')
+        orders, _ = self.orders_api.get_all_orders(limit=20)
+        order = random.choice(orders['orders'])
+        suborder, _ = self.orders_api.get_suborder_by_order_id(id=order['id'])
+        analysis_no = suborder['orders'][0]['analysis'][0]
+        self.info('navigate to analysis active table')
+        self.orders_page.get_orders_page()
+        self.orders_page.navigate_to_analysis_active_table()
+        self.info('filter by analysis no')
+        self.analyses_page.filter_by_analysis_number(filter_text=analysis_no)
+        analysis = self.analyses_page.get_the_latest_row_data()
+        result_analysis_no = analysis['Analysis No.']
+        self.assertEqual(analysis_no, result_analysis_no)
+
+    def test040_multiple_contacts_should_appear_in_active_table(self):
+        """
+        Multiple contacts should appear in active table
+
+        LIMS-5773
+        """
+        response, payload = self.orders_api.create_order_with_multiple_contacts()
+        self.assertEqual(response['status'], 1)
+        contact_list = [contact['text'] for contact in payload[0]['contact']]
+        self.orders_page.sleep_tiny()
+        self.orders_page.get_orders_page()
+        self.orders_page.sleep_small()
+        self.order_page.filter_by_order_no(payload[0]['orderNoWithYear'])
+        self.assertEqual(len(self.order_page.result_table()), 2)
+        contacts = self.orders_page.get_the_latest_row_data()['Contact Name'].split(',\n')
+        self.assertCountEqual(contact_list, contacts)

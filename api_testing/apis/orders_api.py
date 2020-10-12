@@ -122,7 +122,7 @@ class OrdersAPIFactory(BaseAPI):
         shipment_date = self.get_current_date()
         shipment_date_arr = shipment_date.split('-')
         current_year = self.get_current_year()
-        orderNoWithYear = "{}-{}".format(current_year, order_no)
+        orderNoWithYear = "{}-{}".format(order_no, current_year)
         contacts = random.choice(ContactsAPI().get_all_contacts()[0]['contacts'])
         test_plan = TestPlanAPI().create_completed_testplan_random_data()
         suborders_common_data = {
@@ -409,7 +409,7 @@ class OrdersAPI(OrdersAPIFactory):
         return self.create_new_order(**payload)
 
     def create_order_with_multiple_contacts(self):
-        contacts = random.choices(ContactsAPI().get_contacts_with_department(), k=3)
+        contacts = random.sample(ContactsAPI().get_contacts_with_department(), k=3)
         first_contact = contacts[0]
         second_contact = contacts[1]
         third_contact = contacts[2]
