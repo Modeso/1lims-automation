@@ -460,10 +460,9 @@ class BasePages:
         for column in archived_coloums:
             if column.text:
                 self.change_column_view(column=column, value=False)
-
         parent_class = self.base_selenium.driver.find_element_by_xpath('//*[contains(text(), "Apply")]//parent::a')
         class_string = parent_class.get_attribute('class')
-        if 'disabled' in class_string:
+        if 'disabled' not in class_string:
             return True
         else:
             return False

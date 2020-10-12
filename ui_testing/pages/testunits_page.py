@@ -169,7 +169,7 @@ class TstUnits(BasePages):
 
     def restore_quantification_limit_field(self):
         self.info('restore quantification limit field')
-        self.get_archived_items()
+        self.get_archived_fields_tab()
         self.sleep_tiny()
         element_exists = self.base_selenium.check_element_is_exist(element='test_unit:configuration_testunit_useQuantification')
         if element_exists == False:
@@ -180,6 +180,9 @@ class TstUnits(BasePages):
         self.confirm_popup()
         self.sleep_tiny()
         return True
+
+    def is_field_in_use(self):
+        return self.base_selenium.check_element_is_exist(element='test_unit:field_in_use')
 
     def get_last_test_unit_row(self):
         rows = self.result_table()

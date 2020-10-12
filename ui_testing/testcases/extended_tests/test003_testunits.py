@@ -28,6 +28,48 @@ class TestUnitsTestCases(BaseTest):
         self.test_unit_page.get_test_units_page()
 
     @attr(series=True)
+    #@skip('waiting for API deleting')
+    def test036_archive_quantifications_limit_field(self):
+        """
+        User can archive the quantification limits field from the configuration section if not used.
+        "Archive-allowed"
+        LIMS-4164
+        """
+        self.test_unit_page.open_configurations()
+        self.test_unit_page.archive_quantification_limit_field()
+        if not self.test_unit_page.is_field_in_use():
+            self.assertFalse(
+                self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
+            self.test_unit_page.get_archived_fields_tab()
+
+            self.assertTrue(self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
+            self.test_unit_page.get_test_units_page()
+            self.test_unit_page.click_create_new_testunit()
+            self.test_unit_page.set_testunit_type(testunit_type='Quantitative')
+            self.assertFalse(self.base_selenium.check_element_is_exist(element='test_unit:use_quantification'))
+
+    @attr(series=True)
+    def test037_restore_quantifications_limit_field(self):
+        """
+        User can archive the quantification limits field from the configuration section if not used.
+
+        "Restore"
+        LIMS-4164
+        """
+        self.test_unit_page.open_configurations()
+        self.test_unit_page.archive_quantification_limit_field()
+        if not self.test_unit_page.is_field_in_use():
+            self.test_unit_page.restore_quantification_limit_field()
+            self.assertFalse(
+                self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
+            self.test_unit_page.get_active_fields_tab()
+            self.assertTrue(self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
+            self.test_unit_page.get_test_units_page()
+            self.test_unit_page.click_create_new_testunit()
+            self.test_unit_page.set_testunit_type(testunit_type='Quantitative')
+            self.assertTrue(self.base_selenium.check_element_is_exist(element='test_unit:use_quantification'))
+
+    @attr(series=True)
     def test038_test_unit_name_is_mandatory(self):
         """
         New: Test unit: Configuration: Test unit Name Approach: Make the test units field

@@ -258,7 +258,6 @@ class TestUnitsTestCases(BaseTest):
         self.info('Assert error msg')
         self.assertEqual(validation_result, True)
 
-    @skip('https://modeso.atlassian.net/browse/LIMS-8467')
     def test010_material_type_approach(self):
         """"
         In case I created test unit with 4 materiel type, when I go to test plan,
@@ -489,6 +488,7 @@ class TestUnitsTestCases(BaseTest):
             self.assertEqual(test_unit_found['Quantification Limit'], 'N/A')
 
     @skip('https://modeso.atlassian.net/browse/LIMSA-222')
+    @skip('https://modeso.atlassian.net/browse/LIMSA-387')
     def test018_download_test_units_sheet(self):
         """
         I can download all the data in the table view in the excel sheet
@@ -849,7 +849,6 @@ class TestUnitsTestCases(BaseTest):
         self.info('search for value of the unit field: {}'.format(test_unit_found['Unit']))
         self.assertIn(test_unit_found['Unit'], fixed_sheet_row_data)
 
-    @skip('need API to take round option ID and returns round option name')
     def test032_edit_category_affects_testplan_step_two(self):
         """
         New: Test unit: Category Approach: Any update in test unit category should
@@ -857,7 +856,7 @@ class TestUnitsTestCases(BaseTest):
 
         LIMS-3687
         """
-        self.info('Create new test unit with qualitative and random generated data')
+        self.info('create new test unit with qualitative and random generated data')
         response, payload = self.test_unit_api.create_qualitative_testunit()
         self.assertEqual(response['status'], 1, payload)
         self.info('create new test plan with created test unit with name {}'.format(payload['name']))
@@ -865,7 +864,7 @@ class TestUnitsTestCases(BaseTest):
         test_plan = TestPlanAPI().create_testplan_from_test_unit_id(response['testUnit']['testUnitId'])
         self.assertTrue(test_plan, "Test plan not created")
         self.info('created test unit with number {}'.format(test_plan['number']))
-        self.info('Navigate to test plan edit page and get test unit category')
+        self.info('navigate to test plan edit page and get test unit category')
         self.test_plan.get_test_plan_edit_page_by_id(test_plan['id'])
         self.test_plan.sleep_small()
         random_category_before_edit = self.test_plan.get_test_unit_category()
@@ -877,11 +876,11 @@ class TestUnitsTestCases(BaseTest):
         self.info('update test unit category to {}'.format(new_random_category_edit))
         self.test_unit_page.set_category(new_random_category_edit)
         self.test_unit_page.save_and_wait()
-        self.info('Navigate to test plan edit page and get test unit category')
+        self.info('navigate to test plan edit page and get test unit category')
         self.test_plan.get_test_plan_edit_page_by_id(test_plan['id'])
         self.test_plan.sleep_small()
         test_plan_category_after_edit = self.test_plan.get_test_unit_category()
-        self.info('Assert that category updated successfully')
+        self.info('assert that category updated successfully')
         self.assertEqual(test_plan_category_after_edit, new_random_category_edit)
 
     def test033_editing_limit_of_quantification_fields_should_affect_table_and_version(self):
@@ -965,44 +964,6 @@ class TestUnitsTestCases(BaseTest):
         validation_result = self.base_selenium.wait_element(element='test_units:archive_config_error')
         self.assertTrue(validation_result)
 
-    @skip('waiting for API deleting')
-    def test036_archive_quantifications_limit_field(self):
-        """
-        User can archive the quantification limits field from the configuration section if not used.
-        "Archive-allowed"
-        LIMS-4164
-        """
-        self.test_unit_page.open_configurations()
-        self.assertTrue(self.test_unit_page.archive_quantification_limit_field())
-        self.assertFalse(
-            self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
-        self.test_unit_page.get_archived_fields_tab()
-        self.assertTrue(self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
-        self.test_unit_page.get_test_units_page()
-        self.test_unit_page.click_create_new_testunit()
-        self.test_unit_page.set_testunit_type(testunit_type='Quantitative')
-        self.assertFalse(self.base_selenium.check_element_is_exist(element='test_unit:use_quantification'))
-
-    @skip('waiting for API deleting')
-    def test037_restore_quantifications_limit_field(self):
-        """
-        User can archive the quantification limits field from the configuration section if not used.
-
-        "Restore"
-        LIMS-4164
-        """
-        self.test_unit_page.open_configurations()
-        self.test_unit_page.get_archived_fields_tab()
-        self.assertTrue(self.test_unit_page.restore_quantification_limit_field())
-        self.assertFalse(
-            self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
-        self.test_unit_page.get_active_fields_tab()
-        self.assertTrue(self.base_selenium.check_element_is_exist('test_unit:configuration_testunit_useQuantification'))
-        self.test_unit_page.get_test_units_page()
-        self.test_unit_page.click_create_new_testunit()
-        self.test_unit_page.set_testunit_type(testunit_type='Quantitative')
-        self.assertTrue(self.base_selenium.check_element_is_exist(element='test_unit:use_quantification'))
-
     @skip('https://modeso.atlassian.net/browse/LIMSA-207')
     def test043_testunits_search_then_navigate(self):
         """
@@ -1025,7 +986,6 @@ class TestUnitsTestCases(BaseTest):
         Articles().get_articles_page()
         self.assertEqual(self.base_selenium.get_url(), '{}articles'.format(self.base_selenium.url))
 
-    @skip('https://modeso.atlassian.net/browse/LIMSA-212')
     def test044_hide_all_table_configurations(self):
         """
         Table configuration: Make sure that you can't hide all the fields from the table configuration
