@@ -197,8 +197,6 @@ class SubOrders(Order):
     def set_article(self, article='', suborder_index=0):
         if article is None:
             return
-        if self.get_article():
-            self.remove_article()
         self.open_suborder_edit_mode(suborder_index)
         if article:
             self.base_selenium.select_item_from_drop_down(element='order:article', item_text=article)
@@ -480,19 +478,20 @@ class SubOrders(Order):
         self.info('Add new suborder.')
         self.base_selenium.click(element='order:add_new_item')
         self.info('Set material type : {}'.format(material_type))
-        self.set_material_type(material_type)
+        self.set_material_type(material_type=material_type, suborder_index=-1)
         self.sleep_tiny()
+        import ipdb;ipdb.set_trace()
         self.info('Set article name : {}'.format(article_name))
         if article_name == 'all':
-            self.set_article('')
+            self.set_article(article='', suborder_index=-1)
         else:
             self.sleep_tiny()
-            self.set_article(article_name)
+            self.set_article(article=article_name, suborder_index=-1)
         self.sleep_tiny()
         self.info('Set test plan : {}'.format(test_plans))
-        self.set_test_plans(test_plans=test_plans)
+        self.set_test_plans(test_plans=test_plans, suborder_index=-1)
         self.sleep_tiny()
-        self.set_test_units(test_units=test_units)
+        self.set_test_units(test_units=test_units, suborder_index=-1)
         self.sleep_tiny()
         return self.get_suborder_data()
 
