@@ -111,7 +111,6 @@ class Order(Orders):
         self.set_contacts(contacts=[contact])
         return self.base_selenium.check_item_in_items(element='order:contact', item_text=contact)
 
-
 class SubOrders(Order):
     def get_suborder_table(self):
         self.info(' Get suborder table list.')
@@ -616,7 +615,6 @@ class SubOrders(Order):
             suborders_elements = self.base_selenium.get_row_cells_elements_related_to_header(
                 row=suborders[index_to_duplicate_from],
                 table_element='order:suborder_table')
-
             duplicate_element = self.base_selenium.find_element_in_element(
                 source=suborders_elements['Options'], destination_element='order:duplicate_table_view')
             duplicate_element.click()

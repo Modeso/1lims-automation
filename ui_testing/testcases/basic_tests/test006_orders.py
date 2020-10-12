@@ -2402,7 +2402,7 @@ class OrdersTestCases(BaseTest):
         self.info('Delete one of the testplans from the order ')
         self.order_page.sleep_tiny()
         self.info('click on first row and remove a testplan')
-        self.order_page.open_suborder_edit()
+        self.order_page.open_suborder_edit_mode()
         self.base_selenium.clear_items_in_drop_down(element='order:test_plan', confirm_popup=True, one_item_only=True)
         self.order_page.save(save_btn='order:save')
         self.order_page.get_orders_page()
