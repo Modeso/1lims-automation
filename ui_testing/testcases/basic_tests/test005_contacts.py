@@ -223,6 +223,7 @@ class ContactsTestCases(BaseTest):
         contact_person_data_after_save = self.contact_page.get_contact_persons_data()
         self.assertFalse(contact_person_data_after_save)
 
+    @skip('https://modeso.atlassian.net/browse/LIMSA-388')
     def test010_delete_contact_used_in_other_data(self):
         """
         New: Contact: Delete Approach: I can't delete any contact if this contact related to some data 
@@ -230,8 +231,8 @@ class ContactsTestCases(BaseTest):
         LIMS-3565
         """
         self.info("get random order data")
-        random_order = random.choice(OrdersAPI().get_all_orders_json())
-        contact_No = random_order['company'][0]['number']
+        response, payload = OrdersAPI().create_new_order()
+        contact_No = payload[0]['contact'][0]['No']
         self.info('filter by contact No: {}'.format(contact_No))
         self.contact_page.filter_by_contact_no(contact_No)
         contact_record = self.contacts_page.result_table()[0]
@@ -248,6 +249,7 @@ class ContactsTestCases(BaseTest):
         contact_archived_records = self.contacts_page.result_table()[0]
         self.assertFalse(self.contact_page.check_if_table_is_empty())
         self.info('delete selected record')
+
         self.contact_page.click_check_box(source=contact_archived_records)
         self.assertFalse(self.contact_page.delete_selected_contacts())
 
