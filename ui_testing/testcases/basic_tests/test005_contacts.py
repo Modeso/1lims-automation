@@ -211,7 +211,7 @@ class ContactsTestCases(BaseTest):
         self.assertEqual(response['status'], 1, 'can not create contact with {}'.format(payload))
         self.info('open contact edit page')
         self.contacts_page.get_contact_edit_page_by_id(response['company']['companyId'])
-        self.info("Navigate to contact persons page")
+        self.info("navigate to contact persons page")
         self.contact_page.get_contact_persons_page()
         contact_person_data_before_delete = self.contact_page.get_contact_persons_data()
         self.info('contact_persons data before delete {}'.format(contact_person_data_before_delete))
@@ -219,7 +219,6 @@ class ContactsTestCases(BaseTest):
         self.contact_page.delete_contact_persons()
         self.info('refresh to make sure that data are saved correctly')
         self.base_selenium.refresh()
-        self.contact_page.get_contact_persons_page()
         self.info('compare contact person data before refresh and after refresh')
         contact_person_data_after_save = self.contact_page.get_contact_persons_data()
         self.assertFalse(contact_person_data_after_save)
@@ -565,7 +564,7 @@ class ContactsTestCases(BaseTest):
         self.info('Asserting the title was changed successfully to Ms')
         self.assertEqual(new_contact_person_data[0]['title'], 'Ms')
 
-    #@attr(series=True)
+    @attr(series=True)
     def test023_contact_title_translation(self):
         """
         Contacts: Title translation approach:
