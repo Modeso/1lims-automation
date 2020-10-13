@@ -614,6 +614,7 @@ class SubOrders(Order):
         return order_data
 
     def duplicate_from_table_view(self, number_of_duplicates=1, index_to_duplicate_from=0):
+        self.base_selenium.scroll()
         for duplicate in range(0, number_of_duplicates):
             suborders = self.base_selenium.get_table_rows(element='order:suborder_table')
             suborders_elements = self.base_selenium.get_row_cells_elements_related_to_header(

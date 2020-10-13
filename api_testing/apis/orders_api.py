@@ -128,7 +128,7 @@ class OrdersAPIFactory(BaseAPI):
         suborders_common_data = {
             'orderNo': int(order_no),
             'orderNoWithYear': orderNoWithYear,
-            'contact': [{"id": contacts['id'], "text": contacts['name'], 'No': contacts['companyNo']}],
+            'contact': [{"id": contacts['id'], "text": contacts['name']}],
             'deletedTestPlans': [],
             'deletedAnalysisIds': [],
             'dynamicFieldsValues': [],
@@ -303,7 +303,7 @@ class OrdersAPI(OrdersAPIFactory):
         return orders_response['orders']
 
     def get_order_with_multiple_sub_orders(self, no_suborders=1):
-        api, payload = self.get_all_orders(limit=100)
+        api, payload = self.get_all_orders()
         for order in api['orders']:
             suborder = self.get_suborder_by_order_id(id=order['orderId'])[0]['orders']
             if len(suborder) > no_suborders:
@@ -415,32 +415,22 @@ class OrdersAPI(OrdersAPIFactory):
         third_contact = contacts[2]
         payload = {
             'contact': [
-                {"id": first_contact['id'],
-                 "text": first_contact['name'],
-                 'No': first_contact['companyNo']},
-                {"id": second_contact['id'],
-                 "text": second_contact['name'],
-                 'No': second_contact['companyNo']},
-                {"id": third_contact['id'],
-                 "text": third_contact['name'],
-                 'No': third_contact['companyNo']}
+                {"id": first_contact['id'], "text": first_contact['name']},
+                {"id": second_contact['id'], "text": second_contact['name']},
+                {"id": third_contact['id'], "text": third_contact['name']}
             ]
-
         }
         return self.create_new_order(**payload)
 
     def create_order_with_department(self):
+        if len(ContactsAPI().get_contacts_with_department()) < 1:
+            ContactsAPI().create_contact_with_multiple_departments()
         contact = random.choice(ContactsAPI().get_contacts_with_department())
         department_data = ContactsAPI().get_contact_form_data(contact['id'])[0]['contact']['departments'][0]
         payload = {
-            'contact': [
-                {"id": contact['id'],
-                 "text": contact['name'],
-                 'No': contact['companyNo']},
-            ],
+            'contact': [{"id": contact['id'], "text": contact['name']}],
             'departments': [{"id": department_data['id'], "text": department_data['name'],
-                             "group": contact['id'], "groupName": contact['name']}],
-        }
+                             "group": contact['id'], "groupName": contact['name']}]}
         return self.create_new_order(**payload)
 
     def create_order_with_department_by_contact_id(self, contact_id):
@@ -448,13 +438,9 @@ class OrdersAPI(OrdersAPIFactory):
         department_data = contact['departments'][0]
         payload = {
             'contact': [
-                {"id": contact['id'],
-                 "text": contact['name'],
-                 'No': contact['companyNumber']},
-            ],
+                {"id": contact['id'], "text": contact['name']}],
             'departments': [{"id": department_data['id'], "text": department_data['name'],
-                             "group": contact['id'], "groupName": contact['name']}],
-        }
+                             "group": contact['id'], "groupName": contact['name']}]}
         return self.create_new_order(**payload)
 
     def create_order_with_test_units(self, no_of_test_units):
