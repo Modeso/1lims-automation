@@ -242,10 +242,15 @@ class SubOrders(Order):
         suborder_row = self.base_selenium.get_table_rows(element='order:suborder_table')[suborder_index]
         suborder_data = self.base_selenium.get_row_cells_dict_related_to_header(
             suborder_row, table_element='order:suborder_table')
-        if suborder_data['Test Plan: *'] == 'Search':
+        if 'Test Plan:' in suborder_data.keys():
+            key = 'Test Plan:'
+        elif 'Test Plan: *' in suborder_data.keys():
+            key = 'Test Plan: *'
+
+        if suborder_data[key] == 'Search':
             return None
         else:
-            return suborder_data['Test Plan: *'].replace('×', '').split('\n')
+            return suborder_data[key].replace('×', '').split('\n')
 
     def clear_test_plan(self, suborder_index=0):
         self.open_suborder_edit_mode(suborder_index)
@@ -479,7 +484,6 @@ class SubOrders(Order):
         self.info('Set material type : {}'.format(material_type))
         self.set_material_type(material_type=material_type, suborder_index=-1)
         self.sleep_tiny()
-        import ipdb;ipdb.set_trace()
         self.info('Set article name : {}'.format(article_name))
         if article_name == 'all':
             self.set_article(article='', suborder_index=-1)

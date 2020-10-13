@@ -406,6 +406,9 @@ class OrdersAPI(OrdersAPIFactory):
         return self.create_new_order(**payload)
 
     def create_order_with_multiple_contacts(self):
+        if len(ContactsAPI().get_contacts_with_department()) < 3:
+            for i in range(3):
+                ContactsAPI().create_contact_with_multiple_departments()
         contacts = random.sample(ContactsAPI().get_contacts_with_department(), k=3)
         first_contact = contacts[0]
         second_contact = contacts[1]
