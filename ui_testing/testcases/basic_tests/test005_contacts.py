@@ -11,6 +11,7 @@ from api_testing.apis.contacts_api import ContactsAPI
 from api_testing.apis.users_api import UsersAPI
 from parameterized import parameterized
 from nose.plugins.attrib import attr
+from unittest import skip
 import re, random
 
 
