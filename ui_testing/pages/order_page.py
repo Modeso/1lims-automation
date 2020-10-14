@@ -111,6 +111,7 @@ class Order(Orders):
         self.set_contacts(contacts=[contact])
         return self.base_selenium.check_item_in_items(element='order:contact', item_text=contact)
 
+
 class SubOrders(Order):
     def get_suborder_table(self):
         self.info(' Get suborder table list.')
