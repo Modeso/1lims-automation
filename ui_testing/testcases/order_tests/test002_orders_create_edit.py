@@ -3,6 +3,7 @@ from ui_testing.pages.order_page import Order
 from ui_testing.pages.order_page import SubOrders
 from ui_testing.pages.orders_page import Orders
 from api_testing.apis.orders_api import OrdersAPI
+from api_testing.apis.analysis_api import AnalysisAPI
 from ui_testing.pages.analysis_page import AllAnalysesPage
 from api_testing.apis.article_api import ArticleAPI
 from api_testing.apis.test_unit_api import TestUnitAPI
@@ -14,7 +15,6 @@ from parameterized import parameterized
 from random import randint
 import random
 from nose.plugins.attrib import attr
-
 
 
 class OrdersTestCases(BaseTest):
@@ -32,6 +32,7 @@ class OrdersTestCases(BaseTest):
         self.test_unit_api.set_name_configuration_name_only()
         self.orders_api.set_configuration()
         self.orders_api.set_filter_configuration()
+        AnalysisAPI().set_filter_configuration()
 
     @attr(series=True)
     def test001_validate_order_no_exists(self):
@@ -116,7 +117,8 @@ class OrdersTestCases(BaseTest):
         LIMS-4270
         """
         self.info('generate new order number to use it for update')
-        new_order_no = str(self.orders_api.get_auto_generated_order_no()[0]['id'])
+        #new_order_no = str(self.orders_api.get_auto_generated_order_no()[0]['id'])
+        new_order_no = str(random.randint(999, 9999))
         year_value = str(self.order_page.get_current_year()[2:])
         formatted_order_no = new_order_no + '-' + year_value
         self.info('newly generated order number = {}'.format(formatted_order_no))
@@ -247,37 +249,6 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(new_contact, results['Contact Name'])
         self.info('checking old department removed{}'.format(new_contact))
         self.assertNotEqual(results['Departments'], response['orders'][0]['departments'])
-
-    @attr(series=True)
-    def test007_update_contact_config_to_number_create_form(self):
-        """
-        Sample Management: Contact configuration approach: In case the user configures the
-        contact field to display number this action should reflect on the order form step one
-
-        LIMS-6626
-        """
-        self.info("set contact configuration to be searchable by number only")
-        self.orders_api.set_contact_configuration_to_number_only()
-        response, _ = self.contacts_api.get_all_contacts()
-        self.assertEqual(response['status'], 1)
-        self.assertGreaterEqual(response['count'], 1)
-        random_contact = random.choice(response['contacts'])
-        contact_no = random_contact['companyNo']
-        contact_name = random_contact['name']
-        testplan = TestPlanAPI().create_completed_testplan_random_data()
-        self.info("create new order with contact no {}".format(contact_no))
-        self.suborder_table.create_new_order(contacts=[contact_no], save=False,
-                                             material_type=testplan['materialType'][0]['text'],
-                                             article=testplan['selectedArticles'][0]['text'],
-                                             test_plans=[testplan['testPlan']['text']])
-        self.info("assert that contact set to {}".format(str('No: ' + contact_no)))
-        self.assertCountEqual(self.order_page.get_contacts(), [str('No: ' + contact_no)])
-        self.order_page.clear_contact()
-        contact_name_result = self.base_selenium.get_drop_down_suggestion_list(element='order:contact',
-                                                                               item_text=contact_name)
-        self.info("assert that suggestion list of contact name {} is {}".format(contact_name, str('No: ' + contact_no)))
-
-        self.assertEqual(contact_name_result[0], str('No: ' + contact_no))
 
     def test008_user_can_add_suborder(self):
         """
