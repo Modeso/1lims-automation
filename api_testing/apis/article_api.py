@@ -205,6 +205,8 @@ class ArticleAPI(ArticleAPIFactory):
         return articles_list
 
     def get_formatted_article_with_formatted_material_type(self, material_type, avoid_article=''):
+        material_type = {"id": material_type['id'],
+                         "text": material_type['name']}
         articles, payload = self.get_all_articles(limit=500)
         self.info("search for article with material type {}".format(material_type))
         for article in articles['articles']:
@@ -214,7 +216,7 @@ class ArticleAPI(ArticleAPIFactory):
                 formatted_article = {'id': article['id'], 'name': article['name']}
                 return formatted_article
 
-        self.info("No article with requested material type, So create article")
+        self.info("no article with requested material type, so create article")
         api, payload = self.create_article(materialType=material_type,
                                            selectedMaterialType=[material_type],
                                            materialTypeId=int(material_type['id']))
@@ -238,4 +240,3 @@ class ArticleAPI(ArticleAPIFactory):
         with open(config_file, "r") as read_file:
             payload = json.load(read_file)
         super().set_configuration(payload=payload)
-
