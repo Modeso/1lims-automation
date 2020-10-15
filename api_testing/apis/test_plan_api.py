@@ -15,7 +15,7 @@ class TestPlanAPIFactory(BaseAPI):
                     "limit": 100,
                     "start": 0,
                     "sort_order": "DESC",
-                    "filter": "{}",
+                    "filter": '{"quickSearch":""}',
                     "deleted": "0"}
         return api, _payload
 
@@ -198,7 +198,7 @@ class TestPlanAPI(TestPlanAPIFactory):
         return response['testPlans']
 
     def get_testplan_with_filter(self, filter_option, filter_text, **kwargs):
-        filter_text = '{"' + filter_option + '":"' + filter_text + '","columns":["number","name"]}'
+        filter_text = '{"quickSearch": "", "' + filter_option + '":"' + filter_text + '","columns":["number","name"]}'
         response, _ = self.get_all_test_plans(filter=filter_text, start=0, **kwargs)
         return response['testPlans']
 
@@ -278,13 +278,18 @@ class TestPlanAPI(TestPlanAPIFactory):
         return test_units_names
 
     def get_suborder_data_with_different_material_type(self, material_type):
-        test_plans = self.get_completed_testplans(limit=1000)
-        test_plans_without_duplicate = [test_plan for test_plan in test_plans if test_plan['materialType']
-                                        not in [material_type]]
-        test_plan = random.choice(test_plans_without_duplicate)
-        test_unit = self.get_testunits_in_testplan(test_plan['id'])[0]
-
-        return test_plan, test_unit
+        new_material = random.choice(
+            GeneralUtilitiesAPI().get_formatted_material_types_without_duplicate(material_type))
+        formatted_material = {'id': new_material['id'], 'text': new_material['name']}
+        formatted_article = ArticleAPI().get_formatted_article_with_formatted_material_type(
+            material_type=formatted_material)
+        test_plan_data = self.create_completed_testplan(material_type=new_material['name'],
+                                                        formatted_article=formatted_article)
+        created_data = {'test_plan': test_plan_data['testPlanEntity']['name'],
+                        'test_unit': test_plan_data['specifications'][0]['name'],
+                        'material_type': new_material['name'],
+                        'article': formatted_article['name']}
+        return created_data
 
     def create_testplan_from_test_unit_id(self, test_unit_id):
         testunit_data = TestUnitAPI().get_testunit_form_data(id=test_unit_id)[0]['testUnit']
@@ -329,17 +334,15 @@ class TestPlanAPI(TestPlanAPIFactory):
         material_type_id = GeneralUtilitiesAPI().get_material_id(random_article['materialType'])
         formatted_material = {'id': material_type_id, 'text': random_article['materialType']}
         # creates test unit with values in it
-        formated_testunits = []
+        formatted_testunits = []
         for testunit in range(no_testunits):
             tu_response, _ = TestUnitAPI().create_quantitative_testunit(selectedMaterialTypes=[formatted_material])
-            if tu_response['status'] == 2:
-                continue
-            testunit_data = TestUnitAPI().get_testunit_form_data(id=tu_response['testUnit']['testUnitId'])[0][
-                'testUnit']
-            formated_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
-            formated_testunits.append(formated_testunit)
+            testunit_data = TestUnitAPI().get_testunit_form_data(
+                id=tu_response['testUnit']['testUnitId'])[0]['testUnit']
+            formatted_testunit = TstUnit().map_testunit_to_testplan_format(testunit=testunit_data)
+            formatted_testunits.append(formatted_testunit)
 
-        testplan, payload = self.create_testplan(testUnits=formated_testunits,
+        testplan, payload = self.create_testplan(testUnits=formatted_testunits,
                                                  selectedArticles=[formatted_article],
                                                  materialType=[formatted_material],
                                                  materialTypeId=[material_type_id])
