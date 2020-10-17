@@ -12,8 +12,8 @@ EXECUTION_FILES=(
 
 #    ui_testing/testcases/basic_tests/test006_orders.py
 
-    ui_testing/testcases/header_tests/test007_audit_trail.py
-#    ui_testing/testcases/header_tests/test008_company_profile.py
+#    ui_testing/testcases/header_tests/test007_audit_trail.py
+    ui_testing/testcases/header_tests/test008_company_profile.py
 #    ui_testing/testcases/header_tests/test009_usermanagement.py
 #    ui_testing/testcases/header_tests/test010_my_profile.py
 #    ui_testing/testcases/header_tests/test011_rolesandpermissions.py
