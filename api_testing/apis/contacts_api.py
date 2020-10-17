@@ -120,6 +120,10 @@ class ContactsAPIFactory(BaseAPI):
 
 
 class ContactsAPI(ContactsAPIFactory):
+    def get_all_contacts_json(self, **kwargs):
+        response, _ = self.get_all_contacts(**kwargs)
+        return response['contacts']
+
     def get_first_record_with_data_in_attribute(self, attribute):
         contacts_request, _ = self.get_all_contacts()
         if (contacts_request['status'] != 1) or (contacts_request['count'] == 0):

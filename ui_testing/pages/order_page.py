@@ -124,9 +124,9 @@ class SubOrders(Order):
         return suborder_row
 
     def set_departments(self, departments=[''], remove_old=False, suborder_index=0):
-        if remove_old:
-            self.base_selenium.clear_items_in_drop_down(element='order:departments')
         self.open_suborder_edit_mode(suborder_index)
+        if remove_old and self.get_departments():
+            self.base_selenium.clear_items_in_drop_down(element='order:departments')
         if departments:
             for dep in departments:
                 self.base_selenium.select_item_from_drop_down(element='order:departments', item_text=dep)
@@ -625,7 +625,9 @@ class SubOrders(Order):
             duplicate_element.click()
             self.sleep_tiny()
 
-    def upload_attachment(self, file_name, drop_zone_element, remove_current_file=False, save=False):
+    def upload_attachment(self, file_name, drop_zone_element, remove_current_file=False, save=False, index=0):
+        self.open_suborder_edit_mode(suborder_index=index)
+        self.base_selenium.click(element='order:attachment_btn')
         super().upload_file(file_name, drop_zone_element, remove_current_file)
         if save:
             self.base_selenium.driver.execute_script("document.querySelector('.dz-details').style.opacity = 'initial';")

@@ -351,355 +351,499 @@ class OrdersTestCases(BaseTest):
     #     self.info('Assert that the test unit not equal ')
     #     self.assertNotEqual(testunit_before_edit_row, testunit_after_edit_row)
     #
-    @parameterized.expand(['save_btn', 'cancel'])
-    def test010_update_departments_with_save_cancel_btn(self, save):
+    # @parameterized.expand(['save_btn', 'cancel'])
+    # def test010_update_departments_with_save_cancel_btn(self, save):
+    #     """
+    #     Orders: department Approach: In case I update the department then press on save button
+    #     (the department updated successfully) & when I press on cancel button ( this department not updated )
+    #
+    #     LIMS-4765
+    #     """
+    #     self.info('create contact with multiple departments')
+    #     response, payload = self.contacts_api.create_contact_with_multiple_departments()
+    #     self.assertEqual(response['status'], 1, "contact with {} Not created".format(payload))
+    #     self.info('create order with contact {} and first department {}'.
+    #               format(response['company']['name'], payload['departments'][0]['text']))
+    #     order_response, order_payload = \
+    #         self.orders_api.create_order_with_department_by_contact_id(response['company']['companyId'])
+    #     self.assertEqual(order_response['status'], 1, "order with {} Not created".format(order_payload))
+    #     self.info('edit order with No {}'.format(order_payload[0]['orderNo']))
+    #     self.orders_page.get_order_edit_page_by_id(order_response['order']['mainOrderId'])
+    #     order_url = self.base_selenium.get_url()
+    #     self.info('order_url : {}'.format(order_url))
+    #     order_department = self.suborder_table.get_departments()
+    #     new_department = payload['departments'][1]['text']
+    #     self.info("update department to {}".format(new_department))
+    #     self.suborder_table.set_departments(departments=[new_department], remove_old=True)
+    #     if 'save_btn' == save:
+    #         self.order_page.save(save_btn='order:save_btn')
+    #     else:
+    #         self.order_page.cancel(force=True)
+    #
+    #     self.base_selenium.get(url=order_url, sleep=self.base_selenium.TIME_SMALL)
+    #     current_department = self.suborder_table.get_departments()
+    #     if 'save_btn' == save:
+    #         self.info('Assert {} (current_department) == {} (new_department)'.
+    #                   format(current_department, new_department))
+    #         self.assertCountEqual(current_department, [new_department])
+    #     else:
+    #         self.info('Assert {} (current_department) == {} (order_departments)'.
+    #                   format(current_department, order_department))
+    #         self.assertCountEqual(current_department, order_department)
+    #
+    # @parameterized.expand(['save_btn', 'cancel_btn'])
+    # def test011_update_departments_in_second_suborder(self, action):
+    #     """
+    #      Orders: department Approach: In case I update the department then press on save button
+    #      (the department updated successfully) & when I press on cancel button (this department
+    #      not updated) (this will apply from the second order)
+    #      LIMS-6523
+    #     """
+    #     self.info('create contact')
+    #     response, payload = ContactsAPI().create_contact()
+    #     contact, contact_id = payload, response['company']['companyId']
+    #
+    #     orders, payload = self.orders_api.get_all_orders(limit=20)
+    #     order = random.choice(orders['orders'])
+    #     self.info('{}'.format(order['orderNo']))
+    #     self.orders_page.get_order_edit_page_by_id(order['id'])
+    #     order_data = self.suborder_table.get_suborder_data()
+    #     if len(order_data['suborders']) <= 1:
+    #         self.suborder_table.duplicate_from_table_view()
+    #         self.order_page.save(save_btn='order:save_btn')
+    #
+    #     self.order_page.set_contacts(contacts=[contact['name']])
+    #     self.order_page.sleep_small()
+    #     self.order_page.save(save_btn='order:save_btn', sleep=True)
+    #     self.base_selenium.refresh()
+    #
+    #     selected_suborder_data = self.suborder_table.get_suborder_data()
+    #     self.suborder_table.update_suborder(sub_order_index=1, departments=[contact['departments'][0]['text']])
+    #     self.order_page.save(save_btn='order:' + action)
+    #     if action == 'save_btn':
+    #         self.base_selenium.refresh()
+    #         suborder_data_after_update = self.suborder_table.get_suborder_data()
+    #         self.assertIn(contact['departments'][0]['text'], suborder_data_after_update['suborders'][1]['departments'])
+    #     else:
+    #         self.order_page.confirm_popup()
+    #         self.orders_page.get_order_edit_page_by_id(order['id'])
+    #         suborder_data_after_cancel = self.suborder_table.get_suborder_data()
+    #         self.assertEqual(suborder_data_after_cancel['suborders'][1], selected_suborder_data['suborders'][1])
+    #
+    # def test012_edit_department_of_order_with_multiple_contacts(self):
+    #     """
+    #     In case I select multiple contacts the departments should be updated according to that
+    #
+    #     LIMS-5705 'edit mode'
+    #     """
+    #     self.info("create order with multiple contacts")
+    #     response, payload = self.orders_api.create_order_with_multiple_contacts()
+    #     self.assertEqual(response['status'], 1, response)
+    #     contact_names_list = [contact['text'] for contact in payload[0]['contact']]
+    #     self.info('selected contacts are {}'.format(contact_names_list))
+    #     departments_list_with_contacts = ContactsAPI().get_department_contact_list(contact_names_list)
+    #     self.info('department contacts list {}'.format(departments_list_with_contacts))
+    #     self.info('open edit page of order no {}'.format(payload[0]['orderNo']))
+    #     self.orders_page.get_order_edit_page_by_id(response['order']['mainOrderId'])
+    #     self.order_page.sleep_tiny()
+    #     suggested_department_list, departments_only_list = \
+    #         self.suborder_table.get_department_suggestion_lists(open_suborder_table=True, contacts=contact_names_list)
+    #     self.info('suggested department list {}'.format(suggested_department_list))
+    #     self.info('and it should be {}'.format(departments_list_with_contacts))
+    #     index = 0
+    #     for item in suggested_department_list:
+    #         for element in departments_list_with_contacts:
+    #             if item['contact'] == element['contact']:
+    #                 self.assertCountEqual(item['departments'], element['departments'])
+    #                 index = index + 1
+    #     self.assertEqual(index, len(contact_names_list))
+    #
+    #     department = random.choice(departments_only_list)
+    #     self.info('set department to {}'.format(department))
+    #     self.suborder_table.set_departments(department)
+    #     self.order_page.save_and_wait(save_btn='order:save')
+    #     suborder_data = self.suborder_table.get_suborder_data()
+    #     self.assertEqual([department], suborder_data['suborders'][0]['departments'])
+    #
+    # def test013_add_multiple_suborders_with_diff_departments(self):
+    #     """
+    #     Orders: table: Departments Approach: In case I created multiple suborders
+    #     the departments should open drop down list with the options that I can
+    #     select different departments in each one.
+    #
+    #     LIMS-4258
+    #     """
+    #     self.info('create contact with multiple departments')
+    #     response, payload = self.contacts_api.create_contact_with_multiple_departments()
+    #     self.assertEqual(response['status'], 1, "contact with {} Not created".format(payload))
+    #     department_list = [dep['text'] for dep in payload['departments']]
+    #     self.info('create order with contact {} and first department {}'.
+    #               format(response['company']['name'], payload['departments'][0]['text']))
+    #     order_response, order_payload = \
+    #         self.orders_api.create_order_with_department_by_contact_id(
+    #             response['company']['companyId'])
+    #     self.assertEqual(order_response['status'], 1, "order with {} Not created".format(order_payload))
+    #     self.info('edit order with No {}'.format(order_payload[0]['orderNo']))
+    #     self.orders_page.get_order_edit_page_by_id(order_response['order']['mainOrderId'])
+    #     self.order_page.sleep_tiny()
+    #     self.suborder_table.add_new_suborder(material_type=order_payload[0]['materialType']['text'],
+    #                                          article_name=order_payload[0]['article']['text'],
+    #                                          test_plans=[order_payload[0]['testPlans'][0]['name']],
+    #                                          test_units=[])
+    #     self.order_page.sleep_tiny()
+    #     self.info("get departments suggestion list for first suborder")
+    #     _, department_suggestion_list1 = self.suborder_table.get_department_suggestion_lists(
+    #         open_suborder_table=True, index=1)
+    #     self.assertCountEqual(department_suggestion_list1, department_list)
+    #     self.info("set department to {}".format(payload['departments'][1]['text']))
+    #     self.suborder_table.set_departments(payload['departments'][1]['text'])
+    #     self.order_page.sleep_tiny()
+    #     self.suborder_table.add_new_suborder(material_type=order_payload[0]['materialType']['text'],
+    #                                          article_name=order_payload[0]['article']['text'],
+    #                                          test_plans=[order_payload[0]['testPlans'][0]['name']],
+    #                                          test_units=[])
+    #     self.order_page.sleep_tiny()
+    #     self.info("get departments suggestion list for second suborder")
+    #     _, department_suggestion_list2 = self.suborder_table.get_department_suggestion_lists(
+    #         open_suborder_table=True, index=2)
+    #     self.assertCountEqual(department_suggestion_list2, department_list)
+    #     self.info("set department to {}".format(payload['departments'][2]['text']))
+    #     self.suborder_table.set_departments(payload['departments'][2]['text'])
+    #     self.order_page.save_and_wait('order:save_btn')
+    #     self.info("assert that department of each suborder in department lis")
+    #     suborder_data = self.suborder_table.get_suborder_data()["suborders"]
+    #     for suborder in suborder_data:
+    #         self.assertIn(suborder['departments'][0], department_list)
+    #
+    # @parameterized.expand(['save_btn', 'cancel'])
+    # def test014_update_test_date(self, save):
+    #     """
+    #     New: Orders: Test Date: I can update test date successfully with cancel/save buttons
+    #
+    #     LIMS-4780
+    #     """
+    #     self.info("open random order edit page")
+    #     self.order_page.get_random_order()
+    #     # preserve the url
+    #     order_url = self.base_selenium.get_url()
+    #     # get all the suborders
+    #     all_suborders = self.base_selenium.get_table_rows(element='order:suborder_table')
+    #     # get random suborder row_id
+    #     row_id = 0
+    #     if len(all_suborders) > 1:
+    #         row_id = randint(0, len(all_suborders) - 1)
+    #
+    #     # change the test date
+    #     new_test_date = self.suborder_table.update_suborder(sub_order_index=row_id, test_date=True)
+    #
+    #     # save or cancel
+    #     if 'save_btn' == save:
+    #         self.order_page.sleep_medium()
+    #         self.order_page.save(save_btn='order:save_btn')
+    #         self.order_page.sleep_medium()
+    #     else:
+    #         self.order_page.sleep_medium()
+    #         self.order_page.cancel(force=True)
+    #
+    #     # refresh the page
+    #     self.info('reopen the edited order page')
+    #     self.base_selenium.get(url=order_url, sleep=self.base_selenium.TIME_MEDIUM)
+    #
+    #     # get the saved test_date
+    #     saved_test_date = self.suborder_table.get_suborder_data()['suborders'][row_id]['test_date']
+    #
+    #     # check if the test date changed or not
+    #     if 'cancel' == save:
+    #         self.info('Assert {} (current_test_date) != {} (new_test_date)'.
+    #                   format(new_test_date, saved_test_date))
+    #         self.assertNotEqual(saved_test_date, new_test_date)
+    #     else:
+    #         self.info('Assert {} (current_test_date) == {} (new_test_date)'.
+    #                   format(new_test_date, saved_test_date))
+    #         self.assertEqual(saved_test_date, new_test_date)
+    #
+    # @parameterized.expand(['save_btn', 'cancel'])
+    # def test015_update_shipment_date(self, save):
+    #     """
+    #     New: Orders: Shipment date Approach: I can update shipment date successfully with save/cancel button
+    #
+    #     LIMS-4779
+    #     """
+    #     self.info("open random order edit page")
+    #     self.order_page.get_random_order()
+    #     # open the url
+    #     order_url = self.base_selenium.get_url()
+    #     # get all the suborders
+    #     all_suborders = self.base_selenium.get_table_rows(element='order:suborder_table')
+    #     # get random suborder row_id
+    #     row_id = 0
+    #     if len(all_suborders) > 1:
+    #         row_id = randint(0, len(all_suborders) - 1)
+    #
+    #     # update the shipment date
+    #     new_shipment_date = self.suborder_table.update_suborder(sub_order_index=row_id, shipment_date=True)
+    #
+    #     # save or cancel
+    #     if 'save_btn' == save:
+    #         self.order_page.save(save_btn='order:save_btn')
+    #         self.order_page.sleep_medium()
+    #     else:
+    #         self.order_page.sleep_medium()
+    #         self.order_page.cancel(force=True)
+    #
+    #     # refresh the page
+    #     self.info('reopen the edited order page')
+    #     self.base_selenium.get(url=order_url, sleep=self.base_selenium.TIME_MEDIUM)
+    #
+    #     # get the saved shipment date
+    #     saved_shipment_date = self.suborder_table.get_suborder_data()['suborders'][row_id]['shipment_date']
+    #
+    #     # check if the shipment date changed or not
+    #     if 'cancel' == save:
+    #         self.info('Assert {} (current_shipment_date) != {} (new_shipment_date)'.
+    #                   format(new_shipment_date, saved_shipment_date))
+    #         self.assertNotEqual(saved_shipment_date, new_shipment_date)
+    #     else:
+    #         self.info('Assert {} (current_shipment_date) == {} (new_shipment_date)'.
+    #                   format(new_shipment_date, saved_shipment_date))
+    #         self.assertEqual(saved_shipment_date, new_shipment_date)
+    #
+    # def test017_upload_attachment_then_remove(self):
+    #     """
+    #      I can upload any attachment successfully from the order section
+    #
+    #      LIMS-8258
+    #
+    #      Orders step 1: Attachment download approach: There is a link under remove link for
+    #      download and you can preview it by clicking on it
+    #
+    #      LIMS-6933
+    #     """
+    #     order, payload = self.orders_api.create_new_order()
+    #     self.orders_page.get_order_edit_page_by_id(id=order['order']['mainOrderId'])
+    #     file_name = 'logo.png'
+    #     upload_attachment_then_save = self.suborder_table.upload_attachment(file_name='logo.png',
+    #                                                                         drop_zone_element='order:uploader_zone',
+    #                                                                         save=True)
+    #     self.info("assert that the upload file same as the file name ".format(upload_attachment_then_save, file_name))
+    #     self.assertEqual(upload_attachment_then_save, file_name)
+    #     self.base_selenium.click(element='order:attachments_btn')
+    #     download_btn = self.base_selenium.find_element_by_xpath("//a[contains(text(),'Download')]")
+    #     download_btn.click()
+    #     self.assertEqual(download_btn.get_attribute('download'), 'logo.png')
+    #
+    # def test018_update_suborder_material_type_cancel_button(self):
+    #     """
+    #     New: Orders: Edit material type: Make sure that user can cancel any update successfully
+    #     New: Orders: Materiel type Approach: In case then material type of the second suborder
+    #     updated then press on cancel button, Nothing update when I enter one more time
+    #
+    #     LIMS-4281
+    #     LIMS-4282
+    #
+    #     user can edit multiple columns at the same time
+    #     LIMS-5221 second part
+    #     """
+    #     response, payload = self.orders_api.create_new_order()
+    #     self.assertEqual(response['status'], 1, "no new order created")
+    #     material_type = random.choice(
+    #         GeneralUtilitiesAPI().get_material_types_without_duplicate(payload[0]['materialType']['text']))
+    #     self.info("update material type of first suborder to {}".format(material_type))
+    #     self.orders_page.get_order_edit_page_by_id(id=response['order']['mainOrderId'])
+    #     self.orders_page.sleep_small()
+    #     suborders_data_before_update = self.suborder_table.get_suborder_data()
+    #     self.suborder_table.update_suborder(material_type=material_type)
+    #     self.orders_page.sleep_small()
+    #     self.info("check pop up mssg that all analysis will be deleted")
+    #     self.assertTrue(self.base_selenium.check_element_is_exist(element='general:confirmation_pop_up'))
+    #     pop_up_mssg = self.base_selenium.get_text(element='general:confirmation_pop_up')
+    #     self.assertIn("All analysis created with this order and test plan will be deleted", pop_up_mssg)
+    #     self.orders_page.confirm_popup()
+    #     self.info("press on cancel button to cancel changes")
+    #     self.orders_page.cancel()
+    #     self.info("Navigate to order edit page and make sure suborder data not changed")
+    #     self.orders_page.get_order_edit_page_by_id(id=response['order']['mainOrderId'])
+    #     suborders_data_after_update = self.suborder_table.get_suborder_data()
+    #     self.assertCountEqual(suborders_data_after_update, suborders_data_before_update)
+    #
+    # def test019_update_suborder_material_type_test_unit_only(self):
+    #     """
+    #     New: Orders: Material type Approach: I can update the material type
+    #     filed with test units records successfully
+    #
+    #     LIMS-4833
+    #     LIMS-4267
+    #
+    #     user can edit multiple columns at the same time
+    #     LIMS-5221 first part
+    #     """
+    #     order, payload = self.orders_api.create_new_order(testPlans=[])
+    #     self.assertEqual(order['status'], 1)
+    #     old_material = payload[0]['materialType']['text']
+    #     self.info("selected order has material type {}".format(old_material))
+    #     new_article = random.choice(ArticleAPI().get_article_with_different_material(old_material))
+    #     new_material = new_article['materialType']
+    #     formatted_material = {'id': GeneralUtilitiesAPI().get_material_id(new_material), 'text': new_material}
+    #     tu_response, tu_payload = self.test_unit_api.create_qualitative_testunit(
+    #         selectedMaterialTypes=[formatted_material])
+    #     self.assertEqual(tu_response['status'], 1)
+    #     new_test_unit = tu_payload['name']
+    #     self.orders_page.get_order_edit_page_by_id(id=order['order']['mainOrderId'])
+    #     self.info("update material type to {}".format(new_material))
+    #     self.suborder_table.set_material_type(material_type=new_material)
+    #     self.info("check pop up msg that all analysis will be deleted")
+    #     self.assertTrue(self.base_selenium.check_element_is_exist(element='general:confirmation_pop_up'))
+    #     pop_up_msg = self.base_selenium.get_text(element='general:confirmation_pop_up')
+    #     self.assertIn("This Test Unit will be removed from the corresponding analysis", pop_up_msg)
+    #     self.orders_page.confirm_popup()
+    #     self.suborder_table.set_article(article=new_article['name'])
+    #     self.suborder_table.set_test_units(test_units=[new_test_unit])
+    #     self.order_page.save_and_wait(save_btn='order:save_btn')
+    #     suborder_data_after_update = self.suborder_table.get_suborder_data()['suborders'][0]
+    #     self.assertEqual(suborder_data_after_update['material_type'], new_material)
+    #     self.assertEqual(suborder_data_after_update['article']['name'], new_article['name'])
+    #     self.assertEqual(len(suborder_data_after_update['testunits']), 1)
+    #     self.assertEqual(suborder_data_after_update['testunits'][0]['name'], new_test_unit)
+    #     self.orders_page.get_orders_page()
+    #     self.orders_page.navigate_to_analysis_active_table()
+    #     self.analyses_page.filter_by_analysis_number(suborder_data_after_update['analysis_no'])
+    #     self.assertEqual(len(self.analyses_page.result_table())-1, 1)
+    #     analysis = self.analyses_page.get_the_latest_row_data()
+    #     self.assertEqual(analysis['Material Type'], new_material)
+    #     self.assertEqual(analysis['Article Name'], new_article['name'])
+    #     child_table_data = self.analyses_page.get_child_table_data()[0]
+    #     self.assertEqual(new_test_unit, child_table_data['Test Unit'])
+    #
+    # def test020_update_material_type_test_plan_only(self):
+    #     """
+    #     -When user update the materiel type from table view once I delete it message will appear
+    #     (All analysis created with this order and test plan/ test unit will be deleted )
+    #     -Once you press on OK button, the material type & article & test pan/ test unit will delete
+    #     -You can update it by choose another one and choose corresponding article & test plan/ test unit
+    #     LIMS-4264 ( order with test plan )
+    #     """
+    #     self.test_plan_api = TestPlanAPI()
+    #     self.info('create new order')
+    #     response, order_payload = self.orders_api.create_new_order(testUnits=[])
+    #     self.assertEqual(response['status'], 1, order_payload)
+    #     self.info('get random completed test plan with different material type')
+    #     new_data = self.test_plan_api.get_suborder_data_with_different_material_type(
+    #         order_payload[0]['materialType']['text'])
+    #
+    #     self.info('update material type of order from {} to {}'.format(
+    #         order_payload[0]['materialType']['text'], new_data['material_type']))
+    #     self.orders_page.get_order_edit_page_by_id(response['order']['mainOrderId'])
+    #     self.suborder_table.set_material_type(material_type=new_data['material_type'])
+    #     self.order_page.sleep_small()
+    #     self.assertTrue(self.base_selenium.check_element_is_exist(element='general:confirmation_pop_up'))
+    #     pop_up_msg = self.base_selenium.get_text(element='general:confirmation_pop_up')
+    #     self.assertIn("All analysis created with this order and test plan will be deleted", pop_up_msg)
+    #     self.orders_page.confirm_popup()
+    #     self.info('assert article and test plan are empty')
+    #     self.assertEqual(self.suborder_table.get_article(), None)
+    #     self.assertEqual(self.suborder_table.get_test_plans(), None)
+    #     self.info("set article to {} and test plan to {}".format(new_data['article'], new_data['test_plan']))
+    #     self.suborder_table.set_article(article=new_data['article'])
+    #     self.suborder_table.set_test_plans(test_plans=[new_data['test_plan']])
+    #     self.order_page.save_and_wait(save_btn='order:save_btn')
+    #     self.info('navigate to analysis page to make sure analysis corresponding to suborder updated')
+    #     self.order_page.get_orders_page()
+    #     self.orders_page.navigate_to_analysis_active_table()
+    #     self.analyses_page.filter_by_order_no(order_payload[0]['orderNoWithYear'])
+    #     analyses = self.analyses_page.get_the_latest_row_data()
+    #     self.assertEqual(new_data['material_type'], analyses['Material Type'])
+    #     self.assertEqual(new_data['article'], analyses['Article Name'].replace(" ", ""))
+    #     self.assertEqual(new_data['test_plan'], analyses['Test Plans'])
+
+    def test021_validate_order_test_unit_test_plan(self):
         """
-        Orders: department Approach: In case I update the department then press on save button
-        (the department updated successfully) & when I press on cancel button ( this department not updated )
+        New: orders Test plan /test unit validation
 
-        LIMS-4765
+        LIMS-4349
         """
-        self.info('create contact with multiple departments')
-        response, payload = self.contacts_api.create_contact_with_multiple_departments()
-        self.assertEqual(response['status'], 1, "contact with {} Not created".format(payload))
-        self.info('create order with contact {} and first department {}'.
-                  format(response['company']['name'], payload['departments'][0]['text']))
-        order_response, order_payload = \
-            self.orders_api.create_order_with_department_by_contact_id(response['company']['companyId'])
-        self.assertEqual(order_response['status'], 1, "order with {} Not created".format(order_payload))
-        self.info('edit order with No {}'.format(order_payload[0]['orderNo']))
-        self.orders_page.get_order_edit_page_by_id(order_response['order']['mainOrderId'])
-        order_url = self.base_selenium.get_url()
-        self.info('order_url : {}'.format(order_url))
-        order_department = self.suborder_table.get_departments()
-        new_department = payload['departments'][1]['text']
-        self.info("update department to {}".format(new_department))
-        self.suborder_table.set_departments(departments=[new_department], remove_old=True)
-        if 'save_btn' == save:
-            self.order_page.save(save_btn='order:save_btn')
-        else:
-            self.order_page.cancel(force=True)
+        self.info(' Running test case to make sure from the validation of the test plan & test unit')
+        article = random.choice(ArticleAPI().get_all_articles_json())
+        contact = random.choice(self.contacts_api.get_all_contacts_json())
+        self.suborder_table.create_new_order(material_type=article['materialType'],
+                                             article=article['name'],
+                                             contacts=[contact['name']], test_plans=[],
+                                             test_units=[], multiple_suborders=0)
+        self.info('waiting to validation message appear when I did not enter test plan & test unit')
+        validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
+        self.info('Assert the error message to make sure that validation of the test plan & test units fields ? {}'
+                  .format(validation_result))
+        self.assertTrue(validation_result)
 
-        self.base_selenium.get(url=order_url, sleep=self.base_selenium.TIME_SMALL)
-        current_department = self.suborder_table.get_departments()
-        if 'save_btn' == save:
-            self.info('Assert {} (current_department) == {} (new_department)'.
-                      format(current_department, new_department))
-            self.assertCountEqual(current_department, [new_department])
-        else:
-            self.info('Assert {} (current_department) == {} (order_departments)'.
-                      format(current_department, order_department))
-            self.assertCountEqual(current_department, order_department)
-
-    @parameterized.expand(['save_btn', 'cancel_btn'])
-    def test011_update_departments_in_second_suborder(self, action):
+    def test023_validate_order_test_unit_test_plan_edit_mode(self):
         """
-         Orders: department Approach: In case I update the department then press on save button
-         (the department updated successfully) & when I press on cancel button (this department
-         not updated) (this will apply from the second order)
-         LIMS-6523
+        New: orders Test plan /test unit validation in edit mode
+
+        LIMS-4826
         """
-        self.info('create contact')
-        response, payload = ContactsAPI().create_contact()
-        contact, contact_id = payload, response['company']['companyId']
-
-        orders, payload = self.orders_api.get_all_orders(limit=20)
-        order = random.choice(orders['orders'])
-        self.info('{}'.format(order['orderNo']))
-        self.orders_page.get_order_edit_page_by_id(order['id'])
-        order_data = self.suborder_table.get_suborder_data()
-        if len(order_data['suborders']) <= 1:
-            self.suborder_table.duplicate_from_table_view()
-            self.order_page.save(save_btn='order:save_btn')
-
-        self.order_page.set_contacts(contacts=[contact['name']])
-        self.order_page.sleep_small()
-        self.order_page.save(save_btn='order:save_btn', sleep=True)
-        self.base_selenium.refresh()
-
-        selected_suborder_data = self.suborder_table.get_suborder_data()
-        self.suborder_table.update_suborder(sub_order_index=1, departments=[contact['departments'][0]['text']])
-        self.order_page.save(save_btn='order:' + action)
-        if action == 'save_btn':
-            self.base_selenium.refresh()
-            suborder_data_after_update = self.suborder_table.get_suborder_data()
-            self.assertIn(contact['departments'][0]['text'], suborder_data_after_update['suborders'][1]['departments'])
-        else:
-            self.order_page.confirm_popup()
-            self.orders_page.get_order_edit_page_by_id(order['id'])
-            suborder_data_after_cancel = self.suborder_table.get_suborder_data()
-            self.assertEqual(suborder_data_after_cancel['suborders'][1], selected_suborder_data['suborders'][1])
-
-    def test012_edit_department_of_order_with_multiple_contacts(self):
-        """
-        In case I select multiple contacts the departments should be updated according to that
-
-        LIMS-5705 'edit mode'
-        """
-        self.info("create order with multiple contacts")
-        response, payload = self.orders_api.create_order_with_multiple_contacts()
-        self.assertEqual(response['status'], 1, response)
-        contact_names_list = [contact['text'] for contact in payload[0]['contact']]
-        self.info('selected contacts are {}'.format(contact_names_list))
-        departments_list_with_contacts = ContactsAPI().get_department_contact_list(contact_names_list)
-        self.info('department contacts list {}'.format(departments_list_with_contacts))
-        self.info('open edit page of order no {}'.format(payload[0]['orderNo']))
-        self.orders_page.get_order_edit_page_by_id(response['order']['mainOrderId'])
-        self.order_page.sleep_tiny()
-        suggested_department_list, departments_only_list = \
-            self.suborder_table.get_department_suggestion_lists(open_suborder_table=True, contacts=contact_names_list)
-        self.info('suggested department list {}'.format(suggested_department_list))
-        self.info('and it should be {}'.format(departments_list_with_contacts))
-        index = 0
-        for item in suggested_department_list:
-            for element in departments_list_with_contacts:
-                if item['contact'] == element['contact']:
-                    self.assertCountEqual(item['departments'], element['departments'])
-                    index = index + 1
-        self.assertEqual(index, len(contact_names_list))
-
-        department = random.choice(departments_only_list)
-        self.info('set department to {}'.format(department))
-        self.suborder_table.set_departments(department)
-        self.order_page.save_and_wait(save_btn='order:save')
-        suborder_data = self.suborder_table.get_suborder_data()
-        self.assertEqual([department], suborder_data['suborders'][0]['departments'])
-
-    def test013_add_multiple_suborders_with_diff_departments(self):
-        """
-        Orders: table: Departments Approach: In case I created multiple suborders
-        the departments should open drop down list with the options that I can
-        select different departments in each one.
-
-        LIMS-4258
-        """
-        self.info('create contact with multiple departments')
-        response, payload = self.contacts_api.create_contact_with_multiple_departments()
-        self.assertEqual(response['status'], 1, "contact with {} Not created".format(payload))
-        department_list = [dep['text'] for dep in payload['departments']]
-        self.info('create order with contact {} and first department {}'.
-                  format(response['company']['name'], payload['departments'][0]['text']))
-        order_response, order_payload = \
-            self.orders_api.create_order_with_department_by_contact_id(
-                response['company']['companyId'])
-        self.assertEqual(order_response['status'], 1, "order with {} Not created".format(order_payload))
-        self.info('edit order with No {}'.format(order_payload[0]['orderNo']))
-        self.orders_page.get_order_edit_page_by_id(order_response['order']['mainOrderId'])
-        self.order_page.sleep_tiny()
-        self.suborder_table.add_new_suborder(material_type=order_payload[0]['materialType']['text'],
-                                             article_name=order_payload[0]['article']['text'],
-                                             test_plans=[order_payload[0]['testPlans'][0]['name']],
-                                             test_units=[])
-        self.order_page.sleep_tiny()
-        self.info("get departments suggestion list for first suborder")
-        _, department_suggestion_list1 = self.suborder_table.get_department_suggestion_lists(
-            open_suborder_table=True, index=1)
-        self.assertCountEqual(department_suggestion_list1, department_list)
-        self.info("set department to {}".format(payload['departments'][1]['text']))
-        self.suborder_table.set_departments(payload['departments'][1]['text'])
-        self.order_page.sleep_tiny()
-        self.suborder_table.add_new_suborder(material_type=order_payload[0]['materialType']['text'],
-                                             article_name=order_payload[0]['article']['text'],
-                                             test_plans=[order_payload[0]['testPlans'][0]['name']],
-                                             test_units=[])
-        self.order_page.sleep_tiny()
-        self.info("get departments suggestion list for second suborder")
-        _, department_suggestion_list2 = self.suborder_table.get_department_suggestion_lists(
-            open_suborder_table=True, index=2)
-        self.assertCountEqual(department_suggestion_list2, department_list)
-        self.info("set department to {}".format(payload['departments'][2]['text']))
-        self.suborder_table.set_departments(payload['departments'][2]['text'])
-        self.order_page.save_and_wait('order:save_btn')
-        self.info("assert that department of each suborder in department lis")
-        suborder_data = self.suborder_table.get_suborder_data()["suborders"]
-        for suborder in suborder_data:
-            self.assertIn(suborder['departments'][0], department_list)
-
-    @parameterized.expand(['save_btn', 'cancel'])
-    def test014_update_test_date(self, save):
-        """
-        New: Orders: Test Date: I can update test date successfully with cancel/save buttons
-
-        LIMS-4780
-        """
-        self.info("open random order edit page")
-        self.order_page.get_random_order()
-        # preserve the url
-        order_url = self.base_selenium.get_url()
-        # get all the suborders
-        all_suborders = self.base_selenium.get_table_rows(element='order:suborder_table')
-        # get random suborder row_id
-        row_id = 0
-        if len(all_suborders) > 1:
-            row_id = randint(0, len(all_suborders) - 1)
-
-        # change the test date
-        new_test_date = self.suborder_table.update_suborder(sub_order_index=row_id, test_date=True)
-
-        # save or cancel
-        if 'save_btn' == save:
-            self.order_page.sleep_medium()
-            self.order_page.save(save_btn='order:save_btn')
-            self.order_page.sleep_medium()
-        else:
-            self.order_page.sleep_medium()
-            self.order_page.cancel(force=True)
-
-        # refresh the page
-        self.info('reopen the edited order page')
-        self.base_selenium.get(url=order_url, sleep=self.base_selenium.TIME_MEDIUM)
-
-        # get the saved test_date
-        saved_test_date = self.suborder_table.get_suborder_data()['suborders'][row_id]['test_date']
-
-        # check if the test date changed or not
-        if 'cancel' == save:
-            self.info('Assert {} (current_test_date) != {} (new_test_date)'.
-                      format(new_test_date, saved_test_date))
-            self.assertNotEqual(saved_test_date, new_test_date)
-        else:
-            self.info('Assert {} (current_test_date) == {} (new_test_date)'.
-                      format(new_test_date, saved_test_date))
-            self.assertEqual(saved_test_date, new_test_date)
-
-    @parameterized.expand(['save_btn', 'cancel'])
-    def test015_update_shipment_date(self, save):
-        """
-        New: Orders: Shipment date Approach: I can update shipment date successfully with save/cancel button
-
-        LIMS-4779
-        """
-        self.info("open random order edit page")
-        self.order_page.get_random_order()
-        # open the url
-        order_url = self.base_selenium.get_url()
-        # get all the suborders
-        all_suborders = self.base_selenium.get_table_rows(element='order:suborder_table')
-        # get random suborder row_id
-        row_id = 0
-        if len(all_suborders) > 1:
-            row_id = randint(0, len(all_suborders) - 1)
-
-        # update the shipment date
-        new_shipment_date = self.suborder_table.update_suborder(sub_order_index=row_id, shipment_date=True)
-
-        # save or cancel
-        if 'save_btn' == save:
-            self.order_page.save(save_btn='order:save_btn')
-            self.order_page.sleep_medium()
-        else:
-            self.order_page.sleep_medium()
-            self.order_page.cancel(force=True)
-
-        # refresh the page
-        self.info('reopen the edited order page')
-        self.base_selenium.get(url=order_url, sleep=self.base_selenium.TIME_MEDIUM)
-
-        # get the saved shipment date
-        saved_shipment_date = self.suborder_table.get_suborder_data()['suborders'][row_id]['shipment_date']
-
-        # check if the shipment date changed or not
-        if 'cancel' == save:
-            self.info('Assert {} (current_shipment_date) != {} (new_shipment_date)'.
-                      format(new_shipment_date, saved_shipment_date))
-            self.assertNotEqual(saved_shipment_date, new_shipment_date)
-        else:
-            self.info('Assert {} (current_shipment_date) == {} (new_shipment_date)'.
-                      format(new_shipment_date, saved_shipment_date))
-            self.assertEqual(saved_shipment_date, new_shipment_date)
-
-    def test016_upload_attachment(self):
-        """
-        I can upload any attachment successfully from the order section
-        LIMS-8258
-        """
-        order, payload = self.orders_api.create_new_order()
-        print(order)
-        print(payload)
-        self.orders_page.get_order_edit_page_by_id(id=order['order']['mainOrderId'])
-        self.base_selenium.click(element='order:attachment_btn')
-        file_name = 'logo.png'
-        upload_file = self.suborder_table.upload_attachment(file_name='logo.png',
-                                                            drop_zone_element='order:uploader_zone',
-                                                            save=True)
-        self.info("assert that the upload file same as the file name ".format(upload_file, file_name))
-        self.assertEqual(upload_file, file_name)
-
-    def test017_upload_attachment_then_remove(self):
-        """
-        Orders step 1: Attachment download approach: There is a link under remove link for
-        download and you can preview it by clicking on it
-        LIMS-6933
-        """
-        order, payload = self.orders_api.create_new_order()
-        self.orders_page.get_order_edit_page_by_id(id=order['order']['mainOrderId'])
-        self.base_selenium.click(element='order:attachment_btn')
-        file_name = 'logo.png'
-        upload_attachment_then_save = self.suborder_table.upload_attachment(file_name='logo.png',
-                                                                            drop_zone_element='order:uploader_zone',
-                                                                            save=True)
-        self.info("assert that the upload file same as the file name ".format(upload_attachment_then_save, file_name))
-        self.assertEqual(upload_attachment_then_save, file_name)
-        self.info('open the same record in the edit mode')
-        self.orders_page.get_order_edit_page_by_id(id=order['order']['mainOrderId'])
-        self.base_selenium.click(element='order:attachments_btn')
-        self.info("remove the file and submit the record ")
-        after_remove_attachment = self.suborder_table.upload_attachment(file_name='logo2.png',
-                                                                        drop_zone_element='order:uploader_zone',
-                                                                        remove_current_file=True, save=True)
-
-        self.info("assert that after I remove the file it will return none should not equal to the file name ".format(
-            after_remove_attachment, file_name))
-        self.assertNotEqual(after_remove_attachment, file_name)
-
-    def test018_update_suborder_material_type_cancel_button(self):
-        """
-        New: Orders: Edit material type: Make sure that user can cancel any update successfully
-        New: Orders: Materiel type Approach: In case then material type of the second suborder
-        updated then press on cancel button, Nothing update when I enter one more time
-
-        LIMS-4281
-        LIMS-4282
-
-        user can edit multiple columns at the same time
-        LIMS-5221 second part
-        """
+        self.info(' Running test case to check that '
+                  'at least test unit or test plan is mandatory in order')
         response, payload = self.orders_api.create_new_order()
-        self.assertEqual(response['status'], 1, "no new order created")
-        material_type = random.choice(
-            GeneralUtilitiesAPI().get_material_types_without_duplicate(payload[0]['materialType']['text']))
-        self.info("update material type of first suborder to {}".format(material_type))
+        self.assertEqual(response['status'], 1, "order not created ")
         self.orders_page.get_order_edit_page_by_id(id=response['order']['mainOrderId'])
-        self.orders_page.sleep_small()
-        suborders_data_before_update = self.suborder_table.get_suborder_data()
-        self.suborder_table.update_suborder(material_type=material_type)
-        self.orders_page.sleep_small()
-        self.info("check pop up mssg that all analysis will be deleted")
-        self.assertTrue(self.base_selenium.check_element_is_exist(element='general:confirmation_pop_up'))
-        pop_up_mssg = self.base_selenium.get_text(element='general:confirmation_pop_up')
-        self.assertIn("All analysis created with this order and test plan will be deleted", pop_up_mssg)
-        self.orders_page.confirm_popup()
-        self.info("press on cancel button to cancel changes")
-        self.orders_page.cancel()
-        self.info("Navigate to order edit page and make sure suborder data not changed")
-        self.orders_page.get_order_edit_page_by_id(id=response['order']['mainOrderId'])
-        suborders_data_after_update = self.suborder_table.get_suborder_data()
-        self.assertCountEqual(suborders_data_after_update, suborders_data_before_update)
+        self.info(' Remove all selected test plans and test units')
+        self.suborder_table.open_suborder_edit_mode()
+        # delete test plan and test unit
+        if self.suborder_table.get_test_plans():
+            self.suborder_table.clear_test_plan()
+            self.order_page.confirm_popup(force=True)
 
-    def test019_update_suborder_material_type_test_unit_only(self):
+        if self.suborder_table.get_test_units():
+            self.suborder_table.clear_test_unit()
+
+        self.order_page.save(save_btn='order:save_btn')
+        # the red border will display on the test unit only because one of them should be mandatory
+        test_unit_class_name = self.base_selenium.get_attribute(element="order:test_unit", attribute='class')
+        self.assertIn('has-error', test_unit_class_name)
+
+    @parameterized.expand(['new', 'existing'])
+    def test024_create_order_with_test_units(self, order):
         """
-        New: Orders: Material type Approach: I can update the material type
-        filed with test units records successfully
+        New: Orders: Create a new order with test units
 
-        LIMS-4833
-        LIMS-4267
+        LIMS-3267
 
-        user can edit multiple columns at the same time
-        LIMS-5221 first part
+        New: Orders: Create an existing order with test units
+
+        LIMS-3268
+        """
+        response, payload = TestUnitAPI().create_qualitative_testunit()
+        self.assertEqual(response['status'], 1)
+        article = ArticleAPI().get_article_with_material_type('Raw Material')
+        self.info("create order with test unit {}".format(payload['name']))
+        if order == 'new':
+            created_order_no = self.suborder_table.create_new_order(
+                material_type='Raw Material', article=article, test_units=[payload['name']])
+        else:
+            created_order_no = self.suborder_table.create_existing_order(
+                no='', material_type='Raw Material', article=article, test_units=[payload['name']])
+
+        self.order_page.get_orders_page()
+        self.orders_page.navigate_to_analysis_active_table()
+        self.info('Assert There is an analysis for this new order.')
+        self.analyses_page.filter_by_order_no(created_order_no)
+        orders_analyses = self.orders_page.result_table()
+        latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(row=orders_analyses[0])
+        self.assertEqual(created_order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
+        child_data = self.analyses_page.get_child_table_data()
+        self.assertEqual(len(child_data), 1)
+        self.assertEqual(child_data[0]['Test Unit'], payload['name'])
+
+    def test025_create_existing_order_with_test_units_and_change_material_type(self):
+        """
+        New: Orders with test units: Create a new order from an existing order with
+        test units but change the material type
+        LIMS-3269-case 1
         """
         order, payload = self.orders_api.create_new_order(testPlans=[])
         self.assertEqual(order['status'], 1)
         old_material = payload[0]['materialType']['text']
+        order_no = self.suborder_table.create_existing_order_with_auto_fill(no=payload['orderNoWithYear'])
+        self.order_page.sleep_tiny()
         self.info("selected order has material type {}".format(old_material))
         new_article = random.choice(ArticleAPI().get_article_with_different_material(old_material))
         new_material = new_article['materialType']
@@ -708,419 +852,266 @@ class OrdersTestCases(BaseTest):
             selectedMaterialTypes=[formatted_material])
         self.assertEqual(tu_response['status'], 1)
         new_test_unit = tu_payload['name']
-        self.orders_page.get_order_edit_page_by_id(id=order['order']['mainOrderId'])
-        self.info("update material type to {}".format(new_material))
+        self.base_selenium.refresh()
         self.suborder_table.set_material_type(material_type=new_material)
-        self.info("check pop up msg that all analysis will be deleted")
-        self.assertTrue(self.base_selenium.check_element_is_exist(element='general:confirmation_pop_up'))
-        pop_up_msg = self.base_selenium.get_text(element='general:confirmation_pop_up')
-        self.assertIn("This Test Unit will be removed from the corresponding analysis", pop_up_msg)
+        self.assertEqual(self.base_selenium.get_value(element='order:article'), None)
+        self.assertEqual(self.base_selenium.get_value(element='order:test_unit'), None)
         self.orders_page.confirm_popup()
         self.suborder_table.set_article(article=new_article['name'])
         self.suborder_table.set_test_units(test_units=[new_test_unit])
-        self.order_page.save_and_wait(save_btn='order:save_btn')
-        suborder_data_after_update = self.suborder_table.get_suborder_data()['suborders'][0]
-        self.assertEqual(suborder_data_after_update['material_type'], new_material)
-        self.assertEqual(suborder_data_after_update['article']['name'], new_article['name'])
-        self.assertEqual(len(suborder_data_after_update['testunits']), 1)
-        self.assertEqual(suborder_data_after_update['testunits'][0]['name'], new_test_unit)
-        self.orders_page.get_orders_page()
-        self.orders_page.navigate_to_analysis_active_table()
-        self.analyses_page.filter_by_analysis_number(suborder_data_after_update['analysis_no'])
-        self.assertEqual(len(self.analyses_page.result_table())-1, 1)
-        anlaysis = self.analyses_page.get_the_latest_row_data()
-        self.assertEqual(anlaysis['Material Type'], new_material)
-        self.assertEqual(anlaysis['Article Name'], new_article['name'])
-        child_table_data = self.analyses_page.get_child_table_data()[0]
-        self.assertEqual(new_test_unit, child_table_data['Test Unit'])
-
-    def test020_update_material_type_test_plan_only(self):
-        """
-        -When user update the materiel type from table view once I delete it message will appear
-        (All analysis created with this order and test plan/ test unit will be deleted )
-        -Once you press on OK button, the material type & article & test pan/ test unit will delete
-        -You can update it by choose another one and choose corresponding article & test plan/ test unit
-        LIMS-4264 ( order with test plan )
-        """
-        self.test_plan_api = TestPlanAPI()
-        self.info('create new order')
-        response, order_payload = self.orders_api.create_new_order(testUnits=[])
-        self.assertEqual(response['status'], 1, order_payload)
-        self.info('get random completed test plan with different material type')
-        new_data = self.test_plan_api.get_suborder_data_with_different_material_type(
-            order_payload[0]['materialType']['text'])
-
-        self.info('update material type of order from {} to {}'.format(
-            order_payload[0]['materialType']['text'], new_data['material_type']))
-        self.orders_page.get_order_edit_page_by_id(response['order']['mainOrderId'])
-        self.suborder_table.set_material_type(material_type=new_data['material_type'])
-        self.order_page.sleep_small()
-        self.assertTrue(self.base_selenium.check_element_is_exist(element='general:confirmation_pop_up'))
-        pop_up_msg = self.base_selenium.get_text(element='general:confirmation_pop_up')
-        self.assertIn("All analysis created with this order and test plan will be deleted", pop_up_msg)
-        self.orders_page.confirm_popup()
-        self.info('assert article and test plan are empty')
-        self.assertEqual(self.suborder_table.get_article(), None)
-        self.assertEqual(self.suborder_table.get_test_plans(), None)
-        self.info("set article to {} and test plan to {}".format(new_data['article'], new_data['test_plan']))
-        self.suborder_table.set_article(article=new_data['article'])
-        self.suborder_table.set_test_plans(test_plans=[new_data['test_plan']])
-        self.order_page.save_and_wait(save_btn='order:save_btn')
-        self.info('navigate to analysis page to make sure analysis corresponding to suborder updated')
+        self.order_page.save(save_btn='order:save_btn', sleep=True)
         self.order_page.get_orders_page()
         self.orders_page.navigate_to_analysis_active_table()
-        self.analyses_page.filter_by_order_no(order_payload[0]['orderNoWithYear'])
-        analyses = self.analyses_page.get_the_latest_row_data()
-        self.assertEqual(new_data['material_type'], analyses['Material Type'])
-        self.assertEqual(new_data['article'], analyses['Article Name'].replace(" ", ""))
-        self.assertEqual(new_data['test_plan'], analyses['Test Plans'])
+        self.info('Assert There is an analysis for this new order.')
+        self.analyses_page.apply_filter_scenario(
+            filter_element='orders:filter_order_no', filter_text=order_no, field_type='drop_down')
+        latest_order_data = \
+            self.base_selenium.get_row_cells_dict_related_to_header(row=self.analyses_page.result_table()[0])
+        self.assertEqual(order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
+        self.assertEqual(new_article, latest_order_data['Article Name'])
+        self.assertEqual(new_test_unit, self.analyses_page.get_child_table_data()[0]['Test Unit'])
+        self.assertEqual(new_material, latest_order_data['Material Type'])
 
-    # def test022_validate_order_test_unit_test_plan(self):
-    #     """
-    #     New: orders Test plan /test unit validation
-    #
-    #     LIMS-4349
-    #     """
-    #     self.info(' Running test case to make sure from the validation of the test plan & test unit ')
-    #     self.suborder_table.create_new_order(material_type='r', article='', contact=['a'], test_plans=[],
-    #                                          test_units=[], multiple_suborders=0)
-    #     self.info('waiting to validation message appear when I did not enter test plan & test unit')
-    #     validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
-    #     self.info('Assert the error message to make sure that validation of the test plan & test units fields ? {}'
-    #               .format(validation_result))
-    #     self.assertTrue(validation_result)
-    #
-    # def test023_validate_order_test_unit_test_plan_edit_mode(self):
-    #     """
-    #     New: orders Test plan /test unit validation in edit mode
-    #
-    #     LIMS-4826
-    #     """
-    #     self.info(' Running test case to check that '
-    #               'at least test unit or test plan is mandatory in order')
-    #     # Get random order
-    #     response, payload = self.orders_api.create_new_order()
-    #     self.assertEqual(response['status'], 1, "order not created ")
-    #     self.orders_page.get_order_edit_page_by_id(id=response['order']['mainOrderId'])
-    #     # edit suborder
-    #     self.info(' Remove all selected test plans and test units')
-    #     suborder_row = self.base_selenium.get_table_rows(element='order:suborder_table')[0]
-    #     suborder_row.click()
-    #     # delete test plan and test unit
-    #     if self.suborder_table.get_test_plans():
-    #         self.suborder_table.clear_test_plan()
-    #         self.order_page.confirm_popup(force=True)
-    #
-    #     if self.suborder_table.get_test_units():
-    #         self.suborder_table.clear_test_unit()
-    #
-    #     self.order_page.save(save_btn='order:save_btn')
-    #     # the red border will display on the test unit only because one of them should be mandatory
-    #     test_unit_class_name = self.base_selenium.get_attribute(element="order:test_unit", attribute='class')
-    #     self.assertIn('has-error', test_unit_class_name)
-    #
-    # @parameterized.expand(['new', 'existing'])
-    # def test024_create_order_with_test_units(self, order):
-    #     """
-    #     New: Orders: Create a new order with test units
-    #
-    #     LIMS-3267
-    #
-    #     New: Orders: Create an existing order with test units
-    #
-    #     LIMS-3268
-    #     """
-    #     response, payload = TestUnitAPI().create_qualitative_testunit()
-    #     self.assertEqual(response['status'], 1)
-    #     self.orders_page.sleep_small()
-    #     self.info("create order with test unit {}".format(payload['name']))
-    #     if order == 'new':
-    #         created_order_no = self.suborder_table.create_new_order(material_type='Raw Material',
-    #                                                                 test_units=[payload['name']])
-    #     else:
-    #         created_order_no = self.suborder_table.create_existing_order(no='', material_type='Raw Material',
-    #                                                                      test_units=[payload['name']])
-    #
-    #     self.order_page.get_orders_page()
-    #     self.orders_page.navigate_to_analysis_active_table()
-    #     self.info('Assert There is an analysis for this new order.')
-    #     self.analyses_page.filter_by_order_no(created_order_no)
-    #     orders_analyses = self.orders_page.result_table()
-    #     latest_order_data = self.base_selenium.get_row_cells_dict_related_to_header(row=orders_analyses[0])
-    #     self.assertEqual(created_order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
-    #     child_data = self.analyses_page.get_child_table_data()
-    #     self.assertEqual(len(child_data), 1)
-    #     self.assertEqual(child_data[0]['Test Unit'], payload['name'])
-    #
-    # def test025_create_existing_order_with_test_units_and_change_material_type(self):
-    #     """
-    #     New: Orders with test units: Create a new order from an existing order with
-    #     test units but change the material type
-    #     LIMS-3269-case 1
-    #     """
-    #     order_no = self.suborder_table.create_existing_order_with_auto_fill()
-    #     self.order_page.sleep_tiny()
-    #
-    #     self.suborder_table.set_material_type(material_type='Subassembely')
-    #     self.assertEqual(self.base_selenium.get_value(element='order:article'), None)
-    #     self.assertEqual(self.base_selenium.get_value(element='order:test_unit'), None)
-    #
-    #     self.orders_page.sleep_small()
-    #     article = self.suborder_table.set_article()
-    #     test_unit = self.suborder_table.set_test_units()
-    #     self.order_page.save(save_btn='order:save_btn', sleep=True)
-    #     self.order_page.get_orders_page()
-    #     self.orders_page.navigate_to_analysis_active_table()
-    #     self.info('Assert There is an analysis for this new order.')
-    #     self.analyses_page.apply_filter_scenario(
-    #         filter_element='orders:filter_order_no', filter_text=order_no, field_type='drop_down')
-    #     latest_order_data = \
-    #         self.base_selenium.get_row_cells_dict_related_to_header(row=self.analyses_page.result_table()[0])
-    #     self.assertEqual(order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
-    #     self.assertEqual(article.split(' No:')[0], latest_order_data['Article Name'])
-    #     self.assertEqual(test_unit[0], self.analyses_page.get_child_table_data()[0]['Test Unit'])
-    #     self.assertEqual('Subassembely', latest_order_data['Material Type'])
-    #
-    # def test026_create_existing_order_with_test_units_and_change_article(self):
-    #     """
-    #     New: Orders with test units: Create a new order from an existing order with
-    #     test units but change the article
-    #     LIMS-3269- case 2
-    #     """
-    #     order_no = self.suborder_table.create_existing_order_with_auto_fill()
-    #     self.order_page.sleep_tiny()
-    #
-    #     test_unit = self.suborder_table.get_test_units()
-    #     material_type = self.suborder_table.get_material_type()
-    #     article = self.suborder_table.set_article()
-    #
-    #     if self.suborder_table.get_test_units() == [] and self.suborder_table.get_test_plans() == []:
-    #         test_unit = self.suborder_table.set_test_units()
-    #     self.order_page.sleep_small()
-    #     self.assertEqual(self.suborder_table.get_test_units(), test_unit)
-    #     self.assertEqual(self.suborder_table.get_material_type(), material_type)
-    #
-    #     self.order_page.save(save_btn='order:save_btn')
-    #     self.order_page.get_orders_page()
-    #     self.orders_page.navigate_to_analysis_active_table()
-    #     self.info('Assert There is an analysis for this new order.')
-    #     self.analyses_page.apply_filter_scenario(
-    #         filter_element='orders:filter_order_no', filter_text=order_no, field_type='drop_down')
-    #
-    #     latest_order_data = \
-    #         self.base_selenium.get_row_cells_dict_related_to_header(row=self.analyses_page.result_table()[0])
-    #     self.assertEqual(order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
-    #     self.assertEqual(article.split(' No:')[0], latest_order_data['Article Name'])
-    #     self.assertEqual(test_unit, self.analyses_page.get_child_table_data()[0]['Test Unit'])
-    #     self.assertEqual(material_type, latest_order_data['Material Type'])
-    #
-    # def test027_update_suborder_testunits(self):
-    #     """
-    #     -When I delete test unit to update it message will appear
-    #     ( This Test Unit will be removed from the corresponding analysis )
-    #     -Make sure the corresponding analysis records created according to this update in test unit.
-    #     LIMS-4269 case 2
-    #     """
-    #     self.info(" get random order with one test unit")
-    #     order, sub_order, sub_order_index = self.orders_api.get_order_with_field_name(field='testUnit', no_of_field=1)
-    #     self.info("get new test unit with material_type {}".format(sub_order[sub_order_index]['materialType']))
-    #
-    #     new_test_unit_name = TestUnitAPI().get_test_unit_name_with_value_with_material_type(
-    #         material_type=sub_order[sub_order_index]['materialType'], avoid_duplicate=True,
-    #         duplicated_test_unit=sub_order[sub_order_index]['testUnit'][0]['testUnit']['name'])['name']
-    #
-    #     self.info("Edit sub-order {} in order no. {} with test_unit {}".format(
-    #         len(sub_order) - 1 - sub_order_index, order['orderNo'], new_test_unit_name))
-    #     self.info("open order edit page")
-    #     self.orders_page.get_order_edit_page_by_id(order['orderId'])
-    #     self.suborder_table.update_suborder(sub_order_index=int(len(sub_order) - 1 - sub_order_index),
-    #                                     test_units=[new_test_unit_name], remove_old=True, confirm_pop_up=True, articles='')
-    #     # checking that when adding new test unit, the newly added test unit is added to the
-    #     # order's analysis instead of creating new analysis
-    #     self.order_page.save_and_wait(save_btn='order:save_btn')
-    #     self.info('Get suborder data to check it')
-    #     suborder_testunits_after_edit = self.orders_api.get_suborder_by_order_id(
-    #         order['orderId'])[0]['orders'][sub_order_index]['testUnit']
-    #     testunits_after_edit = [testunit['testUnit']['name'] for testunit in suborder_testunits_after_edit]
-    #     self.assertEqual(len(testunits_after_edit), 1)
-    #     self.info('Assert Test units: test units are: {}, and should be: {}'.
-    #               format(testunits_after_edit, new_test_unit_name))
-    #     self.assertEqual(testunits_after_edit[0], new_test_unit_name)
-    #
-    #     self.info('Getting analysis page to check the data in this child table')
-    #     self.order_page.get_orders_page()
-    #     self.orders_page.filter_by_analysis_number(sub_order[sub_order_index]['analysis'])
-    #     sub_order_data = self.orders_page.get_child_table_data()[0]
-    #     self.assertEqual(sub_order_data['Test Units'], new_test_unit_name)
-    #     self.orders_page.navigate_to_analysis_active_table()
-    #     self.analyses_page.apply_filter_scenario(filter_element='analysis_page:analysis_no_filter',
-    #                                              filter_text=sub_order[sub_order_index]['analysis'],
-    #                                              field_type='text')
-    #     analysis_records = self.analyses_page.get_child_table_data()
-    #     test_units = [analysis_record['Test Unit'] for analysis_record in analysis_records]
-    #     self.assertIn(new_test_unit_name, test_units)
-    #
-    # def test028_update_order_article(self):
-    #     """
-    #     New: Orders: Edit Approach: I can update the article successfully and press on ok button
-    #     then press on cancel button, Nothing updated
-    #     LIMS-4297 - save case
-    #     New: Orders: Edit Approach: I can update the article filed successfully with save button
-    #     LIMS-3423
-    #     """
-    #     self.info('get random order')
-    #     orders, _ = self.orders_api.get_all_orders(limit=50)
-    #     order = random.choice(orders['orders'])
-    #     suborders, _ = self.orders_api.get_suborder_by_order_id(order['id'])
-    #     suborder = suborders['orders'][0]
-    #     suborder_update_index = len(suborders['orders']) - 1
-    #     test_units = [test_unit['testUnit']['name'] for test_unit in suborder['testUnit']]
-    #
-    #     self.info('get random completed test plan with different article')
-    #     test_plans = TestPlanAPI().get_completed_testplans()
-    #     test_plans_with_different_article = [test_plan for test_plan in test_plans if
-    #                                          test_plan['materialType'] == suborder['materialType'] and
-    #                                          suborder['article'] != test_plan['article'][0]]
-    #     if test_plans_with_different_article:
-    #         test_plan_data = random.choice(test_plans_with_different_article)
-    #         test_plan = test_plan_data['testPlanName']
-    #         article = test_plan_data['article'][0]
-    #     else:
-    #         article_data = ArticleAPI().get_article_with_material_type(suborder['materialType'])
-    #         article = article_data['name']
-    #         formatted_article = {'id': article_data['id'], 'text': article}
-    #         new_test_plan = TestPlanAPI().create_completed_testplan(
-    #             material_type=suborder['materialType'], formatted_article=formatted_article)
-    #         test_plan = new_test_plan['testPlanEntity']['name']
-    #
-    #     test_plans = [test_plan]
-    #     self.info('update order {} with article {}'.format(order['veorderNo'], article))
-    #     self.orders_page.get_order_edit_page_by_id(order['id'])
-    #     if article == 'all':
-    #         self.suborder_table.update_suborder(sub_order_index=suborder_update_index, article='')
-    #         article = self.suborder_table.get_article()
-    #     else:
-    #         self.suborder_table.update_suborder(sub_order_index=suborder_update_index, article=article)
-    #
-    #     self.info('assert test plan is empty')
-    #     self.assertFalse(self.suborder_table.get_test_plans())
-    #     if test_units:
-    #         self.assertCountEqual(self.suborder_table.get_test_units(), test_units)
-    #     else:
-    #         self.assertFalse(self.suborder_table.get_test_units())
-    #
-    #     self.suborder_table.set_test_plans(test_plan)
-    #     self.info('save the changes then refresh')
-    #     self.order_page.save(save_btn='order:save_btn')
-    #     self.order_page.get_orders_page()
-    #
-    #     self.info('navigate to analysis page to make sure analysis corresponding to suborder updated')
-    #     self.orders_page.navigate_to_analysis_active_table()
-    #     self.analyses_page.filter_by_analysis_number(suborder['analysis'])
-    #     analyses = self.analyses_page.get_the_latest_row_data()
-    #     analyses_test_plans = analyses['Test Plans'].replace("'", '').split(", ")
-    #     self.info('assert that article and test plan changed but test unit still the same')
-    #     self.assertEqual(article.replace(' ', ''), analyses['Article Name'].replace(' ', ''))
-    #     self.assertCountEqual(test_plans, analyses_test_plans)
-    #     child_data = self.analyses_page.get_child_table_data()
-    #     result_test_units = [test_unit['Test Unit'] for test_unit in child_data]
-    #     for testunit in test_units:
-    #         self.assertIn(testunit, result_test_units)
-    #
-    # def test029_update_order_article_cancel_approach(self):
-    #     """
-    #     New: Orders: Edit Approach: I can update the article successfully and press on ok button
-    #     then press on cancel button, Nothing updated
-    #     LIMS-4297 - cancel case
-    #     """
-    #     self.info('get random order')
-    #     orders, _ = self.orders_api.get_all_orders(limit=50)
-    #     order = random.choice(orders['orders'])
-    #     suborders, _ = self.orders_api.get_suborder_by_order_id(order['id'])
-    #     suborder = suborders['orders'][0]
-    #     suborder_update_index = len(suborders['orders']) - 1
-    #     test_units = [test_unit['testUnit']['name'] for test_unit in suborder['testUnit']]
-    #
-    #     self.info('update order {} with random article'.format(order['orderNo']))
-    #     self.orders_page.get_order_edit_page_by_id(order['orderId'])
-    #     self.suborder_table.update_suborder(sub_order_index=suborder_update_index, article='a', confirm_pop_up=True,
-    #                                         remove_old=True)
-    #     self.info('assert test plan is empty')
-    #     self.assertFalse(self.suborder_table.get_test_plans())
-    #     if test_units:
-    #         self.assertCountEqual(self.suborder_table.get_test_units(), test_units)
-    #     else:
-    #         self.assertCountEqual(self.suborder_table.get_test_units(), ['Search'])
-    #     self.order_page.cancel()
-    #     self.info('navigate to analysis page to make sure analysis corresponding to suborder updated')
-    #     self.orders_page.navigate_to_analysis_active_table()
-    #     self.analyses_page.filter_by_analysis_number(suborder['analysis'])
-    #     analyses = self.analyses_page.get_the_latest_row_data()
-    #     analyses_test_plans = analyses['Test Plans'].replace("'", '').split(", ")
-    #     self.info('assert that article, test plan and test unit still the same')
-    #     self.assertEqual(suborder['article'].replace(' ', ''), analyses['Article Name'].replace(' ', ''))
-    #     if suborder['testPlans']:
-    #         self.assertCountEqual(suborder['testPlans'], analyses_test_plans)
-    #     else:
-    #         self.assertCountEqual(['-'], analyses_test_plans)
-    #     child_data = self.analyses_page.get_child_table_data()
-    #     result_test_units = [test_unit['Test Unit'] for test_unit in child_data]
-    #     for testunit in test_units:
-    #         self.assertIn(testunit, result_test_units[0])
-    #
-    # def test030_add_new_suborder_with_testunit(self):
-    #     """
-    #     New: Orders: Create Approach: I can create suborder with test unit successfully,
-    #     make sure the record created successfully in the analysis section.
-    #     LIMS-4255
-    #     """
-    #     self.single_analysis_page = SingleAnalysisPage()
-    #     article, article_data = ArticleAPI().create_article()
-    #     random_testunit, payload = TestUnitAPI().get_all_test_units(filter='{"materialTypes":"all"}')
-    #     testunit_record = random.choice(random_testunit['testUnits'])
-    #     orders, payload = self.orders_api.get_all_orders(limit=20)
-    #     order = random.choice(orders['orders'])
-    #     self.info(
-    #         '{}'.format(order['orderNo']))
-    #     self.orders_page.get_order_edit_page_by_id(order['id'])
-    #     self.info('getting analysis tab to check out the count of the analysis')
-    #     self.order_page.navigate_to_analysis_tab()
-    #     analysis_count_before_adding = self.single_analysis_page.get_analysis_count()
-    #
-    #     self.info('get back to order tab')
-    #     self.single_analysis_page.navigate_to_order_tab()
-    #     order_data_before_adding_new_suborder = self.suborder_table.get_suborder_data()
-    #     suborder_count_before_adding = len(order_data_before_adding_new_suborder['suborders'])
-    #     self.info('count of analysis equals: ' + str(analysis_count_before_adding) +
-    #               "\t count of suborders equals: " + str(suborder_count_before_adding))
-    #
-    #     self.info('create new suborder with materialType {}, and article {}, and testUnit {}'.format(
-    #         article_data['materialType']['text'], article['article']['name'], testunit_record['name']))
-    #
-    #     self.suborder_table.add_new_suborder(
-    #         material_type=article_data['materialType']['text'],
-    #         article_name=article['article']['name'], test_units=[testunit_record['name']])
-    #     self.order_page.save(save_btn='order:save_btn', sleep=True)
-    #     self.base_selenium.refresh()
-    #     self.order_page.sleep_tiny()
-    #
-    #     order_data_after_adding_new_suborder = self.suborder_table.get_suborder_data()
-    #     self.assertEqual(suborder_count_before_adding + 1,
-    #                      len(order_data_after_adding_new_suborder['suborders']))
-    #
-    #     self.info('navigate to analysis page to make sure that only one analysis is added')
-    #     self.order_page.navigate_to_analysis_tab()
-    #     analysis_count = self.single_analysis_page.get_analysis_count()
-    #
-    #     self.info('check analysis count\t' + str(analysis_count) + "\tequals\t" + str(analysis_count_before_adding + 1))
-    #     self.assertGreaterEqual(analysis_count, analysis_count_before_adding + 1)
-    #
-    #     analysis_record = self.single_analysis_page.open_accordion_for_analysis_index(analysis_count - 1)
-    #     testunit_in_analysis = self.single_analysis_page.get_testunits_in_analysis(source=analysis_record)
-    #     self.assertEqual(len(testunit_in_analysis), 1)
-    #     testunit_name = testunit_in_analysis[0]['']
-    #     self.assertIn(testunit_record['name'], testunit_name)
-    #
+    def test026_create_existing_order_with_test_units_and_change_article(self):
+        """
+        New: Orders with test units: Create a new order from an existing order with
+        test units but change the article
+        LIMS-3269- case 2
+        """
+        order_no = self.suborder_table.create_existing_order_with_auto_fill()
+        self.order_page.sleep_tiny()
+
+        test_unit = self.suborder_table.get_test_units()
+        material_type = self.suborder_table.get_material_type()
+        article = self.suborder_table.set_article()
+
+        if self.suborder_table.get_test_units() == [] and self.suborder_table.get_test_plans() == []:
+            test_unit = self.suborder_table.set_test_units()
+        self.order_page.sleep_small()
+        self.assertEqual(self.suborder_table.get_test_units(), test_unit)
+        self.assertEqual(self.suborder_table.get_material_type(), material_type)
+
+        self.order_page.save(save_btn='order:save_btn')
+        self.order_page.get_orders_page()
+        self.orders_page.navigate_to_analysis_active_table()
+        self.info('Assert There is an analysis for this new order.')
+        self.analyses_page.apply_filter_scenario(
+            filter_element='orders:filter_order_no', filter_text=order_no, field_type='drop_down')
+
+        latest_order_data = \
+            self.base_selenium.get_row_cells_dict_related_to_header(row=self.analyses_page.result_table()[0])
+        self.assertEqual(order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
+        self.assertEqual(article.split(' No:')[0], latest_order_data['Article Name'])
+        self.assertEqual(test_unit, self.analyses_page.get_child_table_data()[0]['Test Unit'])
+        self.assertEqual(material_type, latest_order_data['Material Type'])
+
+    def test027_update_suborder_testunits(self):
+        """
+        -When I delete test unit to update it message will appear
+        ( This Test Unit will be removed from the corresponding analysis )
+        -Make sure the corresponding analysis records created according to this update in test unit.
+        LIMS-4269 case 2
+        """
+        self.info(" get random order with one test unit")
+        order, sub_order, sub_order_index = self.orders_api.get_order_with_field_name(field='testUnit', no_of_field=1)
+        self.info("get new test unit with material_type {}".format(sub_order[sub_order_index]['materialType']))
+
+        new_test_unit_name = TestUnitAPI().get_test_unit_name_with_value_with_material_type(
+            material_type=sub_order[sub_order_index]['materialType'], avoid_duplicate=True,
+            duplicated_test_unit=sub_order[sub_order_index]['testUnit'][0]['testUnit']['name'])['name']
+
+        self.info("Edit sub-order {} in order no. {} with test_unit {}".format(
+            len(sub_order) - 1 - sub_order_index, order['orderNo'], new_test_unit_name))
+        self.info("open order edit page")
+        self.orders_page.get_order_edit_page_by_id(order['orderId'])
+        self.suborder_table.update_suborder(sub_order_index=int(len(sub_order) - 1 - sub_order_index),
+                                        test_units=[new_test_unit_name], remove_old=True, confirm_pop_up=True, articles='')
+        # checking that when adding new test unit, the newly added test unit is added to the
+        # order's analysis instead of creating new analysis
+        self.order_page.save_and_wait(save_btn='order:save_btn')
+        self.info('Get suborder data to check it')
+        suborder_testunits_after_edit = self.orders_api.get_suborder_by_order_id(
+            order['orderId'])[0]['orders'][sub_order_index]['testUnit']
+        testunits_after_edit = [testunit['testUnit']['name'] for testunit in suborder_testunits_after_edit]
+        self.assertEqual(len(testunits_after_edit), 1)
+        self.info('Assert Test units: test units are: {}, and should be: {}'.
+                  format(testunits_after_edit, new_test_unit_name))
+        self.assertEqual(testunits_after_edit[0], new_test_unit_name)
+
+        self.info('Getting analysis page to check the data in this child table')
+        self.order_page.get_orders_page()
+        self.orders_page.filter_by_analysis_number(sub_order[sub_order_index]['analysis'])
+        sub_order_data = self.orders_page.get_child_table_data()[0]
+        self.assertEqual(sub_order_data['Test Units'], new_test_unit_name)
+        self.orders_page.navigate_to_analysis_active_table()
+        self.analyses_page.apply_filter_scenario(filter_element='analysis_page:analysis_no_filter',
+                                                 filter_text=sub_order[sub_order_index]['analysis'],
+                                                 field_type='text')
+        analysis_records = self.analyses_page.get_child_table_data()
+        test_units = [analysis_record['Test Unit'] for analysis_record in analysis_records]
+        self.assertIn(new_test_unit_name, test_units)
+
+    def test028_update_order_article(self):
+        """
+        New: Orders: Edit Approach: I can update the article successfully and press on ok button
+        then press on cancel button, Nothing updated
+        LIMS-4297 - save case
+        New: Orders: Edit Approach: I can update the article filed successfully with save button
+        LIMS-3423
+        """
+        self.info('get random order')
+        orders, _ = self.orders_api.get_all_orders(limit=50)
+        order = random.choice(orders['orders'])
+        suborders, _ = self.orders_api.get_suborder_by_order_id(order['id'])
+        suborder = suborders['orders'][0]
+        suborder_update_index = len(suborders['orders']) - 1
+        test_units = [test_unit['testUnit']['name'] for test_unit in suborder['testUnit']]
+
+        self.info('get random completed test plan with different article')
+        test_plans = TestPlanAPI().get_completed_testplans()
+        test_plans_with_different_article = [test_plan for test_plan in test_plans if
+                                             test_plan['materialType'] == suborder['materialType'] and
+                                             suborder['article'] != test_plan['article'][0]]
+        if test_plans_with_different_article:
+            test_plan_data = random.choice(test_plans_with_different_article)
+            test_plan = test_plan_data['testPlanName']
+            article = test_plan_data['article'][0]
+        else:
+            article_data = ArticleAPI().get_article_with_material_type(suborder['materialType'])
+            article = article_data['name']
+            formatted_article = {'id': article_data['id'], 'text': article}
+            new_test_plan = TestPlanAPI().create_completed_testplan(
+                material_type=suborder['materialType'], formatted_article=formatted_article)
+            test_plan = new_test_plan['testPlanEntity']['name']
+
+        test_plans = [test_plan]
+        self.info('update order {} with article {}'.format(order['veorderNo'], article))
+        self.orders_page.get_order_edit_page_by_id(order['id'])
+        if article == 'all':
+            self.suborder_table.update_suborder(sub_order_index=suborder_update_index, article='')
+            article = self.suborder_table.get_article()
+        else:
+            self.suborder_table.update_suborder(sub_order_index=suborder_update_index, article=article)
+
+        self.info('assert test plan is empty')
+        self.assertFalse(self.suborder_table.get_test_plans())
+        if test_units:
+            self.assertCountEqual(self.suborder_table.get_test_units(), test_units)
+        else:
+            self.assertFalse(self.suborder_table.get_test_units())
+
+        self.suborder_table.set_test_plans(test_plan)
+        self.info('save the changes then refresh')
+        self.order_page.save(save_btn='order:save_btn')
+        self.order_page.get_orders_page()
+
+        self.info('navigate to analysis page to make sure analysis corresponding to suborder updated')
+        self.orders_page.navigate_to_analysis_active_table()
+        self.analyses_page.filter_by_analysis_number(suborder['analysis'])
+        analyses = self.analyses_page.get_the_latest_row_data()
+        analyses_test_plans = analyses['Test Plans'].replace("'", '').split(", ")
+        self.info('assert that article and test plan changed but test unit still the same')
+        self.assertEqual(article.replace(' ', ''), analyses['Article Name'].replace(' ', ''))
+        self.assertCountEqual(test_plans, analyses_test_plans)
+        child_data = self.analyses_page.get_child_table_data()
+        result_test_units = [test_unit['Test Unit'] for test_unit in child_data]
+        for testunit in test_units:
+            self.assertIn(testunit, result_test_units)
+
+    def test029_update_order_article_cancel_approach(self):
+        """
+        New: Orders: Edit Approach: I can update the article successfully and press on ok button
+        then press on cancel button, Nothing updated
+        LIMS-4297 - cancel case
+        """
+        self.info('get random order')
+        orders, _ = self.orders_api.get_all_orders(limit=50)
+        order = random.choice(orders['orders'])
+        suborders, _ = self.orders_api.get_suborder_by_order_id(order['id'])
+        suborder = suborders['orders'][0]
+        suborder_update_index = len(suborders['orders']) - 1
+        test_units = [test_unit['testUnit']['name'] for test_unit in suborder['testUnit']]
+
+        self.info('update order {} with random article'.format(order['orderNo']))
+        self.orders_page.get_order_edit_page_by_id(order['orderId'])
+        self.suborder_table.update_suborder(sub_order_index=suborder_update_index, article='a', confirm_pop_up=True,
+                                            remove_old=True)
+        self.info('assert test plan is empty')
+        self.assertFalse(self.suborder_table.get_test_plans())
+        if test_units:
+            self.assertCountEqual(self.suborder_table.get_test_units(), test_units)
+        else:
+            self.assertCountEqual(self.suborder_table.get_test_units(), ['Search'])
+        self.order_page.cancel()
+        self.info('navigate to analysis page to make sure analysis corresponding to suborder updated')
+        self.orders_page.navigate_to_analysis_active_table()
+        self.analyses_page.filter_by_analysis_number(suborder['analysis'])
+        analyses = self.analyses_page.get_the_latest_row_data()
+        analyses_test_plans = analyses['Test Plans'].replace("'", '').split(", ")
+        self.info('assert that article, test plan and test unit still the same')
+        self.assertEqual(suborder['article'].replace(' ', ''), analyses['Article Name'].replace(' ', ''))
+        if suborder['testPlans']:
+            self.assertCountEqual(suborder['testPlans'], analyses_test_plans)
+        else:
+            self.assertCountEqual(['-'], analyses_test_plans)
+        child_data = self.analyses_page.get_child_table_data()
+        result_test_units = [test_unit['Test Unit'] for test_unit in child_data]
+        for testunit in test_units:
+            self.assertIn(testunit, result_test_units[0])
+
+    def test030_add_new_suborder_with_testunit(self):
+        """
+        New: Orders: Create Approach: I can create suborder with test unit successfully,
+        make sure the record created successfully in the analysis section.
+        LIMS-4255
+        """
+        self.single_analysis_page = SingleAnalysisPage()
+        article, article_data = ArticleAPI().create_article()
+        random_testunit, payload = TestUnitAPI().get_all_test_units(filter='{"materialTypes":"all"}')
+        testunit_record = random.choice(random_testunit['testUnits'])
+        orders, payload = self.orders_api.get_all_orders(limit=20)
+        order = random.choice(orders['orders'])
+        self.info(
+            '{}'.format(order['orderNo']))
+        self.orders_page.get_order_edit_page_by_id(order['id'])
+        self.info('getting analysis tab to check out the count of the analysis')
+        self.order_page.navigate_to_analysis_tab()
+        analysis_count_before_adding = self.single_analysis_page.get_analysis_count()
+
+        self.info('get back to order tab')
+        self.single_analysis_page.navigate_to_order_tab()
+        order_data_before_adding_new_suborder = self.suborder_table.get_suborder_data()
+        suborder_count_before_adding = len(order_data_before_adding_new_suborder['suborders'])
+        self.info('count of analysis equals: ' + str(analysis_count_before_adding) +
+                  "\t count of suborders equals: " + str(suborder_count_before_adding))
+
+        self.info('create new suborder with materialType {}, and article {}, and testUnit {}'.format(
+            article_data['materialType']['text'], article['article']['name'], testunit_record['name']))
+
+        self.suborder_table.add_new_suborder(
+            material_type=article_data['materialType']['text'],
+            article_name=article['article']['name'], test_units=[testunit_record['name']])
+        self.order_page.save(save_btn='order:save_btn', sleep=True)
+        self.base_selenium.refresh()
+        self.order_page.sleep_tiny()
+
+        order_data_after_adding_new_suborder = self.suborder_table.get_suborder_data()
+        self.assertEqual(suborder_count_before_adding + 1,
+                         len(order_data_after_adding_new_suborder['suborders']))
+
+        self.info('navigate to analysis page to make sure that only one analysis is added')
+        self.order_page.navigate_to_analysis_tab()
+        analysis_count = self.single_analysis_page.get_analysis_count()
+
+        self.info('check analysis count\t' + str(analysis_count) + "\tequals\t" + str(analysis_count_before_adding + 1))
+        self.assertGreaterEqual(analysis_count, analysis_count_before_adding + 1)
+
+        analysis_record = self.single_analysis_page.open_accordion_for_analysis_index(analysis_count - 1)
+        testunit_in_analysis = self.single_analysis_page.get_testunits_in_analysis(source=analysis_record)
+        self.assertEqual(len(testunit_in_analysis), 1)
+        testunit_name = testunit_in_analysis[0]['']
+        self.assertIn(testunit_record['name'], testunit_name)
+
     # def test031_archived_test_unit_shoudnt_display_in_the_order_drop_down_list(self):
     #     """
     #     Orders: Archived Test unit: Archive Approach: Archived test units shouldn't appear in orders in the drop down
