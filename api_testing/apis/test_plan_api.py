@@ -171,9 +171,13 @@ class TestPlanAPI(TestPlanAPIFactory):
         return testplans_response['testPlans']
 
     def get_completed_testplans(self, **kwargs):
+        completed_test_plans = []
         response, _ = self.get_all_test_plans()
         all_test_plans = response['testPlans']
-        completed_test_plans = [test_plan for test_plan in all_test_plans if test_plan['status'] == 'Completed']
+        for testplan in all_test_plans:
+            testplan_form_data = self.get_testplan_form_data(testplan['id'])
+            if testplan_form_data['status'] == 'Completed':
+                completed_test_plans.append(testplan_form_data)
         return completed_test_plans
 
     def get_inprogress_testplans(self, **kwargs):
@@ -250,11 +254,11 @@ class TestPlanAPI(TestPlanAPIFactory):
         completed_test_plan_list = self.get_completed_testplans_with_material_and_same_article(
             material_type=material_type, article=article, articleNo=article_no)
         completed_test_plans = [testplan for testplan in completed_test_plan_list if
-                                testplan['testPlanName'] not in used_test_plan]
+                                testplan['testPlanEntity']['name'] not in used_test_plan]
         if completed_test_plans:
             new_test_plan_data = random.choice(completed_test_plans)
-            new_test_plan = new_test_plan_data['testPlanName']
-            new_test_unit = self.get_testplan_form_data(id=new_test_plan_data['id'])['specifications'][0]['name']
+            new_test_plan = new_test_plan_data['testPlanEntity']['name']
+            new_test_unit = new_test_plan_data['specifications'][0]['name']
             self.info("completed test plan found with name {} and test unit {}".format(new_test_plan, new_test_unit))
         else:
             self.info("There is no completed test plan so create it ")
