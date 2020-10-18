@@ -358,13 +358,15 @@ class TestPlansTestCases(BaseTest):
 
         LIMS-3708
         """
-        self.info("Navigate to orders page")
+        self.info("navigate to orders page")
         self.order_page = Order()
-        self.order_page.get_orders_page()
         self.info("get random archived testplan")
-        response, payload = self.test_plan_api.get_all_test_plans(deleted="1")
+        response, payload = self.test_plan_api.get_all_test_plans()
         self.assertEqual(response['status'], 1, payload)
         archived_test_plan = random.choice(response['testPlans'])
+        self.test_plan_api.archive_testplans(ids=[str(archived_test_plan['id'])])
+        self.order_page.get_orders_page()
+
         self.info("archived test plan data {}".format(archived_test_plan))
         self.info("create a new order with material type and article of archived testplan")
         if archived_test_plan['article'] != ['all']:
@@ -374,7 +376,6 @@ class TestPlansTestCases(BaseTest):
         else:
             self.order_page.create_new_order(material_type=archived_test_plan['materialTypes'][0],
                                              test_plans=[archived_test_plan['testPlanName']])
-
         order_data = self.order_page.get_suborder_data()
         self.info("get the first suborder's testplan and make sure it's an empty string")
         self.assertCountEqual(order_data['suborders'][0]['testplans'], [''])
