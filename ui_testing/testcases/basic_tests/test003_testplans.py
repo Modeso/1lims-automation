@@ -297,7 +297,6 @@ class TestPlansTestCases(BaseTest):
         self.assertEqual(completed_testplan['version'] + 1, int(inprogress_testplan_version))
         self.assertEqual(testplan_row_data_status, 'In Progress')
 
-    @skip("https://modeso.atlassian.net/browse/LIMSA-200")
     @parameterized.expand(['same', 'All'])
     def test011_create_testplans_same_name_article_materialtype(self, same):
         """
@@ -312,26 +311,10 @@ class TestPlansTestCases(BaseTest):
 
         LIMS-3500
         """
-        self.info(" get random test plan with article != 'all")
-        testplans = self.test_plan_api.get_all_test_plans_json()
-        self.assertTrue(testplans)
-        testplans_list = [testplan for testplan in testplans if testplan['article'] != ['all']]
-        self.assertTrue(testplans_list, 'No test plans with article != all')
-        first_testplan = random.choice(testplans_list)
-        self.info("selected random test plan {}".format(first_testplan))
-        self.info("create another testplan with the same data")
-        if "same" == same:
-            article_no = first_testplan['articleNo'][0]
-        else:
-            article_no = 'All'
-
-        self.test_plan.create_new_test_plan(name=first_testplan['testPlanName'],
-                                            material_type=first_testplan['materialTypes'][0],
-                                            article=article_no)
-        self.info('Waiting for the error message')
-        validation_result = self.base_selenium.wait_element(element='general:oh_snap_msg')
-        self.info('Assert the error message')
-        self.assertTrue(validation_result)
+        payload = self.test_plan_api.create_completed_testplan_random_data()
+        self.test_plan.click_create_test_plan_button()
+        self.test_plan.set_test_plan(name=payload['testPlan']['text'])
+        self.assertFalse(self.test_plan.is_material_type_existing(material_type=payload['materialType'][0]['text']))
 
     @skip("https://modeso.atlassian.net/browse/LIMSA-200")
     def test012_create_testplans_same_name_different_materialtype(self):
