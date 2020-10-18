@@ -356,7 +356,8 @@ class TestPlansTestCases(BaseTest):
         self.assertEqual(response['status'], 1, payolad)
         self.info("created order no {} has testplan name {}".format(payolad[0]['orderNo'],
                                                                     payolad[0]['testPlans'][0]['name']))
-        self.info('Testplan name: {} will be archived'.format(payolad[0]['testPlans'][0]['name']))
+        self.info('testplan name: {} will be archived'.format(payolad[0]['testPlans'][0]['name']))
+        self.test_plan.base_selenium.refresh()
         testplan_deleted = self.test_plan.delete_selected_item_from_active_table_and_from_archived_table(
             item_name=payolad[0]['testPlans'][0]['name'])
 
