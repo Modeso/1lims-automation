@@ -311,76 +311,75 @@ class OrdersTestCases(BaseTest):
     #                   format(current_department, order_department))
     #         self.assertCountEqual(current_department, order_department)
     #
-    # @parameterized.expand(['save_btn', 'cancel_btn'])
-    # def test009_update_departments_in_second_suborder(self, action):
-    #     """
-    #      Orders: department Approach: In case I update the department then press on save button
-    #      (the department updated successfully) & when I press on cancel button (this department
-    #      not updated) (this will apply from the second order)
-    #      LIMS-6523
-    #     """
-    #     self.info('create contact')
-    #     response, payload = ContactsAPI().create_contact()
-    #     contact, contact_id = payload, response['company']['companyId']
-    #     orders, payload = self.orders_api.get_all_orders(limit=20)
-    #     order = random.choice(orders['orders'])
-    #     self.info('{}'.format(order['orderNo']))
-    #     self.orders_page.get_order_edit_page_by_id(order['id'])
-    #     order_data = self.suborder_table.get_suborder_data()
-    #     if len(order_data['suborders']) <= 1:
-    #         self.suborder_table.duplicate_from_table_view()
-    #         self.order_page.save(save_btn='order:save_btn')
-    #
-    #     self.order_page.set_contacts(contacts=[contact['name']])
-    #     self.order_page.sleep_small()
-    #     self.order_page.save_and_wait(save_btn='order:save_btn')
-    #     selected_suborder_data = self.suborder_table.get_suborder_data()
-    #     self.suborder_table.update_suborder(sub_order_index=1, departments=[contact['departments'][0]['text']])
-    #     self.order_page.save(save_btn='order:' + action)
-    #     if action == 'save_btn':
-    #         self.base_selenium.refresh()
-    #         suborder_data_after_update = self.suborder_table.get_suborder_data()
-    #         self.assertIn(contact['departments'][0]['text'], suborder_data_after_update['suborders'][1]['departments'])
-    #     else:
-    #         self.order_page.confirm_popup()
-    #         self.orders_page.get_order_edit_page_by_id(order['id'])
-    #         suborder_data_after_cancel = self.suborder_table.get_suborder_data()
-    #         self.assertEqual(suborder_data_after_cancel['suborders'][1], selected_suborder_data['suborders'][1])
-    #
-    # def test010_edit_department_of_order_with_multiple_contacts(self):
-    #     """
-    #     In case I select multiple contacts the departments should be updated according to that
-    #
-    #     LIMS-5705 'edit mode'
-    #     """
-    #     self.info("create order with multiple contacts")
-    #     response, payload = self.orders_api.create_order_with_multiple_contacts()
-    #     self.assertEqual(response['status'], 1, response)
-    #     contact_names_list = [contact['text'] for contact in payload[0]['contact']]
-    #     self.info('selected contacts are {}'.format(contact_names_list))
-    #     departments_list_with_contacts = ContactsAPI().get_department_contact_list(contact_names_list)
-    #     self.info('department contacts list {}'.format(departments_list_with_contacts))
-    #     self.info('open edit page of order no {}'.format(payload[0]['orderNo']))
-    #     self.orders_page.get_order_edit_page_by_id(response['order']['mainOrderId'])
-    #     self.order_page.sleep_tiny()
-    #     suggested_department_list, departments_only_list = \
-    #         self.suborder_table.get_department_suggestion_lists(open_suborder_table=True, contacts=contact_names_list)
-    #     self.info('suggested department list {}'.format(suggested_department_list))
-    #     self.info('and it should be {}'.format(departments_list_with_contacts))
-    #     index = 0
-    #     for item in suggested_department_list:
-    #         for element in departments_list_with_contacts:
-    #             if item['contact'] == element['contact']:
-    #                 self.assertCountEqual(item['departments'], element['departments'])
-    #                 index = index + 1
-    #     self.assertEqual(index, len(contact_names_list))
-    #
-    #     department = random.choice(departments_only_list)
-    #     self.info('set department to {}'.format(department))
-    #     self.suborder_table.set_departments(department)
-    #     self.order_page.save_and_wait(save_btn='order:save')
-    #     suborder_data = self.suborder_table.get_suborder_data()
-    #     self.assertEqual([department], suborder_data['suborders'][0]['departments'])
+    @parameterized.expand(['save_btn', 'cancel_btn'])
+    def test009_update_departments_in_second_suborder(self, action):
+        """
+         Orders: department Approach: In case I update the department then press on save button
+         (the department updated successfully) & when I press on cancel button (this department
+         not updated) (this will apply from the second order)
+         LIMS-6523
+        """
+        self.info('create contact')
+        response, payload = ContactsAPI().create_contact()
+        contact, contact_id = payload, response['company']['companyId']
+        orders, payload = self.orders_api.get_all_orders(limit=20)
+        order = random.choice(orders['orders'])
+        self.info('{}'.format(order['orderNo']))
+        self.orders_page.get_order_edit_page_by_id(order['id'])
+        order_data = self.suborder_table.get_suborder_data()
+        if len(order_data['suborders']) <= 1:
+            self.suborder_table.duplicate_from_table_view()
+            self.order_page.save(save_btn='order:save_btn')
+
+        self.order_page.set_contacts(contacts=[contact['name']])
+        self.order_page.sleep_small()
+        self.order_page.save_and_wait(save_btn='order:save_btn')
+        old_dep = self.suborder_table.get_departments(suborder_index=1)
+        self.suborder_table.set_departments(suborder_index=1, departments=[contact['departments'][0]['text']])
+        if action == 'save_btn':
+            self.order_page.save_and_wait(save_btn='order:save_btn')
+            self.assertIn(contact['departments'][0]['text'], self.suborder_table.get_departments(suborder_index=1))
+        else:
+            self.order_page.cancel()
+            self.order_page.confirm_popup()
+            self.orders_page.get_order_edit_page_by_id(order['id'])
+            self.order_page.sleep_tiny()
+            self.assertCountEqual(self.suborder_table.get_departments(suborder_index=1), old_dep)
+
+    def test010_edit_department_of_order_with_multiple_contacts(self):
+        """
+        In case I select multiple contacts the departments should be updated according to that
+
+        LIMS-5705 'edit mode'
+        """
+        self.info("create order with multiple contacts")
+        response, payload = self.orders_api.create_order_with_multiple_contacts()
+        self.assertEqual(response['status'], 1, response)
+        contact_names_list = [contact['text'] for contact in payload[0]['contact']]
+        self.info('selected contacts are {}'.format(contact_names_list))
+        departments_list_with_contacts = ContactsAPI().get_department_contact_list(contact_names_list)
+        self.info('department contacts list {}'.format(departments_list_with_contacts))
+        self.info('open edit page of order no {}'.format(payload[0]['orderNo']))
+        self.orders_page.get_order_edit_page_by_id(response['order']['mainOrderId'])
+        self.order_page.sleep_tiny()
+        suggested_department_list, departments_only_list = \
+            self.suborder_table.get_department_suggestion_lists(open_suborder_table=True, contacts=contact_names_list)
+        self.info('suggested department list {}'.format(suggested_department_list))
+        self.info('and it should be {}'.format(departments_list_with_contacts))
+        index = 0
+        for item in suggested_department_list:
+            for element in departments_list_with_contacts:
+                if item['contact'] == element['contact']:
+                    self.assertCountEqual(item['departments'], element['departments'])
+                    index = index + 1
+        self.assertEqual(index, len(contact_names_list))
+
+        department = random.choice(departments_only_list)
+        self.info('set department to {}'.format(department))
+        self.suborder_table.set_departments(departments=[department])
+        self.order_page.save_and_wait(save_btn='order:save')
+        self.suborder_table.sleep_tiny()
+        self.assertCountEqual([department], self.suborder_table.get_departments())
 
     def test011_add_multiple_suborders_with_diff_departments(self):
         """
