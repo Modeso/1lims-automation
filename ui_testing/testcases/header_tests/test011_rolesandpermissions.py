@@ -32,11 +32,11 @@ class HeaderTestCases(BaseTest):
         LIMS-6400
         """
         self.info("select random rows to archive")
-        selected_roles_and_permissions_data, _ = self.header_page.select_random_multiple_users_table_rows()
-        self.info("Archive selected rows")
+        selected_roles_and_permissions_data, _ = self.header_page.select_multiple_random_users_rows()
+        self.info("archive selected rows")
         self.header_page.archive_entity(menu_element='roles_and_permissions:right_menu',
                                         archive_element='roles_and_permissions:archive')
-        self.info("Navigate to archived roles table")
+        self.info("navigate to archived roles table")
         self.header_page.get_archived_entities(menu_element='roles_and_permissions:right_menu',
                                                archived_element='roles_and_permissions:archived')
         for role in selected_roles_and_permissions_data:
@@ -55,7 +55,7 @@ class HeaderTestCases(BaseTest):
         self.header_page.get_archived_entities(menu_element='roles_and_permissions:right_menu',
                                                archived_element='roles_and_permissions:archived')
         self.info("select random rows to restore")
-        selected_role_data, _ = self.header_page.select_random_multiple_users_table_rows()
+        selected_role_data, _ = self.header_page.select_multiple_random_users_rows()
         for role in selected_role_data:
             role_names.append(role['Name'])
         self.info("Restore selected roles")
