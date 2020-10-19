@@ -322,7 +322,6 @@ class OrdersTestCases(BaseTest):
         self.info('create contact')
         response, payload = ContactsAPI().create_contact()
         contact, contact_id = payload, response['company']['companyId']
-
         orders, payload = self.orders_api.get_all_orders(limit=20)
         order = random.choice(orders['orders'])
         self.info('{}'.format(order['orderNo']))
@@ -334,9 +333,7 @@ class OrdersTestCases(BaseTest):
 
         self.order_page.set_contacts(contacts=[contact['name']])
         self.order_page.sleep_small()
-        self.order_page.save(save_btn='order:save_btn', sleep=True)
-        self.base_selenium.refresh()
-
+        self.order_page.save_and_wait(save_btn='order:save_btn')
         selected_suborder_data = self.suborder_table.get_suborder_data()
         self.suborder_table.update_suborder(sub_order_index=1, departments=[contact['departments'][0]['text']])
         self.order_page.save(save_btn='order:' + action)
