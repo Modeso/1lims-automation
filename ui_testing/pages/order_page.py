@@ -410,8 +410,9 @@ class SubOrders(Order):
         self.info("set contacts to {}".format(contacts))
         self.set_contacts(contacts=contacts)
         self.sleep_small()
-        self.info("set departments to {}".format(departments))
-        self.set_departments(departments=departments)
+        if departments:
+            self.info("set departments to {}".format(departments))
+            self.set_departments(departments=departments)
         self.info("set material type to {}".format(material_type))
         self.set_material_type(material_type=material_type)
         self.sleep_small()

@@ -430,49 +430,52 @@ class OrdersTestCases(BaseTest):
     #     for suborder in suborder_data:
     #         self.assertIn(suborder['departments'][0], department_list)
     #
-    # def test012_create_order_with_multiple_contacts_then_add_department(self):
-    #     """
-    #     User should be able to choose more than one contact from drop down menu upon creating a new order
-    #
-    #     LIMS-5704 'create mode'
-    #     """
-    #     self.info("get 3 contacts with department contacts")
-    #     self.contacts_api = ContactsAPI()
-    #     contact_list = random.sample(self.contacts_api.get_contacts_with_department(), k=3)
-    #     self.assertTrue(contact_list, "Can't get 3 contacts with departments")
-    #     contact_names_list = [contact['name'] for contact in contact_list]
-    #     self.info('selected contacts are {}'.format(contact_names_list))
-    #     departments_list_with_contacts = self.contacts_api.get_department_contact_list(contact_names_list)
-    #     self.info('department contacts list {}'.format(departments_list_with_contacts))
-    #     self.info('create new order with selected contacts')
-    #     self.suborder_table.create_new_order(contacts=contact_names_list)
-    #     self.order_page.sleep_tiny()
-    #     contacts = self.order_page.get_contacts()
-    #     self.info('selected contacts are {}'.format(contacts))
-    #     self.assertCountEqual(contacts, contact_names_list)
-    #     suggested_department_list, departments_only_list = \
-    #         self.suborder_table.get_department_suggestion_lists(contacts=contact_names_list)
-    #     self.info('suggested department list {}'.format(suggested_department_list))
-    #     self.info('and it should be {}'.format(departments_list_with_contacts))
-    #     index = 0
-    #     for item in suggested_department_list:
-    #         for element in departments_list_with_contacts:
-    #             if item['contact'] == element['contact']:
-    #                 self.assertCountEqual(item['departments'], element['departments'])
-    #                 index = index + 1
-    #
-    #     self.assertEqual(index, len(contact_names_list))
-    #     department = random.choice(departments_only_list)
-    #     self.info('set department to {}'.format(department))
-    #     self.suborder_table.set_departments(department)
-    #     self.order_page.sleep_small()
-    #     self.order_page.save_and_wait(save_btn='order:save')
-    #     order_data = self.suborder_table.get_suborder_data()
-    #     self.info('assert that new order with multiple contacts created')
-    #     self.assertCountEqual(order_data['contacts'], contact_names_list)
-    #     self.info('assert that department updated')
-    #     self.assertEqual([department], order_data['suborders'][0]['departments'])
-    #
+    def test012_create_order_with_multiple_contacts_then_add_department(self):
+        """
+        User should be able to choose more than one contact from drop down menu upon creating a new order
+
+        LIMS-5704 'create mode'
+        """
+        article = random.choice(ArticleAPI().get_all_articles_json())
+        response, payload = TestUnitAPI().create_qualitative_testunit()
+        self.assertEqual(response['status'], 1)
+        self.info("get 3 contacts with department contacts")
+        contact_names_list, departments_list_with_contacts = ContactsAPI().get_department_and_contact_lists()
+        self.info('selected contacts are {}'.format(contact_names_list))
+        self.info('department contacts list {}'.format(departments_list_with_contacts))
+        self.info('create new order with selected contacts')
+        self.suborder_table.create_new_order(material_type=article['materialType'],
+                                             article=article['name'],
+                                             contacts=contact_names_list, test_plans=[],
+                                             test_units=[payload['name']],
+                                             departments=[])
+        self.order_page.sleep_tiny()
+        contacts = self.order_page.get_contacts()
+        self.info('selected contacts are {}'.format(contacts))
+        self.assertCountEqual(contacts, contact_names_list)
+        suggested_department_list, departments_only_list = \
+            self.suborder_table.get_department_suggestion_lists(contacts=contact_names_list)
+        self.info('suggested department list {}'.format(suggested_department_list))
+        self.info('and it should be {}'.format(departments_list_with_contacts))
+        index = 0
+        for item in suggested_department_list:
+            for element in departments_list_with_contacts:
+                if item['contact'] == element['contact']:
+                    self.assertCountEqual(item['departments'], element['departments'])
+                    index = index + 1
+
+        self.assertEqual(index, len(contact_names_list))
+        department = random.choice(departments_only_list)
+        self.info('set department to {}'.format(department))
+        self.suborder_table.set_departments(departments=[department])
+        self.order_page.sleep_small()
+        self.order_page.save_and_wait(save_btn='order:save')
+        order_data = self.suborder_table.get_suborder_data()
+        self.info('assert that new order with multiple contacts created')
+        self.assertCountEqual(order_data['contacts'], contact_names_list)
+        self.info('assert that department updated')
+        self.assertCountEqual([department], order_data['suborders'][0]['departments'])
+
     # @parameterized.expand(['save_btn', 'cancel'])
     # def test013_update_test_date(self, save):
     #     """
