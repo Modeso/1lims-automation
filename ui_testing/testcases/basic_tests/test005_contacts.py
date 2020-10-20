@@ -124,7 +124,6 @@ class ContactsTestCases(BaseTest):
                     break
             self.assertIn(search_data[column].replace("'", ''), row_data[column].replace("'", ''))
 
-    #@skip('https://modeso.atlassian.net/browse/LIMS-6402')
     def test006_download_contact_sheet(self):
         """
         New: Contact: XSLX File: I can download all the data in the table view in the excel sheet
@@ -417,7 +416,6 @@ class ContactsTestCases(BaseTest):
         self.info('random user email generate is {}'.format(user_mail))
         self.info('contact that user will be created with is {}'.format(contact_name))
         self.info('create new user with the randomly generated data')
-        import ipdb; ipdb.set_trace()
         self.header_page.create_new_user(user_role='Contact', user_password=user_pw,
                                          user_confirm_password=user_pw, contact=contact_name,
                                          user_email=user_mail, user_name=user_name)
