@@ -190,7 +190,7 @@ class OrdersTestCases(BaseTest):
         self.info("create order with multiple suborders using api")
         response, payload = self.orders_api.create_order_with_multiple_suborders()
         self.assertEqual(response['status'], 1)
-        order_no = response['order']['orderNo']
+        order_no = payload[0]['orderNoWithYear']
         order_id = response['order']['mainOrderId']
         suborders = self.orders_api.get_suborder_by_order_id(order_id)[0]['orders']
         analysis_no_list = [suborder['analysis'][0] for suborder in suborders]
@@ -202,7 +202,8 @@ class OrdersTestCases(BaseTest):
         self.orders_page.get_archived_items()
         for analysis in analysis_no_list:
             self.orders_page.filter_by_analysis_number(analysis)
-            self.assertTrue(self.orders_page.is_order_in_table(value=order_no))
+            self.assertEqual(len(self.analyses_page.result_table())-1, 1)
+            self.assertEqual(self.analyses_page.get_the_latest_row_data()['Order No.'], order_no)
 
     def test010_cancel_archive_reflect_on_analysis(self):
         """
