@@ -62,7 +62,7 @@ class OrdersAPIFactory(BaseAPI):
         :return: response, payload
         """
         #order_no = self.get_auto_generated_order_no()[0]['id']
-        order_no = random.randint(999, 9999)
+        order_no = random.randint(999, 99999)
         testplan = TestPlanAPI().create_completed_testplan_random_data()
         material_type = testplan['materialType'][0]['text']
         material_type_id = testplan['materialType'][0]['id']
@@ -118,7 +118,7 @@ class OrdersAPIFactory(BaseAPI):
     @api_factory('post')
     def create_order_with_multiple_suborders(self, no_suborders=3, suborders_fields=[]):
         #order_no = self.get_auto_generated_order_no()[0]['id']
-        order_no = random.randint(999, 9999)
+        order_no = random.randint(999, 99999)
         test_date = self.get_current_date()
         test_date_arr = test_date.split('-')
         shipment_date = self.get_current_date()
