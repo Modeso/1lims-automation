@@ -1604,6 +1604,7 @@ class OrdersTestCases(BaseTest):
         second_suborder_test_plans = [tp['name'] for tp in second_suborder_data['testPlans']]
         self.info("generate data of third suborder")
         third_suborder_test_units = random.sample(test_units_names_only, 3)
+        third_suborder_test_units = random.sample(test_units_names_only, 3)
         self.info("create new order")
         self.suborder_table.create_new_order(material_type=second_suborder_data['material_type'],
                                              article=second_suborder_data['article'],
