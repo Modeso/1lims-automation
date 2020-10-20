@@ -327,7 +327,8 @@ class OrdersTestCases(BaseTest):
             self.suborder_table.update_suborder(test_plans=[new_test_plan], test_units=[new_test_unit])
         else:
             self.info("update test plan to {} and test unit to {}".format(new_test_plan, new_test_unit))
-            self.suborder_table.update_suborder(test_plans=[new_test_plan], test_units=[new_test_unit], remove_old=True)
+            self.suborder_table.update_suborder(test_plans=[new_test_plan], test_units=[new_test_unit],
+                                                remove_old=True, confirm_pop_up=True)
 
         self.order_page.save(save_btn='order:save')
         self.info("navigate to active table")
@@ -448,8 +449,8 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(response['status'], 1, payload)
         test_plans = [payload[0]['selectedTestPlans'][0]['name'], payload[0]['selectedTestPlans'][1]['name']]
         test_units = [testunit['name'] for testunit in payload[0]['selectedTestUnits']]
-        test_units.extend(TestPlanAPI().get_testunits_in_testplan_by_No(payload[0]['testPlans'][0]['number']))
-        test_units.extend(TestPlanAPI().get_testunits_in_testplan_by_No(payload[0]['testPlans'][1]['number']))
+        test_units.extend(TestPlanAPI().get_testunits_in_testplan(payload[0]['testPlans'][0]['testPlan']['id']))
+        test_units.extend(TestPlanAPI().get_testunits_in_testplan(payload[0]['testPlans'][1]['testPlan']['id']))
         self.info("created order has test plans {} ".format(test_plans))
         self.info("created order has test units {} ".format(test_units))
         self.orders_page.filter_by_order_no(payload[0]['orderNo'])
