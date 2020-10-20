@@ -417,6 +417,7 @@ class ContactsTestCases(BaseTest):
         self.info('random user email generate is {}'.format(user_mail))
         self.info('contact that user will be created with is {}'.format(contact_name))
         self.info('create new user with the randomly generated data')
+        import ipdb; ipdb.set_trace()
         self.header_page.create_new_user(user_role='Contact', user_password=user_pw,
                                          user_confirm_password=user_pw, contact=contact_name,
                                          user_email=user_mail, user_name=user_name)
