@@ -270,10 +270,14 @@ class SubOrders(Order):
     def get_test_plans_pop_up_content(self, index=0):
         suborders = self.base_selenium.get_table_rows(element='order:suborder_table')
         suborders_elements = self.base_selenium.get_row_cells_elements_related_to_header(
-            row=suborders[index],
-            table_element='order:suborder_table')
-        popup_element = self.base_selenium.find_element_in_element(
-            source=suborders_elements['Test Plan:'], destination_element='order:testplan_popup_btn')
+            row=suborders[index], table_element='order:suborder_table')
+
+        if 'Test Plan:' in suborders_elements.keys():
+            popup_element = self.base_selenium.find_element_in_element(
+                source=suborders_elements['Test Plan:'], destination_element='order:testplan_popup_btn')
+        else:
+            popup_element = self.base_selenium.find_element_in_element(
+                source=suborders_elements['Test Plan: *'], destination_element='order:testplan_popup_btn')
         popup_element.click()
         self.sleep_small()
         results = []
@@ -500,9 +504,11 @@ class SubOrders(Order):
             self.set_article(article=article_name, suborder_index=-1)
         self.sleep_tiny()
         self.info('Set test plan : {}'.format(test_plans))
-        self.set_test_plans(test_plans=test_plans, suborder_index=-1)
+        if test_plans:
+            self.set_test_plans(test_plans=test_plans, suborder_index=-1)
         self.sleep_tiny()
-        self.set_test_units(test_units=test_units, suborder_index=-1)
+        if test_units:
+            self.set_test_units(test_units=test_units, suborder_index=-1)
         self.sleep_tiny()
         return self.get_suborder_data()
 
@@ -521,7 +527,7 @@ class SubOrders(Order):
             self.set_contacts(contacts=contacts)
         if departments:
             self.info(' Set departments : {}'.format(departments))
-            self.set_departments(departments=departments)
+            self.set_departments(departments=departments, suborder_index=sub_order_index)
             self.sleep_small()
 
         suborder_row.click()
@@ -529,7 +535,7 @@ class SubOrders(Order):
         self.sleep_small()
         if material_type:
             self.info('Set material type : {}'.format(material_type))
-            self.set_material_type(material_type=material_type)
+            self.set_material_type(material_type=material_type, suborder_index=sub_order_index)
             if confirm_pop_up:
                 self.confirm_popup(True)
 
@@ -539,7 +545,7 @@ class SubOrders(Order):
                 self.remove_article(testplans=suborder_elements_dict['testPlans'])
 
             self.info('Set article name : {}'.format(article))
-            self.set_article(article=article)
+            self.set_article(article=article, suborder_index=sub_order_index)
             if confirm_pop_up:
                 self.confirm_popup(True)
             self.sleep_small()
@@ -547,10 +553,10 @@ class SubOrders(Order):
         self.info(' Set test plan : {} for {} time(s)'.format(test_plans, len(test_plans)))
         if test_plans:
             if remove_old:
-                self.clear_test_plan()
+                self.clear_test_plan(suborder_index=sub_order_index)
                 self.confirm_popup()
                 self.sleep_small()
-            self.set_test_plans(test_plans=test_plans)
+            self.set_test_plans(test_plans=test_plans, suborder_index=sub_order_index)
             self.sleep_small()
 
         self.info(' Set test unit : {} for {} time(s)'.format(test_units, len(test_units)))
@@ -558,7 +564,7 @@ class SubOrders(Order):
             if remove_old:
                 self.clear_test_unit(confirm_pop_up)
                 self.sleep_small()
-            self.set_test_units(test_units=test_units)
+            self.set_test_units(test_units=test_units, suborder_index=sub_order_index)
             self.sleep_small()
 
         if shipment_date:
