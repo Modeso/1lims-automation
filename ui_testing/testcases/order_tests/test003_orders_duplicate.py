@@ -211,57 +211,57 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(duplicated_order_data['Article Name'], article['name'])
         self.assertEqual(duplicated_order_data['Test Units'], test_unit_before_duplicate)
 
-    @parameterized.expand(["main_order", "sub_order"])
-    def test006_duplicate_order_and_change_material_type(self, case):
-        """
-        duplicate the main order then change the materiel type
-        LIMS-6219
-        """
-        response, payload = self.orders_api.create_new_order()
-        self.assertEqual(response['status'], 1)
-        old_material = payload[0]['materialType']['text']
-        self.info('get completed test plan with different material type')
-        new_suborder_data = TestPlanAPI().get_suborder_data_with_different_material_type(old_material)
-        self.order_page.filter_by_order_no(payload[0]['orderNo'])
-        if case == "main_order":
-            self.info('duplicate the main order')
-            self.order_page.duplicate_main_order_from_order_option()
-        else:
-            self.order_page.get_child_table_data()
-            self.info("duplicate first sub order of order {} from suborder's options".format(payload[0]['orderNo']))
-            self.order_page.duplicate_sub_order_from_table_overview()
-        self.info('change material type of first suborder')
-        self.suborder_table.set_material_type(material_type=new_suborder_data['material_type'])
-        self.order_page.sleep_tiny()
-        self.info('Make sure that article, test unit, and test plan are empty')
-        self.assertEqual(self.suborder_table.get_article(), None)
-        self.assertEqual(self.suborder_table.get_test_units(), None)
-        self.assertEqual(self.suborder_table.get_test_plans(), None)
-        if case == "main_order":
-            duplicated_order_number = self.order_page.get_order_no()
-            self.info('order to be duplicated is {}, new order no is {}'.
-                      format(payload[0]['orderNo'], duplicated_order_number))
-            self.assertNotEqual(payload[0]['orderNo'], duplicated_order_number)
-        self.info('Update article, test unit and test plan')
-        self.suborder_table.set_article(article=new_suborder_data['article'])
-        self.suborder_table.set_test_plans(test_plans=[new_suborder_data['test_plan']])
-        self.suborder_table.set_test_units(test_units=[new_suborder_data['test_unit']])
-        self.info('duplicated order material is {}, article {}, test_unit {} and test_plan {}'.
-                  format(new_suborder_data['material_type'], new_suborder_data['article'],
-                         new_suborder_data['test_unit'], new_suborder_data['test_plan']))
-        self.order_page.save(save_btn='order:save_btn', sleep=True)
-        self.info("navigate to orders' page to make sure that order duplicated correctly with selected data")
-        self.order_page.get_orders_page()
-        if case == 'main_order':
-            self.orders_page.filter_by_order_no(duplicated_order_number)
-        else:
-            self.order_page.filter_by_order_no(payload[0]['orderNo'])
-        suborder_data = self.order_page.get_child_table_data()[0]
-        self.info('Make sure that suborder data is correct')
-        self.assertEqual(suborder_data['Material Type'], new_suborder_data['material_type'])
-        self.assertEqual(suborder_data['Article Name'], new_suborder_data['article'])
-        self.assertEqual(suborder_data['Test Units'], new_suborder_data['test_unit'])
-        self.assertEqual(suborder_data['Test Plans'], new_suborder_data['test_plan'])
+    # @parameterized.expand(["main_order", "sub_order"])
+    # def test006_duplicate_order_and_change_material_type(self, case):
+    #     """
+    #     duplicate the main order then change the materiel type
+    #     LIMS-6219
+    #     """
+    #     response, payload = self.orders_api.create_new_order()
+    #     self.assertEqual(response['status'], 1)
+    #     old_material = payload[0]['materialType']['text']
+    #     self.info('get completed test plan with different material type')
+    #     new_suborder_data = TestPlanAPI().get_suborder_data_with_different_material_type(old_material)
+    #     self.order_page.filter_by_order_no(payload[0]['orderNo'])
+    #     if case == "main_order":
+    #         self.info('duplicate the main order')
+    #         self.order_page.duplicate_main_order_from_order_option()
+    #     else:
+    #         self.order_page.get_child_table_data()
+    #         self.info("duplicate first sub order of order {} from suborder's options".format(payload[0]['orderNo']))
+    #         self.order_page.duplicate_sub_order_from_table_overview()
+    #     self.info('change material type of first suborder')
+    #     self.suborder_table.set_material_type(material_type=new_suborder_data['material_type'])
+    #     self.order_page.sleep_tiny()
+    #     self.info('Make sure that article, test unit, and test plan are empty')
+    #     self.assertEqual(self.suborder_table.get_article(), None)
+    #     self.assertEqual(self.suborder_table.get_test_units(), None)
+    #     self.assertEqual(self.suborder_table.get_test_plans(), None)
+    #     if case == "main_order":
+    #         duplicated_order_number = self.order_page.get_order_no()
+    #         self.info('order to be duplicated is {}, new order no is {}'.
+    #                   format(payload[0]['orderNo'], duplicated_order_number))
+    #         self.assertNotEqual(payload[0]['orderNo'], duplicated_order_number)
+    #     self.info('Update article, test unit and test plan')
+    #     self.suborder_table.set_article(article=new_suborder_data['article'])
+    #     self.suborder_table.set_test_plans(test_plans=[new_suborder_data['test_plan']])
+    #     self.suborder_table.set_test_units(test_units=[new_suborder_data['test_unit']])
+    #     self.info('duplicated order material is {}, article {}, test_unit {} and test_plan {}'.
+    #               format(new_suborder_data['material_type'], new_suborder_data['article'],
+    #                      new_suborder_data['test_unit'], new_suborder_data['test_plan']))
+    #     self.order_page.save(save_btn='order:save_btn', sleep=True)
+    #     self.info("navigate to orders' page to make sure that order duplicated correctly with selected data")
+    #     self.order_page.get_orders_page()
+    #     if case == 'main_order':
+    #         self.orders_page.filter_by_order_no(duplicated_order_number)
+    #     else:
+    #         self.order_page.filter_by_order_no(payload[0]['orderNo'])
+    #     suborder_data = self.order_page.get_child_table_data()[0]
+    #     self.info('Make sure that suborder data is correct')
+    #     self.assertEqual(suborder_data['Material Type'], new_suborder_data['material_type'])
+    #     self.assertEqual(suborder_data['Article Name'], new_suborder_data['article'])
+    #     self.assertEqual(suborder_data['Test Units'], new_suborder_data['test_unit'])
+    #     self.assertEqual(suborder_data['Test Plans'], new_suborder_data['test_plan'])
 
     # def test007_Duplicate_sub_order_with_multiple_testplans_and_testunits_delete_approach(self):
     #     """

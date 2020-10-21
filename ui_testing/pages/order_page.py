@@ -303,10 +303,16 @@ class SubOrders(Order):
         suborder_row = self.base_selenium.get_table_rows(element='order:suborder_table')[suborder_index]
         suborder_data = self.base_selenium.get_row_cells_dict_related_to_header(
             suborder_row, table_element='order:suborder_table')
-        if suborder_data['Test Unit:'] == 'Search':
+
+        if 'Test Unit:' in suborder_data.keys():
+            key = 'Test Unit:'
+        else:
+            key = 'Test Unit: *'
+
+        if suborder_data[key] == 'Search':
             return None
         else:
-            return suborder_data['Test Unit:'].replace('×', '').split('\n')
+            return suborder_data[key].replace('×', '').split('\n')
 
     def is_testunit_existing(self, test_unit, suborder_index=0):
         self.open_suborder_edit_mode(suborder_index)
