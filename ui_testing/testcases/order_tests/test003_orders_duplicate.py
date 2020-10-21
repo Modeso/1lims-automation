@@ -148,18 +148,14 @@ class OrdersTestCases(BaseTest):
         duplicated_order_data = self.orders_page.get_the_latest_row_data()
         duplicated_contacts = duplicated_order_data['Contact Name'].split(',\n')
         self.assertCountEqual(duplicated_contacts, contacts)
-
         duplicated_suborders = self.orders_page.get_child_table_data()
         self.assertEqual(len(duplicated_suborders), 5)
         analyses_numbers = [suborder['Analysis No.'] for suborder in duplicated_suborders]
         self.orders_page.navigate_to_analysis_active_table()
-        self.analyses_page.open_filter_menu()
         for analysis in analyses_numbers:
-            self.analyses_page.filter_by(
-                filter_element='analysis_page:analysis_no_filter', filter_text=analysis, field_type='text')
-            self.analyses_page.filter_apply()
+            self.analyses_page.filter_by_analysis_number(analysis)
             analysis_data = self.analyses_page.get_the_latest_row_data()
-            duplicated_contacts_in_analyses = analysis_data['Contact Name'].split(', ')
+            duplicated_contacts_in_analyses = analysis_data['Contact Name'].split(',\n')
             self.assertEqual(len(duplicated_contacts_in_analyses), 3)
             self.assertCountEqual(duplicated_contacts, contacts)
 
@@ -187,14 +183,12 @@ class OrdersTestCases(BaseTest):
         if case == 'main_order':
             self.info("duplicate main order no {}".format(payload[0]['orderNo']))
             self.orders_page.duplicate_main_order_from_order_option()
-            self.suborder_table.open_suborder_edit_mode()
         else:
             self.info("duplicate sub order of order no {}".format(payload[0]['orderNo']))
             self.orders_page.open_child_table(source=self.orders_page.result_table()[0])
             self.orders_page.duplicate_sub_order_from_table_overview()
         self.orders_page.sleep_tiny()
         self.info("update article to {}".format(article['name']))
-        self.suborder_table.remove_article()
         self.suborder_table.set_article(article=article['name'])
         self.order_page.save(save_btn='order:save')
         self.orders_page.sleep_tiny()
