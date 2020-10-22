@@ -55,7 +55,7 @@ class Order(Orders):
         return self.base_selenium.get_value(element="order:order_number").replace("'", "")
 
     def set_order_no(self, no):
-        self.info(' set no. {}'.format(no))
+        self.info('set no. {}'.format(no))
         self.base_selenium.set_text(element="order:order_number", value=no)
         self.sleep_small()
         return self.get_order_no()
@@ -118,7 +118,7 @@ class Order(Orders):
 
 class SubOrders(Order):
     def get_suborder_table(self):
-        self.info(' Get suborder table list.')
+        self.info('Get suborder table list.')
         self.base_selenium.click(element='order:suborder_list')
 
     def open_suborder_edit_mode(self, suborder_index=0):
@@ -407,11 +407,14 @@ class SubOrders(Order):
         self.sleep_small()
         return date
 
+    def set_analysis_no(self, anaylsis_no):
+        self.base_selenium.set_text(element='order:analysis_no', value=anaylsis_no)
+
     def create_new_order(self, material_type='', article='', contacts=[''], test_plans=[''], test_units=[''],
                          multiple_suborders=0, departments=[''], order_no='', save=True,
                          check_testunits_testplans=False):
 
-        self.info(' Create new order.')
+        self.info('Create new order.')
         self.click_create_order_button()
         self.sleep_small()
         self.set_new_order()
@@ -458,7 +461,7 @@ class SubOrders(Order):
         if save:
             self.save(save_btn='order:save_btn')
 
-        self.info(' Order created with no : {} '.format(order_no))
+        self.info('Order created with no : {} '.format(order_no))
         if check_testunits_testplans:
             return order_no, suggested_test_units, suggested_testplans
         else:
@@ -486,7 +489,7 @@ class SubOrders(Order):
             return test_units
 
     def create_existing_order(self, no='', material_type='', article='', contacts=[''], test_units=['']):
-        self.info(' Create new order.')
+        self.info('Create new order.')
         self.click_create_order_button()
         self.set_existing_order()
         order_no = self.set_existing_number(no)
@@ -499,7 +502,7 @@ class SubOrders(Order):
         self.set_test_units(test_units=test_units)
         self.sleep_small()
         self.save(save_btn='order:save_btn')
-        self.info(' Order created with no : {} '.format(order_no))
+        self.info('Order created with no : {} '.format(order_no))
         return order_no
 
     def add_new_suborder(self, material_type='', article_name='', test_plans=[''], test_units=['']):
@@ -538,7 +541,7 @@ class SubOrders(Order):
         if contacts:
             self.set_contacts(contacts=contacts)
         if departments:
-            self.info(' Set departments : {}'.format(departments))
+            self.info('Set departments : {}'.format(departments))
             self.set_departments(departments=departments, suborder_index=sub_order_index)
             self.sleep_small()
 
@@ -562,7 +565,7 @@ class SubOrders(Order):
                 self.confirm_popup(True)
             self.sleep_small()
 
-        self.info(' Set test plan : {} for {} time(s)'.format(test_plans, len(test_plans)))
+        self.info('Set test plan : {} for {} time(s)'.format(test_plans, len(test_plans)))
         if test_plans:
             if remove_old:
                 self.clear_test_plan(suborder_index=sub_order_index)
@@ -571,13 +574,17 @@ class SubOrders(Order):
             self.set_test_plans(test_plans=test_plans, suborder_index=sub_order_index)
             self.sleep_small()
 
-        self.info(' Set test unit : {} for {} time(s)'.format(test_units, len(test_units)))
+        self.info('Set test unit : {} for {} time(s)'.format(test_units, len(test_units)))
         if test_units:
             if remove_old:
                 self.clear_test_unit(confirm_pop_up)
                 self.sleep_small()
             self.set_test_units(test_units=test_units, suborder_index=sub_order_index)
             self.sleep_small()
+
+        anaysis_no = self.generate_random_number(99, 999999)
+        self.info(f'update the analysis no {anaysis_no} ')
+        self.set_analysis_no(anaysis_no)
 
         if shipment_date:
             return self.set_shipment_date(row_id=sub_order_index)

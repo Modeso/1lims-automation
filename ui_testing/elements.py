@@ -759,6 +759,8 @@ elements = {
                 'method': 'id',
                 'value': 'orderNofield'}
         },
+        'analysis_no': {'method': 'css_selector',
+                        'value': 'input[id="analysisNo"]'},
         'filter_analysis_no': {
             'method': 'id',
             'value': 'nofield'

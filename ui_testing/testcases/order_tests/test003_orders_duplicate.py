@@ -9,9 +9,11 @@ from api_testing.apis.test_unit_api import TestUnitAPI
 from api_testing.apis.contacts_api import ContactsAPI
 from api_testing.apis.test_plan_api import TestPlanAPI
 from parameterized import parameterized
+from unittest import skip
 import random
 
 
+@skip('https://modeso.atlassian.net/browse/LIMSA-389')
 class OrdersTestCases(BaseTest):
     def setUp(self):
         super().setUp()
@@ -97,7 +99,7 @@ class OrdersTestCases(BaseTest):
         order_number = f"{payload[0]['orderNo']}-{self.orders_api.get_current_year()}"
         self.info("duplicate order No {}".format(order_number))
         self.order_page.filter_by_order_no(order_number)
-        duplicated_order_no = f"{payload[0]['orderNo']}-{self.orders_api.get_current_year()}"
+        duplicated_order_no = f"{self.orders_api.generate_random_number(999, 999999)}-{self.orders_api.get_current_year()}"
         self.order_page.duplicate_main_order_from_order_option(duplicated_order_no)
         self.order_page.set_contacts(contacts=[new_contact], remove_old=True)
         self.order_page.save(save_btn='order:save')
@@ -120,9 +122,8 @@ class OrdersTestCases(BaseTest):
         contacts = [contact['text'] for contact in payload[0]['contact']]
         self.orders_page.filter_by_order_no(payload[0]['orderNo'])
         self.info("duplicate the order {} from order's options".format(payload[0]['orderNo']))
-        duplicated_order_no = f"{payload[0]['orderNo']}-{self.orders_api.get_current_year()}"
+        duplicated_order_no = f"{self.orders_api.generate_random_number(999, 999999)}-{self.orders_api.get_current_year()}"
         self.order_page.duplicate_main_order_from_order_option(duplicated_order_no)
-        self.orders_page.duplicate_main_order_from_order_option()
         self.order_page.save(save_btn='order:save')
         self.info("navigate to orders' active table and check that duplicated suborder found")
         self.order_page.get_orders_page()
@@ -186,7 +187,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.filter_by_order_no(payload[0]['orderNo'])
         if case == 'main_order':
             self.info("duplicate main order no {}".format(payload[0]['orderNo']))
-            duplicated_order_no = f"{payload[0]['orderNo']}-{self.orders_api.get_current_year()}"
+            duplicated_order_no = f"{self.orders_api.generate_random_number(999, 999999)}-{self.orders_api.get_current_year()}"
             self.order_page.duplicate_main_order_from_order_option(duplicated_order_no)
             self.suborder_table.open_suborder_edit_mode()
         else:
@@ -226,7 +227,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.filter_by_order_no(payload[0]['orderNo'])
         if case == "main_order":
             self.info('duplicate the main order')
-            duplicated_order_no = f"{payload[0]['orderNo']}-{self.orders_api.get_current_year()}"
+            duplicated_order_no = f"{self.orders_api.generate_random_number(999, 999999)}-{self.orders_api.get_current_year()}"
             self.order_page.duplicate_main_order_from_order_option(duplicated_order_no)
         else:
             self.order_page.get_child_table_data()
@@ -309,7 +310,6 @@ class OrdersTestCases(BaseTest):
         self.info('create order with test plan and test unit')
         response, payload = self.orders_api.create_new_order()
         self.assertEqual(response['status'], 1, response)
-        self.info('order created with payload {}'.format(payload))
         new_test_plan_data = TestPlanAPI().create_completed_testplan(
             material_type=payload[0]['materialType']['text'], formatted_article=payload[0]['article'])
         new_test_plan = new_test_plan_data['testPlanEntity']['name']
@@ -318,12 +318,12 @@ class OrdersTestCases(BaseTest):
         self.info("duplicate order No {} ".format(payload[0]['orderNo']))
         self.orders_page.filter_by_order_no(payload[0]['orderNo'])
         self.info("duplicate main order")
-        duplicated_order_no = f"{payload[0]['orderNo']}-{self.orders_api.get_current_year()}"
+        duplicated_order_no = f"{self.orders_api.generate_random_number(999, 999999)}-{self.orders_api.get_current_year()}"
         self.order_page.duplicate_main_order_from_order_option(duplicated_order_no)
+        self.order_page.save(save_btn='order:save')
         self.assertIn("duplicateMainOrder", self.base_selenium.get_url())
         self.order_page.sleep_medium()
-        self.info("duplicated order No is {}".format(duplicated_order_No))
-        self.assertNotEqual(duplicated_order_No, payload[0]['orderNo'])
+        self.info("duplicated order No is {}".format(duplicated_order_no))
         if case == 'add':
             self.info("add test plan {} and test unit {} to duplicated order".format(new_test_plan, new_test_unit))
             self.suborder_table.update_suborder(test_plans=[new_test_plan], test_units=[new_test_unit])
@@ -331,11 +331,11 @@ class OrdersTestCases(BaseTest):
             self.info("update test plan to {} and test unit to {}".format(new_test_plan, new_test_unit))
             self.suborder_table.update_suborder(test_plans=[new_test_plan], test_units=[new_test_unit],
                                                 remove_old=True, confirm_pop_up=True)
-
+        import ipdb; ipdb.set_trace()
         self.order_page.save(save_btn='order:save')
         self.info("navigate to active table")
         self.order_page.get_orders_page()
-        self.orders_page.filter_by_order_no(duplicated_order_No)
+        self.orders_page.filter_by_order_no(duplicated_order_no)
         self.assertEqual(len(self.orders_page.result_table())-1, 1)
         duplicated_suborder_data = self.order_page.get_child_table_data()[0]
         if case == 'change':
@@ -351,7 +351,7 @@ class OrdersTestCases(BaseTest):
 
         self.info("navigate to analysis page")
         self.orders_page.navigate_to_analysis_active_table()
-        self.analyses_page.filter_by_order_no(duplicated_order_No)
+        self.analyses_page.filter_by_order_no(duplicated_order_no)
         analyses = self.analyses_page.get_the_latest_row_data()
         if case == 'add':
             self.assertIn(new_test_plan, analyses['Test Plans'].replace("'", ""))
@@ -457,7 +457,7 @@ class OrdersTestCases(BaseTest):
         self.info("created order has test units {} ".format(test_units))
         self.orders_page.filter_by_order_no(payload[0]['orderNo'])
         self.info("duplicate order no {}".format(payload[0]['orderNo']))
-        duplicated_order_no = f"{payload[0]['orderNo']}-{self.orders_api.get_current_year()}"
+        duplicated_order_no = f"{self.orders_api.generate_random_number(999, 999999)}-{self.orders_api.get_current_year()}"
         self.order_page.duplicate_main_order_from_order_option(duplicated_order_no)
         self.orders_page.sleep_small()
         self.order_page.save(save_btn='order:save', sleep=True)
