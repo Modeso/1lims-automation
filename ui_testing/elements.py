@@ -1159,6 +1159,8 @@ elements = {
            'method': 'xpath',
            'value': "//*[contains(@id,'testunit_')]"
         },
+        'save_analysis': {'method': 'xpath',
+                          'value': "//span[contains(text(),'Save')]"}
 
     },
     'company_profile': {
