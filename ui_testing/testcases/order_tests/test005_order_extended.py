@@ -156,8 +156,8 @@ class OrdersExtendedTestCases(BaseTest):
         self.assertEquals(multiple_lines_properties['textOverflow'], 'clip')
         self.assertEquals(multiple_lines_properties['lineBreak'], 'auto')
 
-    @attr(series=True)
     @parameterized.expand(['Name', 'Method', 'Unit', 'No'])
+    @attr(series=True)
     def test004_search_with_test_unit_name_method(self, search_by):
         """
         Orders:Test unit search approach
