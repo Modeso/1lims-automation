@@ -48,7 +48,7 @@ class OrdersTestCases(BaseTest):
         """
         self.info('create new order')
         response, payload = self.orders_api.create_new_order()
-        order_number = f"{payload[0]['orderNo']}-{self.orders_api.get_current_year()}"
+        order_number = payload[0]['orderNoWithYear']
         suborders = self.orders_api.get_suborder_by_order_id(response['order']['mainOrderId'])[0]['orders']
         contacts = [contact['text'] for contact in payload[0]['contact']]
 
@@ -96,7 +96,7 @@ class OrdersTestCases(BaseTest):
         new_contact = res['company']['name']
         self.info('create new order')
         response, payload = self.orders_api.create_new_order()
-        order_number = f"{payload[0]['orderNo']}-{self.orders_api.get_current_year()}"
+        order_number = payload[0]['orderNoWithYear']
         self.info("duplicate order No {}".format(order_number))
         self.order_page.filter_by_order_no(order_number)
         duplicated_order_no = f"{self.orders_api.generate_random_number(999, 999999)}-{self.orders_api.get_current_year()}"

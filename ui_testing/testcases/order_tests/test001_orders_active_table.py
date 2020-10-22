@@ -459,7 +459,6 @@ class OrdersTestCases(BaseTest):
         self.assertCountEqual(order_testunits, analysis_testunits)
 
     @parameterized.expand(['True', 'False'])
-    # @skip('https://modeso.atlassian.net/browse/LIMSA-267')
     def test019_order_search(self, small_letters):
         """
         New: Orders: Search Approach: User can search by any field & each field should display with yellow color
