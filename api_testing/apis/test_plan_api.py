@@ -366,14 +366,22 @@ class TestPlanAPI(TestPlanAPIFactory):
         else:
             return None
 
-    def get_testplans_material_types(self, testplans):
+    def get_testplans_matches_material_types(self, testplans, material_type):
         testplan_materials = []
+        testplans_materials = []
         for testplan in testplans:
             testplan_info = self.get_testplan_with_quicksearch(quickSearchText=testplan)
             if testplan_info is not None:
                 for tp in testplan_info:
-                    for material in tp['materialTypes']:
-                        testplan_materials.append(material)
+                    if tp['testPlanName'] == testplan:
+                        for material in tp['materialTypes']:
+                            testplan_materials.append(material)
+            if len(testplan_materials) == 1:
+                testplans_materials.extend(testplan_materials)
+            elif len(testplan_materials) > 1:
+                if material_type in testplan_materials:
+                    testplans_materials.append(material_type)
+
         return testplan_materials
 
     def create_double_completed_testplan_same_name_diff_material(self, **kwargs):
