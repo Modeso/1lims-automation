@@ -358,6 +358,8 @@ class BasePages:
         self.base_selenium.click(element='general:configurations_archived')
 
     def open_analysis_configuration(self):
+        self.base_selenium.refresh()
+        self.sleep_tiny()
         self.open_configuration()
         self.sleep_tiny()
         self.base_selenium.click(element='general:configurations_analysis')
