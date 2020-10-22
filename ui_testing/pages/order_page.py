@@ -198,6 +198,11 @@ class SubOrders(Order):
         else:
             return suborder_data['Material Type: *'].replace('\n×', '')
 
+    def get_testplan_according_to_material_type(self, material_type, article, index=0):
+        self.set_material_type(material_type=material_type, suborder_index=index)
+        self.set_article(article=article)
+        return self.base_selenium.get_drop_down_suggestion_list(element='order:test_plan', item_text=' ')
+
     def set_article(self, article='', suborder_index=0):
         if article is None:
             return

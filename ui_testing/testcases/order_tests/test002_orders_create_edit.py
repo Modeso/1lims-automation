@@ -840,7 +840,8 @@ class OrdersTestCases(BaseTest):
         self.info('Assert There is an analysis for this new order.')
         self.analyses_page.filter_by_order_no(created_order_no)
         self.orders_page.sleep_tiny()
-        self.assertEqual(len(self.orders_page.result_table())-1, 1)
+        if order == 'new':
+            self.assertEqual(len(self.orders_page.result_table())-1, 1)
         latest_order_data = self.analyses_page.get_the_latest_row_data()
         self.assertEqual(created_order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
         child_data = self.analyses_page.get_child_table_data()
@@ -1545,7 +1546,34 @@ class OrdersTestCases(BaseTest):
                 for testunit in testunit_names:
                     self.assertIn(testunit, result['test_units'])
 
-    def test044_create_multiple_suborders_with_testplans_testunits(self):
+    def test044_check_test_unit_displayed_correct_under_test_plan(self):
+        """
+         Orders: Test Plan: Test unit pop up Approach: Make sure the test units that
+         displayed below test plan, it belongs to this test plan
+         LIMS-4793
+        """
+        created_data = TestPlanAPI().create_multiple_test_plan_with_same_article(no_of_testplans=3)
+        test_plans_formatted = []
+        for testplan in created_data['testPlans']:
+            test_plans_formatted.append({'testPlan': {'id': testplan['id'], 'text': testplan['name']}})
+        response, payload = self.orders_api.create_new_order(testPlans=test_plans_formatted,
+                                                             testUnits=[],
+                                                             materialType=created_data['material_type'],
+                                                             materialTypeId=created_data['material_type']['id'],
+                                                             article=created_data['article'],
+                                                             articleId=created_data['article']['id'])
+        self.assertEqual(response['status'], 1)
+        self.orders_page.get_order_edit_page_by_id(response['order']['mainOrderId'])
+        self.base_selenium.refresh()
+        self.orders_page.sleep_tiny()
+        data = self.suborder_table.get_test_plans_pop_up_content()
+        for i in range(len(data)):
+            self.info('assert test unit : {} is displayed correctly under its corresponding testplan :{} '.format(
+                data[i]['test_units'][0], created_data['testPlans'][i]['name']))
+            self.assertEqual(created_data['testPlans'][i]['name'], data[i]['test_plan'])
+            self.assertEqual(created_data['test_units'][i], data[i]['test_units'][0])
+
+    def test045_create_multiple_suborders_with_testplans_testunits(self):
         """
          New: Orders: table view: Create Approach: when you create suborders with multiple
          test plans & units select the corresponding analysis that triggered according to that.
@@ -1566,6 +1594,7 @@ class OrdersTestCases(BaseTest):
         article = second_suborder_data['article']['text']
         self.info("generate data of third suborder")
         third_suborder_test_units = random.sample(test_units_names_only, 3)
+        self.orders_api.create_order_with_multiple_suborders_double_tp()
         self.info("create new order")
         self.suborder_table.create_new_order(material_type=material_type,
                                              article=article,
@@ -1588,7 +1617,7 @@ class OrdersTestCases(BaseTest):
         for i in range(3):
             row = self.analysis_page.open_accordion_for_analysis_index(i)
             test_units = self.analysis_page.get_testunits_in_analysis(row)
-            test_units_names = [name['Test Unit Name'].split(' ')[0] for name in test_units]
+            test_units_names = [name['Test Unit Name'].split(' (')[0] for name in test_units]
             if i == 0:
                 self.assertCountEqual(test_units_names, first_suborder_test_units)
             elif i == 1:
@@ -1596,7 +1625,7 @@ class OrdersTestCases(BaseTest):
             else:
                 self.assertCountEqual(test_units_names, third_suborder_test_units)
 
-    def test0045_choose_test_plans_without_test_units(self):
+    def test0046_choose_test_plans_without_test_units(self):
         """
         Orders: Create: Orders Choose test plans without test units
 
@@ -1634,7 +1663,7 @@ class OrdersTestCases(BaseTest):
             test_units = [item['Test Unit'] for item in child_data]
             self.assertCountEqual(test_units, test_units_names[i * 2:(i * 2) + 2])
 
-    def test046_create_order_with_test_plans_with_same_name(self):
+    def test047_create_order_with_test_plans_with_same_name(self):
         """
         Orders: Create Approach: Make sure In case you create two test plans with the same name
         and different materiel type, the test units that belongs to them displayed correct in
@@ -1663,3 +1692,70 @@ class OrdersTestCases(BaseTest):
             self.assertEqual(len(test_units), 1)
             test_units_name = test_units[0]['Test Unit Name'].split(' (')[0]
             self.assertEqual(test_units_name, test_units_list[i])
+
+    def test048_testplan_multiple_material_types(self):
+        """
+         Master Data: Test plan: Material-Type Approach: Test plans are loaded correctly in the
+         order section in case multiple material types are selected
+
+         LIMS-7519
+        """
+        self.order_page = Order()
+        testplan_name, selected_material_types = \
+            TestPlanAPI().create_testplan_with_multiple_materials(no_materials=3)
+        selected_articles = []
+        for material in selected_material_types:
+            selected_articles.append(ArticleAPI().get_article_with_material_type(material))
+        self.info('test plan {} is created with materials {}'.format(testplan_name, selected_material_types))
+        self.order_page.get_orders_page()
+        order_no, suggested_test_units, suggested_testplans = \
+            self.suborder_table.create_new_order(material_type=selected_material_types[0],
+                                                 article=selected_articles[0], test_units=[],
+                                                 test_plans=[testplan_name], save=False,
+                                                 check_testunits_testplans=True)
+        self.info('asserting testplan {} appears in testplans suggestion list when selecting material type {}'.
+                  format(testplan_name, selected_material_types[0]))
+        self.assertIn(testplan_name, suggested_testplans)
+        for i in range(2):
+            suggested_testplans = self.suborder_table.get_testplan_according_to_material_type(
+                material_type=selected_material_types[i+1], article=selected_articles[i+1])
+            self.info('asserting testplan {} appears in testplans suggestion list when selecting '
+                      'material type {}'.format(testplan_name, selected_material_types[i + 1]))
+            self.assertIn(testplan_name, suggested_testplans)
+
+    def test0049_update_test_unit_reflect_analysis_section(self):
+        """
+            New: Orders: Update test units & plans then add one more suborder record
+            & this update should reflect in the analysis section
+
+            LIMS-4351
+        """
+        self.analysis_page = SingleAnalysisPage()
+        article, article_data = ArticleAPI().create_article()
+        response, payload = self.orders_api.create_new_order(testPlans=[])
+        old_testUnit = payload[0]['testUnits'][0]['name']
+        test_units = TestUnitAPI().get_testunits_with_material_type('All')
+        test_units_names_only = [testunit['name'] for testunit in test_units]
+        self.info('add extra testunits in the first suborder')
+        extra_testunits = random.sample(test_units_names_only, 2)
+        self.orders_page.get_order_edit_page_by_id(id=response['order']['mainOrderId'])
+        self.suborder_table.set_test_units(test_units=extra_testunits)
+        suborder_testunits = random.sample(test_units_names_only, 3)
+        self.info('create new suborder with testunits only')
+        self.suborder_table.add_new_suborder(
+            material_type=article_data['materialType']['text'], article_name=article['article']['name'],
+            test_units=suborder_testunits, test_plans=[])
+        self.order_page.save(save_btn='order:save_btn')
+        self.order_page.sleep_medium()
+        self.order_page.navigate_to_analysis_tab()
+        self.assertEqual(self.analysis_page.get_analysis_count(), 2)
+        self.info('assert that those updates reflects in the analysis section')
+        for i in range(2):
+            row = self.analysis_page.open_accordion_for_analysis_index(i)
+            test_units = self.analysis_page.get_testunits_in_analysis(row)
+            test_units_names = [name['Test Unit Name'].split(' (')[0] for name in test_units]
+            if i == 0:
+                extra_testunits.append(old_testUnit)
+                self.assertCountEqual(test_units_names, extra_testunits)
+            elif i == 1:
+                self.assertCountEqual(test_units_names, suborder_testunits)
