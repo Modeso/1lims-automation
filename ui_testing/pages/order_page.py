@@ -52,7 +52,7 @@ class Order(Orders):
         return self.base_selenium.is_item_in_drop_down(element='order:existing_order_number', item_text=no)
 
     def get_order_no(self):
-        return self.base_selenium.get_value(element="order:order_number")
+        return self.base_selenium.get_value(element="order:order_number").replace("'", "")
 
     def set_order_no(self, no):
         self.info(' set no. {}'.format(no))

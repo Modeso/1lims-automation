@@ -61,7 +61,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.set_order_no(archived_order)
         self.orders_page.sleep_tiny()
         self.info('waiting fo validation message appear when I enter number archived')
-        validation_result1 = self.base_selenium.wait_element(element='general:oh_snap_msg')
+        validation_result1 = self.base_selenium.wait_element(element='order:error_in_number_mssg')
         self.info('Assert the error message to make sure that validation when '
                   'I enter number archived? {}'.format(validation_result1))
         self.assertTrue(validation_result1)
@@ -70,7 +70,7 @@ class OrdersTestCases(BaseTest):
         self.assertIn('Item already exists in archived', error_mssg2.text)
         self.order_page.set_order_no(archived_order_to_deleted['orderNo'])
         self.orders_page.sleep_tiny()
-        self.assertFalse(self.base_selenium.check_element_is_exist(element='general:oh_snap_msg'))
+        self.assertFalse(self.base_selenium.check_element_is_exist(element='order:error_in_number_mssg'))
         self.orders_page.save_and_wait('order:save_btn')
         number = self.order_page.get_order_no().replace("'", "")
         self.assertEqual(number, archived_order_to_deleted['orderNo'])
@@ -839,6 +839,7 @@ class OrdersTestCases(BaseTest):
         self.orders_page.navigate_to_analysis_active_table()
         self.info('Assert There is an analysis for this new order.')
         self.analyses_page.filter_by_order_no(created_order_no)
+        self.orders_page.sleep_tiny()
         self.assertEqual(len(self.orders_page.result_table())-1, 1)
         latest_order_data = self.analyses_page.get_the_latest_row_data()
         self.assertEqual(created_order_no.replace("'", ""), latest_order_data['Order No.'].replace("'", ""))
@@ -1139,7 +1140,7 @@ class OrdersTestCases(BaseTest):
         found_test_plans = analysis_data['Test Plans'].split(', ')
         self.info("assert that only one test plan found and analysis no not changed")
         self.assertEqual(len(found_test_plans), 1)
-        self.assertEqual(analysis_data['Analysis No.'].split("-")[0], analysis_no)
+        self.assertEqual(analysis_data['Analysis No.'], analysis_no)
         suborder_data = self.analyses_page.get_child_table_data()
         for test_plan in test_plans:
             for test_unit in test_units:
@@ -1191,7 +1192,7 @@ class OrdersTestCases(BaseTest):
         analysis_data = self.analyses_page.get_the_latest_row_data()
         found_test_plans = analysis_data['Test Plans'].split(', ')
         self.assertEqual(len(found_test_plans), 3)
-        self.assertEqual(analysis_data['Analysis No.'].split("-")[0], analysis_no)
+        self.assertEqual(analysis_data['Analysis No.'], analysis_no)
         suborder_data = self.analyses_page.get_child_table_data()
         found_test_units = [testunit['Test Unit'].replace("'", "") for testunit in suborder_data]
         self.assertCountEqual(test_plans, found_test_plans)
@@ -1318,6 +1319,7 @@ class OrdersTestCases(BaseTest):
                                              test_units=[testunit_name],
                                              multiple_suborders=5, test_plans=[])
 
+        self.order_page.sleep_tiny()
         order_id = self.order_page.get_order_id()
         suborders = self.orders_api.get_suborder_by_order_id(id=order_id)
         self.info('asserting api success')
@@ -1370,6 +1372,7 @@ class OrdersTestCases(BaseTest):
                                                  article_name=testplans[i]['selectedArticles'][0]['text'],
                                                  test_plans=[testplans[i]['testPlan']['text']],
                                                  test_units=[testunits[i]])
+            self.suborder_table.sleep_tiny()
 
         self.order_page.save(save_btn='order:save_btn')
         self.order_page.navigate_to_analysis_tab()
@@ -1377,7 +1380,7 @@ class OrdersTestCases(BaseTest):
         for i in range(4):
             row = self.analysis_page.open_accordion_for_analysis_index(i)
             test_units = self.analysis_page.get_testunits_in_analysis(row)
-            test_units_names = [name['Test Unit Name'].split(' ')[0] for name in test_units]
+            test_units_names = [name['Test Unit Name'].split(' (')[0] for name in test_units]
             self.assertEqual(len(test_units_names), 2)
             self.assertEqual(test_units_names[0], testunits_in_testplans[i])
             self.assertEqual(test_units_names[1], testunits[i])
@@ -1480,10 +1483,8 @@ class OrdersTestCases(BaseTest):
         analysis = self.analyses_page.get_the_latest_row_data()
         self.info('asserting status of analysis is open')
         self.assertEqual(analysis['Status'], 'Open')
-
         self.info('asserting correct testplans selected')
         self.assertEqual(analysis['Test Plans'], testplans)
-
         analysis_data = self.analyses_page.get_child_table_data(index=0)
         self.info('asserting 2 child records, one for each test plan')
         self.assertEqual(len(analysis_data), 2)
@@ -1502,9 +1503,9 @@ class OrdersTestCases(BaseTest):
                                                     one_item_only=True)
         self.order_page.save(save_btn='order:save')
         self.order_page.get_orders_page()
+        self.order_page.navigate_to_analysis_tab()
         self.order_page.sleep_tiny()
-        self.analyses_page.apply_filter_scenario(filter_element='analysis_page:analysis_no_filter',
-                                                 filter_text=analysis_number, field_type='text')
+        self.analyses_page.filter_by_analysis_number(analysis_number)
         self.info('asserting correct testplans selected')
         self.order_page.sleep_tiny()
         self.assertEqual(self.analyses_page.get_the_latest_row_data()['Test Plans'], testplan1_name)
@@ -1523,11 +1524,11 @@ class OrdersTestCases(BaseTest):
 
           LIMS-4795
         """
-        order = self.orders_api.get_order_with_multiple_sub_orders(no_suborders=2)
+        response, payload = self.orders_api.create_order_with_multiple_suborders(no_suborders=2)
+        self.assertEqual(response['status'], 1)
         self.info('create testplan with random data')
         testPlan = TestPlanAPI().create_completed_testplan_random_data(no_testunits=3)
-        self.info(f'open order edit page : {order["id"]}')
-        self.orders_page.get_order_edit_page_by_id(order['id'])
+        self.orders_page.get_order_edit_page_by_id(response['order']['mainOrderId'])
         testunit_names = []
         for testunit in testPlan['testUnits']:
             testunit_names.append(testunit['name'])
@@ -1536,6 +1537,7 @@ class OrdersTestCases(BaseTest):
                                             article=testPlan['selectedArticles'][0]['text'],
                                             test_plans=[testPlan['testPlan']['text']],
                                             confirm_pop_up=True)
+        self.suborder_table.sleep_tiny()
         self.info('get testplan popup')
         results = self.suborder_table.get_test_plans_pop_up_content(index=1)
         for result in results:
@@ -1558,9 +1560,9 @@ class OrdersTestCases(BaseTest):
         first_suborder_test_units = random.sample(test_units_names_only, 2)
         self.info("generate data of second suborder")
         second_suborder_data = self.test_plan_api.create_multiple_test_plan_with_same_article(no_of_testplans=2)
+        self.assertTrue(second_suborder_data)
         second_suborder_test_plans = [tp['name'] for tp in second_suborder_data['testPlans']]
         self.info("generate data of third suborder")
-        third_suborder_test_units = random.sample(test_units_names_only, 3)
         third_suborder_test_units = random.sample(test_units_names_only, 3)
         self.info("create new order")
         self.suborder_table.create_new_order(material_type=second_suborder_data['material_type'],
