@@ -44,11 +44,13 @@ class OrdersTestCases(BaseTest):
 
          LIMS-5357
         """
-        self.info('select random record')
-        random_order = random.choice(self.orders_api.get_all_orders_json())
-        suborders = self.orders_api.get_suborder_by_order_id(random_order['orderId'])[0]['orders']
-        contacts = [contact['name'] for contact in random_order['company']]
-        self.orders_page.filter_by_order_no(random_order['orderNo'])
+        self.info('create new order')
+        response, payload = self.orders_api.create_new_order()
+        order_number = f"{payload[0]['orderNo']}-{self.orders_api.get_current_year()}"
+        suborders = self.orders_api.get_suborder_by_order_id(response['order']['mainOrderId'])[0]['orders']
+        contacts = [contact['text'] for contact in payload[0]['contact']]
+
+        self.orders_page.filter_by_order_no(order_number)
         row = self.orders_page.result_table()[0]
         self.info('assert that child table arrow exist')
         childtable_arrow = self.base_selenium.find_element_in_element(
@@ -64,17 +66,17 @@ class OrdersTestCases(BaseTest):
         self.info("open order edit page")
         self.orders_page.open_edit_page_by_css_selector(row)
         self.orders_page.sleep_small()
-        self.info("Duplicate first suborder from table view")
+        self.info("duplicate first suborder from table view")
         self.suborder_table.duplicate_from_table_view(index_to_duplicate_from=0)
         after_duplicate_order = self.suborder_table.get_suborder_data()
         self.info("make sure that the new order has same order No and contact")
-        self.assertEqual(random_order['orderNo'], after_duplicate_order['orderNo'].replace("'", ""))
+        self.assertEqual(order_number, after_duplicate_order['orderNo'].replace("'", ""))
         self.assertCountEqual(contacts, after_duplicate_order['contacts'])
         self.info("save the duplicated order")
         self.order_page.save(save_btn='orders:save_order')
         self.info("go back to the table view, and assert that duplicated suborder added to child table")
         self.order_page.get_orders_page()
-        self.order_page.filter_by_order_no(random_order['orderNo'])
+        self.order_page.filter_by_order_no(order_number)
         suborder_data = self.order_page.get_child_table_data()
         self.assertTrue(len(suborder_data), len(suborders) + 1)
         self.orders_page.navigate_to_analysis_active_table()
@@ -90,13 +92,14 @@ class OrdersTestCases(BaseTest):
         res, _ = self.contacts_api.create_contact()
         self.assertEqual(res['status'], 1)
         new_contact = res['company']['name']
-        self.info('get random main order data')
-        main_order = random.choice(self.orders_api.get_all_orders_json())
-        self.info("duplicate order No {}".format(main_order['orderNo']))
-        self.order_page.filter_by_order_no(main_order['orderNo'])
-        self.order_page.duplicate_main_order_from_order_option()
+        self.info('create new order')
+        response, payload = self.orders_api.create_new_order()
+        order_number = f"{payload[0]['orderNo']}-{self.orders_api.get_current_year()}"
+        self.info("duplicate order No {}".format(order_number))
+        self.order_page.filter_by_order_no(order_number)
+        duplicated_order_no = f"{payload[0]['orderNo']}-{self.orders_api.get_current_year()}"
+        self.order_page.duplicate_main_order_from_order_option(duplicated_order_no)
         self.order_page.set_contacts(contacts=[new_contact], remove_old=True)
-        duplicated_order_no = self.order_page.get_order_no()
         self.order_page.save(save_btn='order:save')
         self.orders_page.get_orders_page()
         self.orders_page.filter_by_order_no(duplicated_order_no)
@@ -117,8 +120,9 @@ class OrdersTestCases(BaseTest):
         contacts = [contact['text'] for contact in payload[0]['contact']]
         self.orders_page.filter_by_order_no(payload[0]['orderNo'])
         self.info("duplicate the order {} from order's options".format(payload[0]['orderNo']))
+        duplicated_order_no = f"{payload[0]['orderNo']}-{self.orders_api.get_current_year()}"
+        self.order_page.duplicate_main_order_from_order_option(duplicated_order_no)
         self.orders_page.duplicate_main_order_from_order_option()
-        duplicated_order_no = self.order_page.get_order_no()
         self.order_page.save(save_btn='order:save')
         self.info("navigate to orders' active table and check that duplicated suborder found")
         self.order_page.get_orders_page()
@@ -182,7 +186,8 @@ class OrdersTestCases(BaseTest):
         self.order_page.filter_by_order_no(payload[0]['orderNo'])
         if case == 'main_order':
             self.info("duplicate main order no {}".format(payload[0]['orderNo']))
-            self.orders_page.duplicate_main_order_from_order_option()
+            duplicated_order_no = f"{payload[0]['orderNo']}-{self.orders_api.get_current_year()}"
+            self.order_page.duplicate_main_order_from_order_option(duplicated_order_no)
             self.suborder_table.open_suborder_edit_mode()
         else:
             self.info("duplicate sub order of order no {}".format(payload[0]['orderNo']))
@@ -221,7 +226,8 @@ class OrdersTestCases(BaseTest):
         self.order_page.filter_by_order_no(payload[0]['orderNo'])
         if case == "main_order":
             self.info('duplicate the main order')
-            self.order_page.duplicate_main_order_from_order_option()
+            duplicated_order_no = f"{payload[0]['orderNo']}-{self.orders_api.get_current_year()}"
+            self.order_page.duplicate_main_order_from_order_option(duplicated_order_no)
         else:
             self.order_page.get_child_table_data()
             self.info("duplicate first sub order of order {} from suborder's options".format(payload[0]['orderNo']))
@@ -312,10 +318,10 @@ class OrdersTestCases(BaseTest):
         self.info("duplicate order No {} ".format(payload[0]['orderNo']))
         self.orders_page.filter_by_order_no(payload[0]['orderNo'])
         self.info("duplicate main order")
-        self.orders_page.duplicate_main_order_from_order_option()
+        duplicated_order_no = f"{payload[0]['orderNo']}-{self.orders_api.get_current_year()}"
+        self.order_page.duplicate_main_order_from_order_option(duplicated_order_no)
         self.assertIn("duplicateMainOrder", self.base_selenium.get_url())
         self.order_page.sleep_medium()
-        duplicated_order_No = self.order_page.get_order_no()
         self.info("duplicated order No is {}".format(duplicated_order_No))
         self.assertNotEqual(duplicated_order_No, payload[0]['orderNo'])
         if case == 'add':
@@ -451,10 +457,10 @@ class OrdersTestCases(BaseTest):
         self.info("created order has test units {} ".format(test_units))
         self.orders_page.filter_by_order_no(payload[0]['orderNo'])
         self.info("duplicate order no {}".format(payload[0]['orderNo']))
-        self.orders_page.duplicate_main_order_from_order_option()
+        duplicated_order_no = f"{payload[0]['orderNo']}-{self.orders_api.get_current_year()}"
+        self.order_page.duplicate_main_order_from_order_option(duplicated_order_no)
         self.orders_page.sleep_small()
         self.order_page.save(save_btn='order:save', sleep=True)
-        duplicated_order_no = self.order_page.get_order_no()
         self.assertNotEqual(duplicated_order_no, payload[0]['orderNo'])
         self.info("navigate to analysis page  and make sure duplicated order created with same data")
         self.order_page.get_orders_page()

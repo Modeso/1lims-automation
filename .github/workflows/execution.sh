@@ -12,10 +12,11 @@ EXECUTION_FILES=(
 
 #    ui_testing/testcases/order_tests/test001_orders_active_table.py
 
-   ui_testing/testcases/order_tests/test004_orders_without_article.py
 
+  ui_testing/testcases/order_tests/test005_orders_extended.py
 
 #   ui_testing/testcases/order_tests/test002_orders_create_edit.py
+#ui_testing/testcases/order_tests/test004_orders_without_article.py
 #   ui_testing/testcases/order_tests/test003_orders_duplicate.py
 #   ui_testing/testcases/order_tests/test005_orders_extended.py
   )

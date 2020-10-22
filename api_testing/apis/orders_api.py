@@ -62,7 +62,7 @@ class OrdersAPIFactory(BaseAPI):
         :return: response, payload
         """
         #order_no = self.get_auto_generated_order_no()[0]['id']
-        order_no = random.randint(999, 99999)
+        order_no = random.randint(999, 999999999)
         testplan = TestPlanAPI().create_completed_testplan_random_data()
         material_type = testplan['materialType'][0]['text']
         material_type_id = testplan['materialType'][0]['id']
