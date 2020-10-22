@@ -9,7 +9,6 @@ import random, json, os
 
 class TestPlanAPIFactory(BaseAPI):
     @api_factory('get')
-    @api_factory('get')
     def get_all_test_plans(self, **kwargs):
         api = '{}{}'.format(self.url, self.END_POINTS['test_plan_api']['list_all_test_plans'])
         _payload = {"sort_value": "number",
@@ -205,7 +204,7 @@ class TestPlanAPI(TestPlanAPIFactory):
         return test_units
 
     def get_testplan_with_quicksearch(self, quickSearchText):
-        filter_text = '{"quickSearch":"' + quickSearchText + '","columns":["number","name", "materialType"]}'
+        filter_text = f'{{"quickSearch":"{quickSearchText}","columns":["number","name","materialType","articleName","articleNo","modifiedAt","modifiedBy","status","version","createdAt"]}}'
         response, _ = self.get_all_test_plans(filter=filter_text, start=0)
         return response['testPlans']
 
@@ -370,7 +369,6 @@ class TestPlanAPI(TestPlanAPIFactory):
     def get_testplans_material_types(self, testplans):
         testplan_materials = []
         for testplan in testplans:
-            import ipdb;ipdb.set_trace()
             testplan_info = self.get_testplan_with_quicksearch(quickSearchText=testplan)
             if testplan_info is not None:
                 for tp in testplan_info:

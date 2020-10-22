@@ -75,12 +75,12 @@ class OrdersWithoutArticleTestCases(BaseTest):
         self.info('asserting All displayed testunits are loaded correctly according to '
                   'selected material type {}'.format(formatted_material['text']))
         testunit_materials = self.test_unit_api.get_testunits_material_types(testunits)
-        self.assertTrue(any(material in ['All', formatted_material['text']] for material in testunit_materials))
+        self.assertTrue(all(material in ['All', formatted_material['text']] for material in testunit_materials))
 
         self.info('asserting All displayed testplans are loaded correctly according to '
                   'selected material type {}'.format(formatted_material['text']))
         testplan_materials = self.test_plan_api.get_testplans_material_types(testplans)
-        self.assertTrue(any(material in ['All', formatted_material['text']] for material in testplan_materials))
+        self.assertTrue(all(material in ['All', formatted_material['text']] for material in testplan_materials))
 
         self.order_page.sleep_tiny()
         self.order_page.get_orders_page()
@@ -114,18 +114,19 @@ class OrdersWithoutArticleTestCases(BaseTest):
         self.assertEqual(self.base_selenium.get_value(element='order:test_plan'), None)
         testunits = self.base_selenium.get_drop_down_suggestion_list(element='order:test_unit',
                                                                      item_text=' ')
-        testplans = self.base_selenium.get_drop_down_suggestion_list(element='order:test_plan',
-                                                                     item_text=' ')
+        _testplans = self.base_selenium.get_drop_down_suggestion_list(element='order:test_plan',
+                                                                    item_text=' ')
 
+        testplans = list(set(_testplans)-set(testunits))
         self.info('asserting All displayed testunits are loaded correctly according to '
                   'selected material type {}'.format(material_type))
         testunit_materials = self.test_unit_api.get_testunits_material_types(testunits)
-        self.assertTrue(any(material in ['All', material_type] for material in testunit_materials))
+        self.assertTrue(all(material in ['All', material_type] for material in testunit_materials))
 
         self.info('asserting All displayed testplans are loaded correctly according to '
                   'selected material type {}'.format(material_type))
         testplan_materials = self.test_plan_api.get_testplans_material_types(testplans)
-        self.assertTrue(any(material in ['All', material_type] for material in testplan_materials))
+        self.assertTrue(all(material in ['All', material_type] for material in testplan_materials))
 
         self.suborder_table.set_test_units(test_units=[created_testunit[1]['name']])
         self.suborder_table.set_test_plans(test_plans=[created_testplan['testPlan']['text']])
