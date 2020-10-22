@@ -434,11 +434,9 @@ class OrdersTestCases(BaseTest):
         suborders_after_delete = self.order_page.get_child_table_data()
         self.assertNotIn(suborder_data['Analysis No.'], suborders_after_delete)
         self.assertGreater(len(suborder_data), 0)
-
         self.info('Navigate to Analysis page to make sure that analysis related to deleted suborder not found')
         self.orders_page.navigate_to_analysis_active_table()
-        self.analyses_page.apply_filter_scenario(filter_element='analysis_page:analysis_no_filter',
-                                                 filter_text=suborder_data['Analysis No.'], field_type='text')
+        self.analyses_page.filter_by_analysis_number(suborder_data['Analysis No.'])
         self.assertEqual(len(self.order_page.result_table()), 1)
 
     def test018_order_of_test_units_in_analysis(self):
@@ -570,10 +568,9 @@ class OrdersTestCases(BaseTest):
         response, payload = self.orders_api.create_new_order()
         filter_dict = self.order_page.order_filters_element(key=key, payload=payload[0])
         self.info('filter by {} with value {}'.format(key, filter_dict['value']))
-        self.orders_page.apply_filter_scenario(
-            filter_element=filter_dict['element'],
-            filter_text=filter_dict['value'],
-            field_type=filter_dict['type'])
+        self.orders_page.apply_filter_scenario(filter_element=filter_dict['element'],
+                                               filter_text=filter_dict['value'],
+                                               field_type=filter_dict['type'])
         self.base_selenium.scroll()
         self.orders_page.close_filter_menu()
         results = self.order_page.result_table()
@@ -657,7 +654,7 @@ class OrdersTestCases(BaseTest):
 
         self.assertTrue(filter_key_found)
 
-    @skip('need to be reimplemented after updating anlysis result')
+    @skip('need to be reimplemented after updating analysis result')
     def test027_filter_by_analysis_result(self):
         """
         I can filter by Analysis result

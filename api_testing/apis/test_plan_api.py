@@ -204,14 +204,14 @@ class TestPlanAPI(TestPlanAPIFactory):
             test_units.extend(names)
         return test_units
 
-    def get_testplan_with_quicksearch(self, quickSearchText, **kwargs):
-        filter_text = '{"quickSearch":"' + quickSearchText + '","columns":["number","name"]}'
-        response, _ = self.get_all_test_plans(filter=filter_text, **kwargs)
+    def get_testplan_with_quicksearch(self, quickSearchText):
+        filter_text = '{"quickSearch":"' + quickSearchText + '","columns":["number","name", "materialType"]}'
+        response, _ = self.get_all_test_plans(filter=filter_text, start=0)
         return response['testPlans']
 
-    def get_testplan_with_filter(self, filter_option, filter_text, **kwargs):
+    def get_testplan_with_filter(self, filter_option, filter_text):
         filter_text = '{"quickSearch": "", "' + filter_option + '":"' + filter_text + '","columns":["number","name"]}'
-        response, _ = self.get_all_test_plans(filter=filter_text, start=0, **kwargs)
+        response, _ = self.get_all_test_plans(filter=filter_text, start=0)
         return response['testPlans']
 
     def get_testplan_form_data(self, id=1):
@@ -370,10 +370,12 @@ class TestPlanAPI(TestPlanAPIFactory):
     def get_testplans_material_types(self, testplans):
         testplan_materials = []
         for testplan in testplans:
+            import ipdb;ipdb.set_trace()
             testplan_info = self.get_testplan_with_quicksearch(quickSearchText=testplan)
             if testplan_info is not None:
                 for tp in testplan_info:
-                    testplan_materials.append(tp['materialTypes'][0])
+                    for material in tp['materialTypes']:
+                        testplan_materials.append(material)
         return testplan_materials
 
     def create_double_completed_testplan_same_name_diff_material(self, **kwargs):

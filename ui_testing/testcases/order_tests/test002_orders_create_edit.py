@@ -830,7 +830,7 @@ class OrdersTestCases(BaseTest):
         if order == 'new':
             created_order_no = self.suborder_table.create_new_order(
                 material_type='Raw Material', article=article,
-                test_units=[payload['name']], contacts=[''])
+                test_units=[payload['name']], contacts=[''], test_plans=[])
         else:
             created_order_no = self.suborder_table.create_existing_order(
                 no='', material_type='Raw Material', article=article, test_units=[payload['name']])
@@ -1562,24 +1562,28 @@ class OrdersTestCases(BaseTest):
         second_suborder_data = self.test_plan_api.create_multiple_test_plan_with_same_article(no_of_testplans=2)
         self.assertTrue(second_suborder_data)
         second_suborder_test_plans = [tp['name'] for tp in second_suborder_data['testPlans']]
+        material_type = second_suborder_data['material_type']['text']
+        article = second_suborder_data['article']['text']
         self.info("generate data of third suborder")
         third_suborder_test_units = random.sample(test_units_names_only, 3)
         self.info("create new order")
-        self.suborder_table.create_new_order(material_type=second_suborder_data['material_type'],
-                                             article=second_suborder_data['article'],
+        self.suborder_table.create_new_order(material_type=material_type,
+                                             article=article,
                                              test_units=first_suborder_test_units,
                                              test_plans=[], save=False)
 
-        self.suborder_table.add_new_suborder(material_type=second_suborder_data['material_type'],
-                                             article_name=second_suborder_data['article'],
+        self.suborder_table.add_new_suborder(material_type=material_type,
+                                             article_name=article,
                                              test_plans=second_suborder_test_plans, test_units=[])
 
-        self.suborder_table.add_new_suborder(material_type=second_suborder_data['material_type'],
-                                             article_name=second_suborder_data['article'],
+        self.suborder_table.add_new_suborder(material_type=material_type,
+                                             article_name=article,
                                              test_plans=[], test_units=third_suborder_test_units)
 
         self.order_page.save(save_btn='order:save_btn')
+        self.order_page.sleep_tiny()
         self.order_page.navigate_to_analysis_tab()
+        self.analysis_page.sleep_tiny()
         self.assertEqual(self.analysis_page.get_analysis_count(), 3)
         for i in range(3):
             row = self.analysis_page.open_accordion_for_analysis_index(i)
@@ -1588,7 +1592,7 @@ class OrdersTestCases(BaseTest):
             if i == 0:
                 self.assertCountEqual(test_units_names, first_suborder_test_units)
             elif i == 1:
-                self.assertCountEqual(test_units_names, second_suborder_data[test_units])
+                self.assertCountEqual(test_units_names, second_suborder_data['test_units'])
             else:
                 self.assertCountEqual(test_units_names, third_suborder_test_units)
 
