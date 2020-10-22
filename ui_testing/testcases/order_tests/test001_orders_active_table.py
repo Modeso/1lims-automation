@@ -194,7 +194,6 @@ class OrdersTestCases(BaseTest):
         order_id = response['order']['mainOrderId']
         suborders = self.orders_api.get_suborder_by_order_id(order_id)[0]['orders']
         analysis_no_list = [suborder['analysis'][0] for suborder in suborders]
-        self.info(" Archive order with number : {}".format(order_no))
         self.orders_page.filter_by_order_no(order_no)
         self.assertEqual(len(self.orders_page.result_table()) - 1, 1)
         self.assertTrue(self.orders_page.archive_main_order_from_order_option())
@@ -458,7 +457,7 @@ class OrdersTestCases(BaseTest):
         self.analyses_page.filter_by_order_no(payload[0]['orderNo'])
         self.info('get child table data')
         table_data = self.analyses_page.get_child_table_data()
-        analysis_testunits = [test_unit['Test Unit'] for test_unit in table_data]
+        analysis_testunits = [test_unit['Test Unit'].replace("'", "") for test_unit in table_data]
         self.assertCountEqual(order_testunits, analysis_testunits)
 
     @parameterized.expand(['True', 'False'])
@@ -696,7 +695,7 @@ class OrdersTestCases(BaseTest):
         self.assertGreaterEqual(len(results), 1)
         for result in results:
             if result.text:
-                self.assertIn(contact, result.text)
+                self.assertIn(contact, result.text.replace("'", ""))
 
     def test029_filter_by_department(self):
         """

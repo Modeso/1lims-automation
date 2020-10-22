@@ -908,7 +908,7 @@ class OrdersTestCases(BaseTest):
         self.assertEqual(new_article, latest_order_data['Article Name'])
         self.assertEqual(payload[0]['materialType']['text'], latest_order_data['Material Type'])
         child_data = self.analyses_page.get_child_table_data()[0]
-        self.assertEqual(payload[0]['testUnits']['name'], child_data['Test Unit'])
+        self.assertEqual(payload[0]['testUnits'][0]['name'], child_data['Test Unit'])
 
     def test027_update_suborder_testunits(self):
         """
@@ -1476,8 +1476,7 @@ class OrdersTestCases(BaseTest):
         self.order_page.get_orders_page()
         self.order_page.navigate_to_analysis_tab()
         self.analyses_page.sleep_tiny()
-        self.analyses_page.apply_filter_scenario(filter_element='analysis_page:analysis_no_filter',
-                                                 filter_text=analysis_number, field_type='text')
+        self.analyses_page.filter_by_analysis_number(analysis_number)
         analysis = self.analyses_page.get_the_latest_row_data()
         self.info('asserting status of analysis is open')
         self.assertEqual(analysis['Status'], 'Open')
